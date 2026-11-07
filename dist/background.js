@@ -84,6 +84,7 @@ importScripts("bug-report/bug-report-generator.js");
 importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
 importScripts("document/document-library.js");
+importScripts("document/document-folders.js");
 importScripts("document/test-script.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
@@ -1741,7 +1742,7 @@ async function getDocumentLibraryBootstrap() {
   const [all, progress] = await Promise.all([
     globalThis.T9StorageQueries.getByPrefixes(
       chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX],
-      [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
+      [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY, globalThis.T9StorageKeys.DOCUMENT_FOLDERS_KEY]
     ),
     reviewProgressStore.list()
   ]);
@@ -1757,8 +1758,11 @@ async function getDocumentLibraryBootstrap() {
     .map(([, value]) => globalThis.T9BugReportModel.normalize(value))
     .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
   const records = all[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY];
+  const folders = globalThis.T9DocumentFolders.read(all[globalThis.T9StorageKeys.DOCUMENT_FOLDERS_KEY]);
   return { sessions, reports, reviewProgress,
-    records: Array.isArray(records) ? records : [] };
+    records: Array.isArray(records) ? records : [],
+    folders: folders.supported ? globalThis.T9DocumentFolders.serialize(folders.tree) : null,
+    foldersSchemaVersion: folders.supported ? "" : folders.schemaVersion || "unknown" };
 }
 
 async function getDocumentLibrary() {
@@ -1768,6 +1772,23 @@ async function getDocumentLibrary() {
   return Array.isArray(data[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY])
     ? data[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
     : [];
+}
+
+// Saves the folder tree, and with it the library records whose folder changed, in one write.
+// A stored tree from a later version is never overwritten.
+async function saveDocumentFolders(tree, records) {
+  const key = globalThis.T9StorageKeys.DOCUMENT_FOLDERS_KEY;
+  const current = globalThis.T9DocumentFolders.read((await chrome.storage.local.get(key))[key]);
+  if (!current.supported) throw new Error("The library folders were saved by a later version and cannot be changed.");
+  const next = globalThis.T9DocumentFolders.read(tree);
+  if (!next.supported) throw new Error("The library folders are not valid.");
+  const values = { [key]: globalThis.T9DocumentFolders.serialize(next.tree) };
+  if (Array.isArray(records)) {
+    values[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY] = records.map(record =>
+      globalThis.T9DocumentLibrary.normalize(record));
+  }
+  await chrome.storage.local.set(values);
+  return values[key];
 }
 
 async function saveDocumentLibrary(records) {
@@ -1816,8 +1837,12 @@ async function createBugReportFromTestStep(testRunId, stepId) {
   const id = sessionId(content.title || "Business Central");
   const settings = { ...(tested?.settings || await getSettings()),
     documentLanguage: content.documentLanguage };
+  // The report starts in the library folder of the document that was tested.
+  const testedRecord = (await getDocumentLibrary()).find(record =>
+    (record.projectId || record.sessionId) === run.sessionId);
   await saveSession({ id, name: content.title || "Business Central", purpose: "",
     recordingPurpose: "bug-report",
+    ...(testedRecord?.folderId ? { libraryFolderId: String(testedRecord.folderId) } : {}),
     businessCentral: JSON.parse(JSON.stringify(tested?.businessCentral || {})),
     startedAt: now, completedAt: now, updatedAt: now, status: "completed", eventCount: 0,
     version: VERSION, settings, source: content.source });
@@ -2437,6 +2462,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_SAVE_DOCUMENT_FOLDERS": {
+        const folders = await saveDocumentFolders(message.folders, message.records);
+        sendResponse({ ok: true, folders });
+        break;
+      }
+
       case "T9_SAVE_DOCUMENT_LIBRARY": {
         const records = Array.isArray(message.records) ? message.records : [];
         const savedRecords = await saveDocumentLibrary(records);
@@ -2672,6 +2703,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         ]);
         sendResponse({ ok: true });
         break;
+
+      case "T9_RELEASE_DOCUMENTS": {
+        // A library import or undo replaced these documents' stored entries.
+        const ids = Array.isArray(message.sessionIds) ? message.sessionIds.map(String) : [];
+        ids.forEach(id => {
+          rawEventLogStorage.release(id);
+          canonicalEventLogStorage.release(id);
+        });
+        sendResponse({ ok: true });
+        break;
+      }
 
       case "T9_DELETE_SESSION":
         await deleteSession(message.sessionId);

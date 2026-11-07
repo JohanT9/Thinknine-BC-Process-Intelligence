@@ -67,7 +67,10 @@
       ? localized("Email prepared {date}", locale, "E-post förberedd {date}", values) : "";
   }
 
-  function card(record, selected, active, locale = "en-US", progress = null, delivery = null) {
+  // view.folderOf(record) gives the record's folder path and its accessible label, and
+  // view.moveToFolderLabel names the menu action; both are left out where folders are not shown.
+  function card(record, selected, active, locale = "en-US", progress = null, delivery = null, view = {}) {
+    const folder = view.folderOf?.(record) || null;
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
     const state = documentState(record, progress);
     const recording = state.state === "recording";
@@ -96,6 +99,7 @@
           <div class="library-card-meta">
             <span>${escape(bugReport ? localized("Bug report", locale, "Felrapport")
               : localized("Documentation", locale, "Dokumentation"))}</span>
+            ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
             ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
             <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
             <span>${escape(localized("Changed {date}", locale,
@@ -131,6 +135,7 @@
               localized("Run test", locale, "Kör test"))}</button>`}
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
+            ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
             <button type="button" data-library-action="archive">${escape(record.archived
               ? localized("Restore from archive", locale, "Återställ från arkivet")
               : localized("Archive", locale, "Arkivera"))}</button>
@@ -181,7 +186,10 @@
     const activeId = records.some(value => value.projectId === state.activeId)
       ? state.activeId : records[0]?.projectId;
     if (!records.length) {
-      container.innerHTML = state.storedCount === 0
+      // An empty folder says so, rather than suggesting that a filter hides its documents.
+      container.innerHTML = state.emptyMessage
+        ? `<p class="library-empty">${escape(state.emptyMessage)}</p>`
+        : state.storedCount === 0
         ? `<p class="library-empty">${escape(localized(
           "No documents yet. Open Business Central, select BC Process Studio in the browser toolbar and choose Document a process.",
           locale, "Det finns inga dokument ännu. Öppna Business Central, välj BC Process Studio i webbläsarens verktygsfält och välj Dokumentera en process."))}</p>`
@@ -194,7 +202,7 @@
     }
     container.innerHTML = records.map(record => card(record,
       selectedIds.has(record.projectId), record.projectId === activeId, locale,
-      state.progress?.get(record.projectId), state.deliveries?.get(record.projectId)
+      state.progress?.get(record.projectId), state.deliveries?.get(record.projectId), state
     )).join("");
     return activeId;
   }
@@ -213,7 +221,7 @@
           card(record, selectedIds.has(record.projectId),
             record.projectId === activeId, locale,
             state.progress?.get(record.projectId),
-            state.deliveries?.get(record.projectId))).join("")}</div></section>`
+            state.deliveries?.get(record.projectId), state)).join("")}</div></section>`
     ).join("");
     return activeId;
   }

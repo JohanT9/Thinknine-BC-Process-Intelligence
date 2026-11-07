@@ -191,7 +191,10 @@
           "^Abrir en OneDrive$",
           "^Åbn i OneDrive$",
           "^Avaa OneDrive$",
-          "^Åpne i OneDrive$"
+          "^Åpne i OneDrive$",
+          "^Ouvrir dans OneDrive$",
+          "^In OneDrive öffnen$",
+          "^Avaa OneDrivessa$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -255,7 +258,9 @@
           "^Instalar en mi Outlook$",
           "^Installer på min Outlook$",
           "^Asenna omaan Outlookiin$",
-          "^Installer i min Outlook$"
+          "^Installer i min Outlook$",
+          "^Installera till mitt Outlook$",
+          "^Asenna Outlookiin$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

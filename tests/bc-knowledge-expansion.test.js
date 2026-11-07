@@ -11,6 +11,7 @@ const manifest = require('../src/knowledge-packs/index.json');
 const packs = manifest.packs.filter(p => p.enabled).map(p =>
   JSON.parse(fs.readFileSync(path.join(root, 'src', p.file), 'utf8')));
 const fixtures = require('./fixtures/bc-expansion-captions.json');
+const translatedCaptions = require('./fixtures/knowledge-localized-captions.json').cases;
 const imported = repositoryApi.importRelease(manifest, packs.map(pack => ({packId:pack.packId,pack})));
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = repositoryApi.createRepository(imported.snapshot);
@@ -20,7 +21,7 @@ assert.equal(added.length, 38);
 assert.equal(new Set(added.map(r => r.packId)).size, 10);
 const assemblyPack=packs.find(p=>p.packId==='bc-assembly');
 const assemblyPolicy=assemblyPack.rules.find(r=>r.ruleId==='BCAssembly.AssemblyPolicyContext');
-assert.deepEqual(assemblyPolicy.verifiedRuntimeLocales,['en-US','sv-SE']);
+assert.deepEqual(assemblyPolicy.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 assert.deepEqual(assemblyPack.sourceLocaleGaps['microsoft-learn-assembly-policy-fi-fi'],['fi-FI']);
 assert.match(assemblyPolicy.localizedExplanations['sv-SE'],/en-till-en/i);
 assert.match(assemblyPolicy.localizedExplanations['sv-SE'],/lager/i);
@@ -107,7 +108,7 @@ const sustainabilityPack=packs.find(p=>p.packId==='bc-sustainability');
 const sustainabilityRules=sustainabilityPack.rules.filter(r=>r.ruleId.startsWith('Sustainability.'));
 assert.equal(sustainabilityRules.length,4);
 for(const rule of sustainabilityRules){
-  assert.deepEqual(rule.verifiedRuntimeLocales,['en-US','sv-SE']);
+  assert.deepEqual(rule.verifiedRuntimeLocales,['Sustainability.CreateAccountCategory','Sustainability.CreateAccountSubcategory'].includes(rule.ruleId)?['en-US','sv-SE']:['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
   assert.match(rule.localizedExplanations['sv-SE'],/journal|konto|underkategori|faktor/i);
   assert.ok(rule.sourceIds.includes('microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us'));
   assert.ok(rule.sourceIds.includes('microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se'));
@@ -119,8 +120,10 @@ assert.ok(collectGL.sourceIds.includes('microsoft-learn-expansion-finance-sustai
 assert.match(collectGL.localizedExplanations['sv-SE'],/absolutvärden/i);
 for (const rule of added) {
   assert.deepEqual(Object.keys(rule.localizedExplanations).sort(), locales, rule.ruleId);
-  const expectedRuntimeLocales = rule.verifiedRuntimeLocales || locales;
-  assert.deepEqual([...new Set(fixtures.filter(f => f.ruleId === rule.ruleId).map(f => f.locale))].sort(), expectedRuntimeLocales);
+  // Runtime languages are verified here or by captions from Business Central's translation files.
+  const expectedRuntimeLocales = [...(rule.verifiedRuntimeLocales || locales)].sort();
+  assert.deepEqual([...new Set([...fixtures, ...translatedCaptions].filter(f => f.ruleId === rule.ruleId)
+    .map(f => f.locale))].sort(), expectedRuntimeLocales, rule.ruleId);
   assert.equal(new Set(Object.values(rule.localizedExplanations)).size, locales.length, 'no English text fallback');
   assert.ok(Object.values(rule.localizedExplanations).every(t => t.length > 70 && !/[\uFFFD]/u.test(t)));
 }
@@ -195,7 +198,7 @@ assert.notEqual(knowledge.apply([{taskId:'wrong-purchase-emissions',pageCaption:
 assert.equal(knowledge.apply([{taskId:'wrong-new',pageCaption:'Purchase Orders',actionCaption:'New'}],packs).tasks[0].contextualExplanationRuleId,'Purchase.CreatePurchaseOrderFromList');
 const trackingPack=packs.find(p=>p.packId==='bc-inventory-tracking');
 const reclassifyTracking=trackingPack.rules.find(r=>r.ruleId==='InventoryTracking.ReclassifyLotOrSerialNumber');
-assert.deepEqual(reclassifyTracking.verifiedRuntimeLocales,['en-US','sv-SE']);
+assert.deepEqual(reclassifyTracking.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 for(const locale of locales){
   const explanation=reclassifyTracking.localizedExplanations[locale];
   assert.match(explanation,/entire lot|hela partiet|lot entier|ganze Charge|lote completo|hele lotten|koko erä|hele partiet/i,

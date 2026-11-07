@@ -718,11 +718,11 @@
       "sv-SE": "Antal leveransenheter anger hur många enheter av den valda leveranstypen som registreras på lastbäraren. Kontrollera antalet mot packlistan och beakta att det inte nödvändigtvis är samma sak som artikelns mottagna kvantitet.",
       "en-US": "Number of Delivery Units records how many units of the selected delivery type are assigned to the handling unit. Check the count against the packing list; it is not necessarily the same as the item quantity received.",
       "fr-FR": "Le nombre d’unités de livraison indique combien d’unités du type sélectionné sont affectées à l’unité de manutention. Vérifiez le nombre avec la liste de colisage ; il ne correspond pas nécessairement à la quantité d’articles réceptionnée.",
-      "de-DE": "Anzahl Liefereinheiten erfasst, wie viele Einheiten des ausgewählten Liefertyps der Ladeeinheit zugeordnet sind. Prüfen Sie die Anzahl anhand der Packliste; sie entspricht nicht zwangsläufig der empfangenen Artikelmenge.",
-      "es-ES": "Número de unidades de entrega indica cuántas unidades del tipo seleccionado se asignan a la unidad de manipulación. Comprueba el recuento con la lista de embalaje; no tiene por qué coincidir con la cantidad de artículos recibida.",
-      "da-DK": "Antal leveringsenheder angiver, hvor mange enheder af den valgte leveringstype der registreres på lasteenheden. Kontrollér antallet mod pakkelisten; det er ikke nødvendigvis det samme som den modtagne varemængde.",
+      "de-DE": "Die Anzahl der Liefereinheiten gibt an, wie viele Einheiten des ausgewählten Liefertyps der Ladeeinheit zugeordnet sind. Prüfen Sie die Anzahl anhand der Packliste; sie entspricht nicht zwangsläufig der empfangenen Artikelmenge.",
+      "es-ES": "El número de unidades de entrega indica cuántas unidades del tipo seleccionado se asignan a la unidad de manipulación. Comprueba el recuento con la lista de embalaje; no tiene por qué coincidir con la cantidad de artículos recibida.",
+      "da-DK": "Antallet af leveringsenheder angiver, hvor mange enheder af den valgte leveringstype der registreres på lasteenheden. Kontrollér antallet mod pakkelisten; det er ikke nødvendigvis det samme som den modtagne varemængde.",
       "fi-FI": "Toimitusyksiköiden määrä kertoo, kuinka monta valitun tyypin yksikköä käsittely-yksikölle kirjataan. Tarkista määrä pakkausluettelosta; se ei välttämättä ole sama kuin vastaanotettujen nimikkeiden määrä.",
-      "nb-NO": "Antall leveringsenheter angir hvor mange enheter av den valgte leveringstypen som registreres på håndteringsenheten. Kontroller antallet mot pakklisten; det er ikke nødvendigvis det samme som mottatt vareantall."
+      "nb-NO": "Antallet leveringsenheter angir hvor mange enheter av den valgte leveringstypen som registreres på håndteringsenheten. Kontroller antallet mot pakklisten; det er ikke nødvendigvis det samme som mottatt vareantall."
     },
     "Observed.Warehouse.CreateHandlingUnit": {
       "sv-SE": "Skapar en lastbärare för godset i mottagningen. Kontrollera lastbärartyp och antal innan uppgifterna sparas.",
@@ -737,12 +737,12 @@
     "Observed.Warehouse.ManualWeight": {
       "sv-SE": "Aktiverar manuell inmatning av fältet Vikt från våg för den valda inleveransraden. Ange vågens avläsning i konfigurerad enhet; vikt och artikelantal är separata uppgifter. Kontrollera artikel, parti eller lastbärare och enhet.",
       "en-US": "Enables manual entry in Weight from Scale for the selected receipt line. Enter the scale reading in the configured unit; weight and item quantity are separate values. Check the item, lot or license plate, and unit.",
-      "fr-FR": "Permet la saisie manuelle du champ Poids de la balance pour la ligne de réception sélectionnée. Saisissez la lecture dans l’unité configurée ; poids et quantité d’articles sont distincts. Vérifiez l’article, le lot ou la plaque, et l’unité.",
-      "de-DE": "Ermöglicht die manuelle Eingabe im Feld Waagengewicht für die ausgewählte Wareneingangszeile. Geben Sie den Waagenwert in der eingerichteten Einheit ein; Gewicht und Artikelmenge sind getrennte Werte. Prüfen Sie Artikel, Charge oder Lizenzplatte und Einheit.",
-      "es-ES": "Permite introducir manualmente el valor de Peso de la báscula para la línea de recepción seleccionada. Introduce la lectura en la unidad configurada; el peso y la cantidad de artículos son valores distintos. Comprueba el artículo, lote o matrícula y unidad.",
-      "da-DK": "Gør det muligt at indtaste værdien i Vægt fra vægt manuelt for den valgte modtagelseslinje. Angiv aflæsningen i den konfigurerede enhed; vægt og vareantal er separate værdier. Kontrollér varen, lotnummer eller licensplade og enheden.",
-      "fi-FI": "Mahdollistaa Va'an paino -kentän manuaalisen syötön valitulle vastaanottoriville. Anna vaa'an lukema määritetyssä yksikössä; paino ja nimikemäärä ovat erillisiä arvoja. Tarkista nimike, erä tai lisenssikilpi ja yksikkö.",
-      "nb-NO": "Gjør det mulig å angi verdien i Vekt fra vekt manuelt for den valgte mottakslinjen. Angi vektens avlesning i konfigurert enhet; vekt og vareantall er separate verdier. Kontroller varen, parti eller lisensplate og enheten."
+      "fr-FR": "Permet la saisie manuelle du champ Weight from Scale pour la ligne de réception sélectionnée. Saisissez la lecture dans l’unité configurée ; poids et quantité d’articles sont distincts. Vérifiez l’article, le lot ou la plaque, et l’unité.",
+      "de-DE": "Ermöglicht die manuelle Eingabe im Feld Weight from Scale für die ausgewählte Wareneingangszeile. Geben Sie den Waagenwert in der eingerichteten Einheit ein; Gewicht und Artikelmenge sind getrennte Werte. Prüfen Sie Artikel, Charge oder Lizenzplatte und Einheit.",
+      "es-ES": "Permite introducir manualmente el valor del campo Weight from Scale para la línea de recepción seleccionada. Introduce la lectura en la unidad configurada; el peso y la cantidad de artículos son valores distintos. Comprueba el artículo, lote o matrícula y unidad.",
+      "da-DK": "Gør det muligt at indtaste værdien i feltet Weight from Scale manuelt for den valgte modtagelseslinje. Angiv aflæsningen i den konfigurerede enhed; vægt og vareantal er separate værdier. Kontrollér varen, lotnummer eller licensplade og enheden.",
+      "fi-FI": "Mahdollistaa Weight from Scale -kentän manuaalisen syötön valitulle vastaanottoriville. Anna vaa'an lukema määritetyssä yksikössä; paino ja nimikemäärä ovat erillisiä arvoja. Tarkista nimike, erä tai lisenssikilpi ja yksikkö.",
+      "nb-NO": "Gjør det mulig å angi verdien i feltet Weight from Scale manuelt for den valgte mottakslinjen. Angi vektens avlesning i konfigurert enhet; vekt og vareantall er separate verdier. Kontroller varen, parti eller lisensplate og enheten."
     },
     "Observed.Warehouse.EnterScaleWeight": {
       "sv-SE": "Fältet tar emot den uppmätta vikten. Ange ett numeriskt värde i rätt enhet och kontrollera det mot vågens avläsning innan du sparar.",

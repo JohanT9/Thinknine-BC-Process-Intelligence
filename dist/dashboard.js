@@ -4378,6 +4378,12 @@ let documentLibraryProgress = new Map();
 // The latest email made from each bug report, by recording.
 let documentLibraryDeliveries = new Map();
 let libraryQuickFilter = "all";
+// Library folders (document/document-folders.js). libraryFolder is the folder shown: "" for
+// all documents, LIBRARY_UNFILED for documents not in a folder, otherwise a folder id.
+const LIBRARY_UNFILED = ":unfiled";
+let documentFolders = globalThis.T9DocumentFolders.empty();
+let documentFoldersEditable = true;
+let libraryFolder = "";
 let librarySelectMode = false;
 const LIBRARY_QUICK_FILTERS = Object.freeze({
   all: record => !record.archived,
@@ -4394,7 +4400,16 @@ const LIBRARY_QUICK_FILTERS = Object.freeze({
 
 function libraryMatches(options = libraryOptions()) {
   return globalThis.T9DocumentLibrary.query(documentLibraryIndex, options)
+    .filter(inLibraryFolder)
     .filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter] || LIBRARY_QUICK_FILTERS.all);
+}
+
+// The folder shown includes its subfolders.
+function inLibraryFolder(record) {
+  if (!libraryFolder) return true;
+  const folderId = globalThis.T9DocumentFolders.folderOf(documentFolders, record);
+  if (libraryFolder === LIBRARY_UNFILED) return !folderId;
+  return globalThis.T9DocumentFolders.descendantIds(documentFolders, libraryFolder).has(folderId);
 }
 
 function reviewProgressSummary(review) {
@@ -4481,9 +4496,12 @@ function fillLibraryFilter(id, values, selected) {
 
 function renderDocumentLibrary() {
   const options = libraryOptions();
-  const searched = globalThis.T9DocumentLibrary.query(
-    documentLibraryIndex, options
-  );
+  if (libraryFolder && libraryFolder !== LIBRARY_UNFILED &&
+    !globalThis.T9DocumentFolders.find(documentFolders, libraryFolder)) libraryFolder = "";
+  const everywhere = globalThis.T9DocumentLibrary.query(documentLibraryIndex, options);
+  renderLibraryFolders(everywhere.filter(
+    LIBRARY_QUICK_FILTERS[libraryQuickFilter] || LIBRARY_QUICK_FILTERS.all));
+  const searched = everywhere.filter(inLibraryFolder);
   for (const button of $("libraryQuickFilters").querySelectorAll("[data-library-filter]")) {
     const filter = button.dataset.libraryFilter;
     button.setAttribute("aria-pressed", String(filter === libraryQuickFilter));
@@ -4496,7 +4514,13 @@ function renderDocumentLibrary() {
   const view = globalThis.T9DocumentLibraryView;
   const viewState = { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
     storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
-    deliveries: documentLibraryDeliveries };
+    deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
+    moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
+    // An empty folder says how to fill it, rather than suggesting that a filter hides it.
+    emptyMessage: libraryFolder && !documentLibraryRecords.some(inLibraryFolder)
+      ? libraryFolder === LIBRARY_UNFILED ? uiT("folder.emptyUnfiled")
+        : uiTf("folder.empty", { select: $("librarySelectMode").textContent.trim() })
+      : "" };
   const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
       globalThis.T9DocumentLibrary.groupByProfile(records,
@@ -4530,6 +4554,7 @@ function renderDocumentLibrary() {
       : uiT("library.filters")
   );
   renderLibraryBatchToolbar();
+  markLibraryCardsDraggable();
 }
 
 function resetDocumentLibraryFilters() {
@@ -4560,7 +4585,8 @@ function renderDocumentLibrarySelection() {
 function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
-  for (const id of ["libraryBatchExport", "libraryBatchFavourite", "libraryBatchArchive",
+  $("libraryBatchMove").hidden = !documentFoldersEditable;
+  for (const id of ["libraryBatchExport", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
     "libraryBatchTags", "libraryBatchProfile", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
@@ -4584,7 +4610,990 @@ function refreshLibraryFilters() {
     $("libraryThemeFilter")?.value || "");
 }
 
+// The email a library card shows for a bug report. A send is shown before a later draft
+// or file, which may never have been sent.
+function libraryDelivery(report) {
+  const deliveries = Array.isArray(report?.deliveries) ? report.deliveries : [];
+  return deliveries.findLast(item => ["sent", "uncertain"].includes(item.outcome)) ||
+    deliveries.at(-1) || null;
+}
+
+// A bug report is emailed from its own tab. When its email history changes, the library
+// shows the new state without being reloaded.
+let libraryDeliveryRender = 0;
+function updateLibraryDeliveries(changes, area) {
+  if (area !== "local") return;
+  let changed = false;
+  for (const [key, change] of Object.entries(changes || {})) {
+    if (!key.startsWith(globalThis.T9StorageKeys.BUG_REPORT_PREFIX)) continue;
+    const recordingId = change.newValue?.recordingId || change.oldValue?.recordingId;
+    if (!recordingId) continue;
+    const latest = change.newValue ? libraryDelivery(change.newValue) : null;
+    const current = documentLibraryDeliveries.get(recordingId) || null;
+    if (JSON.stringify(latest) === JSON.stringify(current)) continue;
+    if (latest) documentLibraryDeliveries.set(recordingId, latest);
+    else documentLibraryDeliveries.delete(recordingId);
+    changed = true;
+  }
+  if (!changed || !documentLibraryRecords.length) return;
+  // Several reports can be saved together; render once.
+  clearTimeout(libraryDeliveryRender);
+  libraryDeliveryRender = setTimeout(renderDocumentLibrary, 100);
+}
+chrome.storage?.onChanged?.addListener(updateLibraryDeliveries);
+
+function libraryFolderName(folderId) {
+  if (folderId === LIBRARY_UNFILED) return uiT("folder.unfiled");
+  return globalThis.T9DocumentFolders.find(documentFolders, folderId)?.name ||
+    uiT("folder.allDocuments");
+}
+
+function libraryFolderPathText(folderId) {
+  return globalThis.T9DocumentFolders.path(documentFolders, folderId)
+    .map(folder => folder.name).join(" / ");
+}
+
+// A card shows its folder unless the folder shown is that folder.
+function libraryCardFolder(record) {
+  const folderId = globalThis.T9DocumentFolders.folderOf(documentFolders, record);
+  if (!folderId || folderId === libraryFolder) return null;
+  const path = libraryFolderPathText(folderId);
+  return { path, label: uiTf("folder.label", { path }) };
+}
+
+// The path to the folder shown, the folder's actions and its subfolders, each with the number
+// of documents in it and below it that the search and quick filter show.
+function renderLibraryFolders(records) {
+  const folders = globalThis.T9DocumentFolders;
+  const locale = applicationSettings.uiLocale || "en-US";
+  const real = Boolean(libraryFolder) && libraryFolder !== LIBRARY_UNFILED;
+  const trail = [{ id: "", name: uiT("folder.allDocuments") },
+    ...(libraryFolder === LIBRARY_UNFILED ? [{ id: LIBRARY_UNFILED, name: uiT("folder.unfiled") }]
+      : folders.path(documentFolders, libraryFolder).map(folder =>
+        ({ id: folder.folderId, name: folder.name })))];
+  $("libraryFolderPath").innerHTML = trail.map((item, index) => index === trail.length - 1
+    ? `<li><span aria-current="location" tabindex="-1" title="${escapeHtml(item.name)}">${
+      escapeHtml(item.name)}</span></li>`
+    : `<li><button type="button" data-library-folder="${escapeHtml(item.id)}" title="${
+      escapeHtml(item.name)}">${escapeHtml(item.name)}</button></li>`).join("");
+  const counts = new Map();
+  for (const record of records) {
+    const id = folders.folderOf(documentFolders, record);
+    counts.set(id, (counts.get(id) || 0) + 1);
+  }
+  const total = folderId => [...folders.descendantIds(documentFolders, folderId)]
+    .reduce((sum, id) => sum + (counts.get(id) || 0), 0);
+  const items = libraryFolder === LIBRARY_UNFILED ? [] : folders.children(documentFolders,
+    real ? libraryFolder : "", locale).map(folder => ({ id: folder.folderId, name: folder.name,
+    count: total(folder.folderId), kind: "folder" }));
+  // Documents not yet in a folder can be listed on their own once folders exist.
+  if (!libraryFolder && documentFolders.folders.length) {
+    items.push({ id: LIBRARY_UNFILED, name: uiT("folder.unfiled"), count: counts.get("") || 0,
+      kind: "unfiled" });
+  }
+  $("libraryFolderList").setAttribute("aria-label", uiTf("folder.subfolders",
+    { folder: libraryFolderName(libraryFolder) }));
+  $("libraryFolderList").innerHTML = items.map(item => `<li><button type="button"
+    class="secondary" data-library-folder="${escapeHtml(item.id)}" data-folder-kind="${item.kind}"
+    ${item.kind === "folder" && documentFoldersEditable ? 'draggable="true"' : ""} title="${escapeHtml(item.name)}">${item.kind === "folder"
+      ? '<span class="library-folder-icon" aria-hidden="true"></span>' : ""}<span
+    class="library-folder-name">${escapeHtml(item.name)}</span> <span
+    class="library-folder-count">(${item.count.toLocaleString(locale)})</span></button></li>`).join("");
+  $("libraryFolderNew").hidden = !documentFoldersEditable || libraryFolder === LIBRARY_UNFILED;
+  $("libraryFolderRename").hidden = !documentFoldersEditable || !real;
+  $("libraryFolderDelete").hidden = !documentFoldersEditable || !real;
+  $("libraryFolderMove").hidden = !documentFoldersEditable || !real;
+  delete $("libraryFolderNotice").dataset.problem;
+  $("libraryFolderNotice").hidden = documentFoldersEditable;
+  $("libraryFolderNotice").textContent = documentFoldersEditable ? "" : uiT("folder.unsupported");
+}
+
+// Opens a folder and moves focus to its name in the path, which announces the new location.
+function openLibraryFolder(folderId, focus = true) {
+  libraryFolder = folderId || "";
+  renderDocumentLibrary();
+  if (focus) $("libraryFolderPath").querySelector('[aria-current="location"]')?.focus();
+}
+
+// A moved folder's name conflict names the folder; a missing parent reads as a missing folder.
+function folderErrorText(error, movedName = "") {
+  const code = error?.code === "parentMissing" ? "missing" : error?.code;
+  if (!code) return uiT("folder.saveFailed");
+  if (code === "nameExists" && movedName) return uiTf("folder.nameExistsThere", { name: movedName });
+  return uiTf(`folder.${code}`, { max: code === "tooDeep"
+    ? globalThis.T9DocumentFolders.MAX_DEPTH : globalThis.T9DocumentFolders.MAX_NAME_LENGTH });
+}
+
+async function saveLibraryFolders(tree, records) {
+  const response = await send({ type: "T9_SAVE_DOCUMENT_FOLDERS",
+    folders: globalThis.T9DocumentFolders.serialize(tree), ...(records ? { records } : {}) });
+  if (!response?.ok) throw new Error(uiT("folder.saveFailed"));
+}
+
+function announceLibraryFolders(message) {
+  $("libraryFolderStatus").textContent = "";
+  setTimeout(() => { $("libraryFolderStatus").textContent = message; }, 30);
+}
+
+// New folder and rename share a dialog. It stays open with the name typed when saving fails.
+let libraryFolderDialogMode = "new";
+function openLibraryFolderDialog(mode) {
+  libraryFolderDialogMode = mode;
+  const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
+  $("libraryFolderDialogTitle").textContent = mode === "rename" ? uiT("folder.renameTitle")
+    : uiTf("folder.newTitle", { folder: folder ? folder.name : uiT("folder.allDocuments") });
+  $("libraryFolderSubmit").textContent = uiT(mode === "rename" ? "folder.save" : "folder.create");
+  $("libraryFolderName").value = mode === "rename" ? folder?.name || "" : "";
+  $("libraryFolderName").removeAttribute("aria-invalid");
+  $("libraryFolderError").textContent = "";
+  $("libraryFolderDialog").showModal();
+  $("libraryFolderName").select();
+}
+
+$("libraryFolderForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const name = $("libraryFolderName").value;
+  const parentId = libraryFolder === LIBRARY_UNFILED ? "" : libraryFolder;
+  const fail = error => {
+    $("libraryFolderError").textContent = folderErrorText(error);
+    $("libraryFolderName").setAttribute("aria-invalid", "true");
+    $("libraryFolderName").focus();
+  };
+  let next;
+  let created = null;
+  try {
+    if (libraryFolderDialogMode === "rename") {
+      next = globalThis.T9DocumentFolders.rename(documentFolders, libraryFolder, name);
+    } else {
+      ({ tree: next, folder: created } = globalThis.T9DocumentFolders.create(documentFolders,
+        { name, parentId }));
+    }
+  } catch (error) {
+    fail(error);
+    return;
+  }
+  $("libraryFolderSubmit").disabled = true;
+  try {
+    await saveLibraryFolders(next);
+  } catch (error) {
+    fail(error);
+    return;
+  } finally {
+    $("libraryFolderSubmit").disabled = false;
+  }
+  documentFolders = next;
+  $("libraryFolderDialog").close();
+  renderDocumentLibrary();
+  const saved = globalThis.T9DocumentFolders.find(documentFolders, created?.folderId || libraryFolder);
+  announceLibraryFolders(uiTf(created ? "folder.created" : "folder.renamed", { name: saved.name }));
+  (created ? $("libraryFolderList").querySelector(
+    `[data-library-folder="${CSS.escape(created.folderId)}"]`) : $("libraryFolderRename"))?.focus();
+});
+
+// Removing a folder moves its documents and subfolders to the folder above.
+function openLibraryFolderDelete() {
+  const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
+  if (!folder) return;
+  const effect = globalThis.T9DocumentFolders.removal(documentFolders, folder.folderId,
+    documentLibraryRecords);
+  $("libraryFolderDeleteTitle").textContent = uiTf("folder.deleteTitle", { name: folder.name });
+  $("libraryFolderDeleteBody").textContent = folder.parentId
+    ? uiTf("folder.deleteBody", { parent: libraryFolderPathText(folder.parentId) })
+    : uiT("folder.deleteBodyTop");
+  $("libraryFolderDeleteCounts").innerHTML = [
+    uiTf("folder.deleteDocuments", { count: effect.documents }),
+    uiTf("folder.deleteSubfolders", { count: effect.subfolders })
+  ].map(line => `<li>${escapeHtml(line)}</li>`).join("");
+  $("libraryFolderDeleteError").textContent = "";
+  $("libraryFolderDeleteDialog").showModal();
+}
+
+$("libraryFolderDeleteForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
+  if (!folder) {
+    $("libraryFolderDeleteDialog").close();
+    return;
+  }
+  const result = globalThis.T9DocumentFolders.remove(documentFolders, folder.folderId,
+    documentLibraryRecords, applicationSettings.uiLocale || "en-US");
+  const records = result.records.map(record => globalThis.T9DocumentLibrary.normalize(record));
+  const submit = $("libraryFolderDeleteForm").querySelector("[type=submit]");
+  submit.disabled = true;
+  try {
+    await saveLibraryFolders(result.tree, result.moved.length ? records : undefined);
+  } catch (error) {
+    $("libraryFolderDeleteError").textContent = folderErrorText(error);
+    return;
+  } finally {
+    submit.disabled = false;
+  }
+  documentFolders = result.tree;
+  if (result.moved.length) {
+    documentLibraryRecords = records;
+    rebuildDocumentLibraryIndex();
+  }
+  $("libraryFolderDeleteDialog").close();
+  openLibraryFolder(folder.parentId);
+  announceLibraryFolders(folder.parentId
+    ? uiTf("folder.deleted", { name: folder.name, parent: libraryFolderPathText(folder.parentId),
+      count: result.moved.length })
+    : uiTf("folder.deletedTop", { name: folder.name, count: result.moved.length }));
+});
+
+// Moving documents or a folder; focus returns to the control that opened the dialog.
+// libraryMoveFolderId is set when the dialog moves the folder shown rather than documents.
+let libraryMoveIds = [];
+let libraryMoveFolderId = "";
+let libraryMoveOpener = null;
+function openLibraryMoveDialog(ids, opener) {
+  const records = documentLibraryRecords.filter(record => ids.includes(record.projectId));
+  if (!records.length) return;
+  libraryMoveIds = records.map(record => record.projectId);
+  libraryMoveFolderId = "";
+  libraryMoveOpener = opener;
+  $("libraryMoveTitle").textContent = records.length === 1
+    ? uiTf("folder.moveTitleOne", { title: records[0].title })
+    : uiTf("folder.moveTitleMany", { count: records.length });
+  const current = globalThis.T9DocumentFolders.folderOf(documentFolders, records[0]);
+  // Suggest the folder shown, unless the document is already there.
+  const shown = libraryFolder && libraryFolder !== LIBRARY_UNFILED ? libraryFolder : "";
+  showLibraryMoveDialog(new Set(), shown && shown !== current ? shown : current);
+}
+
+// A folder can go anywhere except into itself or one of its subfolders.
+function openLibraryFolderMoveDialog(opener) {
+  const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
+  if (!folder) return;
+  libraryMoveIds = [];
+  libraryMoveFolderId = folder.folderId;
+  libraryMoveOpener = opener;
+  $("libraryMoveTitle").textContent = uiTf("folder.moveFolderTitle", { name: folder.name });
+  showLibraryMoveDialog(globalThis.T9DocumentFolders.descendantIds(documentFolders, folder.folderId),
+    folder.parentId);
+}
+
+function showLibraryMoveDialog(excluded, selected) {
+  const locale = applicationSettings.uiLocale || "en-US";
+  $("libraryMoveDestination").innerHTML = [
+    `<option value="">${escapeHtml(uiT("folder.topLevel"))}</option>`,
+    ...globalThis.T9DocumentFolders.outline(documentFolders, locale)
+      .filter(item => !excluded.has(item.folderId)).map(item =>
+        `<option value="${escapeHtml(item.folderId)}">${escapeHtml(item.path.join(" / "))}</option>`)
+  ].join("");
+  $("libraryMoveDestination").value = selected || "";
+  $("libraryMoveError").textContent = "";
+  $("libraryMoveDialog").showModal();
+  $("libraryMoveDestination").focus();
+}
+
+// Files documents in a folder ("" is the top level) and returns how many moved. Nothing is
+// changed when saving fails.
+async function moveLibraryDocuments(ids, folderId) {
+  if (folderId && !globalThis.T9DocumentFolders.find(documentFolders, folderId)) {
+    throw Object.assign(new Error("missing"), { code: "missing" });
+  }
+  const wanted = new Set(ids);
+  const previous = documentLibraryRecords;
+  let moved = 0;
+  documentLibraryRecords = documentLibraryRecords.map(record => {
+    if (!wanted.has(record.projectId) ||
+      globalThis.T9DocumentFolders.folderOf(documentFolders, record) === folderId) return record;
+    moved++;
+    return globalThis.T9DocumentLibrary.merge(record, { folderId });
+  });
+  rebuildDocumentLibraryIndex();
+  try {
+    if (moved) await persistDocumentLibrary();
+  } catch (error) {
+    documentLibraryRecords = previous;
+    rebuildDocumentLibraryIndex();
+    throw error;
+  }
+  return moved;
+}
+
+// Places a folder, with its subfolders and documents, under another folder or at the top level.
+async function moveLibraryFolder(folderId, parentId) {
+  const next = globalThis.T9DocumentFolders.move(documentFolders, folderId, parentId);
+  await saveLibraryFolders(next);
+  documentFolders = next;
+}
+
+function announceLibraryDocumentsMoved(moved, folderId) {
+  announceLibraryFolders(folderId
+    ? uiTf("folder.moved", { count: moved, folder: libraryFolderPathText(folderId) })
+    : uiTf("folder.movedTop", { count: moved }));
+}
+
+function announceLibraryFolderMoved(folderId) {
+  const folder = globalThis.T9DocumentFolders.find(documentFolders, folderId);
+  announceLibraryFolders(folder.parentId
+    ? uiTf("folder.folderMoved", { name: folder.name, folder: libraryFolderPathText(folder.parentId) })
+    : uiTf("folder.folderMovedTop", { name: folder.name }));
+}
+
+$("libraryMoveForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const destination = $("libraryMoveDestination").value;
+  const folder = libraryMoveFolderId
+    ? globalThis.T9DocumentFolders.find(documentFolders, libraryMoveFolderId) : null;
+  if (libraryMoveFolderId && !folder) {
+    $("libraryMoveError").textContent = uiT("folder.missing");
+    return;
+  }
+  const submit = $("libraryMoveForm").querySelector("[type=submit]");
+  submit.disabled = true;
+  let moved = 0;
+  try {
+    if (folder) {
+      if (folder.parentId !== destination) await moveLibraryFolder(folder.folderId, destination);
+    } else {
+      moved = await moveLibraryDocuments(libraryMoveIds, destination);
+    }
+  } catch (error) {
+    $("libraryMoveError").textContent = folderErrorText(error, folder?.name);
+    return;
+  } finally {
+    submit.disabled = false;
+  }
+  $("libraryMoveDialog").close();
+  renderDocumentLibrary();
+  if (folder) announceLibraryFolderMoved(folder.folderId);
+  else announceLibraryDocumentsMoved(moved, destination);
+});
+
+// Dragging documents or a folder onto a folder in the path or the folder list moves them there.
+// The document menu, Move to folder and Move folder do the same from the keyboard.
+const LIBRARY_DRAG_TYPE = "application/x-bc-process-studio-library";
+let libraryDrag = null;
+
+function libraryDropTarget(event) {
+  const element = event.target.closest?.("#libraryFolders [data-library-folder]");
+  if (!element || !libraryDrag) return null;
+  const id = element.dataset.libraryFolder;
+  const folderId = id === LIBRARY_UNFILED ? "" : id;
+  if (libraryDrag.kind === "folder") {
+    const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryDrag.folderId);
+    if (!folder || id === LIBRARY_UNFILED || folder.parentId === folderId ||
+      globalThis.T9DocumentFolders.descendantIds(documentFolders, folder.folderId).has(folderId)) {
+      return null;
+    }
+  }
+  return { element, folderId };
+}
+
+function clearLibraryDropTarget() {
+  $("libraryFolders").querySelectorAll(".library-folder-drop")
+    .forEach(element => element.classList.remove("library-folder-drop"));
+}
+
+function showLibraryFolderProblem(text) {
+  $("libraryFolderNotice").dataset.problem = "true";
+  $("libraryFolderNotice").hidden = false;
+  $("libraryFolderNotice").textContent = text;
+}
+
+// Cards can be dragged once there is a folder to drag them to.
+function markLibraryCardsDraggable() {
+  const draggable = documentFoldersEditable && documentFolders.folders.length > 0;
+  $("libraryResults").querySelectorAll(".library-card").forEach(card => {
+    if (draggable) card.setAttribute("draggable", "true");
+    else card.removeAttribute("draggable");
+  });
+}
+
+$("libraryResults").addEventListener("dragstart", event => {
+  const card = event.target.closest?.('.library-card[draggable="true"]');
+  if (!card) return;
+  const id = card.dataset.libraryProjectId;
+  const selected = documentLibrarySelection.selectedIds;
+  // A selected card carries the whole selection with it.
+  libraryDrag = { kind: "documents", ids: selected.includes(id) ? [...selected] : [id] };
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData(LIBRARY_DRAG_TYPE, libraryDrag.ids.join("\n"));
+});
+
+$("libraryFolders").addEventListener("dragstart", event => {
+  const chip = event.target.closest?.('[data-folder-kind="folder"][draggable="true"]');
+  if (!chip) return;
+  libraryDrag = { kind: "folder", folderId: chip.dataset.libraryFolder };
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData(LIBRARY_DRAG_TYPE, chip.dataset.libraryFolder);
+});
+
+$("libraryFolders").addEventListener("dragover", event => {
+  const target = libraryDropTarget(event);
+  if (!target) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  if (!target.element.classList.contains("library-folder-drop")) {
+    clearLibraryDropTarget();
+    target.element.classList.add("library-folder-drop");
+  }
+});
+
+$("libraryFolders").addEventListener("dragleave", event => {
+  const element = event.target.closest?.("[data-library-folder]");
+  if (element && !element.contains(event.relatedTarget)) {
+    element.classList.remove("library-folder-drop");
+  }
+});
+
+$("libraryFolders").addEventListener("drop", async event => {
+  const target = libraryDropTarget(event);
+  const drag = libraryDrag;
+  libraryDrag = null;
+  clearLibraryDropTarget();
+  if (!target) return;
+  event.preventDefault();
+  try {
+    if (drag.kind === "folder") {
+      await moveLibraryFolder(drag.folderId, target.folderId);
+      renderDocumentLibrary();
+      announceLibraryFolderMoved(drag.folderId);
+    } else {
+      const moved = await moveLibraryDocuments(drag.ids, target.folderId);
+      renderDocumentLibrary();
+      announceLibraryDocumentsMoved(moved, target.folderId);
+    }
+  } catch (error) {
+    renderDocumentLibrary();
+    showLibraryFolderProblem(folderErrorText(error, drag.kind === "folder"
+      ? globalThis.T9DocumentFolders.find(documentFolders, drag.folderId)?.name : ""));
+  }
+});
+
+document.addEventListener("dragend", () => {
+  libraryDrag = null;
+  clearLibraryDropTarget();
+});
+
+for (const id of ["libraryFolderDialog", "libraryMoveDialog", "libraryFolderDeleteDialog"]) {
+  $(id).addEventListener("click", event => {
+    if (event.target.closest("[data-folder-cancel]")) $(id).close();
+  });
+}
+// A moved document can leave the folder shown; focus then goes to the search field.
+$("libraryMoveDialog").addEventListener("close", () => {
+  (libraryMoveOpener?.isConnected && !libraryMoveOpener.hidden ? libraryMoveOpener
+    : $("librarySearch")).focus();
+});
+$("libraryFolderDeleteDialog").addEventListener("close", () => {
+  if (!$("libraryFolderDelete").hidden) $("libraryFolderDelete").focus();
+});
+$("libraryFolderNew").addEventListener("click", () => openLibraryFolderDialog("new"));
+$("libraryFolderRename").addEventListener("click", () => openLibraryFolderDialog("rename"));
+$("libraryFolderMove").addEventListener("click", event =>
+  openLibraryFolderMoveDialog(event.currentTarget));
+$("libraryFolderDelete").addEventListener("click", openLibraryFolderDelete);
+$("libraryFolders").addEventListener("click", event => {
+  const target = event.target.closest("[data-library-folder]");
+  if (target) openLibraryFolder(target.dataset.libraryFolder);
+});
+$("libraryBatchMove").addEventListener("click", event =>
+  openLibraryMoveDialog([...documentLibrarySelection.selectedIds], event.currentTarget));
+
+// Moving documents to another computer (document/library-transfer.js): an export file with
+// everything stored for the documents, and its import with a preview, a choice for documents
+// that differ, and undo.
+const libraryTransfer = globalThis.T9LibraryTransfer;
+const libraryTransferLocale = () => applicationSettings.uiLocale || "en-US";
+let libraryExportRun = null;
+let libraryImportRun = null;
+let libraryTransferOpener = null;
+
+function libraryTransferDate(value) {
+  const date = new Date(value || "");
+  if (!Number.isFinite(date.getTime())) return "";
+  try {
+    return new Intl.DateTimeFormat(libraryTransferLocale(), { dateStyle: "medium", timeStyle: "short" })
+      .format(date);
+  } catch {
+    return date.toISOString();
+  }
+}
+
+function libraryTransferErrorText(error) {
+  const code = error?.code || "";
+  if (["notLibrary", "newerVersion", "damaged", "incomplete", "foreignEntry", "changedFile",
+    "documentMissing", "rollbackFailed", "nothingToUndo", "foldersUnsupported",
+    "downloadNotSaved", "cancelled"].includes(code)) return uiT(`transfer.${code}`);
+  return uiTf("transfer.failed", { error: error?.message || String(error) });
+}
+
+function libraryTransferCancelled() {
+  const error = new Error("transfer.cancelled");
+  error.code = "cancelled";
+  return error;
+}
+
+// Resolves when the browser has written the file: not while it waits in a Save as dialog,
+// and never for a cancelled or failed download.
+function libraryDownloadCompleted(downloadId) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = state => {
+      if (settled || state === "in_progress") return;
+      settled = true;
+      chrome.downloads.onChanged.removeListener(listener);
+      if (state === "complete") resolve();
+      else {
+        const error = new Error("transfer.downloadNotSaved");
+        error.code = "downloadNotSaved";
+        reject(error);
+      }
+    };
+    const listener = delta => {
+      if (delta.id === downloadId && delta.state?.current) finish(delta.state.current);
+    };
+    chrome.downloads.onChanged.addListener(listener);
+    chrome.downloads.search({ id: downloadId }).then(([item]) => {
+      if (item) finish(item.state);
+    }, () => {});
+  });
+}
+
+// The documents each export choice covers.
+function libraryExportScopes() {
+  const folder = libraryFolder && libraryFolder !== LIBRARY_UNFILED
+    ? globalThis.T9DocumentFolders.find(documentFolders, libraryFolder) : null;
+  const inFolder = folder ? (() => {
+    const ids = globalThis.T9DocumentFolders.descendantIds(documentFolders, folder.folderId);
+    return documentLibraryRecords.filter(record =>
+      ids.has(globalThis.T9DocumentFolders.folderOf(documentFolders, record)));
+  })() : [];
+  return { all: documentLibraryRecords, folder, inFolder, selected: selectedLibraryRecords() };
+}
+
+function setLibraryExportBusy(busy) {
+  $("libraryExportSubmit").disabled = busy;
+  $("libraryExportScope").disabled = busy;
+  $("libraryExportProgress").hidden = !busy;
+  $("libraryExportCancel").textContent = uiT(busy ? "transfer.stop" : "folder.cancel");
+}
+
+function openLibraryExportDialog(opener) {
+  libraryTransferOpener = opener;
+  const scopes = libraryExportScopes();
+  $("libraryExportAll").textContent = uiTf("transfer.scopeAll", { count: scopes.all.length });
+  $("libraryExportFolderOption").hidden = !scopes.folder;
+  $("libraryExportFolder").textContent = scopes.folder
+    ? uiTf("transfer.scopeFolder", { name: scopes.folder.name, count: scopes.inFolder.length }) : "";
+  $("libraryExportSelectedOption").hidden = !scopes.selected.length;
+  $("libraryExportSelected").textContent = uiTf("transfer.scopeSelected",
+    { count: scopes.selected.length });
+  const preferred = scopes.selected.length ? "selected" : scopes.folder ? "folder" : "all";
+  $("libraryExportForm").querySelector(`[name=libraryExportScope][value=${preferred}]`).checked = true;
+  $("libraryExportStatus").textContent = "";
+  $("libraryExportError").textContent = "";
+  setLibraryExportBusy(false);
+  $("libraryExportDialog").showModal();
+  $("libraryExportForm").querySelector("[name=libraryExportScope]:checked").focus();
+}
+
+async function runLibraryExport(scope) {
+  const scopes = libraryExportScopes();
+  const records = scope === "selected" ? scopes.selected
+    : scope === "folder" ? scopes.inFolder : scopes.all;
+  if (!records.length) throw Object.assign(new Error("transfer.nothingToExport"), { code: "nothingToExport" });
+  const run = { cancelled: false };
+  libraryExportRun = run;
+  const folders = libraryTransfer.exportFolders(documentFolders, records,
+    scope === "all" ? { all: true } : scope === "folder" ? { folderId: scopes.folder.folderId } : {});
+  const progress = $("libraryExportProgress");
+  progress.max = records.length;
+  progress.value = 0;
+  $("libraryExportStatus").textContent = uiTf("transfer.exporting", { done: 0, total: records.length });
+  const lines = libraryTransfer.exportLines({ storage: chrome.storage.local,
+    keys: globalThis.T9StorageKeys, appVersion: APP_VERSION,
+    items: records.map(record => ({ id: record.projectId, record })), folders,
+    scope: { kind: scope, ...(scope === "folder" ? { folderName: scopes.folder.name } : {}) },
+    onProgress: ({ done, total }) => {
+      progress.value = done;
+      $("libraryExportStatus").textContent = uiTf("transfer.exporting", { done, total });
+    } });
+  // Written through gzip a line at a time, so a large library is never one string.
+  const gzip = new CompressionStream("gzip");
+  const compressed = new Response(gzip.readable).blob();
+  const writer = gzip.writable.getWriter();
+  const encoder = new TextEncoder();
+  try {
+    for await (const line of lines) {
+      if (run.cancelled) throw libraryTransferCancelled();
+      await writer.write(encoder.encode(`${line}\n`));
+    }
+    await writer.close();
+  } catch (error) {
+    writer.abort(error).catch(() => {});
+    compressed.catch(() => {});
+    throw error;
+  }
+  const blob = await compressed;
+  if (run.cancelled) throw libraryTransferCancelled();
+  const filename = libraryTransfer.fileName(new Date(), scope === "folder" ? scopes.folder.name : "");
+  progress.removeAttribute("value");
+  $("libraryExportStatus").textContent = uiT("transfer.waitingForDownload");
+  const downloadId = await downloadBlob(blob, filename);
+  await libraryDownloadCompleted(downloadId);
+  return { filename, count: records.length };
+}
+
+$("libraryExportForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (libraryExportRun) return;
+  const scope = $("libraryExportForm").querySelector("[name=libraryExportScope]:checked")?.value || "all";
+  $("libraryExportError").textContent = "";
+  setLibraryExportBusy(true);
+  try {
+    const result = await runLibraryExport(scope);
+    $("libraryExportStatus").textContent = "";
+    $("libraryExportDialog").close();
+    announceLibraryFolders(uiTf("transfer.exported", { file: result.filename, count: result.count }));
+    show(uiTf("transfer.exported", { file: result.filename, count: result.count }));
+  } catch (error) {
+    $("libraryExportStatus").textContent = "";
+    $("libraryExportError").textContent = error?.code === "nothingToExport"
+      ? uiT("transfer.nothingToExport") : libraryTransferErrorText(error);
+  } finally {
+    libraryExportRun = null;
+    setLibraryExportBusy(false);
+  }
+});
+
+function stopOrCloseLibraryExport() {
+  if (libraryExportRun) libraryExportRun.cancelled = true;
+  else $("libraryExportDialog").close();
+}
+$("libraryExportCancel").addEventListener("click", stopOrCloseLibraryExport);
+$("libraryExportDialog").addEventListener("cancel", event => {
+  if (!libraryExportRun) return;
+  event.preventDefault();
+  stopOrCloseLibraryExport();
+});
+
+// Import: the file is read twice, once for the preview and once while writing, so that a
+// large file is never held in memory.
+// A file that cannot be read or decompressed is reported as damaged, not with the
+// browser's own error text.
+async function* libraryStreamText(stream) {
+  const reader = stream.getReader();
+  try {
+    for (;;) {
+      let chunk;
+      try {
+        chunk = await reader.read();
+      } catch {
+        throw Object.assign(new Error("transfer.damaged"), { code: "damaged" });
+      }
+      const { done, value } = chunk;
+      if (done) return;
+      yield value;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function libraryFileLines(file) {
+  const head = new Uint8Array(await file.slice(0, 2).arrayBuffer());
+  let stream = file.stream();
+  if (head[0] === 0x1f && head[1] === 0x8b) stream = stream.pipeThrough(new DecompressionStream("gzip"));
+  return libraryTransfer.splitLines(libraryStreamText(stream.pipeThrough(new TextDecoderStream())));
+}
+
+function setLibraryImportBusy(busy, label = "") {
+  $("libraryImportSubmit").disabled = busy;
+  $("libraryImportConflicts").disabled = busy;
+  $("libraryImportCancel").disabled = busy;
+  $("libraryImportProgress").hidden = !busy;
+  if (busy) $("libraryImportStatus").textContent = label;
+}
+
+function libraryImportWriteCount() {
+  const planned = libraryImportRun?.planned;
+  if (!planned) return 0;
+  const replace = $("libraryImportForm").querySelector("[name=libraryImportConflict]:checked")?.value === "replace";
+  return planned.counts.new + (replace ? planned.counts.different : 0);
+}
+
+function updateLibraryImportSubmit() {
+  const count = libraryImportWriteCount();
+  const submit = $("libraryImportSubmit");
+  submit.hidden = !libraryImportRun?.planned || !count;
+  submit.textContent = uiTf("transfer.importSubmit", { count });
+  $("libraryImportCancel").textContent = uiT(libraryImportRun?.planned && !count ? "transfer.close" : "folder.cancel");
+}
+
+function renderLibraryImportPlan(planned) {
+  const { header, counts } = planned;
+  $("libraryImportSource").textContent = uiTf("transfer.source", {
+    file: libraryImportRun.file.name, date: libraryTransferDate(header.exportedAt),
+    version: header.appVersion || "?" });
+  $("libraryImportStatus").textContent = counts.new || counts.different ? "" : uiT("transfer.nothingNew");
+  $("libraryImportCounts").hidden = false;
+  $("libraryImportCounts").innerHTML = [
+    uiTf("transfer.countNew", { count: counts.new }),
+    uiTf("transfer.countSame", { count: counts.same }),
+    uiTf("transfer.countDifferent", { count: counts.different }),
+    ...(counts.busy ? [uiTf("transfer.countBusy", { count: counts.busy })] : [])
+  ].map(line => `<li>${escapeHtml(line)}</li>`).join("");
+  const different = planned.items.filter(item => item.status === "different");
+  $("libraryImportConflicts").hidden = !different.length;
+  $("libraryImportConflictLegend").textContent = uiT("transfer.conflictLegend");
+  // The dates are shown when they tell the versions apart.
+  $("libraryImportConflictList").innerHTML = different.map(item => {
+    const title = item.localRecord?.title || item.record.title || item.id;
+    const mine = libraryTransferDate(item.localRecord?.modifiedAt);
+    const theirs = libraryTransferDate(item.record.modifiedAt);
+    return `<li>${escapeHtml(mine && theirs && mine !== theirs
+      ? uiTf("transfer.conflictItem", { title, mine, theirs }) : title)}</li>`;
+  }).join("");
+  $("libraryImportForm").querySelector("[name=libraryImportConflict][value=keep]").checked = true;
+  updateLibraryImportSubmit();
+}
+
+async function libraryActiveRecordingId() {
+  try {
+    const response = await send({ type: "T9_GET_STATE" });
+    return response?.state?.recording ? String(response.state.sessionId || "") : "";
+  } catch {
+    return "";
+  }
+}
+
+async function openLibraryImport(file) {
+  libraryImportRun = { file, planned: null };
+  $("libraryImportSource").textContent = file.name;
+  $("libraryImportCounts").hidden = true;
+  $("libraryImportConflicts").hidden = true;
+  $("libraryImportError").textContent = "";
+  updateLibraryImportSubmit();
+  $("libraryImportDialog").showModal();
+  if (!documentFoldersEditable) {
+    $("libraryImportError").textContent = uiT("transfer.foldersUnsupported");
+    $("libraryImportCancel").textContent = uiT("transfer.close");
+    $("libraryImportCancel").focus();
+    return;
+  }
+  const progress = $("libraryImportProgress");
+  progress.removeAttribute("value");
+  setLibraryImportBusy(true, uiT("transfer.reading"));
+  $("libraryImportCancel").disabled = false;
+  try {
+    const inspection = await libraryTransfer.read(await libraryFileLines(file),
+      globalThis.T9StorageKeys, { onProgress: ({ done, total }) => {
+        if (libraryImportRun?.file !== file) return;
+        if (total) { progress.max = total; progress.value = done; }
+        $("libraryImportStatus").textContent = uiTf("transfer.readingProgress", { done, total });
+      } });
+    if (libraryImportRun?.file !== file) return;
+    const local = await libraryTransfer.localDigests(chrome.storage.local, globalThis.T9StorageKeys,
+      inspection.items.map(item => item.id));
+    const planned = libraryTransfer.plan({ inspection, local, records: documentLibraryRecords,
+      tree: documentFolders, activeId: await libraryActiveRecordingId() });
+    if (libraryImportRun?.file !== file) return;
+    libraryImportRun.planned = planned;
+    setLibraryImportBusy(false);
+    renderLibraryImportPlan(planned);
+    ($("libraryImportSubmit").hidden ? $("libraryImportCancel") : $("libraryImportSubmit")).focus();
+  } catch (error) {
+    if (libraryImportRun?.file !== file) return;
+    setLibraryImportBusy(false);
+    $("libraryImportStatus").textContent = "";
+    $("libraryImportError").textContent = libraryTransferErrorText(error);
+    // Nothing is in progress any more; the dialog can only be closed.
+    $("libraryImportCancel").textContent = uiT("transfer.close");
+    $("libraryImportCancel").focus();
+  }
+}
+
+// The background keeps recent recordings in memory; replaced documents are read afresh.
+async function releaseLibraryDocuments(sessionIds) {
+  if (!sessionIds.length) return;
+  try { await send({ type: "T9_RELEASE_DOCUMENTS", sessionIds }); } catch { /* read afresh later */ }
+}
+
+$("libraryImportForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const run = libraryImportRun;
+  if (!run?.planned || run.writing) return;
+  const replace = $("libraryImportForm").querySelector("[name=libraryImportConflict]:checked")?.value === "replace";
+  const change = libraryTransfer.changes(run.planned, { replace, records: documentLibraryRecords,
+    tree: documentFolders, normalize: globalThis.T9DocumentLibrary.normalize });
+  if (!change.written.length) return;
+  run.writing = true;
+  $("libraryImportError").textContent = "";
+  const progress = $("libraryImportProgress");
+  progress.max = run.planned.items.length;
+  progress.value = 0;
+  setLibraryImportBusy(true, uiTf("transfer.importingFile", { done: 0, total: run.planned.items.length }));
+  try {
+    await libraryTransfer.apply({ storage: chrome.storage.local, keys: globalThis.T9StorageKeys,
+      lines: await libraryFileLines(run.file), planned: run.planned, change, fileName: run.file.name,
+      saveLibrary: (tree, records) => saveLibraryFolders(tree,
+        records.map(record => globalThis.T9DocumentLibrary.normalize(record))),
+      onProgress: ({ done, total }) => {
+        progress.max = total;
+        progress.value = done;
+        $("libraryImportStatus").textContent = uiTf("transfer.importingFile", { done, total });
+      } });
+    await releaseLibraryDocuments(change.replacedIds);
+    libraryImportRun = null;
+    $("libraryImportDialog").close();
+    await loadSessions();
+    await renderLibraryImportNotice();
+    const message = uiTf("transfer.imported", { added: change.newIds.length,
+      replaced: change.replacedIds.length });
+    announceLibraryFolders(message);
+    show(message);
+  } catch (error) {
+    run.writing = false;
+    setLibraryImportBusy(false);
+    $("libraryImportStatus").textContent = "";
+    $("libraryImportError").textContent = `${libraryTransferErrorText(error)} ${
+      error?.code === "rollbackFailed" ? "" : uiT("transfer.rolledBack")}`.trim();
+    await releaseLibraryDocuments(change.replacedIds);
+    await loadSessions().catch(() => {});
+    await renderLibraryImportNotice();
+    updateLibraryImportSubmit();
+  }
+});
+
+$("libraryImportForm").addEventListener("change", event => {
+  if (event.target.name === "libraryImportConflict") updateLibraryImportSubmit();
+});
+$("libraryImportCancel").addEventListener("click", () => $("libraryImportDialog").close());
+$("libraryImportDialog").addEventListener("cancel", event => {
+  if (libraryImportRun?.writing) event.preventDefault();
+});
+$("libraryImportDialog").addEventListener("close", () => {
+  if (!libraryImportRun?.writing) libraryImportRun = null;
+  (libraryTransferOpener?.isConnected && !libraryTransferOpener.hidden ? libraryTransferOpener
+    : $("librarySearch")).focus();
+});
+$("libraryExportDialog").addEventListener("close", () => {
+  (libraryTransferOpener?.isConnected && !libraryTransferOpener.hidden ? libraryTransferOpener
+    : $("librarySearch")).focus();
+});
+$("libraryExport").addEventListener("click", event => openLibraryExportDialog(event.currentTarget));
+$("libraryImport").addEventListener("click", event => {
+  libraryTransferOpener = event.currentTarget;
+  $("libraryImportFile").value = "";
+  $("libraryImportFile").click();
+});
+$("libraryImportFile").addEventListener("change", () => {
+  const file = $("libraryImportFile").files?.[0];
+  if (file) openLibraryImport(file);
+});
+
+// The latest import stays undoable until it is kept or another import is made. An import
+// that stopped halfway (the browser closed) can only be restored.
+let libraryImportUndo = null;
+async function renderLibraryImportNotice() {
+  try {
+    libraryImportUndo = await libraryTransfer.readUndo(chrome.storage.local, globalThis.T9StorageKeys);
+  } catch {
+    libraryImportUndo = null;
+  }
+  const meta = libraryImportUndo?.supported ? libraryImportUndo : null;
+  const notice = $("libraryImportNotice");
+  notice.hidden = !meta;
+  if (!meta) return;
+  const running = meta.state !== "complete";
+  notice.dataset.state = running ? "running" : "complete";
+  $("libraryImportNoticeText").textContent = running
+    ? uiTf("transfer.interrupted", { file: meta.fileName || "", date: libraryTransferDate(meta.startedAt) })
+    : uiTf("transfer.lastImport", { file: meta.fileName || "", date: libraryTransferDate(meta.completedAt),
+      added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length });
+  $("libraryImportUndo").textContent = uiT(running ? "transfer.restore" : "transfer.undo");
+  $("libraryImportKeep").hidden = running;
+}
+
+async function undoLibraryImport() {
+  const meta = libraryImportUndo;
+  const result = await libraryTransfer.undo({ storage: chrome.storage.local,
+    keys: globalThis.T9StorageKeys, records: documentLibraryRecords, tree: documentFolders,
+    normalize: globalThis.T9DocumentLibrary.normalize,
+    saveLibrary: (tree, records) => saveLibraryFolders(tree, records) });
+  await releaseLibraryDocuments([...(meta?.newIds || []), ...(meta?.replacedIds || [])]);
+  await loadSessions();
+  await renderLibraryImportNotice();
+  return result;
+}
+
+function libraryImportUndoFailed(error) {
+  return `${libraryTransferErrorText(error)} ${uiT("transfer.undoFailed")}`.trim();
+}
+
+$("libraryImportUndo").addEventListener("click", async () => {
+  const meta = libraryImportUndo;
+  if (!meta) return;
+  if (meta.state !== "complete") {
+    // Restoring an interrupted import only puts back what was there before it.
+    $("libraryImportUndo").disabled = true;
+    try {
+      await undoLibraryImport();
+      const message = uiT("transfer.restored");
+      announceLibraryFolders(message);
+      show(message);
+      $("librarySearch").focus();
+    } catch (error) {
+      show(libraryImportUndoFailed(error), true);
+    } finally {
+      $("libraryImportUndo").disabled = false;
+    }
+    return;
+  }
+  $("libraryImportUndoBody").textContent = uiTf("transfer.undoBody", {
+    added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length });
+  $("libraryImportUndoError").textContent = "";
+  $("libraryImportUndoDialog").showModal();
+});
+
+$("libraryImportUndoForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const submit = $("libraryImportUndoSubmit");
+  submit.disabled = true;
+  try {
+    await undoLibraryImport();
+    $("libraryImportUndoDialog").close();
+    const message = uiT("transfer.undone");
+    announceLibraryFolders(message);
+    show(message);
+  } catch (error) {
+    $("libraryImportUndoError").textContent = libraryImportUndoFailed(error);
+  } finally {
+    submit.disabled = false;
+  }
+});
+$("libraryImportUndoDialog").addEventListener("click", event => {
+  if (event.target.closest("[data-folder-cancel]")) $("libraryImportUndoDialog").close();
+});
+$("libraryImportUndoDialog").addEventListener("close", () => {
+  ($("libraryImportNotice").hidden ? $("librarySearch") : $("libraryImportUndo")).focus();
+});
+
+$("libraryImportKeep").addEventListener("click", async () => {
+  $("libraryImportKeep").disabled = true;
+  try {
+    await libraryTransfer.clearUndo(chrome.storage.local, globalThis.T9StorageKeys);
+    await renderLibraryImportNotice();
+    announceLibraryFolders(uiT("transfer.kept"));
+    $("librarySearch").focus();
+  } catch (error) {
+    show(libraryTransferErrorText(error), true);
+  } finally {
+    $("libraryImportKeep").disabled = false;
+  }
+});
+
 async function loadDocumentLibrary(sessions, bootstrap = {}) {
+  // Folders saved by a later version are neither shown nor overwritten.
+  const folders = bootstrap.foldersSchemaVersion
+    ? { supported: false } : globalThis.T9DocumentFolders.read(bootstrap.folders);
+  documentFoldersEditable = folders.supported;
+  documentFolders = folders.supported ? folders.tree : globalThis.T9DocumentFolders.empty();
   documentLibrarySessions = new Map(sessions.map(session => [session.id, session]));
   documentLibraryProgress = new Map((bootstrap.reviewProgress || []).map(value =>
     [value.sessionId, value]));
@@ -4594,10 +5603,7 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
   const bugReports = new Map((bootstrap.reports || []).map(report =>
     [report.recordingId, report]));
   documentLibraryDeliveries = new Map([...bugReports].flatMap(([recordingId, report]) => {
-    // A send is shown before a later draft or file, which may never have been sent.
-    const deliveries = report.deliveries || [];
-    const latest = deliveries.findLast(item => ["sent", "uncertain"].includes(item.outcome)) ||
-      deliveries.at(-1);
+    const latest = libraryDelivery(report);
     return latest ? [[recordingId, latest]] : [];
   }));
   documentLibraryRecords = sessions.map(session => {
@@ -4608,7 +5614,11 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
       ...sessionRecord,
       title: reportTitle || sessionRecord.title,
       documentLanguage: storedRecord.documentLanguage ||
-        sessionRecord.documentLanguage
+        sessionRecord.documentLanguage,
+      // A document is filed where it was put; a new bug report from a test starts in the
+      // tested document's folder.
+      folderId: Object.hasOwn(storedRecord, "folderId") ? storedRecord.folderId
+        : session.libraryFolderId || ""
     });
   });
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.reconcile(
@@ -5644,13 +6654,13 @@ function renderReviewStepNavigation(tasks, presentations) {
     const index = tasks.indexOf(task);
     // Without a presentation the stored text still carries its emphasis markers.
     const title = String(presentations.get(task.taskId)?.text ||
-      String(task.description || "").replace(/\*\*|__/gu, "") || "Steg")
+      String(task.description || "").replace(/\*\*|__/gu, ""))
       .replace(/\s+/gu, " ").trim();
     const state = reviewStepStatusLabel(task);
     const stateCode = task.approved ? "approved"
       : state === labels[9] ? "edited" : "pending";
     return `<button type="button" class="review-step-nav-item" data-step-id="${escapeHtml(task.taskId)}" data-state="${stateCode}" aria-label="${escapeHtml(`${labels[0]} ${index + 1}: ${title}`)}" aria-current="false">
-      <span class="review-step-nav-number">${index + 1}</span><span><span class="review-step-nav-text">${escapeHtml(title || `Steg ${index + 1}`)}</span><span class="review-step-nav-state">${state}</span></span></button>`;
+      <span class="review-step-nav-number">${index + 1}</span><span><span class="review-step-nav-text" title="${escapeHtml(title)}">${escapeHtml(title)}</span><span class="review-step-nav-state">${state}</span></span></button>`;
   }).join("");
   navigation.querySelectorAll("[data-step-id]").forEach(button => {
     button.addEventListener("click", event => {
@@ -9865,6 +10875,9 @@ async function runLibraryMenuAction(action, projectId, card) {
       show("");
     } else if (action === "export-recording") {
       await exportSession(session);
+    } else if (action === "move-folder") {
+      openLibraryMoveDialog([projectId], card.querySelector(".library-card-menu summary"));
+      return;
     } else if (action === "archive") {
       await updateDocumentLibraryRecord(projectId, { archived: !record.archived });
       show(record.archived ? uiTf("\"{title}\" har återställts från arkivet.", { title: record.title })
@@ -10207,6 +11220,7 @@ async function initializeDashboard() {
   try {
     await loadSessions(libraryRequest);
     sessionsLoaded = true;
+    renderLibraryImportNotice().catch(() => {});
   } catch (error) {
     console.error("BC Process Studio loadSessions failed", error);
     show(

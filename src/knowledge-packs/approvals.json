@@ -30,7 +30,8 @@
           "^Aprobar$",
           "^Godkend$",
           "^Hyväksy$",
-          "^Godkjenn$"
+          "^Godkjenn$",
+          "^Godkänn$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -205,7 +206,44 @@
       "confidence": 0.96,
       "match": {
         "pagePatterns": [
-          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$"
+          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$",
+          "^Förs\\.order$",
+          "^Förs\\.kreditnota$",
+          "^Förs\\.faktura$",
+          "^Commande vente$",
+          "^Avoir vente$",
+          "^Facture achat$",
+          "^Commande achat$",
+          "^Facture vente$",
+          "^Avoir achat$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsgutschrift$",
+          "^Einkaufsrechnung$",
+          "^Einkaufsbestellung$",
+          "^Verkaufsrechnung$",
+          "^Einkaufsgutschrift$",
+          "^Pedido venta$",
+          "^Nota abono venta$",
+          "^Factura compra$",
+          "^Pedido compra$",
+          "^Factura venta$",
+          "^Nota abono compra$",
+          "^Salgsordre$",
+          "^Salgskreditnota$",
+          "^Købsfaktura$",
+          "^Købsordre$",
+          "^Salgsfaktura$",
+          "^Købskreditnota$",
+          "^Myyntitilaus$",
+          "^Myyntihyvityslasku$",
+          "^Ostolasku$",
+          "^Ostotilaus$",
+          "^Myyntilasku$",
+          "^Ostohyvityslasku$",
+          "^Ordre$",
+          "^Kjøpsfaktura$",
+          "^Bestilling$",
+          "^Kjøpskreditnota$"
         ],
         "actionPatterns": [
           "^Send Approval Request$",
@@ -215,7 +253,10 @@
           "^Enviar solicitud de aprobación$",
           "^Send godkendelsesanmodning$",
           "^Lähetä hyväksymispyyntö$",
-          "^Send godkjenningsforespørsel$"
+          "^Send godkjenningsforespørsel$",
+          "^Envoyer demande d'approbation$",
+          "^Genehmigungsanforderung senden$",
+          "^Enviar solicitud aprobación$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -262,7 +303,44 @@
       "confidence": 0.96,
       "match": {
         "pagePatterns": [
-          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$"
+          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$",
+          "^Förs\\.order$",
+          "^Förs\\.kreditnota$",
+          "^Förs\\.faktura$",
+          "^Commande vente$",
+          "^Avoir vente$",
+          "^Facture achat$",
+          "^Commande achat$",
+          "^Facture vente$",
+          "^Avoir achat$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsgutschrift$",
+          "^Einkaufsrechnung$",
+          "^Einkaufsbestellung$",
+          "^Verkaufsrechnung$",
+          "^Einkaufsgutschrift$",
+          "^Pedido venta$",
+          "^Nota abono venta$",
+          "^Factura compra$",
+          "^Pedido compra$",
+          "^Factura venta$",
+          "^Nota abono compra$",
+          "^Salgsordre$",
+          "^Salgskreditnota$",
+          "^Købsfaktura$",
+          "^Købsordre$",
+          "^Salgsfaktura$",
+          "^Købskreditnota$",
+          "^Myyntitilaus$",
+          "^Myyntihyvityslasku$",
+          "^Ostolasku$",
+          "^Ostotilaus$",
+          "^Myyntilasku$",
+          "^Ostohyvityslasku$",
+          "^Ordre$",
+          "^Kjøpsfaktura$",
+          "^Bestilling$",
+          "^Kjøpskreditnota$"
         ],
         "actionPatterns": [
           "^Cancel Approval Request$",
@@ -272,7 +350,11 @@
           "^Cancelar solicitud de aprobación$",
           "^Annuller godkendelsesanmodning$",
           "^Peruuta hyväksymispyyntö$",
-          "^Annuller godkjenningsforespørsel$"
+          "^Annuller godkjenningsforespørsel$",
+          "^Annullera godkännandebegäran$",
+          "^Annuler demande d'approbation$",
+          "^Genehmigungsanforderung stornieren$",
+          "^Cancelar solicitud aprobación$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -320,7 +402,13 @@
       "match": {
         "pagePatterns": [
           "^Approval User Setup$",
-          "^Användarinställningar för godkännande$"
+          "^Användarinställningar för godkännande$",
+          "^Paramètres utilisateur approbation$",
+          "^Genehmigungsbenutzereinrichtung$",
+          "^Config\\. usuario aprobación$",
+          "^Brugeropsætning af godkendelser$",
+          "^Hyväksynnän käyttäjäasetukset$",
+          "^Brukeroppsett for godkjenning$"
         ],
         "actionPatterns": [
           "^New$",

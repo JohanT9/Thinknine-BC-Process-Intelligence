@@ -11,13 +11,13 @@ const hrAbsenceCategories = hr.rules.find(rule => rule.ruleId === 'HumanResource
 const hrAbsenceOverview = hr.rules.find(rule => rule.ruleId === 'HumanResources.OpenAbsenceOverview');
 assert.ok(edocMatch);
 assert.ok(edocLink);
-assert.deepEqual(edocMatch.verifiedRuntimeLocales, ['en-US', 'sv-SE']);
+assert.deepEqual(edocMatch.verifiedRuntimeLocales, ['en-US', 'sv-SE', 'fr-FR', 'de-DE', 'es-ES', 'da-DK', 'fi-FI', 'nb-NO']);
 assert.deepEqual(Object.keys(edocMatch.localizedExplanations).sort(), ['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
-assert.deepEqual(edocLink.verifiedRuntimeLocales, ['en-US', 'sv-SE']);
+assert.deepEqual(edocLink.verifiedRuntimeLocales, ['en-US', 'sv-SE', 'fr-FR', 'de-DE', 'es-ES', 'da-DK', 'fi-FI', 'nb-NO']);
 assert.ok(hrAbsenceCategories);
 assert.ok(hrAbsenceOverview);
 for (const rule of [hrAbsenceCategories, hrAbsenceOverview]) {
-  assert.deepEqual(rule.verifiedRuntimeLocales, ['en-US', 'sv-SE']);
+  assert.deepEqual(rule.verifiedRuntimeLocales, ['en-US', 'sv-SE', 'fr-FR', 'de-DE', 'es-ES', 'da-DK', 'fi-FI', 'nb-NO']);
   assert.deepEqual(Object.keys(rule.localizedExplanations).sort(), ['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
 }
 

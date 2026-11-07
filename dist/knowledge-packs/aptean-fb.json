@@ -60,7 +60,7 @@
           "^Harvest Order$"
         ],
         "actionPatterns": [
-          "^Create Commodity Receipts$"
+          "^Create Commodity Receipts?$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -317,7 +317,7 @@
       "confidence": 0.96,
       "match": {
         "pagePatterns": [
-          "^Quality Control Action$"
+          "^Quality Control Actions?$"
         ],
         "actionPatterns": [
           "^Post$"

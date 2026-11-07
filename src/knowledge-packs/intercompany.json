@@ -13,18 +13,37 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Intercompany Setup$",
           "^Koncernintern inställning$",
-          "^Företagsintern installation$"
+          "^Företagsintern installation$",
+          "^Paramètres intersociétés$",
+          "^Intercompanyeinrichtung$",
+          "^Config\\. empresas vinculadas$",
+          "^Koncernintern opsætning$",
+          "^Konsernin asetukset$",
+          "^Konserninternt oppsett$"
         ],
         "actionPatterns": [
           "^IC Chart of Accounts$",
           "^IC-dimensions$",
-          "^Koncernintern kontoplan$"
+          "^Koncernintern kontoplan$",
+          "^Konc\\.int\\. kontoplan$",
+          "^Plan comptable IC$",
+          "^IC-Kontenplan$",
+          "^Plan de cuentas IC$",
+          "^IC-kontoplan$",
+          "^Konsernin tilikartta$",
+          "^KI-kontoplan$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -88,7 +107,8 @@
           "^Importar archivo de transacción$",
           "^Indlæs transaktionsfil$",
           "^Tuo tapahtumatiedosto$",
-          "^Importer transaksjonsfil$"
+          "^Importer transaksjonsfil$",
+          "^Importar archivo transacción$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -206,7 +226,8 @@
           "^Transacciones de bandeja de salida entre empresas vinculadas$",
           "^Koncerninterne udbakketransaktioner$",
           "^Konsernin Lähtevät-kansion tapahtumat$",
-          "^Konserninterne utgående transaksjoner$"
+          "^Konserninterne utgående transaksjoner$",
+          "^Transactions Boîte d'envoi Intersociétés$"
         ],
         "actionPatterns": [
           "^Send to Intercompany Partner$",

@@ -13,10 +13,23 @@
       "confidence": 0.95,
       "match": {
         "pagePatterns": [
-          "^Item Tracing$"
+          "^Item Tracing$",
+          "^Artikelspårning$",
+          "^Traçabilité$",
+          "^Artikelablaufverfolgung$",
+          "^Seguimiento productos$",
+          "^Varesporing$",
+          "^Nimikkeen jäljitys$"
         ],
         "actionPatterns": [
-          "^Trace$"
+          "^Trace$",
+          "^Spåra$",
+          "^Suivi$",
+          "^Ablaufverfolgung$",
+          "^Realizar seguimiento$",
+          "^Sporing$",
+          "^Jäljitys$",
+          "^Spor$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -57,10 +70,24 @@
       "confidence": 0.95,
       "match": {
         "pagePatterns": [
-          "^Find Entries$"
+          "^Find Entries$",
+          "^Sök transaktioner$",
+          "^Rechercher des écritures$",
+          "^Posten suchen$",
+          "^Buscar movs\\.$",
+          "^Søg efter poster$",
+          "^Etsi tapahtumat$",
+          "^Søk etter poster$"
         ],
         "actionPatterns": [
-          "^Find$"
+          "^Find$",
+          "^Sök$",
+          "^Rechercher$",
+          "^Suchen$",
+          "^Buscar$",
+          "^Søg$",
+          "^Etsi$",
+          "^Søk$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -102,11 +129,28 @@
       "match": {
         "pagePatterns": [
           "^Item Tracking Lines$",
-          "^Artikelspårningsrader$"
+          "^Artikelspårningsrader$",
+          "^Lignes traçabilité$",
+          "^Artikelverfolgungszeilen$",
+          "^Líns\\. seguim\\. prod\\.$",
+          "^Varesporingslinjer$",
+          "^Nimikkeen seurantarivit$"
         ],
         "actionPatterns": [
           "^Assign (?:Serial|Lot) No\\.$",
-          "^Tilldela (?:serienr|partinr)$"
+          "^Tilldela (?:serienr|partinr)$",
+          "^Affecter n° de série$",
+          "^Affecter n° lot$",
+          "^Seriennr\\. zuweisen$",
+          "^Chargennr\\. zuweisen$",
+          "^Asignar nº serie$",
+          "^Asignar nº lote$",
+          "^Tildel serienr\\.$",
+          "^Tildel lotnr\\.$",
+          "^Määritä sarjanro$",
+          "^Määritä eränro$",
+          "^Tilordne serienr\\.$",
+          "^Tilordne partinr\\.$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -154,17 +198,35 @@
       "priority": 1320,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "confidence": 0.96,
       "match": {
         "pagePatterns": [
           "^Item Reclassification Journals$",
-          "^Artikelomklassificeringsjournaler$"
+          "^Artikelomklassificeringsjournaler$",
+          "^Artikelgrupperingsjournaler$",
+          "^Feuilles reclassement article$",
+          "^Artikel Umlag\\. Buch\\.-Blätter$",
+          "^Diarios de reclasificación de producto$",
+          "^Vareomposteringskladder$",
+          "^Nimikkeen uudelleenluokituspäiväkirjat$",
+          "^Varereklassifiseringskladder$"
         ],
         "actionPatterns": [
           "^Item Tracking Lines$",
-          "^Artikelspårningsrader$"
+          "^Artikelspårningsrader$",
+          "^Lignes traçabilité$",
+          "^Artikelverfolgungszeilen$",
+          "^Líns\\. seguim\\. prod\\.$",
+          "^Varesporingslinjer$",
+          "^Nimikkeen seurantarivit$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

@@ -13,7 +13,7 @@
       "confidence": 0.95,
       "verifiedRuntimeLocales": ["en-US", "sv-SE"],
       "match": {
-        "pagePatterns": ["^Campaigns$", "^Kampanjer$"],
+        "pagePatterns": ["^Campaigns$", "^Kampanjer$", "^Campagnes$", "^Kampagnen$", "^Campañas$", "^Kampagner$", "^Kampanjat$"],
         "actionPatterns": ["^New$", "^Ny$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -48,11 +48,20 @@
       "match": {
         "pagePatterns": [
           "^Contacts$",
-          "^Kontakter$"
+          "^Kontakter$",
+          "^Kontakte$",
+          "^Contactos$",
+          "^Kontaktit$"
         ],
         "actionPatterns": [
           "^Create Interaction$",
-          "^Skapa interaktion$"
+          "^Skapa interaktion$",
+          "^Créer Interaction$",
+          "^Aktivität erstellen$",
+          "^Crear interacción$",
+          "^Opret interaktion$",
+          "^Luo vuorovaikutus$",
+          "^Opprett samhandling$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -100,11 +109,24 @@
       "match": {
         "pagePatterns": [
           "^Opportunities$",
-          "^Affärsmöjligheter$"
+          "^Affärsmöjligheter$",
+          "^Opportunités$",
+          "^Verkaufschancen$",
+          "^Oportunidades$",
+          "^Salgsmuligheder$",
+          "^Mahdollisuudet$",
+          "^Salgsmuligheter$"
         ],
         "actionPatterns": [
           "^Close$",
-          "^Stäng$"
+          "^Stäng$",
+          "^Avsluta$",
+          "^Terminer$",
+          "^Schließen$",
+          "^Cerrar$",
+          "^Luk$",
+          "^Sulje$",
+          "^Lukk$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -188,7 +210,15 @@
       "match": {
         "pagePatterns": [
           "^Segments$",
-          "^Segment$"
+          "^Segment$",
+          "^Segmente$",
+          "^Segmento$",
+          "^Segmentos$",
+          "^Målgruppe$",
+          "^Målgrupper$",
+          "^Segmentti$",
+          "^Segmentit$",
+          "^Segmenter$"
         ],
         "actionPatterns": [
           "^Create Interaction$",
@@ -240,7 +270,15 @@
       "match": {
         "pagePatterns": [
           "^Segments$",
-          "^Segment$"
+          "^Segment$",
+          "^Segmente$",
+          "^Segmento$",
+          "^Segmentos$",
+          "^Målgruppe$",
+          "^Målgrupper$",
+          "^Segmentti$",
+          "^Segmentit$",
+          "^Segmenter$"
         ],
         "actionPatterns": [
           "^New$",
@@ -294,11 +332,25 @@
       "match": {
         "pagePatterns": [
           "^Segments$",
-          "^Segment$"
+          "^Segment$",
+          "^Segmente$",
+          "^Segmento$",
+          "^Segmentos$",
+          "^Målgruppe$",
+          "^Målgrupper$",
+          "^Segmentti$",
+          "^Segmentit$",
+          "^Segmenter$"
         ],
         "actionPatterns": [
           "^Add Contacts$",
-          "^Lägg till kontakter$"
+          "^Lägg till kontakter$",
+          "^Ajouter contacts$",
+          "^Kontakte hinzufügen$",
+          "^Añadir contactos$",
+          "^Tilføj kontakter$",
+          "^Lisää kontakteja$",
+          "^Legg til kontakter$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -354,13 +406,35 @@
       "match": {
         "pagePatterns": [
           "^Segments$",
-          "^Segment$"
+          "^Segment$",
+          "^Segmente$",
+          "^Segmento$",
+          "^Segmentos$",
+          "^Målgruppe$",
+          "^Målgrupper$",
+          "^Segmentti$",
+          "^Segmentit$",
+          "^Segmenter$"
         ],
         "actionPatterns": [
           "^Refine Contacts$",
           "^Reduce Contacts$",
           "^Förfina kontakter$",
-          "^Minska kontakter$"
+          "^Minska kontakter$",
+          "^Förfina urval$",
+          "^Reducera kontakter$",
+          "^Redéfinir les contacts$",
+          "^Réduire les contacts$",
+          "^Kontakte neu definieren$",
+          "^Kontakte entfernen$",
+          "^Redefinir contactos$",
+          "^Reducir contactos$",
+          "^Begræns kontakter$",
+          "^Reducer kontakter$",
+          "^Tarkenna kontakteja$",
+          "^Vähennä kontakteja$",
+          "^Forny kontakter$",
+          "^Reduser kontakter$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

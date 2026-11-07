@@ -261,7 +261,13 @@
           "^Sales Orders$",
           "^Sales Order List$",
           "^F\\u00f6rs\\.?\\s*order$",
-          "^F\\u00f6rs\\u00e4ljningsorder$"
+          "^F\\u00f6rs\\u00e4ljningsorder$",
+          "^Commandes vente$",
+          "^Verkaufsaufträge$",
+          "^Pedidos venta$",
+          "^Salgsordrer$",
+          "^Myyntitilaukset$",
+          "^Ordrer$"
         ],
         "actionPatterns": [
           "^Ny$",
@@ -306,7 +312,13 @@
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -420,7 +432,8 @@
           "^Salgsordrer$",
           "^Myyntitilaus$",
           "^Myyntitilaukset$",
-          "^Ordre$"
+          "^Ordre$",
+          "^Pedido venta$"
         ],
         "actionPatterns": [
           "^Reopen$",
@@ -430,7 +443,11 @@
           "^Reabrir$",
           "^Genåbne$",
           "^Avaa uudelleen$",
-          "^Åpne på nytt$"
+          "^Åpne på nytt$",
+          "^Status zurücksetzen$",
+          "^Volver a abrir$",
+          "^Åbn igen$",
+          "^Uudelleenavaa$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -555,7 +572,9 @@
           "^Pedido de venta$",
           "^Salgsordre$",
           "^Myyntitilaus$",
-          "^Ordre$"
+          "^Ordre$",
+          "^Förs\\.order$",
+          "^Pedido venta$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -669,27 +688,26 @@
         "pagePatterns": [
           "bokförda försäljningsfakturor",
           "posted sales invoices",
-          "commande de retour vente",
           "factures vente validées",
-          "avoir vente",
-          "verkaufsrückgabeauftrag",
           "gebuchte verkaufsrechnungen",
-          "verkaufsgutschrift",
-          "pedido de devolución de ventas",
           "facturas de venta registradas",
-          "abono de venta",
-          "salgsreturvareordre",
           "bogførte salgsfakturaer",
-          "salgskreditnota",
-          "myyntipalautustilaus",
           "kirjatut myyntilaskut",
-          "myyntihyvityslasku",
-          "salgsreturordre",
-          "bokførte salgsfakturaer"
+          "bokførte salgsfakturaer",
+          "^Factures vente enregistrées$",
+          "^Geb\\. Verkaufsrechnungen$",
+          "^Lista hist\\. facturas venta$",
+          "^Bogf\\. salgsfakturaer$"
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -755,7 +773,11 @@
           "^Cantidad a enviar$",
           "^Lever antal$",
           "^Toimitettava määrä$",
-          "^Levere \\(antall\\)$"
+          "^Levere \\(antall\\)$",
+          "^Zu liefern$",
+          "^Cant\\. a enviar$",
+          "^Antal at levere$",
+          "^Lever \\(antal\\)$"
         ],
         "automationIdPatterns": []
       },
@@ -931,21 +953,33 @@
           "salgsreturvareordre",
           "myyntipalautustilaus",
           "salgsreturordre",
-          "factures vente validées",
-          "avoir vente",
-          "gebuchte verkaufsrechnungen",
-          "verkaufsgutschrift",
-          "facturas de venta registradas",
-          "abono de venta",
-          "bogførte salgsfakturaer",
-          "salgskreditnota",
-          "kirjatut myyntilaskut",
-          "myyntihyvityslasku",
-          "bokførte salgsfakturaer"
+          "^Förs\\.returorder$",
+          "^Retours vente$",
+          "^Archives retours vente$",
+          "^Verkaufsreklamation$",
+          "^Verkaufsreklamationen$",
+          "^Verkaufsreklamationsarchiv$",
+          "^Archiv für Verkaufsreklamationen$",
+          "^Devolución venta$",
+          "^Devoluciones ventas$",
+          "^Archivo de devolución de venta$",
+          "^Archivo de devoluciones de venta$",
+          "^Pedido dev\\. venta$",
+          "^Myyntipalautustilaukset$",
+          "^Ordreretur$",
+          "^Ordrereturer$",
+          "^Arkiv for ordreretur$",
+          "^Arkiv for ordrereturer$"
         ],
         "actionPatterns": [
           "^open record$",
-          "^öppna post$"
+          "^öppna post$",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -993,7 +1027,27 @@
           "pedidos de devolución de ventas",
           "salgsreturvareordrer",
           "myyntipalautustilaus",
-          "ordreretur for salg"
+          "ordreretur for salg",
+          "^Förs\\.returorder$",
+          "^Retour vente$",
+          "^Retours vente$",
+          "^Archives retours vente$",
+          "^Verkaufsreklamation$",
+          "^Verkaufsreklamationen$",
+          "^Verkaufsreklamationsarchiv$",
+          "^Archiv für Verkaufsreklamationen$",
+          "^Devolución venta$",
+          "^Devoluciones ventas$",
+          "^Archivo de devolución de venta$",
+          "^Archivo de devoluciones de venta$",
+          "^Pedido dev\\. venta$",
+          "^Salgsreturvareordre$",
+          "^Salgsreturvareordrearkiv$",
+          "^Myyntipalautustilaukset$",
+          "^Ordreretur$",
+          "^Ordrereturer$",
+          "^Arkiv for ordreretur$",
+          "^Arkiv for ordrereturer$"
         ],
         "actionPatterns": [
           "^get posted document lines to reverse$",
@@ -1003,7 +1057,8 @@
           "^revertir líneas documentos registrados$",
           "^hent bogførte bilagslinjer, der skal tilbageføres$",
           "^hae peruutettavat kirjatut asiakirjarivit$",
-          "^hent bokførte dokumentlinjer som skal tilbakeføres$"
+          "^hent bokførte dokumentlinjer som skal tilbakeføres$",
+          "^Extraire lignes document enreg\\. à contrepasser$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1055,7 +1110,27 @@
           "pedidos de devolución de ventas",
           "salgsreturvareordrer",
           "myyntipalautustilaus",
-          "ordreretur for salg"
+          "ordreretur for salg",
+          "^Förs\\.returorder$",
+          "^Retour vente$",
+          "^Retours vente$",
+          "^Archives retours vente$",
+          "^Verkaufsreklamation$",
+          "^Verkaufsreklamationen$",
+          "^Verkaufsreklamationsarchiv$",
+          "^Archiv für Verkaufsreklamationen$",
+          "^Devolución venta$",
+          "^Devoluciones ventas$",
+          "^Archivo de devolución de venta$",
+          "^Archivo de devoluciones de venta$",
+          "^Pedido dev\\. venta$",
+          "^Salgsreturvareordre$",
+          "^Salgsreturvareordrearkiv$",
+          "^Myyntipalautustilaukset$",
+          "^Ordreretur$",
+          "^Ordrereturer$",
+          "^Arkiv for ordreretur$",
+          "^Arkiv for ordrereturer$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -1119,7 +1194,27 @@
           "pedidos de devolución de ventas",
           "salgsreturvareordrer",
           "myyntipalautustilaus",
-          "ordreretur for salg"
+          "ordreretur for salg",
+          "^Förs\\.returorder$",
+          "^Retour vente$",
+          "^Retours vente$",
+          "^Archives retours vente$",
+          "^Verkaufsreklamation$",
+          "^Verkaufsreklamationen$",
+          "^Verkaufsreklamationsarchiv$",
+          "^Archiv für Verkaufsreklamationen$",
+          "^Devolución venta$",
+          "^Devoluciones ventas$",
+          "^Archivo de devolución de venta$",
+          "^Archivo de devoluciones de venta$",
+          "^Pedido dev\\. venta$",
+          "^Salgsreturvareordre$",
+          "^Salgsreturvareordrearkiv$",
+          "^Myyntipalautustilaukset$",
+          "^Ordreretur$",
+          "^Ordrereturer$",
+          "^Arkiv for ordreretur$",
+          "^Arkiv for ordrereturer$"
         ],
         "actionPatterns": [
           "^post$",
@@ -1129,7 +1224,8 @@
           "^registrar$",
           "^bogfør$",
           "^kirjaa$",
-          "^bokfør$"
+          "^bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1181,7 +1277,11 @@
           "facturas de venta registradas",
           "bogførte salgsfakturaer",
           "kirjatut myyntilaskut",
-          "bokførte salgsfakturaer"
+          "bokførte salgsfakturaer",
+          "^Factures vente enregistrées$",
+          "^Geb\\. Verkaufsrechnungen$",
+          "^Lista hist\\. facturas venta$",
+          "^Bogf\\. salgsfakturaer$"
         ],
         "actionPatterns": [
           "^create corrective credit memo$",
@@ -1191,7 +1291,8 @@
           "^crear un abono correctivo$",
           "^opret rettelseskreditnota$",
           "^luo korjaava hyvityslasku$",
-          "^opprett korrigerende kreditnota$"
+          "^opprett korrigerende kreditnota$",
+          "^Crear nota de abono correctiva$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1243,7 +1344,11 @@
           "facturas de venta registradas",
           "bogførte salgsfakturaer",
           "kirjatut myyntilaskut",
-          "bokførte salgsfakturaer"
+          "bokførte salgsfakturaer",
+          "^Factures vente enregistrées$",
+          "^Geb\\. Verkaufsrechnungen$",
+          "^Lista hist\\. facturas venta$",
+          "^Bogf\\. salgsfakturaer$"
         ],
         "actionPatterns": [
           "^cancel$",
@@ -1304,7 +1409,21 @@
           "verkaufsgutschrift",
           "abono de venta",
           "salgskreditnota",
-          "myyntihyvityslasku"
+          "myyntihyvityslasku",
+          "^Förs\\.kreditnota$",
+          "^Försäljningskreditnotor$",
+          "^Bokförda försäljningskreditnotor$",
+          "^Bokförda förs\\.kreditnotarader$",
+          "^Förs\\.kreditnotastatistik$",
+          "^Avoirs vente$",
+          "^Avoirs vente enregistrés$",
+          "^Nota abono venta$",
+          "^Histórico notas abono venta$",
+          "^Hist\\. líns\\. notas abono venta$",
+          "^Estad\\. nota de abono ventas$",
+          "^Bogf\\. salgskr\\.notaer$",
+          "^Kirj\\. myyntihyvityslask\\. rivit$",
+          "^Bokførte salgskr\\.notalinjer$"
         ],
         "actionPatterns": [
           "^copy from document$",
@@ -1365,7 +1484,21 @@
           "verkaufsgutschrift",
           "abono de venta",
           "salgskreditnota",
-          "myyntihyvityslasku"
+          "myyntihyvityslasku",
+          "^Förs\\.kreditnota$",
+          "^Försäljningskreditnotor$",
+          "^Bokförda försäljningskreditnotor$",
+          "^Bokförda förs\\.kreditnotarader$",
+          "^Förs\\.kreditnotastatistik$",
+          "^Avoirs vente$",
+          "^Avoirs vente enregistrés$",
+          "^Nota abono venta$",
+          "^Histórico notas abono venta$",
+          "^Hist\\. líns\\. notas abono venta$",
+          "^Estad\\. nota de abono ventas$",
+          "^Bogf\\. salgskr\\.notaer$",
+          "^Kirj\\. myyntihyvityslask\\. rivit$",
+          "^Bokførte salgskr\\.notalinjer$"
         ],
         "actionPatterns": [
           "^apply entries$",
@@ -1375,7 +1508,9 @@
           "^liquidar movimientos$",
           "^udlign poster$",
           "^kohdista tapahtumat$",
-          "^utligne poster$"
+          "^utligne poster$",
+          "^Liquidar movs\\.$",
+          "^Utlign poster$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1426,7 +1561,21 @@
           "verkaufsgutschrift",
           "abono de venta",
           "salgskreditnota",
-          "myyntihyvityslasku"
+          "myyntihyvityslasku",
+          "^Förs\\.kreditnota$",
+          "^Försäljningskreditnotor$",
+          "^Bokförda försäljningskreditnotor$",
+          "^Bokförda förs\\.kreditnotarader$",
+          "^Förs\\.kreditnotastatistik$",
+          "^Avoirs vente$",
+          "^Avoirs vente enregistrés$",
+          "^Nota abono venta$",
+          "^Histórico notas abono venta$",
+          "^Hist\\. líns\\. notas abono venta$",
+          "^Estad\\. nota de abono ventas$",
+          "^Bogf\\. salgskr\\.notaer$",
+          "^Kirj\\. myyntihyvityslask\\. rivit$",
+          "^Bokførte salgskr\\.notalinjer$"
         ],
         "actionPatterns": [
           "^post$",
@@ -1436,7 +1585,8 @@
           "^registrar$",
           "^bogfør$",
           "^kirjaa$",
-          "^bokfør$"
+          "^bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1481,7 +1631,10 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Sales Invoices?|Försäljningsfaktur(?:a|or)|Factures? des ventes|Factures? vente|Verkaufsrechnung(?:en)?|Facturas? de venta|Salgsfaktura(?:er)?|Myyntilasku(?:t)?|Salgsfaktura(?:er)?)$"
+          "^(Sales Invoices?|Försäljningsfaktur(?:a|or)|Factures? des ventes|Factures? vente|Verkaufsrechnung(?:en)?|Facturas? de venta|Salgsfaktura(?:er)?|Myyntilasku(?:t)?|Salgsfaktura(?:er)?)$",
+          "^Förs\\.faktura$",
+          "^Factura venta$",
+          "^Facturas venta$"
         ],
         "actionPatterns": [
           "^(Get Shipment Lines|Hämta utleveransrader|Obtenir lignes d’expédition|Obtenir lignes d\\x27expédition|Warenversandzeilen holen|Obtener líneas de envío|Hent salgsleverancelinjer|Hae toimitusrivit|Hent leveringslinjer)$"
@@ -1521,7 +1674,12 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$",
+          "^Verkaufsauftrag$",
+          "^Pedido venta$",
+          "^Pedidos venta$",
+          "^Myyntitilaus$",
+          "^Ordrer$"
         ],
         "actionPatterns": [
           "^Tillämpat försäljningspris och rabatt$",
@@ -1568,7 +1726,12 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$",
+          "^Verkaufsauftrag$",
+          "^Pedido venta$",
+          "^Pedidos venta$",
+          "^Myyntitilaus$",
+          "^Ordrer$"
         ],
         "actionPatterns": [
           "^Manuellt pris(?:\\.\\.\\.|…)?$",
@@ -1615,7 +1778,12 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$",
+          "^Verkaufsauftrag$",
+          "^Pedido venta$",
+          "^Pedidos venta$",
+          "^Myyntitilaus$",
+          "^Ordrer$"
         ],
         "actionPatterns": [
           "^Ändra tillämpat enhetspris$",
@@ -1662,7 +1830,12 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$",
+          "^Verkaufsauftrag$",
+          "^Pedido venta$",
+          "^Pedidos venta$",
+          "^Myyntitilaus$",
+          "^Ordrer$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [

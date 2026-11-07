@@ -13,7 +13,7 @@ const rules = [
 const setupRule = pack.rules.find(r => r.ruleId === 'Intercompany.SetupAccountsAndDimensions');
 assert.ok(setupRule, 'account and dimension mapping setup scenario exists');
 assert.deepEqual(Object.keys(setupRule.localizedExplanations).sort(), locales);
-assert.deepEqual(setupRule.verifiedRuntimeLocales, ['en-US', 'sv-SE']);
+assert.deepEqual(setupRule.verifiedRuntimeLocales, ['en-US', 'sv-SE', 'fr-FR', 'de-DE', 'es-ES', 'da-DK', 'fi-FI', 'nb-NO']);
 for (const [locale, pageCaption, actionCaption] of [
   ['en-US', 'Intercompany Setup', 'IC Chart of Accounts'],
   ['sv-SE', 'Företagsintern installation', 'Koncernintern kontoplan'],

@@ -20,7 +20,13 @@
           "^Tareas de servicio$",
           "^Serviceopgaver$",
           "^Palvelutehtävät$",
-          "^Tjenesteoppgaver$"
+          "^Tjenesteoppgaver$",
+          "^Serviceuppgifter$",
+          "^Tâches service$",
+          "^Serviceaufgaben$",
+          "^Tareas servicio$",
+          "^Huoltotehtävät$",
+          "^Serviceoppgaver$"
         ],
         "actionPatterns": [
           "^Item Worksheet$",
@@ -30,7 +36,11 @@
           "^Hoja de producto$",
           "^Varekladde$",
           "^Nimikkeen työkirja$",
-          "^Arbeidsordre$"
+          "^Arbeidsordre$",
+          "^Artikelförslag$",
+          "^Servicearbeitsblatt$",
+          "^Hoja trabajo producto$",
+          "^Serviceartikelkld\\.$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -74,7 +84,11 @@
           "^Hoja de trabajo de artículo de servicio$",
           "^Serviceartikelkladde$",
           "^Huoltonimikkeen työkirja$",
-          "^Servicevareskjema$"
+          "^Servicevareskjema$",
+          "^Feuille activité article serv\\.$",
+          "^Service Artikel Arbeitsblatt$",
+          "^Hoja trabajo prod\\. serv\\.$",
+          "^Arbeidsordre$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -128,7 +142,8 @@
           "^Pedido servicio$",
           "^Serviceordre$",
           "^Huoltotilaus$",
-          "^Serviceordre$"
+          "^Serviceordre$",
+          "^Serviceorder$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -138,7 +153,11 @@
           "^Registrar$",
           "^Indlæg$",
           "^Julkaisu$",
-          "^Publiser$"
+          "^Publiser$",
+          "^Bokför$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -192,7 +211,10 @@
           "^Pedidos de servicio$",
           "^(?:Serviceordre|Serviceordrer)$",
           "^Huoltotilaukset$",
-          "^(?:Serviceordre|Serviceordrer)$"
+          "^(?:Serviceordre|Serviceordrer)$",
+          "^Serviceorder$",
+          "^Commandes service$",
+          "^Pedidos servicio$"
         ],
         "actionPatterns": [
           "^New$",
@@ -251,11 +273,29 @@
         "pagePatterns": [
           "^Service Quotes$",
           "^Service Contract Quotes$",
-          "^Offerter för tjänstkontrakt$"
+          "^Offerter för tjänstkontrakt$",
+          "^Serviceofferter$",
+          "^Servicekontraktsofferter$",
+          "^Devis service$",
+          "^Devis contrat de service$",
+          "^Serviceangebote$",
+          "^Servicevertragsangebote$",
+          "^Ofertas servicio$",
+          "^Ofertas contrato servicio$",
+          "^Servicetilbud$",
+          "^Servicekontrakttilbud$",
+          "^Huoltotarjoukset$",
+          "^Huoltosopimustarjoukset$"
         ],
         "actionPatterns": [
           "^Make Order$",
-          "^Skapa order$"
+          "^Skapa order$",
+          "^Créer commande$",
+          "^Auftrag erst\\.$",
+          "^Convertir en pedido$",
+          "^Opret ordre$",
+          "^Tee tilaus$",
+          "^Lag ordre$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -309,7 +349,10 @@
           "^(?:Pedido servicio|Pedidos de servicio)$",
           "^(?:Serviceordre|Serviceordrer)$",
           "^(?:Huoltotilaus|Huoltotilaukset)$",
-          "^(?:Serviceordre|Serviceordrer)$"
+          "^(?:Serviceordre|Serviceordrer)$",
+          "^Serviceorder$",
+          "^Commandes service$",
+          "^Pedidos servicio$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -373,7 +416,41 @@
           "^Dispatch Board$",
           "^Resource Allocations$",
           "^Tj?nsteorder$",
-          "^Serviceordrer$"
+          "^Serviceordrer$",
+          "^Serviceorder$",
+          "^Resursfördelningar$",
+          "^Serviceofferter$",
+          "^Beordringstavla$",
+          "^Serviceoffert$",
+          "^Commande service$",
+          "^Affectations ressources$",
+          "^Commandes service$",
+          "^Devis service$",
+          "^Tableau d'affectation$",
+          "^Serviceauftrag$",
+          "^Ressourcenzuordnungen$",
+          "^Serviceaufträge$",
+          "^Serviceangebote$",
+          "^Einsatzplanung$",
+          "^Serviceangebot$",
+          "^Pedido servicio$",
+          "^Asignaciones recurso$",
+          "^Pedidos servicio$",
+          "^Ofertas servicio$",
+          "^Panel despacho$",
+          "^Oferta servicio$",
+          "^Serviceordre$",
+          "^Ressourceallokeringer$",
+          "^Servicetilbud$",
+          "^Ordreoversigt$",
+          "^Huoltotilaus$",
+          "^Resurssin kohdistukset$",
+          "^Huoltotilaukset$",
+          "^Huoltotarjoukset$",
+          "^Lähetystaulukko$",
+          "^Huoltotarjous$",
+          "^Ressurstildelinger$",
+          "^Servicefordeling$"
         ],
         "actionPatterns": [
           "^Allocate$",
@@ -385,7 +462,14 @@
           "^Tildel ressource$",
           "^Ressourcen zuordnen$",
           "^Asignar recursos$",
-          "^Affecter des ressources$"
+          "^Affecter des ressources$",
+          "^Fördela till alla serviceartiklar$",
+          "^Affecter à tous les articles de service$",
+          "^Allen Serviceartikeln zuordnen$",
+          "^Asignar a todos prods\\. serv\\.$",
+          "^Alloker til alle serviceartikler$",
+          "^Kohd\\. kaikkiin huoltonimik\\.$",
+          "^Tildel til alle servicevarer$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -437,7 +521,31 @@
           "^Service Item Worksheet$",
           "^Service Tasks$",
           "^Tj?nsteorder$",
-          "^Serviceordrer$"
+          "^Serviceordrer$",
+          "^Serviceuppgifter$",
+          "^Serviceorder$",
+          "^Serviceartikeldokument$",
+          "^Tâches service$",
+          "^Commande service$",
+          "^Commandes service$",
+          "^Feuille activité article serv\\.$",
+          "^Serviceaufgaben$",
+          "^Serviceauftrag$",
+          "^Serviceaufträge$",
+          "^Service Artikel Arbeitsblatt$",
+          "^Tareas servicio$",
+          "^Pedido servicio$",
+          "^Pedidos servicio$",
+          "^Hoja trabajo prod\\. serv\\.$",
+          "^Serviceopgaver$",
+          "^Serviceordre$",
+          "^Serviceartikelkladde$",
+          "^Huoltotehtävät$",
+          "^Huoltotilaus$",
+          "^Huoltotilaukset$",
+          "^Huoltonimikkeen työkirja$",
+          "^Serviceoppgaver$",
+          "^Arbeidsordre$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -449,7 +557,16 @@
           "^Reparaturstatus$",
           "^Estado de reparaci?n$",
           "^Reparationsstatuskode$",
-          "^Korjaustilan koodi$"
+          "^Korjaustilan koodi$",
+          "^Code état réparation$",
+          "^Etat de la réparation$",
+          "^Reparaturstatuscode$",
+          "^Cód\\. estado reparación$",
+          "^Estado reparación$",
+          "^Korjauksen tilakoodi$",
+          "^Korjauksen tila$",
+          "^Reparasjonsstatuskode$",
+          "^Reparasjonsstatus$"
         ],
         "automationIdPatterns": []
       },

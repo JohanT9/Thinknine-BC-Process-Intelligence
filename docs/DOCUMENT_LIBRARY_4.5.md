@@ -76,7 +76,8 @@ references existing projects.
 ## Known limitations
 
 - Data is local to the extension; there is no cloud sync, sharing or
-  collaboration.
+  collaboration. Documents are moved to another computer with an export file
+  (see Moving documents to another computer).
 - Tags, author and thumbnails can be displayed/indexed but do not yet have a
   dedicated metadata-editing workflow.
 - Health and section metadata remain minimal until Document Workspace has been
@@ -103,3 +104,58 @@ each reference sequentially through the existing Word pipeline and never keeps
 multiple Review objects loaded. Progress is announced; the user may cancel in
 the preflight confirmation before processing begins. Export never mutates a
 document.
+
+## Moving documents to another computer
+
+Export… in the library heading writes a file with the whole library, the folder
+shown with its subfolders, or the selected documents. Import… reads such a file
+on another computer. Nothing is sent anywhere; the user moves the file.
+`document/library-transfer.js` holds the format and the rules; the dashboard
+only reads and writes the file and shows the result.
+
+- **Content.** A document is every stored entry of its recording: the session,
+  raw and canonical recordings with their events, screenshots, review and
+  progress, error evidence, test runs and bug reports, plus its library record.
+  Entries are copied unchanged, including fields this version does not know, so
+  nothing is regenerated or reinterpreted. Settings, licenses, language
+  preferences and other documents are never part of the file. The file can
+  contain customer data from Business Central; the export dialog says so.
+- **Format.** A gzip-compressed text file (`.bcps`) with one JSON object per
+  line: a header (format `bc-process-studio-library`, format version 1, export
+  time, extension version, scope and the folders the documents need), then per
+  document an item line, its entry lines and an item end with the entry count
+  and a SHA-256 digest of its entries, and finally an end line with the totals.
+  The export and the import process one line at a time, so a large library is
+  never held in memory as one string.
+- **Checks.** A file with another format, a newer format version, a missing end
+  line, a wrong count or digest, or an entry whose key does not belong to the
+  document it is listed under is refused before anything is written. An entry
+  belongs to a document by its key (`t9_session_<id>`,
+  `t9_recording_<id>:event:…`, `t9_screenshot_blob_<id>:…` and so on) or, for
+  error evidence, test runs and bug reports, by the document its value names.
+- **Preview.** The import shows how many documents are new, already here and
+  unchanged, already here with other content, or being recorded now (never
+  changed). Content is compared by digest with object keys sorted, and the
+  library record without the time it was last opened, so the same document is
+  not reported as changed because its fields were stored in another order.
+  Documents that differ are kept by default; Replace them takes the file's
+  version.
+- **Folders.** A folder in the file maps to the same folder here, otherwise to a
+  folder with the same name in the same place, otherwise it is created. Only
+  folders the imported documents are in are created; a folder that would be
+  deeper than allowed takes its documents to the folder above.
+- **Undo and recovery.** Before anything is replaced, its entries are copied to
+  `t9_library_import_undo_entry_*`, and `t9_library_import_undo` records the
+  import. A write that fails at any point puts everything back. The latest import
+  can be undone from the notice in the library until it is kept or another
+  import is made; undo removes the imported documents and restores the replaced
+  ones, including changes made to them since. An import interrupted by closing
+  the browser is offered for restoring on the next start.
+- **Export result.** The export reports the file as saved only when the browser
+  reports the download complete; a cancelled or failed download is reported as
+  not saved.
+- **Usage statistics.** An import writes stored entries directly and sends no
+  usage statistics.
+- **Not included.** This is a manual transfer, not synchronization. A document
+  deleted on one computer comes back when an older file is imported. There is no
+  merging of two versions of the same document; one of them is kept.

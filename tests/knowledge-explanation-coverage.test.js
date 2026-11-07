@@ -465,15 +465,25 @@ const apteanAddOnCases = [
   ["Aptean.PostPackAndShip", { taskType: "RunAction", pageCaption: "Shipping Batch", actionCaption: "Post" }],
   ["Aptean.ProcessEDIMessage", { taskType: "RunAction", pageCaption: "EDI Messages", actionCaption: "Process" }],
   ["Aptean.ProcessAIPEvents", { taskType: "RunAction", pageCaption: "AIP Connection Setup", actionCaption: "Process Events" }],
-  ["Aptean.SendOrderToTLx", { taskType: "RunAction", pageCaption: "Sales Order", actionCaption: "Send to TLx" }]
+  ["Aptean.SendOrderToTLx", { taskType: "RunAction", pageCaption: "Sales Order", actionCaption: "Send to TLx" }],
+  // Captions as written in Aptean's documentation (erpdocs.apteancloud.com/bc, English only):
+  // the harvest order card offers Create Purchase Contract, its lines Create Commodity Receipt,
+  // and quality control actions are posted from the Quality Control Actions list.
+  ["Aptean.CreatePurchaseContractFromHarvest", { taskType: "RunAction", pageCaption: "Harvest Order", actionCaption: "Create Purchase Contract" }],
+  ["Aptean.CreateCommodityReceiptFromHarvestOrder", { taskType: "RunAction", pageCaption: "Harvest Order", actionCaption: "Create Commodity Receipt" }],
+  ["Aptean.PostQualityAction", { taskType: "RunAction", pageCaption: "Quality Control Actions", actionCaption: "Post" }]
 ];
-for (const [ruleId, task] of apteanAddOnCases) {
-  const result = knowledge.apply([{ taskId: `aptean-${ruleId}`, pageIdentificationConfidence: 1,
-    language: "sv-SE", ...task }], allPacks).tasks[0];
-  assert.equal(result.knowledgeRule, ruleId, `${ruleId} resolves only in its documented page/action context`);
-  assert.ok(result.contextualExplanations?.["sv-SE"], `${ruleId} provides its localized explanation`);
-  assert.equal(catalog.basis(knowledge.rules(allPacks).find(rule => rule.ruleId === ruleId)),
-    "vendor-documentation", `${ruleId} identifies Aptean as its source`);
+// Aptean's captions are documented in English only. The cases run with an English interface and,
+// as before, with a Swedish interface showing the same English captions.
+for (const language of ["sv-SE", "en-US"]) {
+  for (const [ruleId, task] of apteanAddOnCases) {
+    const result = knowledge.apply([{ taskId: `aptean-${ruleId}`, pageIdentificationConfidence: 1,
+      language, ...task }], allPacks).tasks[0];
+    assert.equal(result.knowledgeRule, ruleId, `${ruleId} resolves only in its documented page/action context (${language})`);
+    assert.ok(result.contextualExplanations?.[language], `${ruleId} provides its ${language} explanation`);
+    assert.equal(catalog.basis(knowledge.rules(allPacks).find(rule => rule.ruleId === ruleId)),
+      "vendor-documentation", `${ruleId} identifies Aptean as its source`);
+  }
 }
 const genericClaimCreate = knowledge.apply([{ taskId: "generic-claim-create", taskType: "RunAction",
   actionCaption: "Create Claim", language: "sv-SE" }], allPacks).tasks[0];

@@ -20,7 +20,11 @@
           "^Pedidos de ensamblado$",
           "^Montageordrer$",
           "^Kokoonpanotilaukset$",
-          "^Samlingsordrer$"
+          "^Samlingsordrer$",
+          "^Monteringsorder$",
+          "^Ordres d'assemblage$",
+          "^Montageaufträge$",
+          "^Monteringsordrer$"
         ],
         "actionPatterns": [
           "^New$",
@@ -90,7 +94,8 @@
           "^Pedido de ensamblado$",
           "^Montageordre$",
           "^Kokoonpanotilaus$",
-          "^Monteringsordre$"
+          "^Monteringsordre$",
+          "^Ordre d'assemblage$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -101,7 +106,8 @@
           "^Cantidad a ensamblar$",
           "^Antal til montage$",
           "^Kokoonpantava määrä$",
-          "^Antall å montere$"
+          "^Antall å montere$",
+          "^Menge für Montage$"
         ],
         "automationIdPatterns": []
       },
@@ -162,7 +168,8 @@
           "^Pedido de ensamblado$",
           "^Montageordre$",
           "^Kokoonpanotilaus$",
-          "^Monteringsordre$"
+          "^Monteringsordre$",
+          "^Ordre d'assemblage$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -172,7 +179,9 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaat$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Bokför$",
+          "^Kirjaa$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -233,7 +242,9 @@
           "^Artikelkarte$",
           "^Ficha de producto$",
           "^Varekort$",
-          "^Nimikekortti$"
+          "^Nimikekortti$",
+          "^Ficha producto$",
+          "^Nimikkeen kortti$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -244,7 +255,12 @@
           "^Política de ensamblado$",
           "^Montageprincip$",
           "^Kokoonpanokäytäntö$",
-          "^Monteringspolicy$"
+          "^Monteringspolicy$",
+          "^Monteringsmetod$",
+          "^Stratégie d'assemblage$",
+          "^Directiva de ensamblado$",
+          "^Montagepolitik$",
+          "^Monteringsprinsipp$"
         ],
         "automationIdPatterns": []
       },
@@ -261,7 +277,13 @@
       ],
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": [],
       "sourceIds": [

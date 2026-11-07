@@ -233,7 +233,13 @@
           "^Plantillas de inspección de calidad$",
           "^Kvalitetsinspektionsskabeloner$",
           "^Laadun tarkastusmallit$",
-          "^Maler for kvalitetsinspeksjon$"
+          "^Maler for kvalitetsinspeksjon$",
+          "^Mallar för kvalitetsgranskning$",
+          "^Modèles d’inspection qualité$",
+          "^Qualitätsinspektionsvorlagen$",
+          "^Skabeloner til kvalitetskontrol$",
+          "^Laaduntarkistusmallit$",
+          "^Kvalitetsinspeksjonsmaler$"
         ],
         "actionPatterns": [
           "^New$",
@@ -294,7 +300,8 @@
           "^Qualitätstests$",
           "^Pruebas de calidad$",
           "^Kvalitetstest$",
-          "^Laatutestit$"
+          "^Laatutestit$",
+          "^Kvalitetstests$"
         ],
         "actionPatterns": [
           "^New$",
@@ -356,7 +363,13 @@
           "^Plantillas de inspección de calidad$",
           "^Kvalitetsinspektionsskabeloner$",
           "^Laadun tarkastusmallit$",
-          "^Maler for kvalitetsinspeksjon$"
+          "^Maler for kvalitetsinspeksjon$",
+          "^Mallar för kvalitetsgranskning$",
+          "^Modèles d’inspection qualité$",
+          "^Qualitätsinspektionsvorlagen$",
+          "^Skabeloner til kvalitetskontrol$",
+          "^Laaduntarkistusmallit$",
+          "^Kvalitetsinspeksjonsmaler$"
         ],
         "actionPatterns": [
           "^Copy Template$",
@@ -414,11 +427,24 @@
       "match": {
         "pagePatterns": [
           "^Quality Inspection Templates$",
-          "^Kvalitetsgranskningsmallar$"
+          "^Kvalitetsgranskningsmallar$",
+          "^Mallar för kvalitetsgranskning$",
+          "^Modèles d’inspection qualité$",
+          "^Qualitätsinspektionsvorlagen$",
+          "^Plantillas de inspección de calidad$",
+          "^Skabeloner til kvalitetskontrol$",
+          "^Laaduntarkistusmallit$",
+          "^Kvalitetsinspeksjonsmaler$"
         ],
         "actionPatterns": [
           "^Create Inspection$",
-          "^Skapa inspektion$"
+          "^Skapa inspektion$",
+          "^Créer une inspection$",
+          "^Inspektion erstellen$",
+          "^Crear inspección$",
+          "^Opret kvalitetskontrol$",
+          "^Luo tarkastus$",
+          "^Opprett inspeksjon$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -464,18 +490,37 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Purchase Order$",
           "^Production Order$",
           "^Inköpsorder$",
-          "^Produktionsorder$"
+          "^Produktionsorder$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
         ],
         "actionPatterns": [
           "^Create Inspection$",
-          "^Skapa inspektion från raden$"
+          "^Skapa inspektion från raden$",
+          "^Skapa inspektion$",
+          "^Créer une inspection$",
+          "^Inspektion erstellen$",
+          "^Crear inspección$",
+          "^Opret kvalitetskontrol$",
+          "^Luo tarkastus$",
+          "^Opprett inspeksjon$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -572,7 +617,14 @@
       "match": {
         "pagePatterns": [
           "^Quality Inspection$",
-          "^Kvalitetsinspektion$"
+          "^Kvalitetsinspektion$",
+          "^Kvalitetsgranskning$",
+          "^Inspection de la qualité$",
+          "^Qualitätsinspektion$",
+          "^Inspección de calidad$",
+          "^Kvalitetskontrol$",
+          "^Laadun tarkastus$",
+          "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
           "^Create Purchase Return$",
@@ -623,7 +675,11 @@
       "match": {
         "pagePatterns": [
           "^Workflows$",
-          "^Arbetsflöden$"
+          "^Arbetsflöden$",
+          "^Flux de travail$",
+          "^Flujos de trabajo$",
+          "^Työnkulut$",
+          "^Arbeidsflyter$"
         ],
         "actionPatterns": [
           "^Block Lot in the Inspection$",
@@ -673,7 +729,11 @@
       "match": {
         "pagePatterns": [
           "^Workflows$",
-          "^Arbetsflöden$"
+          "^Arbetsflöden$",
+          "^Flux de travail$",
+          "^Flujos de trabajo$",
+          "^Työnkulut$",
+          "^Arbeidsflyter$"
         ],
         "actionPatterns": [
           "^Unblock Lot in the Inspection$",
@@ -723,11 +783,24 @@
       "match": {
         "pagePatterns": [
           "^Quality Inspection$",
-          "^Kvalitetsinspektion$"
+          "^Kvalitetsinspektion$",
+          "^Kvalitetsgranskning$",
+          "^Inspection de la qualité$",
+          "^Qualitätsinspektion$",
+          "^Inspección de calidad$",
+          "^Kvalitetskontrol$",
+          "^Laadun tarkastus$",
+          "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
           "^Finish$",
-          "^Slutför$"
+          "^Slutför$",
+          "^Fin$",
+          "^Fertig stellen$",
+          "^Finalizar$",
+          "^Udfør$",
+          "^Lopetus$",
+          "^Fullfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -788,7 +861,14 @@
         ],
         "fieldPatterns": [
           "^Schedule Group$",
-          "^Schemagrupp$"
+          "^Schemagrupp$",
+          "^Schemalägg grupp$",
+          "^Planifier un groupe$",
+          "^Gruppe planen$",
+          "^Programar grupo$",
+          "^Planlæg gruppe$",
+          "^Ajoita ryhmä$",
+          "^Planlegg gruppen$"
         ],
         "automationIdPatterns": []
       },
@@ -830,7 +910,14 @@
       "confidence": 0.95,
       "match": {
         "pagePatterns": [
-          "^Quality Inspection Results$"
+          "^Quality Inspection Results$",
+          "^Resultat av kvalitetsgranskning$",
+          "^Résultats de l’inspection de la qualité$",
+          "^Ergebnisse der Qualitätsinspektion$",
+          "^Resultados de la inspección de calidad$",
+          "^Resultaterne af kvalitetskontrol$",
+          "^Laatutarkastusten tulokset$",
+          "^Kvalitetsinspeksjonsresultater$"
         ],
         "actionPatterns": [
           "^New$"
@@ -883,11 +970,24 @@
           "^Output Journal$",
           "^Production Journal$",
           "^Utdatajournal$",
-          "^Produktionsjournal$"
+          "^Produktionsjournal$",
+          "^Feuille production$",
+          "^Produktions Buch\\.-Blatt$",
+          "^Diario de producción$",
+          "^Produktionskladde$",
+          "^Tuotantopäiväkirja$",
+          "^Produksjonskladd$"
         ],
         "actionPatterns": [
           "^Post$",
-          "^Publicera$"
+          "^Publicera$",
+          "^Bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -938,7 +1038,13 @@
       "match": {
         "pagePatterns": [
           "^Purchase Order$",
-          "^Inköpsorder$"
+          "^Inköpsorder$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
         ],
         "actionPatterns": [
           "^Show Inspections for Item and Document$",
@@ -983,16 +1089,36 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Quality Inspection$",
-          "^Kvalitetsinspektion$"
+          "^Kvalitetsinspektion$",
+          "^Kvalitetsgranskning$",
+          "^Inspection de la qualité$",
+          "^Qualitätsinspektion$",
+          "^Inspección de calidad$",
+          "^Kvalitetskontrol$",
+          "^Laadun tarkastus$",
+          "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
           "^Move Inventory$",
-          "^Flytta lager$"
+          "^Flytta lager$",
+          "^Flytta inventering$",
+          "^Déplacer le stock$",
+          "^Bestand umlagern$",
+          "^Mover inventario$",
+          "^Flyt lager$",
+          "^Siirrä varasto$",
+          "^Flytt lagerbeholdning$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1033,16 +1159,35 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Quality Inspection$",
-          "^Kvalitetsinspektion$"
+          "^Kvalitetsinspektion$",
+          "^Kvalitetsgranskning$",
+          "^Inspection de la qualité$",
+          "^Qualitätsinspektion$",
+          "^Inspección de calidad$",
+          "^Kvalitetskontrol$",
+          "^Laadun tarkastus$",
+          "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
           "^Create Negative Adjustment$",
-          "^Skapa negativ justering$"
+          "^Skapa negativ justering$",
+          "^Créer un ajustement négatif$",
+          "^Negative Berichtigung erstellen$",
+          "^Crear ajuste negativo$",
+          "^Opret negativ justering$",
+          "^Luo negatiivinen muutos$",
+          "^Opprett negativ justering$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1083,16 +1228,36 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Quality Inspection$",
-          "^Kvalitetsinspektion$"
+          "^Kvalitetsinspektion$",
+          "^Kvalitetsgranskning$",
+          "^Inspection de la qualité$",
+          "^Qualitätsinspektion$",
+          "^Inspección de calidad$",
+          "^Kvalitetskontrol$",
+          "^Laadun tarkastus$",
+          "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
           "^Change Item Tracking$",
-          "^Spåra ändringsobjekt$"
+          "^Spåra ändringsobjekt$",
+          "^Ändra objektspårning$",
+          "^Suivi des changements d’articles$",
+          "^Artikelverfolgung ändern$",
+          "^Cambiar seguimiento de artículos$",
+          "^Skift varesporing$",
+          "^Muuta nimikkeen seurantaa$",
+          "^Endre varesporing$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1138,7 +1303,10 @@
           "^Lignes de traçabilité$",
           "^Artikelverfolgungszeilen$",
           "^Líneas de seguimiento del artículo$",
-          "^Varesporingslinjer$"
+          "^Varesporingslinjer$",
+          "^Lignes traçabilité$",
+          "^Líns\\. seguim\\. prod\\.$",
+          "^Nimikkeen seurantarivit$"
         ],
         "actionPatterns": [
           "^Create Quality Inspections$",

@@ -11,10 +11,10 @@
       "entity": "AbsenceRegistration",
       "priority": 1310,
       "confidence": 0.95,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
-        "pagePatterns": ["^Employees$", "^Anställda$"],
-        "actionPatterns": ["^Absences by Categories$", "^Frånvaro per kategori$"],
+        "pagePatterns": ["^Employees$", "^Anställda$", "^Personal$", "^Medarbetare$", "^Salariés$", "^Employés$", "^Mitarbeiter$", "^Empleados$", "^Medarbejdere$", "^Työntekijät$", "^Ansatte$"],
+        "actionPatterns": ["^Absences by Categories$", "^Frånvaro per kategori$", "^Absences par catégorie$", "^Abwesenheiten nach Kategorien$", "^Ausencias por categorías$", "^Fravær pr\\. kategori$", "^Poissaolot luokittain$", "^Fravær per kategori$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -49,10 +49,10 @@
       "entity": "AbsenceRegistration",
       "priority": 1310,
       "confidence": 0.95,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
-        "pagePatterns": ["^Absence Registration$", "^Frånvaroregistrering$"],
-        "actionPatterns": ["^Overview by Categories$", "^Overview by Periods$", "^Översikt per kategori$", "^Översikt per perioder$"],
+        "pagePatterns": ["^Absence Registration$", "^Frånvaroregistrering$", "^Saisie des absences$", "^Abwesenheitsregistrierung$", "^Registro ausencias$", "^Fraværsregistrering$", "^Poissaolon rekisteröinti$"],
+        "actionPatterns": ["^Overview by Categories$", "^Overview by Periods$", "^Översikt per kategori$", "^Översikt per perioder$", "^Översikt per period$", "^Détail par catégorie$", "^Détail par période$", "^Übersicht nach Kategorien$", "^Übersicht nach Perioden$", "^Panorama por categorías$", "^Panorama por periodos$", "^Oversigt pr\\. kategori$", "^Oversigt pr\\. periode$", "^Yleiskuvaus luokittain$", "^Yleiskuvaus kausittain$", "^Oversikt per kategori$", "^Oversikt per periode$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -96,7 +96,10 @@
           "^Empleados$",
           "^Medarbejdere$",
           "^Työntekijät$",
-          "^Ansatte$"
+          "^Ansatte$",
+          "^Personal$",
+          "^Medarbetare$",
+          "^Salariés$"
         ],
         "actionPatterns": [
           "^New$",
@@ -157,7 +160,8 @@
           "^Abwesenheitsregistrierung$",
           "^Registro de ausencias$",
           "^Fraværsregistrering$",
-          "^Poissaolon rekisteröinti$"
+          "^Poissaolon rekisteröinti$",
+          "^Registro ausencias$"
         ],
         "actionPatterns": [
           "^New$",
@@ -219,7 +223,9 @@
           "^Ficha de empleado$",
           "^Medarbejderkort$",
           "^Työntekijäkortti$",
-          "^Ansattkort$"
+          "^Ansattkort$",
+          "^Ficha empleado$",
+          "^Työntekijän kortti$"
         ],
         "actionPatterns": [
           "^Apply Template$",
@@ -229,7 +235,9 @@
           "^Aplicar plantilla$",
           "^Anvend skabelon$",
           "^Käytä mallia$",
-          "^Bruk mal$"
+          "^Bruk mal$",
+          "^Koppla mall$",
+          "^Appliquer modèle$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

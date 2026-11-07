@@ -15,6 +15,12 @@
   // Not "t9_review_progress_": everything under REVIEW_PREFIX is read as a review.
   const REVIEW_PROGRESS_PREFIX = "t9_progress_";
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
+  // The library's folder tree (document/document-folders.js).
+  const DOCUMENT_FOLDERS_KEY = "t9_document_folders";
+  // The latest library import (document/library-transfer.js) and the entries it replaced,
+  // kept so that it can be undone. Not under any document prefix, so never exported.
+  const LIBRARY_IMPORT_UNDO_KEY = "t9_library_import_undo";
+  const LIBRARY_IMPORT_UNDO_ENTRY_PREFIX = "t9_library_import_undo_entry_";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
   const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
   // One entry per test run, keyed by its own id; each names the recording it tests.
@@ -39,6 +45,9 @@
     TEST_RUN_PREFIX,
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
+    DOCUMENT_FOLDERS_KEY,
+    LIBRARY_IMPORT_UNDO_KEY,
+    LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
     REVIEW_PREFIX,
     REVIEW_PROGRESS_PREFIX,
     RECORDING_PREFIX,
