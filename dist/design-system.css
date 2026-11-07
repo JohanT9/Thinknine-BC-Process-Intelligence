@@ -185,7 +185,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .library-filter-options label{display:inline-flex;align-items:center;gap:var(--space8)}
 .library-filter-options input{width:auto}.library-filter-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
 .library-card-meta{display:flex;flex-wrap:wrap;gap:4px 10px;color:var(--colorTextSecondary);font-size:12px}
-.library-card-meta .library-profile{font-size:12px}.library-card-status{font-weight:700;color:var(--c-fg-6b4f00)}
+.library-card-meta .library-profile{font-size:12px}.library-card-status{font-weight:700;color:var(--c-fg-6b4f00)}.library-delivery[data-outcome="uncertain"]{font-weight:700}
 .library-card h4,.review-title-row h2,.process-overview-content>strong{overflow-wrap:anywhere}
 .review-progress { height: 4px !important; border-radius: 0 !important; }
 .review-progress-bar { background: var(--colorBrandPrimary) !important; }

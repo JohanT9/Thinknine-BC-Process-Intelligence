@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Test run</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    html{overflow-x:hidden}body{font:16px system-ui;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-eef2f6);overflow-x:hidden}
+    header{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 24px;background:var(--c-bg-ffffff);border-bottom:1px solid var(--c-bd-ccd5df)}
+    header .actions{display:flex;flex-wrap:wrap;gap:8px}header button{min-height:40px;padding:8px 12px;margin:0}
+    #runMessage{flex:1 1 220px;min-width:0;font-size:.9375rem}
+    main{box-sizing:border-box;max-width:1100px;margin:auto;background:var(--c-bg-ffffff);padding:24px}
+    h1{margin:0 0 4px;font-size:1.5rem;overflow-wrap:anywhere}h2{font-size:1.15rem;margin:24px 0 8px}
+    .save-state{margin:0 0 12px;font-size:.875rem;color:var(--c-fg-526273)}.save-state button{margin-left:8px;min-height:32px}
+    .save-state[data-state=failed]{color:var(--c-fg-8a1c14);font-weight:600}
+    .run-intro{margin:0 0 16px;max-width:72ch;color:var(--c-fg-526273)}
+    .run-summary{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin:0 0 16px;padding:10px 14px;border:1px solid var(--c-bd-dfe5ec);border-radius:6px}
+    .run-summary strong[data-outcome=passed]{color:var(--c-fg-166534)}.run-summary strong[data-outcome=failed]{color:var(--c-fg-8a1c14)}
+    .run-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 16px;margin:0 0 8px}
+    label{display:block;font-weight:600}input[type=text],textarea{box-sizing:border-box;width:100%;padding:8px;font:inherit;margin-top:4px}
+    textarea{min-height:64px;resize:vertical}.field-help{margin:4px 0 0;font-size:.875rem;color:var(--c-fg-526273);font-weight:400}
+    .process-expected p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+    .run-steps{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:12px}
+    .run-step{padding:14px 16px;border:1px solid var(--c-bd-ccd5df);border-left:4px solid var(--c-bd-ccd5df);border-radius:6px;min-width:0}
+    .run-step[data-status=passed]{border-left-color:var(--c-bd-15803d)}.run-step[data-status=failed]{border-left-color:var(--c-bd-b42318);background:var(--c-bg-fff4f2)}
+    .run-step[data-status=skipped]{border-left-color:var(--c-bd-8392a5)}
+    .run-step-heading{margin:0 0 4px;font-size:.8125rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--c-fg-526273)}
+    .run-step h3{margin:0 0 10px;font-size:1rem;font-weight:400;overflow-wrap:anywhere}.run-step h3 .step-number{font-weight:700;margin-right:6px}
+    .run-step-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 16px}
+    .run-status{margin:10px 0 0;padding:0;border:0;min-width:0;background:none;box-shadow:none}.run-status legend{font-weight:600;padding:0;margin-bottom:6px}
+    .run-status .choices{display:flex;flex-wrap:wrap;gap:6px}
+    .run-status .choice{display:inline-flex;align-items:center;gap:6px;font-weight:400;padding:6px 12px;min-height:32px;border:1px solid var(--c-bd-8392a5);border-radius:999px;cursor:pointer;background:var(--c-bg-ffffff)}
+    .run-status input{margin:0;accent-color:var(--c-bg-008c95)}
+    .run-status .choice:has(input:checked){border-width:2px;font-weight:700}
+    .run-status .choice:has(input:focus-visible){outline:var(--focusWidth) solid var(--colorFocusIndicator);outline-offset:2px}
+    .run-step-report{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}.run-step-report button{margin:0;min-height:40px}
+    .earlier-runs ul{margin:0;padding-left:20px}.earlier-runs li{margin:4px 0;overflow-wrap:anywhere}
+    @media(max-width:640px){header{padding:10px 16px}main{padding:16px}.run-step-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="actions">
+      <button id="exportRun" type="button" data-i18n="test.exportMarkdown">Export Markdown</button>
+      <button id="runAgain" type="button" data-i18n="test.runAgain">Run again</button>
+      <button id="closeRun" type="button" data-i18n="test.close">Close</button>
+    </div>
+    <span id="runMessage" role="status"></span>
+  </header>
+  <main id="testRun" aria-labelledby="runTitle">
+    <h1 id="runTitle" data-i18n-ignore></h1>
+    <p id="saveState" class="save-state" role="status"></p>
+    <p class="run-intro" data-i18n="test.intro">The steps come from the reviewed document as it was when the test was created. Write the expected result for each step; it is kept for the next run.</p>
+    <p id="runSummary" class="run-summary" data-i18n-ignore></p>
+    <div class="run-fields">
+      <div><label for="runTester" data-i18n="test.tester">Tester</label><input id="runTester" type="text" autocomplete="name"></div>
+      <div><label for="runEnvironment" data-i18n="test.environment">Environment tested</label><input id="runEnvironment" type="text" aria-describedby="runEnvironmentHelp">
+        <p id="runEnvironmentHelp" class="field-help" data-i18n="test.environmentHelp">For example the Business Central version, environment or company.</p></div>
+    </div>
+    <section id="processExpected" class="process-expected" aria-labelledby="processExpectedTitle" hidden>
+      <h2 id="processExpectedTitle" data-i18n="test.processExpected">Expected result of the process</h2>
+      <p id="processExpectedText" data-i18n-ignore></p>
+    </section>
+    <ol id="runSteps" class="run-steps" data-i18n-ignore></ol>
+    <section id="earlierRuns" class="earlier-runs" aria-labelledby="earlierRunsTitle" hidden>
+      <h2 id="earlierRunsTitle" data-i18n="test.earlierRuns">Earlier runs of this test</h2>
+      <ul id="earlierRunList" data-i18n-ignore></ul>
+    </section>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="document/test-script.js"></script>
+  <script src="test-run.js"></script>
+</body>
+</html>

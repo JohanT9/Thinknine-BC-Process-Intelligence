@@ -55,7 +55,19 @@
     return state.state === "new" ? localized("Not reviewed", locale, "Ej granskad") : "";
   }
 
-  function card(record, selected, active, locale = "en-US", progress = null) {
+  // The latest email made from a bug report. Only a confirmed send is shown as sent.
+  function deliveryLabel(delivery, locale) {
+    if (!delivery) return "";
+    const values = { date: date(delivery.at, locale) };
+    if (delivery.outcome === "sent") return localized("Sent {date}", locale, "Skickad {date}", values);
+    if (delivery.outcome === "uncertain") {
+      return localized("Possibly sent {date}", locale, "Kanske skickad {date}", values);
+    }
+    return ["draft", "file"].includes(delivery.outcome)
+      ? localized("Email prepared {date}", locale, "E-post förberedd {date}", values) : "";
+  }
+
+  function card(record, selected, active, locale = "en-US", progress = null, delivery = null) {
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
     const state = documentState(record, progress);
     const recording = state.state === "recording";
@@ -88,6 +100,8 @@
             <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
             <span>${escape(localized("Changed {date}", locale,
               "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
+            ${bugReport && deliveryLabel(delivery, locale) ? `<span class="library-delivery"
+              data-outcome="${escape(delivery.outcome)}">${escape(deliveryLabel(delivery, locale))}</span>` : ""}
             ${record.archived ? `<span class="library-card-status">${escape(localized(
               "Archived", locale, "Arkiverad"))}</span>` : ""}
             ${record.status ? `<span>${escape(record.status)}</span>` : ""}
@@ -112,7 +126,9 @@
             "Fler åtgärder för {title}", { title: record.title }))}">⋯</summary>
           <div class="library-card-menu-panel" data-no-tooltip>
             ${bugReport || recording ? "" : `<button type="button" data-library-action="export-word">${escape(
-              localized("Export Word", locale, "Exportera Word"))}</button>`}
+              localized("Export Word", locale, "Exportera Word"))}</button>
+            <button type="button" data-library-action="run-test">${escape(
+              localized("Run test", locale, "Kör test"))}</button>`}
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
             <button type="button" data-library-action="archive">${escape(record.archived
@@ -178,7 +194,7 @@
     }
     container.innerHTML = records.map(record => card(record,
       selectedIds.has(record.projectId), record.projectId === activeId, locale,
-      state.progress?.get(record.projectId)
+      state.progress?.get(record.projectId), state.deliveries?.get(record.projectId)
     )).join("");
     return activeId;
   }
@@ -196,7 +212,8 @@
         <div class="library-group-cards">${group.documents.map(record =>
           card(record, selectedIds.has(record.projectId),
             record.projectId === activeId, locale,
-            state.progress?.get(record.projectId))).join("")}</div></section>`
+            state.progress?.get(record.projectId),
+            state.deliveries?.get(record.projectId))).join("")}</div></section>`
     ).join("");
     return activeId;
   }

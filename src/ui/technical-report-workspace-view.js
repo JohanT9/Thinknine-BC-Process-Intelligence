@@ -95,6 +95,53 @@
     fillSaveState(doc, status, workspaceState, options, options.locale || "en-US");
     return true;
   }
+  // Emails made from the report, newest first, and whether the report has changed since the
+  // latest one. Only Microsoft's confirmation is shown as sent.
+  const DELIVERY_TEXTS = Object.freeze({
+    sent: ["technical.deliverySent", "Sent {date} to {to}."],
+    uncertain: ["technical.deliveryUncertain",
+      "Possibly sent {date} to {to}. Check Sent Items in Outlook."],
+    draft: ["technical.deliveryDraft", "Outlook draft created {date} for {to}."],
+    file: ["technical.deliveryFile", "Email file saved {date} for {to}."] });
+  function deliveryTime(value, locale) {
+    const time = new Date(value);
+    if (!Number.isFinite(time.getTime())) return String(value || "");
+    try {
+      return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" })
+        .format(time);
+    } catch { return time.toISOString(); }
+  }
+  function appendDeliveries(doc, container, workspaceState, locale) {
+    const deliveries = (workspaceState.report.deliveries || [])
+      .filter(item => DELIVERY_TEXTS[item.outcome]);
+    if (!deliveries.length) return;
+    const section = element(doc, "section", "", "report-deliveries");
+    section.setAttribute("aria-labelledby", "technical-report-deliveries-title");
+    const heading = element(doc, "h2", uiKey("technical.deliveriesTitle", locale,
+      "Email history"));
+    heading.id = "technical-report-deliveries-title";
+    const list = element(doc, "ul", "", "report-delivery-list");
+    [...deliveries].reverse().forEach(item => {
+      const [key, fallback] = DELIVERY_TEXTS[item.outcome];
+      const entry = element(doc, "li", uiKey(key, locale, fallback)
+        .replace("{date}", deliveryTime(item.at, locale))
+        .replace("{to}", item.to.join(", ") || "–"));
+      entry.dataset.outcome = item.outcome;
+      if (item.cc.length) entry.append(" ", uiKey("technical.deliveryCc", locale, "Copy: {cc}.")
+        .replace("{cc}", item.cc.join(", ")));
+      list.appendChild(entry);
+    });
+    const latest = deliveries[deliveries.length - 1];
+    const changed = latest.reportRevision !== workspaceState.contentRevision;
+    const note = element(doc, "p", changed
+      ? uiKey("technical.deliveryChanged", locale,
+        "The report has changed since the latest email. The recipient has an earlier version.")
+      : uiKey("technical.deliveryCurrent", locale,
+        "The latest email holds the current version of the report."), "report-delivery-note");
+    note.dataset.state = changed ? "changed" : "current";
+    section.append(heading, list, note);
+    container.appendChild(section);
+  }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
     const onEdit = options.onEdit || (() => {});
@@ -149,6 +196,7 @@
       .filter(Boolean).join(" "), "report-privacy-help");
     maskHelp.id = "technical-report-mask-help";
     privacy.append(maskLabel, maskHelp); container.appendChild(privacy);
+    appendDeliveries(doc, container, workspaceState, locale);
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";
     editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
