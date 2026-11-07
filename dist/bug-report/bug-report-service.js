@@ -263,7 +263,9 @@
         ]).map(item => JSON.parse(item)),
         diagnosticRefs: clone(current.evidence.diagnosticRefs),
         attachmentRefs: clone(current.evidence.attachmentRefs) },
-      enrichment: clone(current.enrichment) });
+      enrichment: clone(current.enrichment),
+      // What was sent stays recorded; the regenerated report is a new version of it.
+      deliveries: clone(current.deliveries) });
   }
 
   function reparseTechnicalDiagnostics(report, errorEvidence = []) {

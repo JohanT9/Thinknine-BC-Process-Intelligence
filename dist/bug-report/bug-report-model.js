@@ -13,6 +13,28 @@
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
   const text = value => typeof value === "string" ? value : "";
+  const stable = value => JSON.stringify(value, (_, child) => child &&
+    typeof child === "object" && !Array.isArray(child) ? Object.keys(child).sort()
+      .reduce((out, key) => { out[key] = child[key]; return out; }, {}) : child);
+  function hash(value) {
+    let result = 2166136261;
+    for (const character of stable(value)) {
+      result ^= character.charCodeAt(0); result = Math.imul(result, 16777619);
+    }
+    return (result >>> 0).toString(16).padStart(8, "0");
+  }
+  const MAX_DELIVERIES = 100;
+  const addressList = value => (Array.isArray(value) ? value : String(value || "").split(/[;,]/u))
+    .map(item => String(item || "").trim()).filter(Boolean);
+  // A record of an email made from the report: sent directly, possibly sent, an Outlook
+  // draft or a saved email file. Fields from later versions are kept.
+  function normalizeDelivery(value) {
+    if (!value || typeof value !== "object" || !value.deliveryId || !value.at) return null;
+    return { ...clone(value), deliveryId: String(value.deliveryId), at: String(value.at),
+      method: text(value.method), outcome: text(value.outcome),
+      to: addressList(value.to), cc: addressList(value.cc),
+      reportRevision: value.reportRevision ? String(value.reportRevision) : null };
+  }
 
   function humanText(value = {}) {
     return { text: text(value.text), authorship: "human",
@@ -99,7 +121,27 @@
     result.enrichment = clone(result.enrichment || {
       telemetry: null, analysis: null
     });
+    result.deliveries = (Array.isArray(result.deliveries) ? result.deliveries : [])
+      .map(normalizeDelivery).filter(Boolean);
     return result;
+  }
+
+  // Identifies what the report says, so a delivery can tell whether the report has changed
+  // since. The delivery history, save times, status and telemetry do not count.
+  function contentRevision(report) {
+    const { deliveries, updatedAt, status, enrichment, ...content } = normalize(report);
+    return `content:${hash(content)}`;
+  }
+
+  // Adds a delivery without changing when the report was last edited. The same delivery is
+  // recorded once.
+  function recordDelivery(report, delivery) {
+    const result = normalize(report);
+    const entry = normalizeDelivery(delivery);
+    if (!entry) throw new TypeError("A delivery needs an id and a time.");
+    if (result.deliveries.some(item => item.deliveryId === entry.deliveryId)) return result;
+    result.deliveries = [...result.deliveries, entry].slice(-MAX_DELIVERIES);
+    return normalize(result);
   }
 
   function updateHumanContent(report, patch = {}, updatedAt) {
@@ -235,7 +277,7 @@
   }
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    addReproductionStep, attachTelemetry, selectPrimaryError,
+    addReproductionStep, contentRevision, recordDelivery, attachTelemetry, selectPrimaryError,
     updateHumanContent, updateReproductionStep, updateScreenshotVisibility,
     updateScreenshotRedactions };
 });

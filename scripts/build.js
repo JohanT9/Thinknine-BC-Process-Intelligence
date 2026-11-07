@@ -184,7 +184,7 @@ for (const file of [
   "workspace-controller.js",
   "workspace-context.js",
   "technical-report.html", "technical-report.js",
-  "technical-report-workspace-view.js", "knowledge-admin.html",
+  "technical-report-workspace-view.js", "test-run.html", "test-run.js", "knowledge-admin.html",
   "knowledge-admin.js", "knowledge-admin-policy.schema.json"
 ]) {
   copyFile(

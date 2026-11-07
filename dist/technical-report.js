@@ -406,10 +406,19 @@
       return { draft, imageResult, reportKey: bugReportId + ":" +
         issuePreviewState.issuePackage.sourceRevision };
     }
+    // Each email made from the report is recorded with the version it held. A draft or a
+    // file is recorded as such; only Microsoft's confirmation records the report as sent.
+    function recordDelivery(method, outcome, to, cc = []) {
+      try {
+        workspace.recordDelivery({ deliveryId: crypto.randomUUID(), at: new Date().toISOString(),
+          method, outcome, to, cc });
+      } catch (error) { console.warn("The delivery could not be recorded.", error); }
+    }
     async function emailReport() {
       const { draft, imageResult } = preparedEmail || await prepareEmail();
       const result = await download(draft.content, draft.fileName,
         "message/rfc822;charset=utf-8", true);
+      recordDelivery("eml", "file", draft.to);
       message.textContent = [globalThis.T9UiI18n.translateStaticText(
         result.opened
           ? "Email draft created with the report attached."
@@ -643,6 +652,7 @@
         await outlookClient.send({ reportKey: sending.reportKey, email: { ...sending.draft,
           to: to.valid.join("; "), cc: cc.valid.join("; ") } });
         closeSendConfirm();
+        recordDelivery("direct", "sent", to.valid, cc.valid);
         await rememberRecipients([...to.valid, ...cc.valid]);
         const sent = t("outlook.sent").replace("{to}", [...to.valid, ...cc.valid].join(", "));
         outlookStatus.textContent = sent;
@@ -652,7 +662,10 @@
       } catch (error) {
         // An unconfirmed send may have gone out; the confirmation closes so that it is not
         // sent again by a second click before Sent Items has been checked.
-        if (error?.outlookCode === "uncertain") closeSendConfirm();
+        if (error?.outlookCode === "uncertain") {
+          closeSendConfirm();
+          recordDelivery("direct", "uncertain", to.valid, cc.valid);
+        }
         outlookStatus.textContent = t(sendMessageKey(error?.outlookCode));
       } finally {
         controls.forEach(control => { control.disabled = false; });
@@ -814,6 +827,7 @@
         preparedEmail = await prepareEmail();
         const result = await outlookClient.draft({ reportKey: preparedEmail.reportKey,
           email: preparedEmail.draft });
+        recordDelivery("outlook-draft", "draft", preparedEmail.draft.to, preparedEmail.draft.cc);
         outlookLink.href = result.webLink;
         outlookLink.hidden = false;
         outlookStatus.textContent = t(result.recovery ? "outlook.uncertain" : "outlook.created");

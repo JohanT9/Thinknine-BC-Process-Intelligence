@@ -3902,6 +3902,37 @@ async function exportLibraryDocument(record, exportSettings) {
   return result;
 }
 
+// A manual test from the document as it reads now: its steps in the document language,
+// with the user's edits. The run opens on its own page.
+async function createTestRun(record) {
+  const session = documentLibrarySessions.get(record.projectId);
+  if (!session || session.status === "recording" || session.recordingPurpose === "bug-report") {
+    throw new Error(uiT("test.noSteps"));
+  }
+  const model = await prepareSessionModel(session);
+  const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
+  const review = existing.review
+    ? globalThis.T9Review.normalizeReview({
+      ...existing.review,
+      tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
+    })
+    : globalThis.T9Review.createReview(session, model.businessTasks);
+  const prepared = globalThis.T9WordExportPipeline.createPresentation({
+    session: model.response.session, review, profileId: record.profile.profileId });
+  let run;
+  try {
+    run = globalThis.T9TestScript.create(prepared.presentationDocument, {
+      testRunId: `test-run-${crypto.randomUUID()}`, sessionId: session.id,
+      title: record.title, processExpectedResult: review.documentFields?.expectedResult ||
+        review.expectedResult || "" });
+  } catch {
+    throw new Error(uiT("test.noSteps"));
+  }
+  const response = await send({ type: "T9_CREATE_TEST_RUN", run });
+  if (!response?.ok) throw new Error(uiT(response?.error || "test.runNotFound"));
+  return response.run;
+}
+
 async function exportActiveReviewToWord() {
   if (!activeReviewSession || !activeReview) {
     throw new Error(uiT("Ingen granskning är öppen."));
@@ -4344,6 +4375,8 @@ const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
 let visibleDocumentLibraryRecords = [];
 // Review progress per document, the active quick filter and whether checkboxes are shown.
 let documentLibraryProgress = new Map();
+// The latest email made from each bug report, by recording.
+let documentLibraryDeliveries = new Map();
 let libraryQuickFilter = "all";
 let librarySelectMode = false;
 const LIBRARY_QUICK_FILTERS = Object.freeze({
@@ -4462,7 +4495,8 @@ function renderDocumentLibrary() {
   visibleDocumentLibraryRecords = records;
   const view = globalThis.T9DocumentLibraryView;
   const viewState = { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
-    storedCount: documentLibraryRecords.length, progress: documentLibraryProgress };
+    storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
+    deliveries: documentLibraryDeliveries };
   const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
       globalThis.T9DocumentLibrary.groupByProfile(records,
@@ -4559,6 +4593,13 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
   ));
   const bugReports = new Map((bootstrap.reports || []).map(report =>
     [report.recordingId, report]));
+  documentLibraryDeliveries = new Map([...bugReports].flatMap(([recordingId, report]) => {
+    // A send is shown before a later draft or file, which may never have been sent.
+    const deliveries = report.deliveries || [];
+    const latest = deliveries.findLast(item => ["sent", "uncertain"].includes(item.outcome)) ||
+      deliveries.at(-1);
+    return latest ? [[recordingId, latest]] : [];
+  }));
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
     const sessionRecord = librarySessionRecord(session);
@@ -9818,6 +9859,10 @@ async function runLibraryMenuAction(action, projectId, card) {
       await exportLibraryDocument(record, { ...DEFAULTS,
         ...(settingsResponse?.settings || {}) });
       show(uiTf("library.exportComplete", { count: 1 }));
+    } else if (action === "run-test") {
+      show(uiT("test.creatingRun"));
+      await createTestRun(record);
+      show("");
     } else if (action === "export-recording") {
       await exportSession(session);
     } else if (action === "archive") {

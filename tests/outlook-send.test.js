@@ -195,7 +195,7 @@ function harness(mode = 'success', sessionValues = null) {
   assert.ok(!typing.includes('interactive: true'), 'typing never opens sign-in');
   assert.match(page, /searchPeopleButton\.addEventListener\("click"[\s\S]*outlookClient\.people\("", \{ interactive: true \}\)/);
   assert.match(confirmClick, /email: \{ \.\.\.sending\.draft,\s+to: to\.valid\.join\("; "\), cc: cc\.valid\.join\("; "\) \}/);
-  assert.match(confirmClick, /if \(error\?\.outlookCode === "uncertain"\) closeSendConfirm\(\);/);
+  assert.match(confirmClick, /if \(error\?\.outlookCode === "uncertain"\) \{\s+closeSendConfirm\(\);\s+recordDelivery\("direct", "uncertain"/);
 
   // Every interface language has the texts.
   const ui = vm.createContext({ T9LanguageRegistry: language });

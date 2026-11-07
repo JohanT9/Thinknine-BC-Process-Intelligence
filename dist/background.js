@@ -84,6 +84,7 @@ importScripts("bug-report/bug-report-generator.js");
 importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
 importScripts("document/document-library.js");
+importScripts("document/test-script.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
@@ -256,6 +257,7 @@ const SETTINGS_KEY = "t9_settings";
 const {
   BC_ERROR_EVIDENCE_PREFIX,
   BUG_REPORT_PREFIX,
+  TEST_RUN_PREFIX,
   EVENT_PREFIX,
   RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
@@ -1778,7 +1780,73 @@ async function saveDocumentLibrary(records) {
   return normalized;
 }
 
+// Test runs of a process document. A run is stored on its own and names the recording.
+async function loadTestRun(testRunId) {
+  const key = TEST_RUN_PREFIX + String(testRunId || "");
+  const value = (await chrome.storage.local.get(key))[key];
+  return value ? globalThis.T9TestScript.normalize(value) : null;
+}
+async function saveTestRun(run) {
+  const value = globalThis.T9TestScript.normalize(run);
+  await chrome.storage.local.set({ [TEST_RUN_PREFIX + value.testRunId]: value });
+  return value;
+}
+async function listTestRuns(recordingId = "") {
+  const all = await globalThis.T9StorageQueries.getByPrefixes(chrome.storage.local,
+    [TEST_RUN_PREFIX]);
+  return Object.entries(all).filter(([key, value]) => key.startsWith(TEST_RUN_PREFIX) &&
+    (!recordingId || value?.sessionId === recordingId))
+    .flatMap(([, value]) => { try { return [globalThis.T9TestScript.normalize(value)]; }
+      catch { return []; } })
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+// A bug report from a failed test step. Nothing was recorded for it, so it gets a recording
+// of its own without events, and the steps, expected and actual result come from the test:
+// the document's steps up to the failed one, its checks and the tester's description.
+async function createBugReportFromTestStep(testRunId, stepId) {
+  const run = await loadTestRun(testRunId);
+  if (!run) throw new Error("test.runNotFound");
+  const content = globalThis.T9TestScript.bugReportContent(run, stepId);
+  const step = run.steps.find(item => item.stepId === String(stepId));
+  if (step.status !== "failed") throw new Error("test.reportOnlyFailed");
+  if (!content.actualResult) throw new Error("test.describeFailure");
+  const tested = await getSession(run.sessionId);
+  const now = new Date().toISOString();
+  const id = sessionId(content.title || "Business Central");
+  const settings = { ...(tested?.settings || await getSettings()),
+    documentLanguage: content.documentLanguage };
+  await saveSession({ id, name: content.title || "Business Central", purpose: "",
+    recordingPurpose: "bug-report",
+    businessCentral: JSON.parse(JSON.stringify(tested?.businessCentral || {})),
+    startedAt: now, completedAt: now, updatedAt: now, status: "completed", eventCount: 0,
+    version: VERSION, settings, source: content.source });
+  await saveEvents(id, []);
+  const recording = await getCanonicalRecording(id);
+  const model = globalThis.T9BugReportModel;
+  let report = globalThis.T9BugReportService.createBugReportFromRecording(recording, [], {
+    extensionVersion: VERSION, productVersion: VERSION, errorEvidence: [],
+    documentLanguage: content.documentLanguage, title: content.title, now });
+  for (const instruction of content.steps) {
+    report = model.addReproductionStep(report, instruction, now);
+  }
+  report = model.updateHumanContent({ ...report, source: content.source }, {
+    expectedResult: content.expectedResult, actualResult: content.actualResult }, now);
+  const saved = await bugReportStore.save(report);
+  await saveTestRun(globalThis.T9TestScript.updateStep(run, stepId,
+    { bugReportId: saved.bugReportId }, now));
+  const workspaceUrl = chrome.runtime.getURL(
+    `technical-report.html?bugReportId=${encodeURIComponent(saved.bugReportId)}&new=1`);
+  const tab = await chrome.tabs.create({ url: workspaceUrl });
+  return { report: saved, workspaceUrl, tabId: tab.id };
+}
+
 async function deleteSession(id) {
+  // The document's test runs go with it; reports made from them are kept.
+  const runs = await listTestRuns(id);
+  if (runs.length) {
+    await chrome.storage.local.remove(runs.map(run => TEST_RUN_PREFIX + run.testRunId));
+  }
   await screenshotAssetStore.remove(id);
   await rawEventLogStorage.remove(id);
   await canonicalEventLogStorage.remove(id);
@@ -2111,6 +2179,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, report: saved, workspaceUrl:
           chrome.runtime.getURL(`technical-report.html?bugReportId=${encodeURIComponent(
             saved.bugReportId)}`) });
+        break;
+      }
+
+      case "T9_CREATE_TEST_RUN": {
+        // Expected results written in the latest earlier run of the document are kept.
+        const previous = (await listTestRuns(String(message.run?.sessionId || "")))[0];
+        const run = await saveTestRun(globalThis.T9TestScript.carryOver(message.run, previous));
+        const tab = await chrome.tabs.create({ url: chrome.runtime.getURL(
+          `test-run.html?testRunId=${encodeURIComponent(run.testRunId)}`) });
+        sendResponse({ ok: true, run, tabId: tab.id });
+        break;
+      }
+
+      case "T9_LOAD_TEST_RUN": {
+        const run = await loadTestRun(message.testRunId);
+        if (!run) throw new Error("test.runNotFound");
+        sendResponse({ ok: true, run });
+        break;
+      }
+
+      case "T9_SAVE_TEST_RUN": {
+        sendResponse({ ok: true, run: await saveTestRun(message.run) });
+        break;
+      }
+
+      case "T9_LIST_TEST_RUNS": {
+        // Earlier runs of the same document, newest first, with their results counted.
+        const runs = await listTestRuns(String(message.sessionId || ""));
+        sendResponse({ ok: true, runs: runs.map(run => ({ testRunId: run.testRunId,
+          createdAt: run.createdAt, updatedAt: run.updatedAt, tester: run.tester,
+          environment: run.environment, summary: globalThis.T9TestScript.summary(run) })) });
+        break;
+      }
+
+      case "T9_CREATE_BUG_REPORT_FROM_TEST_STEP": {
+        const result = await createBugReportFromTestStep(message.testRunId, message.stepId);
+        sendResponse({ ok: true, ...result });
         break;
       }
 

@@ -39,7 +39,8 @@
       state() { return { report: clone(report), evidence: clone(evidence),
         document: generator.project(report, { errorEvidence: evidence }),
         // Changes with every edit, undo and redo, but not when a save completes.
-        revision, saveState, canUndo: historyIndex > 0,
+        revision, saveState, contentRevision: model.contentRevision(report),
+        canUndo: historyIndex > 0,
         canRedo: historyIndex < history.length - 1 }; },
       subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
       edit(patch, now) { return commit(model.updateHumanContent(report, patch, now)); },
@@ -57,6 +58,19 @@
       },
       updateScreenshotRedactions(assetId, redactions, now) {
         return commit(model.updateScreenshotRedactions(report, assetId, redactions, now));
+      },
+      // An email made from the report is recorded with the version it held. It belongs to
+      // every undo step, so undoing an edit does not remove it.
+      recordDelivery(delivery) {
+        const entry = { ...clone(delivery), reportRevision: model.contentRevision(report) };
+        report = model.recordDelivery(report, entry);
+        for (let index = 0; index < history.length; index += 1) {
+          history[index] = clone(model.recordDelivery(history[index], entry));
+        }
+        revision += 1;
+        saveState = "unsaved";
+        notify();
+        return report;
       },
       undo() { if (historyIndex > 0) { historyIndex -= 1; revision += 1;
         report = model.normalize(history[historyIndex]); saveState = "unsaved";

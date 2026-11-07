@@ -17,6 +17,8 @@
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
   const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
+  // One entry per test run, keyed by its own id; each names the recording it tests.
+  const TEST_RUN_PREFIX = "t9_test_run_";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -34,6 +36,7 @@
   return {
     BUG_REPORT_PREFIX,
     BC_ERROR_EVIDENCE_PREFIX,
+    TEST_RUN_PREFIX,
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,
