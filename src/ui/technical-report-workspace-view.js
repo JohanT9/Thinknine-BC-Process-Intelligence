@@ -148,7 +148,7 @@
     const locale = options.locale || "en-US";
     const report = workspaceState.document;
     container.replaceChildren();
-    container.setAttribute("aria-label", `Technical Bug Report: ${report.title}`);
+    container.setAttribute("aria-label", `${ui("Technical Bug Report", locale)}: ${report.title}`);
     container.appendChild(element(doc, "h1", report.title));
     const status = element(doc, "p", "", "save-state");
     status.setAttribute("role", "status");

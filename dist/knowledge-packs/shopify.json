@@ -14,11 +14,24 @@
       "match": {
         "pagePatterns": [
           "^Shopify Shop Card$",
-          "^Shopify-butikskort$"
+          "^Shopify-butikskort$",
+          "^Butikskort i Shopify$",
+          "^Fiche magasin Shopify$",
+          "^Shopify – Shop-Karte$",
+          "^Ficha de tienda de Shopify$",
+          "^Shopify Butikskort$",
+          "^Shopify-kauppa-kortti$",
+          "^Shopify-butikkort$"
         ],
         "actionPatterns": [
           "^Sync Orders From Shopify$",
-          "^Synkronisera beställningar från Shopify$"
+          "^Synkronisera beställningar från Shopify$",
+          "^Synkronisera order från Shopify$",
+          "^Synchroniser les commandes à partir de Shopify$",
+          "^Aufträge von Shopify synchronisieren$",
+          "^Sincronizar pedidos desde Shopify$",
+          "^Synkroniser ordrer fra Shopify$",
+          "^Synkronoi tilaukset Shopifysta$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -84,11 +97,29 @@
           "^Shopify Shop Card$",
           "^Shopify-butikskort$",
           "^Shopify Products$",
-          "^Shopify-produkter$"
+          "^Shopify-produkter$",
+          "^Butikskort i Shopify$",
+          "^Fiche magasin Shopify$",
+          "^Produits Shopify$",
+          "^Shopify – Shop-Karte$",
+          "^Shopify Produkte$",
+          "^Ficha de tienda de Shopify$",
+          "^Productos de Shopify$",
+          "^Shopify Butikskort$",
+          "^Shopify-kauppa-kortti$",
+          "^Shopify-tuotteet$",
+          "^Shopify-butikkort$"
         ],
         "actionPatterns": [
           "^Sync Inventory$",
-          "^Synkronisera lager$"
+          "^Synkronisera lager$",
+          "^Synka lager$",
+          "^Synchroniser les stocks$",
+          "^Inventar synchronisieren$",
+          "^Sincronizar inventario$",
+          "^Synkroniser lager$",
+          "^Synkronoi varasto$",
+          "^Synkronisering av beholdning$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -146,11 +177,23 @@
           "^Shopify Orders$",
           "^Shopify-order$",
           "^Shopify Order Card$",
-          "^Shopify-orderkort$"
+          "^Shopify-orderkort$",
+          "^Commandes Shopify$",
+          "^Shopify Aufträge$",
+          "^Pedidos de Shopify$",
+          "^Shopify-ordrer$",
+          "^Shopify-tilaukset$",
+          "^Shopify ordrer$"
         ],
         "actionPatterns": [
           "^Create Sales Documents$",
-          "^Skapa försäljningsdokument$"
+          "^Skapa försäljningsdokument$",
+          "^Créer documents vente$",
+          "^Verkaufsbelege erstellen$",
+          "^Crear documentos de venta$",
+          "^Opret salgsdokumenter$",
+          "^Luo myyntiasiakirjat$",
+          "^Opprett salgsdokumenter$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -200,13 +243,27 @@
           "^Shopify Shop Card$",
           "^Shopify-butikskort$",
           "^Shopify Sales Orders$",
-          "^Shopify-försäljningsorder$"
+          "^Shopify-försäljningsorder$",
+          "^Butikskort i Shopify$",
+          "^Fiche magasin Shopify$",
+          "^Shopify – Shop-Karte$",
+          "^Ficha de tienda de Shopify$",
+          "^Shopify Butikskort$",
+          "^Shopify-kauppa-kortti$",
+          "^Shopify-butikkort$"
         ],
         "actionPatterns": [
           "^Sync Shipments$",
           "^Synkronisera leveranser$",
           "^Sync Shipments to Shopify$",
-          "^Synkronisera leveranser till Shopify$"
+          "^Synkronisera leveranser till Shopify$",
+          "^Synkronisera utleveranser$",
+          "^Synchroniser les expéditions$",
+          "^Lieferungen synchronisieren$",
+          "^Sincronizar envíos$",
+          "^Synkroniser forsendelser$",
+          "^Synkronoi toimitukset$",
+          "^Synkroniser leveringer$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -256,11 +313,29 @@
           "^Shopify Shop Card$",
           "^Shopify-butikskort$",
           "^Shopify Products$",
-          "^Shopify-produkter$"
+          "^Shopify-produkter$",
+          "^Butikskort i Shopify$",
+          "^Fiche magasin Shopify$",
+          "^Produits Shopify$",
+          "^Shopify – Shop-Karte$",
+          "^Shopify Produkte$",
+          "^Ficha de tienda de Shopify$",
+          "^Productos de Shopify$",
+          "^Shopify Butikskort$",
+          "^Shopify-kauppa-kortti$",
+          "^Shopify-tuotteet$",
+          "^Shopify-butikkort$"
         ],
         "actionPatterns": [
           "^Sync Products$",
-          "^Synkronisera produkter$"
+          "^Synkronisera produkter$",
+          "^Synka produkter$",
+          "^Synchroniser les produits$",
+          "^Produkte synchronisieren$",
+          "^Sincronizar productos$",
+          "^Synkroniser produkter$",
+          "^Synkronoi tuotteet$",
+          "^Synkronisering av produkter$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

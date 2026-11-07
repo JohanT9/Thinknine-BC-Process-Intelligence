@@ -263,7 +263,7 @@
   --colorBackgroundElevated: #252b30; --colorHeaderSurface: #0f151b; --colorTextPrimary: #e8eaed;
   --colorTextSecondary: #b4bcc6; --colorTextSubtle: #a3acb6; --colorTextDisabled: #6b737c; --colorTextOnBrand: #ffffff;
   --colorBorderDefault: #3b444c; --colorBorderSubtle: #2f363c; --colorBrandPrimary: #007f84; --colorBrandHover: #006f73;
-  --colorBrandPressed: #005c60; --colorBrandSubtle: #173a3c; --colorBrandInformation: #1d4a4d; --colorFocusIndicator: #63c9cc;
+  --colorBrandPressed: #005c60; --colorBrandSubtle: #173a3c; --colorBrandInformation: #1d4a4d; --colorFocusIndicator: #63c9cc; --colorBrandText: #63c9cc;
   --colorStatusSuccess: #6ccb6c; --colorStatusWarning: #f0a868; --colorStatusDanger: #ff8a8a; --colorStatusInformation: #63c9cc;
   --colorStatusRecording: #ff8a8a; --colorStatusDraft: #b4bcc6; --colorStatusReview: #f0a868; --colorStatusApproved: #6ccb6c;
   --colorStatusPublished: #63c9cc; --colorStatusAi: #c4a7f0;
@@ -530,7 +530,7 @@
     --colorBackgroundElevated: #252b30; --colorHeaderSurface: #0f151b; --colorTextPrimary: #e8eaed;
     --colorTextSecondary: #b4bcc6; --colorTextSubtle: #a3acb6; --colorTextDisabled: #6b737c; --colorTextOnBrand: #ffffff;
     --colorBorderDefault: #3b444c; --colorBorderSubtle: #2f363c; --colorBrandPrimary: #007f84; --colorBrandHover: #006f73;
-    --colorBrandPressed: #005c60; --colorBrandSubtle: #173a3c; --colorBrandInformation: #1d4a4d; --colorFocusIndicator: #63c9cc;
+    --colorBrandPressed: #005c60; --colorBrandSubtle: #173a3c; --colorBrandInformation: #1d4a4d; --colorFocusIndicator: #63c9cc; --colorBrandText: #63c9cc;
     --colorStatusSuccess: #6ccb6c; --colorStatusWarning: #f0a868; --colorStatusDanger: #ff8a8a; --colorStatusInformation: #63c9cc;
     --colorStatusRecording: #ff8a8a; --colorStatusDraft: #b4bcc6; --colorStatusReview: #f0a868; --colorStatusApproved: #6ccb6c;
     --colorStatusPublished: #63c9cc; --colorStatusAi: #c4a7f0;

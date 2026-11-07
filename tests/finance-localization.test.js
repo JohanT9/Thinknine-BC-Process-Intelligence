@@ -521,7 +521,7 @@ assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGener
 
 const costPack=packs.find(x=>x.packId==='bc-cost-accounting').pack;
 const allocationKeyRule=costPack.rules.find(x=>x.ruleId==='CostAccounting.CalculateAllocationKey');
-assert.deepEqual(allocationKeyRule.verifiedRuntimeLocales,['en-US','sv-SE']);
+assert.deepEqual(allocationKeyRule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 for(const [locale,page,action] of [
   ['en-US','Cost Allocation','Calculate Allocation Key'],
   ['sv-SE','Kostnadsfördelning','Beräkna fördelningsnyckel']

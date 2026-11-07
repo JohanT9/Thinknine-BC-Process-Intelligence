@@ -131,6 +131,14 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
     const note = container.querySelector(".report-delivery-note");
     assert.strictEqual(note.dataset.state, "changed");
     assert.strictEqual(note.textContent, ui.T9UiI18n.translate("technical.deliveryChanged", "fi-FI"));
+    // The report's accessible name is in the interface language.
+    for (const { locale } of languages.supported("ui")) {
+      view.render(container, workspace.state(), { locale }, doc);
+      const name = container.attributes["aria-label"];
+      assert.ok(name.endsWith(`: ${workspace.state().document.title}`), `${locale} ${name}`);
+      assert.strictEqual(name.split(": ")[0], ui.T9UiI18n.translateStaticText("Technical Bug Report", locale));
+      if (locale !== "en-US") assert.ok(!name.startsWith("Technical Bug Report"), `${locale} ${name}`);
+    }
     // A report without history shows no history section.
     view.render(container, { ...workspace.state(), report: { ...workspace.state().report,
       deliveries: [] } }, { locale: "sv-SE" }, doc);
@@ -169,5 +177,40 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
   const dashboard = read("src/ui/dashboard.js");
   assert.match(dashboard, /deliveries: documentLibraryDeliveries/u);
   assert.match(dashboard, /findLast\(item => \["sent", "uncertain"\]\.includes\(item\.outcome\)\)/u);
+  {
+    // A report emailed from its own tab updates an open library without a reload.
+    const start = dashboard.indexOf("function libraryDelivery(");
+    const end = dashboard.indexOf("chrome.storage?.onChanged?.addListener(updateLibraryDeliveries);");
+    assert.ok(start > 0 && end > start, "the library listens for email history changes");
+    assert.match(read("src/ui/dashboard.html"), /<script src="engine\/storage-keys\.js"><\/script>/u);
+    const renders = [];
+    const context = vm.createContext({ globalThis: {}, JSON, Array, Object, clearTimeout() {},
+      setTimeout: callback => callback(), renderDocumentLibrary: () => renders.push(1) });
+    context.globalThis.T9StorageKeys = require("../src/engine/storage-keys");
+    vm.runInContext(`let documentLibraryDeliveries = new Map(); let documentLibraryRecords = [{}];
+      ${dashboard.slice(start, end)}`, context);
+    const update = (changes, area = "local") => vm.runInContext("updateLibraryDeliveries",
+      context)(changes, area);
+    const deliveries = () => vm.runInContext("documentLibraryDeliveries", context);
+    const key = "t9_bug_report_r1";
+    const sentReport = { recordingId: "rec-1", deliveries: [
+      { deliveryId: "a", outcome: "sent", at: "2026-11-06T11:00:00Z" }] };
+    update({ [key]: { newValue: sentReport } });
+    assert.strictEqual(deliveries().get("rec-1").deliveryId, "a");
+    assert.strictEqual(renders.length, 1);
+    // Saving the report without a new email does not redraw the library.
+    update({ [key]: { oldValue: sentReport, newValue: { ...sentReport, title: "Ändrad" } } });
+    assert.strictEqual(renders.length, 1);
+    // A later draft does not hide that the report was sent.
+    update({ [key]: { newValue: { ...sentReport, deliveries: [...sentReport.deliveries,
+      { deliveryId: "b", outcome: "draft", at: "2026-11-06T12:00:00Z" }] } } });
+    assert.strictEqual(deliveries().get("rec-1").deliveryId, "a");
+    update({ [key]: { oldValue: sentReport } });
+    assert.strictEqual(deliveries().has("rec-1"), false, "a deleted report shows no email");
+    assert.strictEqual(renders.length, 2);
+    update({ t9_session_x: { newValue: {} } });
+    update({ [key]: { newValue: sentReport } }, "sync");
+    assert.strictEqual(renders.length, 2, "other storage changes are ignored");
+  }
   console.log("Bug report delivery history tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

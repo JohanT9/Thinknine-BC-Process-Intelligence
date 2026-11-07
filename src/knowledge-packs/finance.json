@@ -20,7 +20,9 @@
           "^Previsión de flujo de efectivo$",
           "^Pengestrømsprognose$",
           "^Kassavirtaennuste$",
-          "^Kontantstrømprognose$"
+          "^Kontantstrømprognose$",
+          "^Prévision de trésorerie$",
+          "^Cashflowplanung$"
         ],
         "actionPatterns": [
           "^Recalculate Forecast$",
@@ -30,7 +32,8 @@
           "^Recalcular previsión$",
           "^Genberegn prognose$",
           "^Laske ennuste uudelleen$",
-          "^Omberegn prognose$"
+          "^Omberegn prognose$",
+          "^Beregn prognose på nytt$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -92,7 +95,11 @@
           "^Presupuestos de G/L$",
           "^Finansbudgetter$",
           "^KP-budjetit$",
-          "^G/L-budsjetter$"
+          "^G/L-budsjetter$",
+          "^Redovisningsbudgetar$",
+          "^Budgets comptables$",
+          "^Presupuestos contables$",
+          "^Finansbudsjetter$"
         ],
         "actionPatterns": [
           "^Edit Budget$",
@@ -102,7 +109,8 @@
           "^Editar presupuesto$",
           "^Rediger budget$",
           "^Muokkaa budjettia$",
-          "^Rediger budsjett$"
+          "^Rediger budsjett$",
+          "^Budget bearbeiten$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -220,7 +228,10 @@
           "^Devolución de IVA$",
           "^Momsangivelser$",
           "^ALV-palautukset$",
-          "^Mva-returer$"
+          "^Mva-returer$",
+          "^MwSt\\.-Berichte$",
+          "^Devoluciones de IVA$",
+          "^Omsetningsoppgaver$"
         ],
         "actionPatterns": [
           "^Suggest Lines$",
@@ -284,7 +295,12 @@
           "^Calcular depreciación$",
           "^Beregn afskrivning$",
           "^Laske poisto$",
-          "^Beregn avskrivning$"
+          "^Beregn avskrivning$",
+          "^Calculer amortissement$",
+          "^AfA berechnen$",
+          "^Calcular amortización$",
+          "^Beregn afskrivninger$",
+          "^Beregn avskrivninger$"
         ],
         "actionPatterns": [
           "^OK$",
@@ -348,7 +364,13 @@
           "^A/F Diario general$",
           "^Anlægsfinanskladder$",
           "^Käyttöomaisuuden KP-päiväkirja$",
-          "^AKTIVA-finansjournaler$"
+          "^AKTIVA-finansjournaler$",
+          "^Redovisningsjournaler för anläggningstillgång$",
+          "^Feuilles compta\\. immo\\.$",
+          "^Anlagen Fibu Buch\\.-Blätter$",
+          "^Diarios generales de activos fijos$",
+          "^Käyttöomaisuuden KP-päiväkirjat$",
+          "^Finanskladder for aktivum$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -358,7 +380,8 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -444,7 +467,13 @@
           "^Index Fixed Assets$",
           "^Indeksér anlægsaktiver$",
           "^Tee indeksimuutos KO:teen$",
-          "^Indeksrekkede aktiva$"
+          "^Indeksrekkede aktiva$",
+          "^Indexera anläggningstillgångar$",
+          "^Actualiser immobilisations$",
+          "^Anlagen indexieren$",
+          "^Ajustar valores activos fijos$",
+          "^Indekser anlæg$",
+          "^Indeksreg\\. aktiva$"
         ],
         "actionPatterns": [
           "^OK$",
@@ -508,7 +537,9 @@
           "^A/F Anular movs$",
           "^Annuller anlægsfinansposter$",
           "^Peruuta KO-tapahtumat$",
-          "^Kanseller aktivaposter$"
+          "^Kanseller aktivaposter$",
+          "^Annuler écritures comptables immobilisation$",
+          "^A/F Anular movs\\.$"
         ],
         "actionPatterns": [
           "^OK$",
@@ -572,7 +603,12 @@
           "^Definiciones de fila \\(informe financiero\\)$",
           "^\\(Finansiel rapport\\) Rækkedefinitioner$",
           "^\\(Talousraportit\\) rivimääritykset$",
-          "^\\(Finansrapporter\\) Raddefinisjon$"
+          "^\\(Finansrapporter\\) Raddefinisjon$",
+          "^\\(Ekonomisk rapport\\) Raddefinitioner$",
+          "^Définitions de ligne \\(de l’état financier\\)$",
+          "^\\(Finanzbericht\\) Zeilendefinitionen$",
+          "^\\(Talousraportin\\) rivimääritykset$",
+          "^Raddefinisjoner \\(for finansrapport\\)$"
         ],
         "actionPatterns": [
           "^Edit Row Definition$",
@@ -582,7 +618,8 @@
           "^Editar definición de fila$",
           "^Rediger rækkedefinition$",
           "^Muokkaa rivimääritystä$",
-          "^Rediger raddefinisjon$"
+          "^Rediger raddefinisjon$",
+          "^Modifier définition de ligne$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -636,7 +673,8 @@
           "^Definiciones de columna$",
           "^Kolonnedefinitioner$",
           "^Sarakemääritykset$",
-          "^Kolonnedefinisjoner$"
+          "^Kolonnedefinisjoner$",
+          "^Définitions colonne$"
         ],
         "actionPatterns": [
           "^Edit Column Definition$",
@@ -700,7 +738,8 @@
           "^Diarios generales$",
           "^Finanskladder$",
           "^Yleinen päiväkirja$",
-          "^Generelle journaler$"
+          "^Generelle journaler$",
+          "^Yleiset päiväkirjat$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -710,7 +749,8 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -772,7 +812,8 @@
           "^Test plan de cuentas$",
           "^Indryk kontoplan$",
           "^Sisennä tilikartta$",
-          "^Innrykk kontoplan$"
+          "^Innrykk kontoplan$",
+          "^Einrückung des Kontenplans$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -826,7 +867,10 @@
           "^Configuración de contabilidad$",
           "^Regnskabsopsætning$",
           "^Pääkirjanpidon asetukset$",
-          "^Finansoppsett$"
+          "^Finansoppsett$",
+          "^Finanzbuchhaltung Einrichtung$",
+          "^Configuración contabilidad$",
+          "^Opsætning af Finans$"
         ],
         "actionPatterns": [
           "^Change Global Dimensions$",
@@ -836,7 +880,10 @@
           "^Cambiar dimensiones globales$",
           "^Rediger globale dimensioner$",
           "^Muuta globaali dimensio$",
-          "^Endre globale dimensjoner$"
+          "^Endre globale dimensjoner$",
+          "^Modifier les axes principaux$",
+          "^Cambiar dimen\\. globales$",
+          "^Muuta globaaleja dimensioita$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -890,7 +937,8 @@
           "^Periodos contables$",
           "^Regnskabsperioder$",
           "^Kirjanpitojaksot$",
-          "^Regnskapsperioder$"
+          "^Regnskapsperioder$",
+          "^Bokföringsperioder$"
         ],
         "actionPatterns": [
           "^Create Year$",
@@ -900,7 +948,11 @@
           "^Crear ejercicio$",
           "^Opret år$",
           "^Luo vuosi$",
-          "^Opprett år$"
+          "^Opprett år$",
+          "^Upprätta år$",
+          "^Crear ejercic\\.$",
+          "^Nyt år$",
+          "^Nytt år$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -954,7 +1006,8 @@
           "^Periodos contables$",
           "^Regnskabsperioder$",
           "^Kirjanpitojaksot$",
-          "^Regnskapsperioder$"
+          "^Regnskapsperioder$",
+          "^Bokföringsperioder$"
         ],
         "actionPatterns": [
           "^Close Year$",
@@ -964,7 +1017,10 @@
           "^Cerrar ejercicio$",
           "^Afslut år$",
           "^Sulje vuosi$",
-          "^Lukk år$"
+          "^Lukk år$",
+          "^Avsluta år$",
+          "^Jahr abschließen$",
+          "^Fijar cierre$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1018,7 +1074,14 @@
           "^Cerrar declaración de ingresos$",
           "^Luk resultatopgørelse$",
           "^Sulje tulolaskelma$",
-          "^Lukk resultatregnskap$"
+          "^Lukk resultatregnskap$",
+          "^Avslut av resultaträkning$",
+          "^Clôturer compte de résultat$",
+          "^GuV-Konten Nullstellung$",
+          "^Cerrar balance de ingresos$",
+          "^Nulstil resultatopgørelse$",
+          "^Sulje tuloslaskelma$",
+          "^Lukk resultatregnskapet$"
         ],
         "actionPatterns": [
           "^OK$",

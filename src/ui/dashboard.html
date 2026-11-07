@@ -31,7 +31,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-group{grid-column:1/-1}.library-group>h3{margin:8px 0}.library-group-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .library-card{border:1px solid var(--c-bd-d8dee5);border-radius:8px;padding:14px;background:var(--c-bg-ffffff);min-width:0}
 .library-card[data-selected="true"]{outline:3px solid var(--c-bd-0f6cbd);outline-offset:1px}.library-card:focus-visible{outline:3px solid var(--c-bd-0f6cbd)}
-.library-card-heading{display:flex;gap:8px;align-items:start}.library-card h4{margin:0;flex:1}.library-language{background:var(--c-bg-008b8b);color:var(--c-fg-ffffff);border-radius:3px;font-size:11px;font-weight:700;padding:3px 5px}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:var(--c-fg-7c5800)}
+.library-card-heading{display:flex;gap:8px;align-items:start}.library-card h4{margin:0;flex:1}.library-language{background:var(--c-bg-006f73);color:var(--c-fg-ffffff);border-radius:3px;font-size:11px;font-weight:700;padding:3px 5px}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:var(--c-fg-7c5800)}
 .library-profile{color:var(--c-fg-0f4c81);font-weight:600}.library-tags{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.library-tags span{background:var(--c-bg-edf2f7);border-radius:99px;padding:3px 8px;font-size:12px}
 .library-empty{grid-column:1/-1;padding:28px;text-align:center;background:var(--c-bg-f8fafc);border-radius:8px}.library-status{min-height:20px}
 .library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:var(--c-bg-eef6ff);border:1px solid var(--c-bd-9bc4e2);border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
@@ -387,6 +387,18 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 
   <div class="library-heading">
     <h3 id="libraryAllTitle">Alla dokument</h3>
+    <div class="library-transfer-actions" role="group" aria-label="Flytta dokument till en annan dator" data-i18n-aria-label="transfer.actions">
+      <button id="libraryExport" type="button" class="secondary" data-i18n="transfer.export">Exportera…</button>
+      <button id="libraryImport" type="button" class="secondary" data-i18n="transfer.import">Importera…</button>
+      <input id="libraryImportFile" type="file" accept=".bcps" hidden tabindex="-1">
+    </div>
+  </div>
+  <div id="libraryImportNotice" class="library-import-notice" hidden>
+    <p id="libraryImportNoticeText"></p>
+    <div class="library-import-notice-actions">
+      <button id="libraryImportUndo" type="button" class="secondary"></button>
+      <button id="libraryImportKeep" type="button" class="secondary" data-i18n="transfer.keep">Behåll importen</button>
+    </div>
   </div>
   <div class="library-primary-controls" role="search">
     <label for="librarySearch"><span class="sr-only">Sök dokument</span>
@@ -447,6 +459,22 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       </div>
     </details>
   </div>
+  <div id="libraryFolders" class="library-folders">
+    <div class="library-folder-head">
+      <nav class="library-folder-nav" aria-label="Mappsökväg" data-i18n-aria-label="folder.breadcrumb">
+        <ol id="libraryFolderPath" class="library-folder-path"></ol>
+      </nav>
+      <div class="library-folder-actions" role="group" aria-label="Mappåtgärder" data-i18n-aria-label="folder.actions">
+        <button id="libraryFolderNew" type="button" class="secondary" data-i18n="folder.new">Ny mapp</button>
+        <button id="libraryFolderRename" type="button" class="secondary" data-i18n="folder.rename" hidden>Byt namn på mapp</button>
+        <button id="libraryFolderMove" type="button" class="secondary" data-i18n="folder.moveFolder" hidden>Flytta mapp</button>
+        <button id="libraryFolderDelete" type="button" class="secondary" data-i18n="folder.delete" hidden>Ta bort mapp</button>
+      </div>
+    </div>
+    <ul id="libraryFolderList" class="library-folder-list"></ul>
+    <p id="libraryFolderNotice" class="library-folder-notice" role="alert" hidden></p>
+    <p id="libraryFolderStatus" class="sr-only" role="status" aria-live="polite"></p>
+  </div>
   <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
   <div id="libraryResults" class="library-results" role="list" data-select-mode="false"
     aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
@@ -457,6 +485,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <button id="libraryBatchExport" class="primary">Exportera Word</button>
     <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
     <button id="libraryBatchArchive" class="secondary">Arkivera</button>
+    <button id="libraryBatchMove" class="secondary" data-i18n="folder.moveSelected">Flytta till mapp</button>
     <details class="library-batch-more">
       <summary>Fler åtgärder</summary>
       <div class="library-batch-more-panel">
@@ -688,6 +717,84 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 </dialog>
 
 
+
+<dialog id="libraryFolderDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryFolderDialogTitle">
+  <form id="libraryFolderForm" method="dialog" novalidate>
+    <h3 id="libraryFolderDialogTitle"></h3>
+    <label class="library-folder-field" for="libraryFolderName"><span data-i18n="folder.nameLabel">Mappnamn</span>
+      <input id="libraryFolderName" type="text" maxlength="80" autocomplete="off" required
+        aria-describedby="libraryFolderError"></label>
+    <p id="libraryFolderError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" value="cancel" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
+      <button id="libraryFolderSubmit" type="submit" class="primary"></button></footer>
+  </form>
+</dialog>
+<dialog id="libraryMoveDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryMoveTitle">
+  <form id="libraryMoveForm" method="dialog">
+    <h3 id="libraryMoveTitle"></h3>
+    <label class="library-folder-field" for="libraryMoveDestination"><span data-i18n="folder.destination">Mapp</span>
+      <select id="libraryMoveDestination" aria-describedby="libraryMoveError"></select></label>
+    <p id="libraryMoveError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
+      <button type="submit" class="primary" data-i18n="folder.move">Flytta</button></footer>
+  </form>
+</dialog>
+<dialog id="libraryExportDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog library-transfer-dialog" aria-labelledby="libraryExportTitle" aria-describedby="libraryExportBody">
+  <form id="libraryExportForm" method="dialog">
+    <h3 id="libraryExportTitle" data-i18n="transfer.exportTitle">Exportera dokument</h3>
+    <p id="libraryExportBody" data-i18n="transfer.exportBody">Filen kan importeras i BC Process Studio på en annan dator.</p>
+    <fieldset id="libraryExportScope" class="library-transfer-choice">
+      <legend data-i18n="transfer.scope">Vad ska exporteras?</legend>
+      <label><input type="radio" name="libraryExportScope" value="all"> <span id="libraryExportAll"></span></label>
+      <label id="libraryExportFolderOption"><input type="radio" name="libraryExportScope" value="folder"> <span id="libraryExportFolder"></span></label>
+      <label id="libraryExportSelectedOption"><input type="radio" name="libraryExportScope" value="selected"> <span id="libraryExportSelected"></span></label>
+    </fieldset>
+    <p class="library-transfer-note" data-i18n="transfer.exportContents">Filen innehåller inspelningar, skärmbilder, granskningar, anteckningar, felbevis och testkörningar. Den kan innehålla kunddata från Business Central, så hantera den som känslig.</p>
+    <progress id="libraryExportProgress" class="library-transfer-progress" hidden></progress>
+    <p id="libraryExportStatus" class="library-transfer-status" role="status" aria-live="polite"></p>
+    <p id="libraryExportError" class="library-folder-error" role="alert"></p>
+    <footer><button id="libraryExportCancel" type="button" class="secondary" data-i18n="folder.cancel">Avbryt</button>
+      <button id="libraryExportSubmit" type="submit" class="primary" data-i18n="transfer.exportSubmit">Exportera</button></footer>
+  </form>
+</dialog>
+<dialog id="libraryImportDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog library-transfer-dialog" aria-labelledby="libraryImportTitle" aria-describedby="libraryImportSource">
+  <form id="libraryImportForm" method="dialog">
+    <h3 id="libraryImportTitle" data-i18n="transfer.importTitle">Importera dokument</h3>
+    <p id="libraryImportSource" class="library-transfer-source"></p>
+    <progress id="libraryImportProgress" class="library-transfer-progress" hidden></progress>
+    <p id="libraryImportStatus" class="library-transfer-status" role="status" aria-live="polite"></p>
+    <ul id="libraryImportCounts" class="library-folder-counts" hidden></ul>
+    <fieldset id="libraryImportConflicts" class="library-transfer-choice" hidden>
+      <legend id="libraryImportConflictLegend"></legend>
+      <ul id="libraryImportConflictList" class="library-transfer-conflicts"></ul>
+      <label><input type="radio" name="libraryImportConflict" value="keep" checked> <span data-i18n="transfer.keepMine">Behåll mina versioner</span></label>
+      <label><input type="radio" name="libraryImportConflict" value="replace"> <span data-i18n="transfer.replaceMine">Ersätt med versionerna i filen</span></label>
+      <p class="library-transfer-note" data-i18n="transfer.replaceNote">Dina versioner sparas först, så att importen kan ångras.</p>
+    </fieldset>
+    <p id="libraryImportError" class="library-folder-error" role="alert"></p>
+    <footer><button id="libraryImportCancel" type="button" class="secondary" data-i18n="folder.cancel">Avbryt</button>
+      <button id="libraryImportSubmit" type="submit" class="primary" hidden></button></footer>
+  </form>
+</dialog>
+<dialog id="libraryImportUndoDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryImportUndoTitle" aria-describedby="libraryImportUndoBody">
+  <form id="libraryImportUndoForm" method="dialog">
+    <h3 id="libraryImportUndoTitle" data-i18n="transfer.undoTitle">Ångra importen?</h3>
+    <p id="libraryImportUndoBody"></p>
+    <p id="libraryImportUndoError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
+      <button id="libraryImportUndoSubmit" type="submit" class="danger" data-i18n="transfer.undo">Ångra import</button></footer>
+  </form>
+</dialog>
+<dialog id="libraryFolderDeleteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryFolderDeleteTitle" aria-describedby="libraryFolderDeleteBody">
+  <form id="libraryFolderDeleteForm" method="dialog">
+    <h3 id="libraryFolderDeleteTitle"></h3>
+    <p id="libraryFolderDeleteBody"></p>
+    <ul id="libraryFolderDeleteCounts" class="library-folder-counts"></ul>
+    <p id="libraryFolderDeleteError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
+      <button type="submit" class="danger" data-i18n="folder.deleteConfirm">Ta bort mapp</button></footer>
+  </form>
+</dialog>
 
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">
   <section id="reviewDialog" class="review-shell" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" aria-describedby="reviewSummary reviewKeyboardHelp" tabindex="-1">
@@ -1154,6 +1261,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   </form>
 </dialog>
 
+<script src="engine/storage-keys.js"></script>
+<script src="engine/storage-queries.js"></script>
 <script src="engine/json-clone.js"></script>
 <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
@@ -1227,6 +1336,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document/process-versioning.js"></script>
 <script src="document/process-version-workflow.js"></script>
 <script src="document/document-library.js"></script>
+<script src="document/document-folders.js"></script>
+<script src="document/library-transfer.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>

@@ -13,16 +13,33 @@
       "confidence": 0.97,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^E-Document$",
-          "^E-dokument$"
+          "^E-dokument$",
+          "^Document électronique$",
+          "^E-Beleg$",
+          "^Documento electrónico$",
+          "^Sähköinen asiakirja$"
         ],
         "actionPatterns": [
           "^Match Purchase Order$",
-          "^Matcha inköpsorder$"
+          "^Matcha inköpsorder$",
+          "^Mettre en correspondance la commande achat$",
+          "^Bestellung abgleichen$",
+          "^Conciliar pedido de compra$",
+          "^Match købsordre$",
+          "^Kohdista ostotilaus$",
+          "^Samsvar bestilling$",
+          "^Avstem bestilling$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -67,10 +84,10 @@
       "entity": "PurchaseEDocument",
       "priority": 1330,
       "confidence": 0.96,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
-        "pagePatterns": ["^E-Document$", "^E-dokument$"],
-        "actionPatterns": ["^Update Purchase Order Link$", "^Uppdatera inköpsorderlänk$"],
+        "pagePatterns": ["^E-Document$", "^E-dokument$", "^Document électronique$", "^E-Beleg$", "^Documento electrónico$", "^Sähköinen asiakirja$"],
+        "actionPatterns": ["^Update Purchase Order Link$", "^Uppdatera inköpsorderlänk$", "^Mettre à jour le lien commande achat$", "^Bestellungslink aktualisieren$", "^Actualizar vínculo de pedido de compra$", "^Opdater link til købsordre$", "^Päivitä ostotilauslinkki$", "^Oppdater bestillingskobling$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -117,7 +134,8 @@
           "^E-Beleg$",
           "^Documentos electrónicos$",
           "^E-dokumenter$",
-          "^Sähköiset asiakirjat$"
+          "^Sähköiset asiakirjat$",
+          "^Documents électroniques$"
         ],
         "actionPatterns": [
           "^Send Document$",
@@ -127,7 +145,8 @@
           "^Enviar documento$",
           "^Send dokumenter$",
           "^Lähetä asiakirja$",
-          "^Send dokument$"
+          "^Send dokument$",
+          "^Send bilag$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -184,7 +203,8 @@
           "^E-Beleg$",
           "^Documentos electrónicos$",
           "^E-dokumenter$",
-          "^Sähköiset asiakirjat$"
+          "^Sähköiset asiakirjat$",
+          "^Documents électroniques$"
         ],
         "actionPatterns": [
           "^Communication Logs$",
@@ -251,7 +271,8 @@
           "^E-Beleg$",
           "^Documentos electrónicos$",
           "^E-dokumenter$",
-          "^Sähköiset asiakirjat$"
+          "^Sähköiset asiakirjat$",
+          "^Documents électroniques$"
         ],
         "actionPatterns": [
           "^Create Document$",
@@ -261,7 +282,8 @@
           "^Crear documento$",
           "^Opret dokument$",
           "^Luo asiakirja$",
-          "^Opprett dokument$"
+          "^Opprett dokument$",
+          "^Créer document$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

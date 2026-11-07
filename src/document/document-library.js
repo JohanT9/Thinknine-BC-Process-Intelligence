@@ -81,6 +81,8 @@
         ...(companyTag ? [companyTag] : [])
       ])],
       favourite: Boolean(source.favourite),
+      // The library folder (document/document-folders.js); empty at the top level.
+      folderId: text(source.folderId),
       readingMinutes: Math.max(0, Number(source.readingMinutes) || 0),
       thumbnailRef: text(source.thumbnailRef),
       health: {

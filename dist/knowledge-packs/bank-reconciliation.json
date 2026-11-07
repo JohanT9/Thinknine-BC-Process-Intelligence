@@ -24,7 +24,8 @@
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
           "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$"
+          "^Conciliación de cuenta bancaria$",
+          "^Conciliación banco$"
         ],
         "actionPatterns": [
           "^Import Bank Statement$",
@@ -92,7 +93,8 @@
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
           "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$"
+          "^Conciliación de cuenta bancaria$",
+          "^Conciliación banco$"
         ],
         "actionPatterns": [
           "^Match Automatically$",
@@ -160,7 +162,8 @@
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
           "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$"
+          "^Conciliación de cuenta bancaria$",
+          "^Conciliación banco$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -170,7 +173,8 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -228,7 +232,8 @@
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
           "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$"
+          "^Conciliación de cuenta bancaria$",
+          "^Conciliación banco$"
         ],
         "actionPatterns": [
           "^Match Manually$",

@@ -260,7 +260,11 @@
           "^Pedidos de compra$",
           "^Indkøbsordrer$",
           "^Ostotilaukset$",
-          "^Bestillinger$"
+          "^Bestillinger$",
+          "^Inköpsorder$",
+          "^Einkaufsbestellungen$",
+          "^Pedidos compra$",
+          "^Købsordrer$"
         ],
         "actionPatterns": [
           "^Ny\\.?$",
@@ -317,7 +321,9 @@
           "^Pedido de compra$",
           "^Købsordre$",
           "^Ostotilaus$",
-          "^Innkjøpsordre$"
+          "^Innkjøpsordre$",
+          "^Pedido compra$",
+          "^Bestilling$"
         ],
         "actionPatterns": [
           "^Tillämpat inköpspris och rabatt$",
@@ -369,7 +375,13 @@
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -503,7 +515,12 @@
           "^Ostotilaus$",
           "^Ostotilaukset$",
           "^Bestilling$",
-          "^Bestillinger$"
+          "^Bestillinger$",
+          "^Einkaufsbestellungen$",
+          "^Pedidos compra$",
+          "^Pedido compra$",
+          "^Købsordrer$",
+          "^Købsordre$"
         ],
         "actionPatterns": [
           "^Reopen$",
@@ -513,7 +530,11 @@
           "^Reabrir$",
           "^Genåbne$",
           "^Avaa uudelleen$",
-          "^Åpne på nytt$"
+          "^Åpne på nytt$",
+          "^Status zurücksetzen$",
+          "^Volver a abrir$",
+          "^Åbn igen$",
+          "^Uudelleenavaa$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -670,7 +691,20 @@
           "^Ostolasku$",
           "^Bestilling$",
           "^Bestillinger$",
-          "^Kjøpsfaktura$"
+          "^Kjøpsfaktura$",
+          "^Inköpsfakturor$",
+          "^Factures achat$",
+          "^Einkaufsbestellungen$",
+          "^Einkaufsrechnungen$",
+          "^Factura compra$",
+          "^Pedidos compra$",
+          "^Pedido compra$",
+          "^Facturas compra$",
+          "^Købsordrer$",
+          "^Købsordre$",
+          "^Købsfakturaer$",
+          "^Ostolaskut$",
+          "^Kjøpsfakturaer$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -690,7 +724,13 @@
           "^Kreditor$",
           "^Proveedor$",
           "^Leverandør$",
-          "^Toimittaja$"
+          "^Toimittaja$",
+          "^N° fournisseur$",
+          "^Kreditorennr\\.$",
+          "^N\\.º de proveedor$",
+          "^Kreditornr\\.$",
+          "^Toimittajan nro$",
+          "^Leverandørnr\\.$"
         ],
         "automationIdPatterns": []
       },
@@ -733,7 +773,10 @@
           "^Pedido de compra$",
           "^Indkøbsordre$",
           "^Ostotilaus$",
-          "^Bestilling$"
+          "^Bestilling$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -822,7 +865,8 @@
           "^Cantidad a recibir$",
           "^Modtag \\(antal\\)$",
           "^Vastaanotettava määrä$",
-          "^Motta \\(antall\\)$"
+          "^Motta \\(antall\\)$",
+          "^Ant\\. att inlevereras$"
         ],
         "automationIdPatterns": []
       },
@@ -940,7 +984,13 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^Inköpsorder$"
+          "^Inköpsorder$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
         ],
         "actionPatterns": [
           "^Nr, sorterade i Stigande order Välj posten"
@@ -1032,7 +1082,13 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^Inköpsorder$"
+          "^Inköpsorder$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
         ],
         "actionPatterns": [
           "^Manuellt pris",
@@ -1083,7 +1139,13 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^Inköpsorder$"
+          "^Inköpsorder$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -1226,7 +1288,29 @@
           "pedidos de devolución de compra",
           "købsreturvareordrer",
           "ostopalautustilaukset",
-          "kjøpsreturordrer"
+          "kjøpsreturordrer",
+          "^Archives retour achat$",
+          "^Retour achat$",
+          "^Retours achat$",
+          "^Einkaufsreklamationsarchiv$",
+          "^Einkaufsreklamation$",
+          "^Einkaufsreklamationen$",
+          "^Archive für Einkaufsreklamationen$",
+          "^Archivo devolución venta$",
+          "^Devolución compra$",
+          "^Pedidos dev\\. compra$",
+          "^Archivos de devolución de compra$",
+          "^Devoluciones compras$",
+          "^Købsreturvareordrearkiv$",
+          "^Købsreturvareordre$",
+          "^Købsreturvareordrearkiver$",
+          "^Ostopalautustilausten arkisto$",
+          "^Ostopalautustilaus$",
+          "^Ostopalautustilausarkistot$",
+          "^Arkiv for bestillingsretur$",
+          "^Bestillingsretur$",
+          "^Bestillingsreturer$",
+          "^Arkiver for bestillingsretur$"
         ],
         "actionPatterns": [
           "^open record$",
@@ -1236,7 +1320,9 @@
           "^abrir registro$",
           "^åbn post$",
           "^avaa tietue$",
-          "^åpne post$"
+          "^åpne post$",
+          "^Ouvrir l'enregistrement$",
+          "^Åbn record$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1282,7 +1368,29 @@
           "pedidos de devolución de compra",
           "købsreturvareordrer",
           "ostopalautustilaukset",
-          "kjøpsreturordrer"
+          "kjøpsreturordrer",
+          "^Archives retour achat$",
+          "^Retour achat$",
+          "^Retours achat$",
+          "^Einkaufsreklamationsarchiv$",
+          "^Einkaufsreklamation$",
+          "^Einkaufsreklamationen$",
+          "^Archive für Einkaufsreklamationen$",
+          "^Archivo devolución venta$",
+          "^Devolución compra$",
+          "^Pedidos dev\\. compra$",
+          "^Archivos de devolución de compra$",
+          "^Devoluciones compras$",
+          "^Købsreturvareordrearkiv$",
+          "^Købsreturvareordre$",
+          "^Købsreturvareordrearkiver$",
+          "^Ostopalautustilausten arkisto$",
+          "^Ostopalautustilaus$",
+          "^Ostopalautustilausarkistot$",
+          "^Arkiv for bestillingsretur$",
+          "^Bestillingsretur$",
+          "^Bestillingsreturer$",
+          "^Arkiver for bestillingsretur$"
         ],
         "actionPatterns": [
           "^get posted document lines to reverse$",
@@ -1292,7 +1400,8 @@
           "^revertir líneas documentos registrados$",
           "^hent bogførte bilagslinjer, der skal tilbageføres$",
           "^hae peruutettavat kirjatut asiakirjarivit$",
-          "^hent bokførte dokumentlinjer som skal tilbakeføres$"
+          "^hent bokførte dokumentlinjer som skal tilbakeføres$",
+          "^Extraire lignes document enreg\\. à contrepasser$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1338,7 +1447,29 @@
           "pedidos de devolución de compra",
           "købsreturvareordrer",
           "ostopalautustilaukset",
-          "kjøpsreturordrer"
+          "kjøpsreturordrer",
+          "^Archives retour achat$",
+          "^Retour achat$",
+          "^Retours achat$",
+          "^Einkaufsreklamationsarchiv$",
+          "^Einkaufsreklamation$",
+          "^Einkaufsreklamationen$",
+          "^Archive für Einkaufsreklamationen$",
+          "^Archivo devolución venta$",
+          "^Devolución compra$",
+          "^Pedidos dev\\. compra$",
+          "^Archivos de devolución de compra$",
+          "^Devoluciones compras$",
+          "^Købsreturvareordrearkiv$",
+          "^Købsreturvareordre$",
+          "^Købsreturvareordrearkiver$",
+          "^Ostopalautustilausten arkisto$",
+          "^Ostopalautustilaus$",
+          "^Ostopalautustilausarkistot$",
+          "^Arkiv for bestillingsretur$",
+          "^Bestillingsretur$",
+          "^Bestillingsreturer$",
+          "^Arkiver for bestillingsretur$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -1394,7 +1525,29 @@
           "pedidos de devolución de compra",
           "købsreturvareordrer",
           "ostopalautustilaukset",
-          "kjøpsreturordrer"
+          "kjøpsreturordrer",
+          "^Archives retour achat$",
+          "^Retour achat$",
+          "^Retours achat$",
+          "^Einkaufsreklamationsarchiv$",
+          "^Einkaufsreklamation$",
+          "^Einkaufsreklamationen$",
+          "^Archive für Einkaufsreklamationen$",
+          "^Archivo devolución venta$",
+          "^Devolución compra$",
+          "^Pedidos dev\\. compra$",
+          "^Archivos de devolución de compra$",
+          "^Devoluciones compras$",
+          "^Købsreturvareordrearkiv$",
+          "^Købsreturvareordre$",
+          "^Købsreturvareordrearkiver$",
+          "^Ostopalautustilausten arkisto$",
+          "^Ostopalautustilaus$",
+          "^Ostopalautustilausarkistot$",
+          "^Arkiv for bestillingsretur$",
+          "^Bestillingsretur$",
+          "^Bestillingsreturer$",
+          "^Arkiver for bestillingsretur$"
         ],
         "actionPatterns": [
           "^post$",
@@ -1404,7 +1557,8 @@
           "^registrar$",
           "^bogfør$",
           "^kirjaa$",
-          "^bokfør$"
+          "^bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1448,7 +1602,11 @@
           "facturas de compra registradas",
           "bogførte købsfakturaer",
           "kirjatut ostolaskut",
-          "bokførte kjøpsfakturaer"
+          "bokførte kjøpsfakturaer",
+          "^Factures achat enregistrées$",
+          "^Geb\\. Einkaufsrechnungen$",
+          "^Histórico facturas de compra$",
+          "^Bogf\\. købsfakturaer$"
         ],
         "actionPatterns": [
           "^create corrective credit memo$",
@@ -1458,7 +1616,8 @@
           "^crear un abono correctivo$",
           "^opret rettelseskreditnota$",
           "^luo korjaava hyvityslasku$",
-          "^opprett korrigerende kreditnota$"
+          "^opprett korrigerende kreditnota$",
+          "^Crear nota de abono correctiva$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1502,7 +1661,11 @@
           "facturas de compra registradas",
           "bogførte købsfakturaer",
           "kirjatut ostolaskut",
-          "bokførte kjøpsfakturaer"
+          "bokførte kjøpsfakturaer",
+          "^Factures achat enregistrées$",
+          "^Geb\\. Einkaufsrechnungen$",
+          "^Histórico facturas de compra$",
+          "^Bogf\\. købsfakturaer$"
         ],
         "actionPatterns": [
           "^cancel$",
@@ -1556,7 +1719,15 @@
           "abono de compra",
           "købskreditnota",
           "ostohyvityslasku",
-          "kjøpskreditnota"
+          "kjøpskreditnota",
+          "^Inköpskreditnotor$",
+          "^Bokförda inköpskreditnotor$",
+          "^Avoirs achat$",
+          "^Avoirs achat enregistrés$",
+          "^Histórico nota abono compra$",
+          "^Nota crédito compra registrada: actualización$",
+          "^Nota abono compra$",
+          "^Histórico notas abono compra$"
         ],
         "actionPatterns": [
           "^copy from document$",
@@ -1610,7 +1781,15 @@
           "abono de compra",
           "købskreditnota",
           "ostohyvityslasku",
-          "kjøpskreditnota"
+          "kjøpskreditnota",
+          "^Inköpskreditnotor$",
+          "^Bokförda inköpskreditnotor$",
+          "^Avoirs achat$",
+          "^Avoirs achat enregistrés$",
+          "^Histórico nota abono compra$",
+          "^Nota crédito compra registrada: actualización$",
+          "^Nota abono compra$",
+          "^Histórico notas abono compra$"
         ],
         "actionPatterns": [
           "^post$",
@@ -1620,7 +1799,8 @@
           "^registrar$",
           "^bogfør$",
           "^kirjaa$",
-          "^bokfør$"
+          "^bokfør$",
+          "^Bokför$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1664,7 +1844,15 @@
           "abono de compra",
           "købskreditnota",
           "ostohyvityslasku",
-          "kjøpskreditnota"
+          "kjøpskreditnota",
+          "^Inköpskreditnotor$",
+          "^Bokförda inköpskreditnotor$",
+          "^Avoirs achat$",
+          "^Avoirs achat enregistrés$",
+          "^Histórico nota abono compra$",
+          "^Nota crédito compra registrada: actualización$",
+          "^Nota abono compra$",
+          "^Histórico notas abono compra$"
         ],
         "actionPatterns": [
           "^apply entries$",
@@ -1674,7 +1862,10 @@
           "^liquidar movimientos$",
           "^udlign poster$",
           "^kohdista tapahtumat$",
-          "^utligne poster$"
+          "^utligne poster$",
+          "^Liquidar movs\\.$",
+          "^Udlign$",
+          "^Utlign poster$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1711,7 +1902,9 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$"
+          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$",
+          "^Factura compra$",
+          "^Facturas compra$"
         ],
         "actionPatterns": [
           "^(Get Receipt Lines|Hämta inleveransrader|Obtenir les lignes de réception|Wareneingangszeilen holen|Traer líns\\. recep\\.|Hent købsleverancelinjer|Hae vast\\.oton rivit|Hent mottakslinjer)$"
@@ -1751,10 +1944,14 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$"
+          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$",
+          "^Factura compra$",
+          "^Facturas compra$"
         ],
         "actionPatterns": [
-          "^(Get Order Lines|Hämta orderrader|Récupérer les lignes de commande|Bestellzeilen abrufen|Obtener líneas de pedido|Hent ordrelinjer|Hae tilausrivit|Hent ordrelinjer)$"
+          "^(Get Order Lines|Hämta orderrader|Récupérer les lignes de commande|Bestellzeilen abrufen|Obtener líneas de pedido|Hent ordrelinjer|Hae tilausrivit|Hent ordrelinjer)$",
+          "^Obtenir les lignes de commande$",
+          "^Auftragspositionen abrufen$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

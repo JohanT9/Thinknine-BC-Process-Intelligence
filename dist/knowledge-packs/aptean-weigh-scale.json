@@ -46,7 +46,8 @@
     "The four Observed.Warehouse handling-unit and delivery-unit rules come from recorded sessions. Their captions (Handling Unit Code, Delivery Unit Code, Number of Delivery Units, Create handling unit) do not appear in the public WSC or WBR articles; WBR documents Handling Unit weight and count on the Weighbridge Ticket only.",
     "Observed.Warehouse.ManualWeight and Observed.Warehouse.SaveWeightRegistration were recorded as Manual weight and Save and close on the warehouse receipt; the public articles document Fill Weight Manually and Save on Weigh Scale Registration.",
     "The Aptean Scale Integration pages for setup, testing and logs were not retrieved; Get Weight behaviour is described from the Weigh Scale and Weighbridge articles.",
-    "Individual Weigh Scale release-note pages were not retrieved; only the release list is recorded."
+    "Individual Weigh Scale release-note pages were not retrieved; only the release list is recorded.",
+    "The Observed.Warehouse rules match only the Swedish and English captions recorded in a tenant. French, German, Spanish, Danish, Finnish and Norwegian captions for these tenant actions and fields are not verified and are not matched; recordings in those languages can add them."
   ],
   "rules": [
     {
@@ -64,13 +65,7 @@
         ],
         "actionPatterns": [
           "^Registrera vikt$",
-          "^Register weight$",
-          "^Enregistrer le poids$",
-          "^Gewicht erfassen$",
-          "^Registrar peso$",
-          "^Registrer vægt$",
-          "^Kirjaa paino$",
-          "^Registrer vekt$"
+          "^Register weight$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": [],
@@ -111,13 +106,7 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^Lastbärarekod$",
-          "^Handling Unit Code$",
-          "^Code unité de manutention$",
-          "^Ladeeinheitencode$",
-          "^Código unidad de manipulación$",
-          "^Lasteenhedskode$",
-          "^Käsittely-yksikön koodi$",
-          "^Håndteringsenhetskode$"
+          "^Handling Unit Code$"
         ],
         "automationIdPatterns": [],
         "pageObjectIds": [
@@ -157,13 +146,7 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^Leveransenhetskod$",
-          "^Delivery Unit Code$",
-          "^Code unité de livraison$",
-          "^Liefereinheitencode$",
-          "^Código de unidad de entrega$",
-          "^Leveringsenhedskode$",
-          "^Toimitusyksikön koodi$",
-          "^Leveringsenhetskode$"
+          "^Delivery Unit Code$"
         ],
         "automationIdPatterns": [],
         "pageObjectIds": [
@@ -203,13 +186,7 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^Antal leveransenheter$",
-          "^Number of Delivery Units$",
-          "^Nombre d’unités de livraison$",
-          "^Anzahl Liefereinheiten$",
-          "^Número de unidades de entrega$",
-          "^Antal leveringsenheder$",
-          "^Toimitusyksiköiden määrä$",
-          "^Antall leveringsenheter$"
+          "^Number of Delivery Units$"
         ],
         "automationIdPatterns": [],
         "pageObjectIds": [
@@ -248,13 +225,7 @@
         ],
         "actionPatterns": [
           "^Skapa lastbärare$",
-          "^Create handling unit$",
-          "^Créer une unité de manutention$",
-          "^Ladeeinheit erstellen$",
-          "^Crear unidad de manipulación$",
-          "^Opret lasteenhed$",
-          "^Luo käsittely-yksikkö$",
-          "^Opprett håndteringsenhet$"
+          "^Create handling unit$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": [],
@@ -294,13 +265,7 @@
         ],
         "actionPatterns": [
           "^Manuell vikt$",
-          "^Manual weight$",
-          "^Poids manuel$",
-          "^Manuelles Gewicht$",
-          "^Peso manual$",
-          "^Manuel vægt$",
-          "^Manuaalinen paino$",
-          "^Manuell vekt$"
+          "^Manual weight$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": [],
@@ -339,23 +304,11 @@
         ],
         "actionPatterns": [
           "^Vikt från våg$",
-          "^Weight from scale$",
-          "^Poids de la balance$",
-          "^Waagengewicht$",
-          "^Peso de la báscula$",
-          "^Vægt fra vægt$",
-          "^Vaa'an paino$",
-          "^Vekt fra vekt$"
+          "^Weight from scale$"
         ],
         "fieldPatterns": [
           "^Vikt från våg$",
-          "^Weight from scale$",
-          "^Poids de la balance$",
-          "^Waagengewicht$",
-          "^Peso de la báscula$",
-          "^Vægt fra vægt$",
-          "^Vaa'an paino$",
-          "^Vekt fra vekt$"
+          "^Weight from scale$"
         ],
         "automationIdPatterns": [],
         "pageObjectIds": [
@@ -393,13 +346,7 @@
         ],
         "actionPatterns": [
           "^Spara och stäng$",
-          "^Save and close$",
-          "^Enregistrer et fermer$",
-          "^Speichern und schließen$",
-          "^Guardar y cerrar$",
-          "^Gem og luk$",
-          "^Tallenna ja sulje$",
-          "^Lagre og lukk$"
+          "^Save and close$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": [],

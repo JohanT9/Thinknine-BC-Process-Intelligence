@@ -14,7 +14,14 @@
       "match": {
         "pagePatterns": [
           "^Transfer GL Entries to CA$",
-          "^Överför GL-poster till CA$"
+          "^Överför GL-poster till CA$",
+          "^Överför redovisningstransaktioner till kostnadsredovisning$",
+          "^Transférer les écritures comptables vers CA$",
+          "^Sachposten in Kostenrechnung übertragen$",
+          "^Transferir movs\\. contabilidad a costes$",
+          "^Overfør finansposter til omkostningsregnskab$",
+          "^Siirrä KP-tapahtumat kustannuslaskentaan$",
+          "^Overfør finansposter til KR$"
         ],
         "actionPatterns": [
           "^Yes$",
@@ -66,7 +73,13 @@
       "match": {
         "pagePatterns": [
           "^Cost Allocation$",
-          "^Kostnadsfördelning$"
+          "^Kostnadsfördelning$",
+          "^Affectation des coûts$",
+          "^Kostenzuteilung$",
+          "^Asignación costes$",
+          "^Omkostningsfordeling$",
+          "^Kustannusten kohdistaminen$",
+          "^Kostfordeling$"
         ],
         "actionPatterns": [
           "^Run Cost Allocation$",
@@ -117,16 +130,34 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "match": {
         "pagePatterns": [
           "^Cost Allocation$",
-          "^Kostnadsfördelning$"
+          "^Kostnadsfördelning$",
+          "^Affectation des coûts$",
+          "^Kostenzuteilung$",
+          "^Asignación costes$",
+          "^Omkostningsfordeling$",
+          "^Kustannusten kohdistaminen$",
+          "^Kostfordeling$"
         ],
         "actionPatterns": [
           "^Calculate Allocation Key$",
-          "^Beräkna fördelningsnyckel$"
+          "^Beräkna fördelningsnyckel$",
+          "^Calculer la clé de ventilation$",
+          "^Verteilungsschlüssel berechnen$",
+          "^Calcular clave de asignación$",
+          "^Beregn fordelingsnøgle$",
+          "^Laske kohdistusavain$",
+          "^Beregn fordelingsnøkkel$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -174,7 +205,13 @@
       "match": {
         "pagePatterns": [
           "^Cost Budgets$",
-          "^Kostnadsbudgetar$"
+          "^Kostnadsbudgetar$",
+          "^Budgets des coûts$",
+          "^Kostenbudgets$",
+          "^Presupuestos de costes$",
+          "^Omkostningsbudgetter$",
+          "^Kustannusbudjetit$",
+          "^Kostbudsjetter$"
         ],
         "actionPatterns": [
           "^New$",
@@ -410,7 +447,14 @@
       ],
       "match": {
         "pagePatterns": [
-          "^Delete Cost Budget Entries$"
+          "^Delete Cost Budget Entries$",
+          "^Ta bort kostnadsbudgettransaktioner$",
+          "^Supprimer écritures budget des coûts$",
+          "^Kostenbudgetposten löschen$",
+          "^Eliminar movs\\. ppto\\. costes$",
+          "^Slet omkostningsbudgetposter$",
+          "^Poista kustannusbudjettitapahtumat$",
+          "^Slett kostbudsjettposter$"
         ],
         "actionPatterns": [
           "^OK$"

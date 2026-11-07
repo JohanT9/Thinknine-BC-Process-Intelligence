@@ -14,11 +14,87 @@
       "match": {
         "pagePatterns": [
           "produktionsorder",
-          "production order"
+          "production order",
+          "^Prod\\.order statistik$",
+          "^Planerad prod\\.order$",
+          "^Prod\\.orderlista$",
+          "^Färdig prod\\.order$",
+          "^Statistiques O\\.F\\.$",
+          "^O\\.F\\. planifiés$",
+          "^O\\.F\\. planifié$",
+          "^O\\.F\\. simulés$",
+          "^Liste des O\\.F\\.$",
+          "^O\\.F\\. lancés$",
+          "^O\\.F\\. terminés$",
+          "^Changer statut O\\.F\\.$",
+          "^O\\.F\\. lancé$",
+          "^O\\.F\\. simulé$",
+          "^O\\.F\\. terminé$",
+          "^FA-Statistik$",
+          "^Geplante FA$",
+          "^Geplanter FA$",
+          "^Simulierte Fertigungsaufträge$",
+          "^Fertigungsauftragsübersicht$",
+          "^Freigegebene Fertigungsaufträge$",
+          "^Beendete Fertigungsaufträge$",
+          "^FA-Status ändern$",
+          "^Freigegebener FA$",
+          "^Simulierter FA$",
+          "^Beendeter FA$",
+          "^Estadísticas orden producción$",
+          "^Órdenes producción planificadas$",
+          "^Orden producción planificada$",
+          "^Órdenes producción simuladas$",
+          "^Lista órdenes producción$",
+          "^Órdenes producción lanzadas$",
+          "^Órdenes producción terminadas$",
+          "^Cambiar estado orden prod\\.$",
+          "^Orden producción lanzada$",
+          "^Orden producción simulada$",
+          "^Orden producción terminada$",
+          "^Prod\\.ordrestatistik$",
+          "^Planlagte produktionsordrer$",
+          "^Planlagt produktionsordre$",
+          "^Simulerede produktionsordrer$",
+          "^Prod\\.ordreoversigt$",
+          "^Frigivne produktionsordrer$",
+          "^Færdige produktionsordrer$",
+          "^Skift prod\\.ordrestatus$",
+          "^Frigivet produktionsordre$",
+          "^Simuleret produktionsordre$",
+          "^Færdig produktionsordre$",
+          "^Tuotantotilaustilastot$",
+          "^Suunnitellut tuotantotilaukset$",
+          "^Suunniteltu tuotantotilaus$",
+          "^Simuloidut tuotantotilaukset$",
+          "^Tuotantotilausluettelo$",
+          "^Vapautetut tuotantotilaukset$",
+          "^Valmiit tuotantotilaukset$",
+          "^Muuta tuotantotilauksen tila$",
+          "^Vapautettu tuotantotilaus$",
+          "^Simuloitu tuotantotilaus$",
+          "^Valmis tuotantotilaus$",
+          "^Produksjonsordrestatistikk$",
+          "^Planlagte produksjonsordrer$",
+          "^Planlagt produksjonsordre$",
+          "^Simulerte produksjonsordrer$",
+          "^Produksjonsordreoversikt$",
+          "^Frigitte produksjonsordrer$",
+          "^Ferdige produksjonsordrer$",
+          "^Endre produksjonsordrestatus$",
+          "^Frigitt produksjonsordre$",
+          "^Simulert produksjonsordre$",
+          "^Ferdig produksjonsordre$"
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -159,7 +235,10 @@
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$"
+          "^Produksjonsjournal$",
+          "^Feuille production$",
+          "^Produktions Buch\\.-Blatt$",
+          "^Produksjonskladd$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -170,7 +249,9 @@
           "^Publicar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Valider$",
+          "^Registrar$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -216,7 +297,10 @@
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$"
+          "^Produksjonsjournal$",
+          "^Feuille production$",
+          "^Produktions Buch\\.-Blatt$",
+          "^Produksjonskladd$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -227,7 +311,8 @@
           "^Consumo \\(cantidad\\)$",
           "^Forbrugsantal$",
           "^Kulutusmäärä$",
-          "^Forbruksantall$"
+          "^Forbruksantall$",
+          "^Förbrukningsantal$"
         ],
         "automationIdPatterns": []
       },
@@ -278,7 +363,10 @@
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$"
+          "^Produksjonsjournal$",
+          "^Feuille production$",
+          "^Produktions Buch\\.-Blatt$",
+          "^Produksjonskladd$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -290,7 +378,9 @@
           "^Cantidad salida$",
           "^Output Mængde$",
           "^Tuotoksen määrä$",
-          "^Avgangsantall$"
+          "^Avgangsantall$",
+          "^Fertig gestellte Menge$",
+          "^Afgangsantal$"
         ],
         "automationIdPatterns": []
       },
@@ -331,7 +421,8 @@
           "^(Production Orders?|Produktionsorder|Produktionsordrar|Ordres? de fabrication|Fertigungsauftrag(?:e)?|Orden de producción|Órdenes de producción|Produktionsordrer?|Tuotantotilaus|Tuotantotilaukset|Produksjonsordre(?:r)?)$"
         ],
         "actionPatterns": [
-          "^(Replan|Omplanera|Replanifier|Neu planen|Replanificar|Omplanlæg|Uudelleensuunnittele|Planlegg på nytt)$"
+          "^(Replan|Omplanera|Replanifier|Neu planen|Replanificar|Omplanlæg|Uudelleensuunnittele|Planlegg på nytt)$",
+          "^Replanlæg$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

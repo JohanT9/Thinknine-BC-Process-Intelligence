@@ -10,6 +10,7 @@ const manifest = require('../src/knowledge-packs/index.json');
 const packs = manifest.packs.filter(p => p.enabled).map(p =>
   JSON.parse(fs.readFileSync(path.join(root, 'src', p.file), 'utf8')));
 const fixtures = require('./fixtures/quality-management-captions.json');
+const translatedCaptions = require('./fixtures/knowledge-localized-captions.json').cases;
 const imported = repositoryApi.importRelease(manifest, packs.map(pack => ({packId:pack.packId,pack})));
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = repositoryApi.createRepository(imported.snapshot);
@@ -29,8 +30,10 @@ assert.match(copiedTemplate.localizedExplanations['sv-SE'],/provstorlek/i);
 assert.match(copiedTemplate.localizedExplanations['sv-SE'],/kopierar inte befintliga inspektionsposter eller resultat/i);
 for (const rule of added) {
   assert.deepEqual(Object.keys(rule.localizedExplanations).sort(), locales, rule.ruleId);
-  const expectedRuntimeLocales = rule.verifiedRuntimeLocales || locales;
-  assert.deepEqual([...new Set(fixtures.filter(f => f.ruleId === rule.ruleId).map(f => f.locale))].sort(), expectedRuntimeLocales);
+  // Runtime languages are verified here or by captions from Business Central's translation files.
+  const expectedRuntimeLocales = [...(rule.verifiedRuntimeLocales || locales)].sort();
+  assert.deepEqual([...new Set([...fixtures, ...translatedCaptions].filter(f => f.ruleId === rule.ruleId)
+    .map(f => f.locale))].sort(), expectedRuntimeLocales, rule.ruleId);
   assert.equal(new Set(Object.values(rule.localizedExplanations)).size, locales.length, 'no English text fallback');
   assert.ok(Object.values(rule.localizedExplanations).every(t => t.length > 70 && !/[\uFFFD]/u.test(t)));
 }

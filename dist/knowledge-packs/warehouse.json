@@ -75,11 +75,37 @@
       "match": {
         "pagePatterns": [
           "distlagerinleverans",
-          "warehouse receipt"
+          "warehouse receipt",
+          "^Bokförda inleveranser till distributionslager$",
+          "^Distributionslagerinleverans$",
+          "^Dist\\.lager inleveranser$",
+          "^Réceptions entrepôt enregistrées$",
+          "^Réception entrepôt$",
+          "^Réceptions entrepôt$",
+          "^Gebuchte Wareneingänge$",
+          "^Wareneingang$",
+          "^Wareneingänge$",
+          "^Recepciones de almacén registradas$",
+          "^Recep\\. almacén$",
+          "^Recepciones almacén$",
+          "^Bogførte lagerstedsmodtagelser$",
+          "^Lagerstedsmodtagelse$",
+          "^Lagerstedsmodtagelser$",
+          "^Kirjatut fyysisen varaston vastaanotot$",
+          "^F\\. varastoinnin vastaanotto$",
+          "^F\\.var\\. vast\\.otot$",
+          "^Bokførte lagermottak$",
+          "^Lagermottak$"
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -117,11 +143,38 @@
       "match": {
         "pagePatterns": [
           "distlagerutleverans",
-          "warehouse shipment"
+          "warehouse shipment",
+          "^Utleveranser från distributionslager$",
+          "^Distributionslagerutleverans$",
+          "^Bokförda utleveranser från distributionslager$",
+          "^Expéditions entrepôt$",
+          "^Expédition entrepôt$",
+          "^Expéditions entrepôt enregistrées$",
+          "^Warenausgänge$",
+          "^Warenausgang$",
+          "^Gebuchte Warenausgänge$",
+          "^Envíos de almacén$",
+          "^Envío almacén$",
+          "^Envíos registrados de almacén$",
+          "^Lagerstedsforsendelser$",
+          "^Lagerstedsforsendelse$",
+          "^Bogførte lagerstedsforsendelser$",
+          "^Fyysisen varaston toimitukset$",
+          "^F\\.var\\. toimitus$",
+          "^Kirjatut fyysisen varaston toimitukset$",
+          "^Lagerleveringer$",
+          "^Lagerlevering$",
+          "^Bokførte lagerleveringer$"
         ],
         "actionPatterns": [
           "open record",
-          "öppna post"
+          "öppna post",
+          "^Ouvrir l'enregistrement$",
+          "^Datensatz öffnen$",
+          "^Abrir registro$",
+          "^Åbn record$",
+          "^Avaa tietue$",
+          "^Åpne post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -174,7 +227,13 @@
           "^Luo varaston hyllytys tai poiminta$",
           "^Luo varaston poiminta$",
           "^Opprett lagerplassering/-plukking$",
-          "^Opprett lagerplukking$"
+          "^Opprett lagerplukking$",
+          "^Skapa lagerinförsel / plockning$",
+          "^Lagerbelege erstellen$",
+          "^Crear almac\\./ pick\\. inventario$",
+          "^Opret læg-på-lager \\(lager\\)/pluk \\(lager\\)$",
+          "^Luo varastohyllytys/-poiminta$",
+          "^Opprett lagerplassering/-plukk$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -218,7 +277,19 @@
           "^Selecciones de Almacén$",
           "^Lagerpluk$",
           "^Varaston valinnat$",
-          "^Lagervalg$"
+          "^Lagervalg$",
+          "^Distributionslagerplockning$",
+          "^Distributionslagerplockningar$",
+          "^Prélèvement entrepôt$",
+          "^Prélèvements entrepôt$",
+          "^Kommissionierung$",
+          "^Kommissionierungen$",
+          "^Picking almacén$",
+          "^Pluk \\(logistik\\)$",
+          "^F\\.varastoinnin poiminta$",
+          "^Fyysisen varaston poiminnat$",
+          "^Plukk$",
+          "^Lagerplukk$"
         ],
         "actionPatterns": [
           "^Register Pick$",
@@ -266,7 +337,27 @@
       "match": {
         "pagePatterns": [
           "distlagerinleverans",
-          "warehouse receipt"
+          "warehouse receipt",
+          "^Bokförda inleveranser till distributionslager$",
+          "^Distributionslagerinleverans$",
+          "^Dist\\.lager inleveranser$",
+          "^Réceptions entrepôt enregistrées$",
+          "^Réception entrepôt$",
+          "^Réceptions entrepôt$",
+          "^Gebuchte Wareneingänge$",
+          "^Wareneingang$",
+          "^Wareneingänge$",
+          "^Recepciones de almacén registradas$",
+          "^Recep\\. almacén$",
+          "^Recepciones almacén$",
+          "^Bogførte lagerstedsmodtagelser$",
+          "^Lagerstedsmodtagelse$",
+          "^Lagerstedsmodtagelser$",
+          "^Kirjatut fyysisen varaston vastaanotot$",
+          "^F\\. varastoinnin vastaanotto$",
+          "^F\\.var\\. vast\\.otot$",
+          "^Bokførte lagermottak$",
+          "^Lagermottak$"
         ],
         "actionPatterns": [
           "^Bokför$",
@@ -309,7 +400,28 @@
       "match": {
         "pagePatterns": [
           "distlagerutleverans",
-          "warehouse shipment"
+          "warehouse shipment",
+          "^Utleveranser från distributionslager$",
+          "^Distributionslagerutleverans$",
+          "^Bokförda utleveranser från distributionslager$",
+          "^Expéditions entrepôt$",
+          "^Expédition entrepôt$",
+          "^Expéditions entrepôt enregistrées$",
+          "^Warenausgänge$",
+          "^Warenausgang$",
+          "^Gebuchte Warenausgänge$",
+          "^Envíos de almacén$",
+          "^Envío almacén$",
+          "^Envíos registrados de almacén$",
+          "^Lagerstedsforsendelser$",
+          "^Lagerstedsforsendelse$",
+          "^Bogførte lagerstedsforsendelser$",
+          "^Fyysisen varaston toimitukset$",
+          "^F\\.var\\. toimitus$",
+          "^Kirjatut fyysisen varaston toimitukset$",
+          "^Lagerleveringer$",
+          "^Lagerlevering$",
+          "^Bokførte lagerleveringer$"
         ],
         "actionPatterns": [
           "^Bokför$",
@@ -447,7 +559,15 @@
           "^Varaston poiminta$",
           "^Varaston poiminnat$",
           "^Lagerplukk$",
-          "^Lagerplukking$"
+          "^Lagerplukking$",
+          "^Prélèvements stock enregistrés$",
+          "^Gebuchte Lagerkommissionierungen$",
+          "^Picking inventario$",
+          "^Pickings de inventario registrados$",
+          "^Bogførte lagerpluk$",
+          "^Kirjatut varaston poiminnat$",
+          "^Beholdningsplukk$",
+          "^Bokførte beholdningsplukk$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -461,7 +581,12 @@
           "^Cdad\\. a manipular$",
           "^Håndteringsantal$",
           "^Käsiteltävä määrä$",
-          "^Ant\\. som skal håndt$"
+          "^Ant\\. som skal håndt$",
+          "^Qté à traiter$",
+          "^Bewegungsmenge$",
+          "^Cant\\. a manipular$",
+          "^Antal at håndtere$",
+          "^Ant\\. som skal håndt\\.$"
         ],
         "automationIdPatterns": []
       },
@@ -516,7 +641,15 @@
           "^Varaston poiminta$",
           "^Varaston poiminnat$",
           "^Lagerplukk$",
-          "^Lagerplukking$"
+          "^Lagerplukking$",
+          "^Prélèvements stock enregistrés$",
+          "^Gebuchte Lagerkommissionierungen$",
+          "^Picking inventario$",
+          "^Pickings de inventario registrados$",
+          "^Bogførte lagerpluk$",
+          "^Kirjatut varaston poiminnat$",
+          "^Beholdningsplukk$",
+          "^Bokførte beholdningsplukk$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -527,7 +660,8 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Buchen$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -582,7 +716,34 @@
           "^Varaston hyllytys$",
           "^Varaston hyllytykset$",
           "^Lagerplassering$",
-          "^Lagerplasseringer$"
+          "^Lagerplasseringer$",
+          "^Skapa lagerinförsel/plockning/transport$",
+          "^Artikelinförsellista$",
+          "^Lagerinförsellista$",
+          "^Créer rangement/prélèvement/mouvement stock$",
+          "^Liste des rangements$",
+          "^Liste des rangements stock$",
+          "^Gestion de la qualité – Créer un rangement interne$",
+          "^Bestandseinlagerung/Kommissionierung/Umlagerung erstellen$",
+          "^Einlagerungsliste$",
+          "^Lagereinlagerungsliste$",
+          "^Qualitätsmanagement – Interne Einlagerung erstellen$",
+          "^Crear almacenamiento/picking/movimiento de inventario$",
+          "^Lista almac\\.$",
+          "^Lista almac\\. inventario$",
+          "^Administración de calidad: creación de una colocación interna$",
+          "^Opret læg-på-lager/pluk/bevægelse$",
+          "^Læg-på-lager-oversigt$",
+          "^Læg-på-lager-oversigt \\(lager\\)$",
+          "^Quality Management – Opret intern læg-på-lager$",
+          "^Luo varaston hyllytys/poiminta/siirto$",
+          "^Hyllytysluettelo$",
+          "^Var\\. hyllytysluettelo$",
+          "^Laadunhallinta – luo sisäinen varastointi$",
+          "^Opprett beholdningsplassering/-plukk/-flytting$",
+          "^Plasseringsoversikt$",
+          "^Oversikt over beholdningsplassering$",
+          "^Kvalitetsadministrasjon – opprett intern plassering$"
         ],
         "actionPatterns": [
           "^Register Put-Away$",
@@ -593,7 +754,9 @@
           "^Registrar ubicación$",
           "^Registrer læg-på-lager$",
           "^Rekisteröi hyllytys$",
-          "^Registrer plassering$"
+          "^Registrer plassering$",
+          "^Enregistrer rangement$",
+          "^Registrar almacenamiento$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -649,7 +812,20 @@
           "^Lagermodtagelser$",
           "^F\\. varastoinnin vastaanotto$",
           "^Varastokuittaukset$",
-          "^Lagermottak$"
+          "^Lagermottak$",
+          "^Bokförda inleveranser till distributionslager$",
+          "^Distributionslagerinleverans$",
+          "^Réceptions entrepôt enregistrées$",
+          "^Gebuchte Wareneingänge$",
+          "^Wareneingänge$",
+          "^Recepciones de almacén registradas$",
+          "^Recepciones almacén$",
+          "^Bogførte lagerstedsmodtagelser$",
+          "^Lagerstedsmodtagelse$",
+          "^Lagerstedsmodtagelser$",
+          "^Kirjatut fyysisen varaston vastaanotot$",
+          "^F\\.var\\. vast\\.otot$",
+          "^Bokførte lagermottak$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -663,7 +839,13 @@
           "^Cdad\\. a recibir$",
           "^Modtag \\(antal\\)$",
           "^Vastaanotettava määrä$",
-          "^Antall som skal mottas$"
+          "^Antall som skal mottas$",
+          "^Ant\\. att inleverera$",
+          "^Qté à recevoir$",
+          "^Menge akt\\. Lieferung$",
+          "^Cant\\. a recibir$",
+          "^Antal at modtage$",
+          "^Motta \\(antall\\)$"
         ],
         "automationIdPatterns": []
       },
@@ -717,7 +899,20 @@
           "^Lagermodtagelser$",
           "^F\\. varastoinnin vastaanotto$",
           "^Varastokuittaukset$",
-          "^Lagermottak$"
+          "^Lagermottak$",
+          "^Bokförda inleveranser till distributionslager$",
+          "^Distributionslagerinleverans$",
+          "^Réceptions entrepôt enregistrées$",
+          "^Gebuchte Wareneingänge$",
+          "^Wareneingänge$",
+          "^Recepciones de almacén registradas$",
+          "^Recepciones almacén$",
+          "^Bogførte lagerstedsmodtagelser$",
+          "^Lagerstedsmodtagelse$",
+          "^Lagerstedsmodtagelser$",
+          "^Kirjatut fyysisen varaston vastaanotot$",
+          "^F\\.var\\. vast\\.otot$",
+          "^Bokførte lagermottak$"
         ],
         "actionPatterns": [
           "^Post Receipt$",
@@ -728,7 +923,10 @@
           "^Registrar recepción$",
           "^Bogfør modtagelse$",
           "^Kirjaa vastaanotto$",
-          "^Bokfør mottak$"
+          "^Bokfør mottak$",
+          "^Registrar recep\\.$",
+          "^Bogfør leverance$",
+          "^Kirjaa vast\\.otto$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -790,7 +988,8 @@
           "^Ficha de producto$",
           "^Varekort$",
           "^Nimikkeen kortti$",
-          "^Varekort$"
+          "^Varekort$",
+          "^Ficha producto$"
         ],
         "actionPatterns": [
           "^Event$",
@@ -800,7 +999,8 @@
           "^Evento$",
           "^Hændelse$",
           "^Tapahtuma$",
-          "^Hendelse$"
+          "^Hendelse$",
+          "^Begivenhed$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -844,7 +1044,8 @@
           "^Ficha de producto$",
           "^Varekort$",
           "^Nimikkeen kortti$",
-          "^Varekort$"
+          "^Varekort$",
+          "^Ficha producto$"
         ],
         "actionPatterns": [
           "^Period$",
@@ -898,7 +1099,8 @@
           "^Ficha de producto$",
           "^Varekort$",
           "^Nimikkeen kortti$",
-          "^Varekort$"
+          "^Varekort$",
+          "^Ficha producto$"
         ],
         "actionPatterns": [
           "^Location$",
@@ -908,7 +1110,8 @@
           "^Almacén$",
           "^Lokation$",
           "^Sijainti$",
-          "^Lokasjon$"
+          "^Lokasjon$",
+          "^Lagerort$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -953,7 +1156,8 @@
           "^Productos por almacén$",
           "^Varer pr\\. lokation$",
           "^Nimikkeet sijainneittain$",
-          "^Varer per lokasjon$"
+          "^Varer per lokasjon$",
+          "^Prods\\. por almacén$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -997,7 +1201,8 @@
           "^Ficha de producto$",
           "^Varekort$",
           "^Nimikkeen kortti$",
-          "^Varekort$"
+          "^Varekort$",
+          "^Ficha producto$"
         ],
         "actionPatterns": [
           "^Item Availability by BOM Level$",
@@ -1051,7 +1256,8 @@
           "^Ficha de producto$",
           "^Varekort$",
           "^Nimikkeen kortti$",
-          "^Varekort$"
+          "^Varekort$",
+          "^Ficha producto$"
         ],
         "actionPatterns": [
           "^Item Availability by Variant$",

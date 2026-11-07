@@ -16,7 +16,19 @@
           "^Purchase Order$",
           "^Purchase Invoice$",
           "^Inköpsorder$",
-          "^Inköpsfaktura$"
+          "^Inköpsfaktura$",
+          "^Facture achat$",
+          "^Commande achat$",
+          "^Einkaufsrechnung$",
+          "^Einkaufsbestellung$",
+          "^Factura compra$",
+          "^Pedido compra$",
+          "^Købsfaktura$",
+          "^Købsordre$",
+          "^Ostolasku$",
+          "^Ostotilaus$",
+          "^Kjøpsfaktura$",
+          "^Bestilling$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -27,7 +39,34 @@
           "^Hållbarhetskontonr\\.?$",
           "^Utsläpp CO2$",
           "^Utsläpp CH4$",
-          "^Utsläpp N2O$"
+          "^Utsläpp N2O$",
+          "^Utsläpp av CO2$",
+          "^Utsläpp av N2O$",
+          "^Utsläpp av CH4$",
+          "^Émission CO2$",
+          "^Émission N2O$",
+          "^Émission CH4$",
+          "^CO2-Emission$",
+          "^N2O-Emission$",
+          "^CH4-Emission$",
+          "^Emisión CO2$",
+          "^Emisión N2O$",
+          "^Emisión CH4$",
+          "^Udledning af CO2$",
+          "^Udledning af N2O$",
+          "^Udledning af CH4$",
+          "^Udledning N2O$",
+          "^Udlednings-CO2$",
+          "^Udlednings-N2O$",
+          "^CO2-päästöt$",
+          "^N2O-päästöt$",
+          "^CH4-päästöt$",
+          "^CO2-päästö$",
+          "^N2O-päästö$",
+          "^CH4-päästö$",
+          "^Utslipp CO2$",
+          "^Utslipp N2O$",
+          "^Utslipp CH4$"
         ],
         "automationIdPatterns": []
       },
@@ -44,7 +83,13 @@
       ],
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": [],
       "sourceIds": [
@@ -80,11 +125,24 @@
       "match": {
         "pagePatterns": [
           "^Sustainability Journal$",
-          "^Hållbarhetsjournal$"
+          "^Hållbarhetsjournal$",
+          "^Feuille durabilité$",
+          "^Nachhaltigkeitsjournal$",
+          "^Diario de sostenibilidad$",
+          "^Bæredygtighedskladde$",
+          "^Vastuullisuuspäiväkirja$",
+          "^Bærekraftskladd$"
         ],
         "actionPatterns": [
           "^Collect Amount from G/L Entries$",
-          "^Samla in belopp från huvudbokstransaktioner$"
+          "^Samla in belopp från huvudbokstransaktioner$",
+          "^Samla in belopp från redovisningstransaktioner$",
+          "^Collecter le montant des écritures comptables$",
+          "^Betrag aus Sachposten erfassen$",
+          "^Recopilar importe de movs\\. contables$",
+          "^Opkræv beløb fra finansposter$",
+          "^Kerää summa KP-tapahtumista$",
+          "^Samle inn beløp fra finansposter$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -102,7 +160,13 @@
       ],
       "verifiedRuntimeLocales": [
         "en-US",
-        "sv-SE"
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": [],
       "sourceIds": [
@@ -138,7 +202,14 @@
       "match": {
         "pagePatterns": [
           "^Sustainability Account Categories$",
-          "^Kategorier för hållbarhetskonto$"
+          "^Kategorier för hållbarhetskonto$",
+          "^Kategorier för hållbarhetskonton$",
+          "^Catégories de compte de durabilité$",
+          "^Kategorien von Nachhaltigkeitskonten$",
+          "^Categorías de cuentas de sostenibilidad$",
+          "^Kategorier af bæredygtighedskonti$",
+          "^Vastuullisuustilin luokat$",
+          "^Kategorier for bærekraftskonto$"
         ],
         "actionPatterns": [
           "^New$",
@@ -194,7 +265,14 @@
       "match": {
         "pagePatterns": [
           "^Sustainability Account Subcategories$",
-          "^Underkategorier för hållbarhetskonto$"
+          "^Underkategorier för hållbarhetskonto$",
+          "^Underkategorier för hållbarhetskonton$",
+          "^Sous-catégories de compte de durabilité$",
+          "^Unterkategorien des Nachhaltigkeitskontos$",
+          "^Subcategorías de cuenta de sostenibilidad$",
+          "^Underkategorier af bæredygtighedskonti$",
+          "^Vastuullisuustilin alaluokat$",
+          "^Underkategorier for bærekraftskonto$"
         ],
         "actionPatterns": [
           "^New$",
@@ -256,7 +334,10 @@
           "^Diario de sostenibilidad$",
           "^Bæredygtighedskladde$",
           "^Kestävyyspäiväkirja$",
-          "^Bærekraftskladd$"
+          "^Bærekraftskladd$",
+          "^Feuille durabilité$",
+          "^Nachhaltigkeitsjournal$",
+          "^Vastuullisuuspäiväkirja$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -320,7 +401,10 @@
           "^Diario de sostenibilidad$",
           "^Bæredygtighedskladde$",
           "^Kestävyyspäiväkirja$",
-          "^Bærekraftskladd$"
+          "^Bærekraftskladd$",
+          "^Feuille durabilité$",
+          "^Nachhaltigkeitsjournal$",
+          "^Vastuullisuuspäiväkirja$"
         ],
         "actionPatterns": [
           "^Recalculate$",
@@ -330,7 +414,8 @@
           "^Recalcular$",
           "^Genberegn$",
           "^Laske uudelleen$",
-          "^Beregn på nytt$"
+          "^Beregn på nytt$",
+          "^Beregn igen$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -384,7 +469,10 @@
           "^Diario de sostenibilidad$",
           "^Bæredygtighedskladde$",
           "^Kestävyyspäiväkirja$",
-          "^Bærekraftskladd$"
+          "^Bærekraftskladd$",
+          "^Feuille durabilité$",
+          "^Nachhaltigkeitsjournal$",
+          "^Vastuullisuuspäiväkirja$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -394,7 +482,9 @@
           "^Registrar$",
           "^Bogfør$",
           "^Kirjaa$",
-          "^Bokfør$"
+          "^Bokfør$",
+          "^Valider$",
+          "^Registro$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

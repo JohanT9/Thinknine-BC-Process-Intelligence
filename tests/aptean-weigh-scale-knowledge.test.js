@@ -31,6 +31,18 @@ for (const ruleId of ["Observed.Warehouse.RegisterWeight", "Observed.Warehouse.M
   assert.ok(pack.rules.some(rule => rule.ruleId === ruleId), `${ruleId} keeps its ID`);
 }
 
+// Recorded tenant captions exist in Swedish and English only; other languages are not guessed.
+for (const rule of pack.rules.filter(item => item.ruleId.startsWith("Observed.Warehouse."))) {
+  for (const key of ["actionPatterns", "fieldPatterns"]) {
+    assert.ok(rule.match[key].length <= 2, `${rule.ruleId} ${key} holds only recorded captions`);
+  }
+}
+assert.ok(pack.documentationGaps.some(gap => /only the Swedish and English captions recorded/u.test(gap)));
+const knownFieldLabels = /Poids de la balance|Waagengewicht|Peso de la báscula|Vægt fra vægt|Va'?an paino|Vekt fra vekt/u;
+assert.doesNotMatch(fs.readFileSync(path.join(__dirname, "..", "src", "engine",
+  "knowledge-explanation-catalog.js"), "utf8"), knownFieldLabels,
+  "explanations do not present unverified translations as field names");
+
 const sourceById = new Map(pack.sources.map(source => [source.sourceId, source]));
 for (const source of pack.sources) {
   assert.match(source.sourceUri, /^https:\/\/erpdocs\.apteancloud\.com\/bc\/docs\/(?:WSC|SCI|WBR)\//u,
@@ -78,6 +90,21 @@ assert.equal(resolve({ pageCaption: "Warehouse Receipt", actionCaption: "Transfe
   "AptWeighScale.TransferWeighScaleEntries");
 assert.equal(resolve({ pageCaption: "Weighbridge Ticket", actionCaption: "Post Quantity To Receive" }),
   "AptWeighbridge.PostQuantityToReceive");
+// Further actions as the WSC and WBR articles name them (English only, checked 2026-11-07).
+for (const [pageCaption, actionCaption, ruleId] of [
+  ["Weigh Scale Registration", "Save and Print Labels", "AptWeighScale.SaveAndPrintLabels"],
+  ["Weigh Scale Registration", "Assign Lot No.", "AptWeighScale.AssignLotNo"],
+  ["Weigh Scale Registration", "Create License Plate", "AptWeighScale.CreateLicensePlate"],
+  ["Weigh Scale Registration", "Assign Lot Attributes", "AptWeighScale.AssignLotAttributes"],
+  ["Weigh Scale Registration", "Change Status", "AptWeighScale.ChangeEntryStatus"],
+  ["Released Production Order", "Weigh Scale Entries", "AptWeighScale.OpenWeighScaleEntries"],
+  ["Weighbridge Ticket", "Create Inbound Register", "AptWeighbridge.CreateInboundRegister"],
+  ["Weighbridge Ticket", "Create Outbound Register", "AptWeighbridge.CreateOutboundRegister"]
+]) {
+  assert.equal(resolve({ pageCaption, actionCaption }), ruleId, `${actionCaption} on ${pageCaption}`);
+}
+assert.notEqual(resolve({ pageCaption: "Sales Order", actionCaption: "Change Status" }),
+  "AptWeighScale.ChangeEntryStatus", "Change Status elsewhere is not a weigh-scale entry change");
 
 const posted = knowledge.apply([{ taskId: "p", taskType: "RunAction", language: "sv-SE",
   pageCaption: "Weighbridge Ticket", actionCaption: "Create Inbound Register" }], allPacks).tasks[0];

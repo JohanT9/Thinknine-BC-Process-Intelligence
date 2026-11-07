@@ -20,7 +20,9 @@
           "^Líneas de planificación de proyecto$",
           "^Projektplanlægningslinjer$",
           "^Projektin suunnittelurivit$",
-          "^Prosjektplanleggingslinjer$"
+          "^Prosjektplanleggingslinjer$",
+          "^Lignes de planification de projet$",
+          "^Projektplanzeilen$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -31,7 +33,10 @@
           "^Cdad\\. a transferir al diario$",
           "^Antal, der skal overføres til kladde$",
           "^Päiväkirjaan siirrettävä määrä$",
-          "^Ant\\. som skal overføres til kladd$"
+          "^Ant\\. som skal overføres til kladd$",
+          "^Qté à transférer sur le journal$",
+          "^In Buch\\.-Blatt zu übertragende Menge$",
+          "^Cant\\. a transferir al diario$"
         ],
         "automationIdPatterns": []
       },
@@ -65,7 +70,9 @@
           "^Líneas de planificación de proyecto$",
           "^Projektplanlægningslinjer$",
           "^Projektin suunnittelurivit$",
-          "^Prosjektplanleggingslinjer$"
+          "^Prosjektplanleggingslinjer$",
+          "^Lignes de planification de projet$",
+          "^Projektplanzeilen$"
         ],
         "actionPatterns": [
           "^Create Project Journal Lines$",
@@ -75,7 +82,10 @@
           "^Crear líneas de diario de proyectos$",
           "^Opret projektkladdelinjer$",
           "^Luo projektipäiväkirjan rivit$",
-          "^Opprett prosjektkladdelinjer$"
+          "^Opprett prosjektkladdelinjer$",
+          "^Créer lignes feuille projet$",
+          "^Projekt-Buchungsblattzeilen erstellen$",
+          "^Crear líneas diario proyecto$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -110,7 +120,9 @@
           "^Diario de proyectos$",
           "^Projektkladde$",
           "^Projektipäiväkirja$",
-          "^Prosjektkladd$"
+          "^Prosjektkladd$",
+          "^Projekt Buch\\.-Blatt$",
+          "^Diario del proyecto$"
         ],
         "actionPatterns": [
           "^Post$",
@@ -155,7 +167,11 @@
           "^Líneas de tareas del proyecto$",
           "^Project Opgavelinjer$",
           "^Project Task Lines$",
-          "^Prosjektoppgavelinjer$"
+          "^Prosjektoppgavelinjer$",
+          "^Lignes tâche projet$",
+          "^Líneas tarea proyecto$",
+          "^Projektopgavelinjer$",
+          "^Projektitehtävän rivit$"
         ],
         "actionPatterns": [
           "^Project Planning Lines$",
@@ -165,7 +181,9 @@
           "^Líneas planificación proyecto$",
           "^Projektplanlægningslinjer$",
           "^Project Suunnittelurivit$",
-          "^Prosjektplanleggingslinjer$"
+          "^Prosjektplanleggingslinjer$",
+          "^Projektplanzeilen$",
+          "^Projektin suunnittelurivit$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -200,7 +218,10 @@
           "^Líneas planificación proyecto$",
           "^Projektplanlægningslinjer$",
           "^Projektin suunnittelurivit$",
-          "^Prosjektplanleggingslinjer$"
+          "^Prosjektplanleggingslinjer$",
+          "^Lignes de planification de projet$",
+          "^Projektplanzeilen$",
+          "^Líneas de planificación de proyecto$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -211,7 +232,10 @@
           "^Cdad\\. para transferir a factura$",
           "^Antal til overførsel til faktura$",
           "^Laskuun siirrettävä määrä$",
-          "^Ant\\. som skal overføres til faktura$"
+          "^Ant\\. som skal overføres til faktura$",
+          "^Cant\\. a transferir a factura$",
+          "^Antal, der skal overf\\. til faktura$",
+          "^Antal, der skal overføres til faktura$"
         ],
         "automationIdPatterns": []
       },
@@ -244,7 +268,8 @@
           "^Proyectos$",
           "^Projekter$",
           "^Projektit$",
-          "^Prosjekter$"
+          "^Prosjekter$",
+          "^Projekte$"
         ],
         "actionPatterns": [
           "^Create Project Sales Invoice$",
@@ -254,7 +279,10 @@
           "^Crear factura de venta de proyecto$",
           "^Opret projektsalgsfaktura$",
           "^Luo projektin myyntilasku$",
-          "^Opprett salgsfaktura for prosjekt$"
+          "^Opprett salgsfaktura for prosjekt$",
+          "^Skapa en försäljningsfaktura för projekt$",
+          "^Opret salgsfaktura for projekt$",
+          "^Luo projekti- ja myyntilasku$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -282,7 +310,10 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Time Sheets|Tidrapporter|Feuilles de temps|Arbeitszeittabellen|Hojas de tiempo|Timesedler|Aikaraportit|Timelister)$"
+          "^(Time Sheets|Tidrapporter|Feuilles de temps|Arbeitszeittabellen|Hojas de tiempo|Timesedler|Aikaraportit|Timelister)$",
+          "^Arbeitszeitnachweise$",
+          "^Partes de horas$",
+          "^Tuntiraportit$"
         ],
         "actionPatterns": [
           "^Create lines from project planning$",
@@ -320,7 +351,12 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$"
+          "^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$",
+          "^Feuilles projet$",
+          "^Projekterfassungen$",
+          "^Diario de proyecto$",
+          "^Projektkladder$",
+          "^Prosjektkladder$"
         ],
         "actionPatterns": [
           "^Suggest Lines from Time Sheets$",
@@ -330,7 +366,10 @@
           "^Sugerir líneas de hojas de horas$",
           "^Foreslå linjer fra timesedler$",
           "^Ehdota rivejä aikaraporteista$",
-          "^Foreslå linjer fra timelister$"
+          "^Foreslå linjer fra timelister$",
+          "^Zeilen anhand von Arbeitszeitnachweisen vorschlagen$",
+          "^Sugerir líneas de partes de horas$",
+          "^Ehdota rivejä tuntiraporteista$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -359,7 +398,8 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"
+          "^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$",
+          "^Resurssin kortti$"
         ],
         "actionPatterns": [
           "^Resource Capacity$",
@@ -369,7 +409,8 @@
           "^Capacidad recurso$",
           "^Ressourcekapacitet$",
           "^Resurssikapasiteetti$",
-          "^Ressurskapasitet$"
+          "^Ressurskapasitet$",
+          "^Ressourcen Kapazität$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -397,7 +438,8 @@
       "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "^(Resource Capacity Settings|Inställningar för resurskapacitet|Paramétrage capacité ressource|Res\\.-Kapazität Einstellungen|Config\\. capacidad recurso|Ressourcekap\\.indstillinger|Resurssin kapasiteetti asetuk\\.|Innstillinger for ressurskapasitet)$"
+          "^(Resource Capacity Settings|Inställningar för resurskapacitet|Paramétrage capacité ressource|Res\\.-Kapazität Einstellungen|Config\\. capacidad recurso|Ressourcekap\\.indstillinger|Resurssin kapasiteetti asetuk\\.|Innstillinger for ressurskapasitet)$",
+          "^Resurskapacitetssättning$"
         ],
         "actionPatterns": [
           "^Update Capacity$",
@@ -434,8 +476,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"],
-        "actionPatterns": ["^(Costs|Kostnader|Coûts|Kosten|Costes|Kostpriser|Kustannukset)$"],
+        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$", "^Resurssin kortti$"],
+        "actionPatterns": ["^(Costs|Kostnader|Coûts|Kosten|Costes|Kostpriser|Kustannukset)$", "^Einstandspreise$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -452,8 +494,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"],
-        "actionPatterns": ["^(Prices|Priser|Prix|Preise|Precios|Hinnat)$"],
+        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$", "^Resurssin kortti$"],
+        "actionPatterns": ["^(Prices|Priser|Prix|Preise|Precios|Hinnat)$", "^VK-Preise$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -470,8 +512,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$"],
-        "actionPatterns": ["^(Calc\\. Remaining Usage|Ber\\. återstående förbrukning|Calc\\. utilisation restante|Verbleibender Verbrauch berechnen|Cálc\\. uso restante|Beregn resterede forbrug|Laske jäljellä oleva käyttö|Beregn gjenstående forbruk)$"],
+        "pagePatterns": ["^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$", "^Feuilles projet$", "^Projekterfassungen$", "^Diario de proyecto$", "^Projektkladder$", "^Prosjektkladder$"],
+        "actionPatterns": ["^(Calc\\. Remaining Usage|Ber\\. återstående förbrukning|Calc\\. utilisation restante|Verbleibender Verbrauch berechnen|Cálc\\. uso restante|Beregn resterede forbrug|Laske jäljellä oleva käyttö|Beregn gjenstående forbruk)$", "^Calc\\. activité restante$", "^Restverbrauch berechnen$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -488,8 +530,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
-        "actionPatterns": ["^(Create Inventory Pick|Skapa lagerplockning|Créer un prélèvement stock|Lagerkommissionierung erstellen|Crear picking inventario|Opret pluk \\(lager\\)|Luo varastopoiminta|Opprett beholdningsplukk)$"],
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$", "^Projets$", "^Projekte$", "^Proyectos$", "^Projekter$", "^Projektit$", "^Prosjekter$"],
+        "actionPatterns": ["^(Create Inventory Pick|Skapa lagerplockning|Créer un prélèvement stock|Lagerkommissionierung erstellen|Crear picking inventario|Opret pluk \\(lager\\)|Luo varastopoiminta|Opprett beholdningsplukk)$", "^Créer prélèvement stock$", "^Opret lagerpluk$", "^Luo varaston poiminta$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -506,8 +548,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
-        "actionPatterns": ["^(Create Warehouse Pick|Skapa distributionslagerplockning|Créer un prélèvement entrepôt|Lagerkommissionierungen erstellen|Crear picking almacén|Opret lager \\(logistik\\)|Luo fyysisen varaston poiminta|Opprett lagerplukk)$"],
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$", "^Projets$", "^Projekte$", "^Proyectos$", "^Projekter$", "^Projektit$", "^Prosjekter$"],
+        "actionPatterns": ["^(Create Warehouse Pick|Skapa distributionslagerplockning|Créer un prélèvement entrepôt|Lagerkommissionierungen erstellen|Crear picking almacén|Opret lager \\(logistik\\)|Luo fyysisen varaston poiminta|Opprett lagerplukk)$", "^Créer prélèvement entrepôt$", "^Kommissionierung erstellen$", "^Opret lagerstedspluk$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -524,8 +566,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Sales Invoice|Försäljningsfaktura|Facture vente|Verkaufsrechnung|Factura venta|Salgsfaktura|Myyntilasku)$"],
-        "actionPatterns": ["^(Get Project Planning Lines|Hämta projektplaneringsrader|Extraire lignes Planning projet|Projektplanzeilen abrufen|Obtener líneas de planificación de proyecto|Hent projektplanlægningslinjer|Hae projektin suunnittelurivit|Hent prosjektplanleggingslinjer)$"],
+        "pagePatterns": ["^(Sales Invoice|Försäljningsfaktura|Facture vente|Verkaufsrechnung|Factura venta|Salgsfaktura|Myyntilasku)$", "^Förs\\.faktura$"],
+        "actionPatterns": ["^(Get Project Planning Lines|Hämta projektplaneringsrader|Extraire lignes Planning projet|Projektplanzeilen abrufen|Obtener líneas de planificación de proyecto|Hent projektplanlægningslinjer|Hae projektin suunnittelurivit|Hent prosjektplanleggingslinjer)$", "^Obtenir les lignes de planification de projet$", "^Obtener líneas de planificación de proyectos$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -542,8 +584,8 @@
       "priority": 1280,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
-        "actionPatterns": ["^(Create Purchase Orders|Skapa inköpsorder|Créer des commandes achat|Einkaufsbestellung erstellen|Crear pedidos de compra|Opret købsordrer|Luo ostotilaukset|Opprett bestillinger)$"],
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$", "^Projets$", "^Projekte$", "^Proyectos$", "^Projekter$", "^Projektit$", "^Prosjekter$"],
+        "actionPatterns": ["^(Create Purchase Orders|Skapa inköpsorder|Créer des commandes achat|Einkaufsbestellung erstellen|Crear pedidos de compra|Opret købsordrer|Luo ostotilaukset|Opprett bestillinger)$", "^Einkaufsbestellungen erstellen$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },

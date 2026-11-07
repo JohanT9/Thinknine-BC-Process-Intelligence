@@ -11,16 +11,29 @@
       "entity": "ItemReclassificationJournal",
       "priority": 1310,
       "confidence": 0.95,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
         "pagePatterns": [
           "^Item Reclass\\. Journals$",
           "^Item Reclassification Journals$",
-          "^Artikelomklassificeringsjournaler$"
+          "^Artikelomklassificeringsjournaler$",
+          "^Artikelgrupperingsjournaler$",
+          "^Feuilles reclassement article$",
+          "^Artikel Umlag\\. Buch\\.-Blätter$",
+          "^Diarios de reclasificación de producto$",
+          "^Vareomposteringskladder$",
+          "^Nimikkeen uudelleenluokituspäiväkirjat$",
+          "^Varereklassifiseringskladder$"
         ],
         "actionPatterns": [
           "^Post$",
-          "^Bokför$"
+          "^Bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -83,7 +96,10 @@
           "^Lagerbestand berechnen$",
           "^Calcular inventario$",
           "^Beregn beholdning$",
-          "^Laske varasto$"
+          "^Laske varasto$",
+          "^Beräkna lagersaldo$",
+          "^Calculer quantité en stock$",
+          "^Calcular inventario físico$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -201,7 +217,10 @@
           "^Pedido de transferencia$",
           "^Overflytningsordre$",
           "^Siirtotilaus$",
-          "^Overføringsordrer$"
+          "^Overføringsordrer$",
+          "^Ordre de transfert$",
+          "^Ped\\. transfer\\.$",
+          "^Overføringsordre$"
         ],
         "actionPatterns": [
           "^Post$",

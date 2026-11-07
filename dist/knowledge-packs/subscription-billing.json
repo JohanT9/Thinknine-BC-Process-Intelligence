@@ -20,7 +20,9 @@
           "^Facturación recurrente$",
           "^Tilbagevendende fakturering$",
           "^Toistuva laskutus$",
-          "^Gjentakende fakturering$"
+          "^Gjentakende fakturering$",
+          "^Facturation périodique$",
+          "^Facturación periódica$"
         ],
         "actionPatterns": [
           "^Create Billing Proposal$",
@@ -30,7 +32,8 @@
           "^Crear propuesta de facturación$",
           "^Opret faktureringsforslag$",
           "^Luo laskutusehdotus$",
-          "^Opprett faktureringsforslag$"
+          "^Opprett faktureringsforslag$",
+          "^Abrechnungsvorschlag erstellen$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -84,7 +87,9 @@
           "^Facturación recurrente$",
           "^Tilbagevendende fakturering$",
           "^Toistuva laskutus$",
-          "^Gjentakende fakturering$"
+          "^Gjentakende fakturering$",
+          "^Facturation périodique$",
+          "^Facturación periódica$"
         ],
         "actionPatterns": [
           "^Create Documents$",
@@ -148,7 +153,9 @@
           "^Facturación recurrente$",
           "^Tilbagevendende fakturering$",
           "^Toistuva laskutus$",
-          "^Gjentakende fakturering$"
+          "^Gjentakende fakturering$",
+          "^Facturation périodique$",
+          "^Facturación periódica$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
@@ -159,7 +166,9 @@
           "^Facturación hasta la fecha$",
           "^Fakturering til dato$",
           "^Laskutuksen päättymispäivämäärä$",
-          "^Faktureringssluttdato$"
+          "^Faktureringssluttdato$",
+          "^Abrechnung bis$",
+          "^Laskutus tähän päivämäärään asti$"
         ],
         "automationIdPatterns": []
       },
@@ -208,7 +217,21 @@
           "^Customer Subscription Contract$",
           "^Customer Subscription Contract Card$",
           "^Vendor Subscription Contract$",
-          "^Vendor Subscription Contract Card$"
+          "^Vendor Subscription Contract Card$",
+          "^Prenumerationskontrakt för kund$",
+          "^Prenumerationskontrakt för leverantör$",
+          "^Contrat Souscription client$",
+          "^Contrat Souscription fournisseur$",
+          "^Debitoren-Abonnementvertrag$",
+          "^Kreditoren-Abonnementvertrag$",
+          "^Contrato de suscripción de cliente$",
+          "^Contrato de suscripción de proveedor$",
+          "^Debitors abonnementskontrakt$",
+          "^Kreditors abonnementskontrakt$",
+          "^Asiakkaan tilaussopimus$",
+          "^Toimittajan tilaussopimus$",
+          "^Abonnementskontrakt for kunde$",
+          "^Abonnementskontrakt for leverandør$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
