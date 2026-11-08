@@ -391,6 +391,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       <button id="libraryExport" type="button" class="secondary" data-i18n="transfer.export">Exportera…</button>
       <button id="libraryImport" type="button" class="secondary" data-i18n="transfer.import">Importera…</button>
       <input id="libraryImportFile" type="file" accept=".bcps" hidden tabindex="-1">
+      <button id="librarySync" type="button" class="secondary" data-i18n="sync.button">Synka…</button>
+      <span id="librarySyncStatus" class="library-sync-status" role="status" aria-live="polite" hidden></span>
     </div>
   </div>
   <div id="libraryImportNotice" class="library-import-notice" hidden>
@@ -774,6 +776,38 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <p id="libraryImportError" class="library-folder-error" role="alert"></p>
     <footer><button id="libraryImportCancel" type="button" class="secondary" data-i18n="folder.cancel">Avbryt</button>
       <button id="libraryImportSubmit" type="submit" class="primary" hidden></button></footer>
+  </form>
+</dialog>
+<dialog id="librarySyncDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog library-transfer-dialog" aria-labelledby="librarySyncTitle" aria-describedby="librarySyncIntro">
+  <form id="librarySyncForm" method="dialog">
+    <h3 id="librarySyncTitle" data-i18n="sync.title">Synka mellan datorer</h3>
+    <p id="librarySyncIntro" data-i18n="sync.intro">Välj en mapp som redan synkas mellan dina datorer, till exempel en tom mapp i OneDrive. BC Process Studio sparar dokumenten där och hämtar det som ändrats på dina andra datorer.</p>
+    <p class="library-transfer-note" data-i18n="sync.privacy">Tillägget skickar ingenting själv. Filerna flyttas av tjänsten som synkar mappen. De innehåller inspelningar och skärmbilder som kan innehålla kunddata från Business Central.</p>
+    <p id="librarySyncFolder" class="library-transfer-source" hidden></p>
+    <progress id="librarySyncProgress" class="library-transfer-progress" hidden></progress>
+    <p id="librarySyncMessage" class="library-transfer-status" role="status" aria-live="polite"></p>
+    <ul id="librarySyncSummary" class="library-folder-counts" hidden></ul>
+    <fieldset id="librarySyncConflicts" class="library-transfer-choice" hidden>
+      <legend data-i18n="sync.conflictLegend">Ändrade både här och på en annan dator</legend>
+      <ul id="librarySyncConflictList" class="library-transfer-conflicts"></ul>
+      <label><input type="radio" name="librarySyncConflict" value="later" checked> <span data-i18n="sync.later">Bestäm senare</span></label>
+      <label><input type="radio" name="librarySyncConflict" value="mine"> <span data-i18n="sync.mine">Behåll den här datorns versioner</span></label>
+      <label><input type="radio" name="librarySyncConflict" value="theirs"> <span data-i18n="sync.theirs">Använd versionerna från den andra datorn</span></label>
+      <p class="library-transfer-note" data-i18n="sync.conflictNote">Bestäm senare synkar allt annat och låter de här dokumenten vara som de är på båda datorerna.</p>
+    </fieldset>
+    <fieldset id="librarySyncRemovals" class="library-transfer-choice" hidden>
+      <legend id="librarySyncRemovalLegend"></legend>
+      <ul id="librarySyncRemovalList" class="library-transfer-conflicts"></ul>
+      <label><input id="librarySyncRemove" type="checkbox" checked> <span data-i18n="sync.removeHere">Ta bort dem här också</span></label>
+      <p class="library-transfer-note" data-i18n="sync.removalNote">Synken kan ångras efteråt.</p>
+    </fieldset>
+    <p id="librarySyncError" class="library-folder-error" role="alert"></p>
+    <footer>
+      <button id="librarySyncDisconnect" type="button" class="secondary" data-i18n="sync.disconnect" hidden>Koppla från</button>
+      <button id="librarySyncClose" type="button" class="secondary" data-i18n="transfer.close">Stäng</button>
+      <button id="librarySyncChoose" type="button" class="primary" data-i18n="sync.choose" hidden>Välj mapp…</button>
+      <button id="librarySyncNow" type="submit" class="primary" data-i18n="sync.now" hidden>Synka nu</button>
+    </footer>
   </form>
 </dialog>
 <dialog id="libraryImportUndoDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryImportUndoTitle" aria-describedby="libraryImportUndoBody">
@@ -1338,6 +1372,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document/document-library.js"></script>
 <script src="document/document-folders.js"></script>
 <script src="document/library-transfer.js"></script>
+<script src="document/library-sync.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>

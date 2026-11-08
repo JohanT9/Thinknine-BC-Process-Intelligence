@@ -140,7 +140,8 @@
         "pagePatterns": [],
         "actionPatterns": [
           "^Tillbaka$", "^Back$", "^Précédent$", "^Retour$", "^Zurück$",
-          "^Atrás$", "^Volver$", "^Tilbage$", "^Takaisin$", "^Tilbake$"
+          "^Atrás$", "^Volver$", "^Tilbage$", "^Takaisin$", "^Tilbake$",
+          "^Bakåt$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

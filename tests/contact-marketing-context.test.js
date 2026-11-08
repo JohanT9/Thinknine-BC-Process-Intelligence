@@ -18,7 +18,7 @@ const campaignRule=pack.rules.find(x=>x.ruleId==='ContactMarketing.CreateCampaig
 assert.ok(rule);
 assert.ok(campaignRule);
 assert.deepEqual(Object.keys(rule.localizedExplanations).sort(),['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
-assert.deepEqual(rule.verifiedRuntimeLocales,['en-US','sv-SE']);
+assert.deepEqual(rule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 for(const [locale,page,action] of [
  ['en-US','Opportunity List','Update'], ['sv-SE','Affärsmöjlighetslista','Uppdatera']
 ]) {
@@ -38,7 +38,7 @@ for(const locale of Object.keys(rule.localizedExplanations)) {
  assert.match(text,/does not close|stänger inte|ne clôt pas|weder geschlossen|no cierra|lukker ikke|ei sulje/i,locale);
  assert.match(text,/Next or Previous|Nästa eller Föregående|Suivant ou Précédent|Weiter oder Zurück|Siguiente o Anterior|Næste eller Forrige|Seuraava tai Edellinen|Neste eller Forrige/i,locale);
 }
-assert.deepEqual(campaignRule.verifiedRuntimeLocales,['en-US','sv-SE']);
+assert.deepEqual(campaignRule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 assert.deepEqual(Object.keys(campaignRule.localizedExplanations).sort(),['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
 for(const [locale,page,action] of [['en-US','Campaigns','New'],['sv-SE','Kampanjer','Ny']]) {
  const result=repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});

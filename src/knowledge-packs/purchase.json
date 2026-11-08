@@ -371,7 +371,13 @@
       "match": {
         "pagePatterns": [
           "inköpsorder",
-          "purchase order"
+          "purchase order",
+          "^Commandes achat$",
+          "^Einkaufsbestellungen$",
+          "^Pedidos compra$",
+          "^Købsordrer$",
+          "^Ostotilaukset$",
+          "^Bestillinger$"
         ],
         "actionPatterns": [
           "open record",
@@ -381,7 +387,13 @@
           "^Abrir registro$",
           "^Åbn record$",
           "^Avaa tietue$",
-          "^Åpne post$"
+          "^Åpne post$",
+          "^Ouvrir l'enregistrement « .+ »$",
+          "^Datensatz „.+“ öffnen$",
+          "^Abrir el registro \".+\"$",
+          "^Åbn record \".+\"$",
+          "^Avaa tietue \".+\"$",
+          "^Åpne posten .+$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1156,7 +1168,13 @@
           "^Coste unitario directo$",
           "^Direkte enhedsomkostning$",
           "^Suora yksikkökustannus$",
-          "^Direkte enhetskostnad$"
+          "^Direkte enhetskostnad$",
+          "^Inköpspris$",
+          "^EK-Preis$",
+          "^Coste unit\\. directo$",
+          "^Købspris$",
+          "^Välitön yksikkökustannus$",
+          "^Direkte enhetskost$"
         ],
         "automationIdPatterns": []
       },
@@ -1480,7 +1498,8 @@
           "^cód\\. motivo devolución$",
           "^returårsagskode$",
           "^palautuksen syykoodi$",
-          "^returårsakskode$"
+          "^returårsakskode$",
+          "^Cód\\. auditoría dev\\.$"
         ],
         "automationIdPatterns": []
       },
@@ -1737,7 +1756,15 @@
           "^copiar de documento$",
           "^kopiér fra dokument$",
           "^kopioi asiakirjasta$",
-          "^kopier fra dokument$"
+          "^kopier fra dokument$",
+          "^Copy Document$",
+          "^Kopiera dokument$",
+          "^Copier document$",
+          "^Beleg kopieren$",
+          "^Copiar líneas$",
+          "^Kopiér dokument$",
+          "^Kopioi asiakirja$",
+          "^Kopier dokument$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

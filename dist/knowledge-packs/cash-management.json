@@ -965,7 +965,15 @@
           "^registrar$",
           "^bogfør$",
           "^kirjaa$",
-          "^bokfør$"
+          "^bokfør$",
+          "^Post Payments and Reconcile Bank Account$",
+          "^Bokför betalningar och stäm av bankkonton$",
+          "^Valider les paiements et rapprocher les comptes bancaires$",
+          "^Zahlungen buchen und Bankkonto abstimmen$",
+          "^Registrar pagos y conciliar banco$",
+          "^Bogfør betalinger og afstem bankkonti$",
+          "^Kirjaa maksut ja täsmäytä pankkitili$",
+          "^Bokfør betalinger og avstem bankkonto$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

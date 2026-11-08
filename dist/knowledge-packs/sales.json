@@ -276,7 +276,8 @@
           "^Nouveau$",
           "^Neu$",
           "^Nuevo$",
-          "^Uusi$"
+          "^Uusi$",
+          "^Créer$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -308,7 +309,13 @@
         "pagePatterns": [
           "förs\\.?\\s*order",
           "försäljningsorder",
-          "sales order"
+          "sales order",
+          "^Commandes vente$",
+          "^Verkaufsaufträge$",
+          "^Pedidos venta$",
+          "^Salgsordrer$",
+          "^Myyntitilaukset$",
+          "^Ordrer$"
         ],
         "actionPatterns": [
           "open record",
@@ -318,7 +325,13 @@
           "^Abrir registro$",
           "^Åbn record$",
           "^Avaa tietue$",
-          "^Åpne post$"
+          "^Åpne post$",
+          "^Ouvrir l'enregistrement « .+ »$",
+          "^Datensatz „.+“ öffnen$",
+          "^Abrir el registro \".+\"$",
+          "^Åbn record \".+\"$",
+          "^Avaa tietue \".+\"$",
+          "^Åpne posten .+$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1433,7 +1446,14 @@
           "^copiar de documento$",
           "^kopiér fra dokument$",
           "^kopioi asiakirjasta$",
-          "^kopier fra dokument$"
+          "^kopier fra dokument$",
+          "^Copy Document$",
+          "^Copier document$",
+          "^Beleg kopieren$",
+          "^Copiar líneas$",
+          "^Kopiér dokument$",
+          "^Kopioi asiakirja$",
+          "^Kopier dokument$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -1839,7 +1859,10 @@
         ],
         "actionPatterns": [],
         "fieldPatterns": [
-          "^(?:Enhetspris|A-pris(?: exkl\\.? moms)?|Unit Price(?: Excl\\. VAT)?|Prix unitaire|Einzelpreis|Precio unitario|Enhedspris|Yksikköhinta)$"
+          "^(?:Enhetspris|A-pris(?: exkl\\.? moms)?|Unit Price(?: Excl\\. VAT)?|Prix unitaire|Einzelpreis|Precio unitario|Enhedspris|Yksikköhinta)$",
+          "^VK-Preis$",
+          "^Precio venta$",
+          "^Salgspris$"
         ],
         "automationIdPatterns": []
       },

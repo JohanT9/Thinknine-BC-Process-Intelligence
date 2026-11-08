@@ -8,33 +8,33 @@ A rule counts as runtime-covered in a language when one of the 22 knowledge test
 
 | Pack | Rules | sv | en | fr | de | es | da | fi | nb |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| bc-core | 9 | 5 | 6 | 4 | 4 | 4 | 4 | 4 | 4 |
-| bc-sales | 25 | 15 | 15 | 15 | 15 | 15 | 15 | 15 | 15 |
-| bc-purchase | 26 | 17 | 17 | 17 | 17 | 17 | 17 | 17 | 17 |
-| bc-warehouse | 20 | 16 | 17 | 15 | 15 | 15 | 15 | 15 | 15 |
+| bc-core | 9 | 8 | 8 | 7 | 7 | 7 | 7 | 7 | 7 |
+| bc-sales | 25 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 |
+| bc-purchase | 26 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 |
+| bc-warehouse | 20 | 18 | 17 | 17 | 17 | 17 | 17 | 17 | 17 |
 | bc-manufacturing | 8 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 |
 | bc-projects | 17 | 17 | 17 | 17 | 17 | 17 | 17 | 17 | 17 |
 | bc-services | 8 | 8 | 8 | 8 | 8 | 8 | 8 | 8 | 8 |
 | aptean-fb | 31 | 30 | 28 | 0 | 0 | 0 | 0 | 0 | 0 |
 | aptean-weigh-scale | 23 | 6 | 16 | 0 | 0 | 0 | 0 | 0 | 0 |
-| bc-cash-management | 10 | 9 | 9 | 9 | 9 | 9 | 9 | 9 | 9 |
-| bc-finance | 16 | 15 | 15 | 15 | 15 | 15 | 15 | 15 | 15 |
+| bc-cash-management | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
+| bc-finance | 16 | 16 | 16 | 16 | 16 | 16 | 16 | 16 | 16 |
 | bc-intercompany | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | bc-assembly | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | bc-bank-reconciliation | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
-| bc-approvals | 6 | 6 | 6 | 5 | 5 | 5 | 5 | 5 | 5 |
+| bc-approvals | 6 | 6 | 6 | 6 | 6 | 6 | 6 | 6 | 6 |
 | bc-human-resources | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
-| bc-sustainability | 7 | 7 | 7 | 5 | 5 | 5 | 5 | 5 | 5 |
-| bc-subscription-billing | 4 | 3 | 4 | 3 | 3 | 3 | 3 | 3 | 3 |
+| bc-sustainability | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 |
+| bc-subscription-billing | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | bc-electronic-documents | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | bc-microsoft365 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | bc-inventory | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
-| bc-quality-management | 18 | 12 | 12 | 11 | 11 | 11 | 11 | 11 | 11 |
-| bc-cost-accounting | 8 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 |
-| bc-contact-marketing | 8 | 6 | 6 | 4 | 4 | 4 | 4 | 4 | 4 |
+| bc-quality-management | 18 | 14 | 14 | 13 | 13 | 13 | 13 | 13 | 13 |
+| bc-cost-accounting | 8 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 |
+| bc-contact-marketing | 8 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 |
 | bc-shopify-connector | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | bc-inventory-tracking | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
-| **All packs** | **285** | **222** | **233** | **177** | **177** | **177** | **177** | **177** | **177** |
+| **All packs** | **285** | **250** | **257** | **211** | **211** | **211** | **211** | **211** | **211** |
 
 ## Missing localized Microsoft Learn sources
 
@@ -56,9 +56,6 @@ Languages in which no test resolves the rule. *No Learn page* marks languages wi
 
 | Rule | Tested | Missing |
 |---|---|---|
-| Core.NavigateBack | none | all |
-| Core.EditRecord | none | all |
-| Core.DeleteRecord | en | sv, fr, de, es, da, fi, nb |
 | Core.Lookup | none | all |
 | Core.ChangeDate | sv, en | fr, de, es, da, fi, nb |
 
@@ -66,38 +63,24 @@ Languages in which no test resolves the rule. *No Learn page* marks languages wi
 
 | Rule | Tested | Missing |
 |---|---|---|
-| Sales.CreateSalesOrderFromList | none | all |
-| Sales.OpenSalesOrder | none | all |
-| Sales.SetReturnReasonCode | none | all |
-| Sales.PostSalesReturnOrder | none | all |
-| Sales.CopyToCreditMemo | none | all |
-| Sales.PostSalesCreditMemo | none | all |
 | Sales.ViewSalesPriceDiscountDetails | none | all |
 | Sales.OpenManualPrice | none | all |
 | Sales.ChangeAppliedUnitPrice | none | all |
-| Sales.SetSalesLineUnitPrice | none | all |
 
 ### bc-purchase
 
 | Rule | Tested | Missing |
 |---|---|---|
 | Purchase.ApplyPurchasePricesAndDiscounts | none | all |
-| Purchase.OpenPurchaseOrder | none | all |
 | Purchase.SelectPurchaseLineItemFromLookup | none | all |
 | Purchase.OpenPurchaseOrderListFromSearch | none | all |
 | Purchase.OpenManualPurchasePrice | none | all |
-| Purchase.SetDirectUnitCost | none | all |
-| Purchase.SetReturnReasonCode | none | all |
-| Purchase.CopyToCreditMemo | none | all |
-| Purchase.PostPurchaseCreditMemo | none | all |
 
 ### bc-warehouse
 
 | Rule | Tested | Missing |
 |---|---|---|
 | Observed.Purchase.CreateWarehouseReceipt | sv | en, fr, de, es, da, fi, nb |
-| Warehouse.PostReceipt | en | sv, fr, de, es, da, fi, nb |
-| Warehouse.PostShipment | en | sv, fr, de, es, da, fi, nb |
 | Warehouse.SelectLocation | none | all |
 | Warehouse.SelectBin | none | all |
 
@@ -171,46 +154,13 @@ Languages in which no test resolves the rule. *No Learn page* marks languages wi
 | AptWeighbridge.CreateOutboundRegister | en | sv, fr, de, es, da, fi, nb |
 | AptWeighbridge.PostQuantityToReceive | en | sv, fr, de, es, da, fi, nb |
 
-### bc-cash-management
-
-| Rule | Tested | Missing |
-|---|---|---|
-| CashManagement.PostPaymentReconciliationJournal | none | all |
-
-### bc-finance
-
-| Rule | Tested | Missing |
-|---|---|---|
-| Finance.RunCloseIncomeStatement | none | all |
-
-### bc-approvals
-
-| Rule | Tested | Missing |
-|---|---|---|
-| BCExpansion.CreateApprovalUser | sv, en | fr (no Learn page), de (no Learn page), es (no Learn page), da (no Learn page), fi (no Learn page), nb (no Learn page) |
-
-### bc-sustainability
-
-| Rule | Tested | Missing |
-|---|---|---|
-| Sustainability.CreateAccountCategory | sv, en | fr, de, es, da, fi, nb |
-| Sustainability.CreateAccountSubcategory | sv, en | fr, de, es, da, fi, nb |
-
-### bc-subscription-billing
-
-| Rule | Tested | Missing |
-|---|---|---|
-| SubscriptionBilling.ManualContractLine | en | sv (no Learn page), fr (no Learn page), de (no Learn page), es (no Learn page), da (no Learn page), fi (no Learn page), nb (no Learn page) |
-
 ### bc-quality-management
 
 | Rule | Tested | Missing |
 |---|---|---|
 | QualityManagement.ScheduleInspections | none | all |
-| QualityManagement.CreatePurchaseReturnFromFailedInspection | none | all |
 | QualityManagement.BlockLotInWorkflow | none | all |
 | QualityManagement.UnblockLotOnPassInWorkflow | none | all |
-| QualityManagement.ScheduleTimeBasedInspections | none | all |
 | QualityManagement.ShowPurchaseOrderInspections | sv, en | fr (no Learn page), de (no Learn page), es (no Learn page), da (no Learn page), fi (no Learn page), nb (no Learn page) |
 | QualityManagement.CreateInspectionFromTrackingLine | none | all |
 
@@ -218,32 +168,25 @@ Languages in which no test resolves the rule. *No Learn page* marks languages wi
 
 | Rule | Tested | Missing |
 |---|---|---|
-| CostAccounting.TransferGeneralLedgerEntries | sv | en, fr, de, es, da, fi, nb |
 | CostAccounting.RunCostAllocation | none | all |
-| CostAccounting.CreateCostBudget | none | all |
-| CostAccounting.CreateCostCenter | none | all |
-| CostAccounting.CreateCostObject | none | all |
-| CostAccounting.PostCostJournal | none | all |
-| CostAccounting.DeleteCostBudgetEntries | en | sv (no Learn page), fr (no Learn page), de (no Learn page), es (no Learn page), da (no Learn page), fi (no Learn page), nb (no Learn page) |
 
 ### bc-contact-marketing
 
 | Rule | Tested | Missing |
 |---|---|---|
-| ContactMarketing.CreateCampaign | sv, en | fr, de, es, da, fi, nb |
-| ContactMarketing.UpdateOpportunityStage | sv, en | fr, de, es, da, fi, nb |
 | ContactMarketing.CreateSegmentInteraction | none | all |
-| ContactMarketing.CreateSegment | none | all |
 
 ## Where localized captions come from
 
 Localized captions are taken from Business Central's own translation files: the Microsoft language apps for Base Application and the translations shipped in the first-party apps (E-Document Core, Quality Management, Shopify Connector, Subscription Billing and Sustainability), version 28.1 (W1). The English caption a rule already matches identifies the page, action or field; the same translation unit gives its caption in every language. `tests/fixtures/knowledge-localized-captions.json` holds one case per rule and language with the translation units it was read from, and `tests/knowledge-localized-captions.test.js` checks that each language resolves as English does.
 
+Actions the client itself provides (*New*, *OK*, *Yes*, *Delete*, *Edit*, *Back* and the *Open record* tooltip) are taken from the Business Central web client's language resources (`Microsoft.Dynamics.Framework.Resource.js`, platform 26.18.55014.0); the fixture names their resource keys. The client's *New* is *Créer* in French, not *Nouveau*.
+
 Localized Microsoft Learn pages are not used for captions. They are partly machine-translated and disagree with the product (Learn's Swedish *Överför GL-poster till CA* is *Överför redovisningstransaktioner till kostnadsredovisning* in Business Central).
 
 The remaining gaps are:
 
-- Actions provided by the client itself, such as *New*, *OK* and *Yes*, which are not in the application's translation files.
+- Rules whose captions are not in the Business Central 28.1 translation files, such as *Applied Sales Price and Discount*, *Manual Price*, *Change Applied Unit Price*, *Apply Purchase Prices and Discounts*, *Run Cost Allocation*, *Block Lot in the Inspection* and *Show Inspections for Item and Document*. They may come from another version, an extension or a recording; they are not expanded until a source confirms them.
 - Rules whose English patterns are generic or not anchored, which are not expanded automatically.
 - Aptean add-on rules. They match the captions in Aptean's product documentation (erpdocs.apteancloud.com/bc), which is published in English only, so other languages cannot be verified from a public source.
 - Observed workflows recorded in a tenant, which have no Microsoft translation source.

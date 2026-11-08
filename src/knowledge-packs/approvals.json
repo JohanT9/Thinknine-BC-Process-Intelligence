@@ -412,7 +412,11 @@
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -428,10 +432,7 @@
         "fi-FI",
         "nb-NO"
       ],
-      "verifiedRuntimeLocales": [
-        "en-US",
-        "sv-SE"
-      ],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "aliases": [],
       "sourceIds": [
         "approval-user-setup-en-us",

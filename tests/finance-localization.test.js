@@ -544,7 +544,7 @@ assert.match(allocationKeyRule.localizedExplanations['sv-SE'],/kör inte själva
 
 const deleteCostBudgetRule=costPack.rules.find(rule=>rule.ruleId==='CostAccounting.DeleteCostBudgetEntries');
 assert.ok(deleteCostBudgetRule);
-assert.deepEqual(deleteCostBudgetRule.verifiedRuntimeLocales,['en-US']);
+assert.deepEqual(deleteCostBudgetRule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 assert.deepEqual(Object.keys(deleteCostBudgetRule.localizedExplanations).sort(),
   ['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
 const deleteCostBudget=repository.resolveAction({language:'en-US',context:{

@@ -389,6 +389,10 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-heading h3{margin-right:auto!important}
 .library-transfer-actions{display:flex;flex-wrap:wrap;gap:var(--space8)}
 .library-transfer-actions button{margin:0}
+.library-sync-status{align-self:center;color:var(--colorTextSecondary);font-size:13px;overflow-wrap:anywhere}
+.library-sync-status::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--colorStatusSuccess);vertical-align:middle}
+.library-sync-status[data-state="decision"]::before{background:var(--colorStatusWarning)}
+.library-sync-status[data-state="failed"]::before{background:var(--colorStatusDanger)}
 .library-import-notice{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space8) var(--space12);margin:var(--space8) 0;padding:var(--space8) var(--space12);border:1px solid var(--colorBorderDefault);border-left:4px solid var(--colorBrandPrimary);border-radius:var(--radiusLarge);background:var(--colorBackgroundSurface)}
 .library-import-notice[data-state="running"]{border-left-color:var(--colorStatusWarning)}
 .library-import-notice p{flex:1 1 280px;min-width:0;margin:0;overflow-wrap:anywhere}
@@ -397,7 +401,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-transfer-choice{display:grid;gap:var(--space8);margin:0!important;padding:var(--space12)!important;min-width:0}
 .library-transfer-choice legend{padding:0 var(--space4);font-weight:600}
 .library-transfer-choice label:not([hidden]){display:flex!important;align-items:flex-start;gap:var(--space8);margin:0!important}
-.library-transfer-choice input[type=radio]{width:auto;margin:3px 0 0;flex:none}
+.library-transfer-choice input[type=radio],.library-transfer-choice input[type=checkbox]{width:auto;margin:3px 0 0;flex:none}
 .library-transfer-note,.library-transfer-source{color:var(--colorTextSecondary);font-size:13px;overflow-wrap:anywhere}
 .library-transfer-status{overflow-wrap:anywhere}
 .library-transfer-status:empty,.library-transfer-source:empty{display:none}

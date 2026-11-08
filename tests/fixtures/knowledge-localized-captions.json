@@ -1,5 +1,5 @@
 {
- "source": "Microsoft Dynamics 365 Business Central 28.1.49838.55240 (W1) translation files: the language apps for Base Application and the first-party apps E-Document Core, Quality Management, Shopify Connector, Subscription Billing and Sustainability. pageUnit and controlUnit name the translated object and member.",
+ "source": "Microsoft Dynamics 365 Business Central 28.1.49838.55240 (W1) translation files: the language apps for Base Application and the first-party apps E-Document Core, Quality Management, Shopify Connector, Subscription Billing and Sustainability. pageUnit and controlUnit name the translated object and member. Actions the client provides itself (New, OK, Yes, Delete, Edit, Back, Open record) come from the Business Central web client 26.18.55014.0 language resources (Microsoft.Dynamics.Framework.Resource.js); their controlUnit names the resource key.",
  "cases": [
   {
    "ruleId": "BCExpansion.ApproveRequest",
@@ -7488,6 +7488,2198 @@
    "pageUnit": "Base Application | Page Item Card - Property Caption",
    "actionCaption": "Variant",
    "controlUnit": "Base Application | Page Item Card - Action Variant - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "en-US",
+   "pageCaption": "Sales Orders",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.order",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "fr-FR",
+   "pageCaption": "Commandes vente",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsaufträge",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "es-ES",
+   "pageCaption": "Pedidos venta",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "da-DK",
+   "pageCaption": "Salgsordrer",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntitilaukset",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.CreateSalesOrderFromList",
+   "locale": "nb-NO",
+   "pageCaption": "Ordrer",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "en-US",
+   "pageCaption": "Sales Orders",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Open record \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.order",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Öppna posten 1001",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "fr-FR",
+   "pageCaption": "Commandes vente",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Ouvrir l'enregistrement « 1001 »",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsaufträge",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Datensatz „1001“ öffnen",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "es-ES",
+   "pageCaption": "Pedidos venta",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Abrir el registro \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "da-DK",
+   "pageCaption": "Salgsordrer",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Åbn record \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntitilaukset",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Avaa tietue \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.OpenSalesOrder",
+   "locale": "nb-NO",
+   "pageCaption": "Ordrer",
+   "pageUnit": "Base Application | Page Sales Order List - Property Caption",
+   "actionCaption": "Åpne posten 1001",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "en-US",
+   "pageCaption": "Sales Return Order",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Return Reason Code",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.returorder",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Returorsakskod",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "fr-FR",
+   "pageCaption": "Retour vente",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Code motif retour",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsreklamation",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Reklamationsgrundcode",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "es-ES",
+   "pageCaption": "Devolución venta",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Cód. auditoría dev.",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "da-DK",
+   "pageCaption": "Salgsreturvareordre",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Returårsagskode",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntipalautustilaus",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Palautuksen syykoodi",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetReturnReasonCode",
+   "locale": "nb-NO",
+   "pageCaption": "Ordreretur",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "fieldCaption": "Returårsakskode",
+   "controlUnit": "Base Application | Table Sales Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "en-US",
+   "pageCaption": "Sales Return Order",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Post",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.returorder",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Bokför",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "fr-FR",
+   "pageCaption": "Retour vente",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Valider",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsreklamation",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Buchen",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "es-ES",
+   "pageCaption": "Devolución venta",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Registrar",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "da-DK",
+   "pageCaption": "Salgsreturvareordre",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Bogfør",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntipalautustilaus",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Kirjaa",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesReturnOrder",
+   "locale": "nb-NO",
+   "pageCaption": "Ordreretur",
+   "pageUnit": "Base Application | Page Sales Return Order - Property Caption",
+   "actionCaption": "Bokfør",
+   "controlUnit": "Base Application | Page Sales Return Order - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "en-US",
+   "pageCaption": "Sales Credit Memo",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Copy Document",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.kreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Kopiera dokument",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "fr-FR",
+   "pageCaption": "Avoir vente",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Copier document",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsgutschrift",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Beleg kopieren",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "es-ES",
+   "pageCaption": "Nota abono venta",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Copiar líneas",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "da-DK",
+   "pageCaption": "Salgskreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Kopiér dokument",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntihyvityslasku",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Kopioi asiakirja",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.CopyToCreditMemo",
+   "locale": "nb-NO",
+   "pageCaption": "Salgskreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Kopier dokument",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action CopyDocument - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "en-US",
+   "pageCaption": "Sales Credit Memo",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Post",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.kreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Bokför",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "fr-FR",
+   "pageCaption": "Avoir vente",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Valider",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsgutschrift",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Buchen",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "es-ES",
+   "pageCaption": "Nota abono venta",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Registrar",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "da-DK",
+   "pageCaption": "Salgskreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Bogfør",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntihyvityslasku",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Kirjaa",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.PostSalesCreditMemo",
+   "locale": "nb-NO",
+   "pageCaption": "Salgskreditnota",
+   "pageUnit": "Base Application | Page Sales Credit Memo - Property Caption",
+   "actionCaption": "Bokfør",
+   "controlUnit": "Base Application | Page Sales Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "en-US",
+   "pageCaption": "Sales Order",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Unit Price",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "sv-SE",
+   "pageCaption": "Förs.order",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "A-pris",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "fr-FR",
+   "pageCaption": "Commande vente",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Prix unitaire",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufsauftrag",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "VK-Preis",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "es-ES",
+   "pageCaption": "Pedido venta",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Precio venta",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "da-DK",
+   "pageCaption": "Salgsordre",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Enhedspris",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "fi-FI",
+   "pageCaption": "Myyntitilaus",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Yksikköhinta",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Sales.SetSalesLineUnitPrice",
+   "locale": "nb-NO",
+   "pageCaption": "Ordre",
+   "pageUnit": "Base Application | Page Sales Order - Property Caption",
+   "fieldCaption": "Salgspris",
+   "controlUnit": "Base Application | Table Sales Line - Field Unit Price - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "en-US",
+   "pageCaption": "Purchase Orders",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Open record \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "sv-SE",
+   "pageCaption": "Inköpsorder",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Öppna posten 1001",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "fr-FR",
+   "pageCaption": "Commandes achat",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Ouvrir l'enregistrement « 1001 »",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "de-DE",
+   "pageCaption": "Einkaufsbestellungen",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Datensatz „1001“ öffnen",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "es-ES",
+   "pageCaption": "Pedidos compra",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Abrir el registro \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "da-DK",
+   "pageCaption": "Købsordrer",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Åbn record \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "fi-FI",
+   "pageCaption": "Ostotilaukset",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Avaa tietue \"1001\"",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.OpenPurchaseOrder",
+   "locale": "nb-NO",
+   "pageCaption": "Bestillinger",
+   "pageUnit": "Base Application | Page Purchase Order List - Property Caption",
+   "actionCaption": "Åpne posten 1001",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditControlWithDefaultActionToolTip"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "en-US",
+   "pageCaption": "Purchase Order",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Direct Unit Cost",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "sv-SE",
+   "pageCaption": "Inköpsorder",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Inköpspris",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "fr-FR",
+   "pageCaption": "Commande achat",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Coût unitaire direct",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "de-DE",
+   "pageCaption": "Einkaufsbestellung",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "EK-Preis",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "es-ES",
+   "pageCaption": "Pedido compra",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Coste unit. directo",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "da-DK",
+   "pageCaption": "Købsordre",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Købspris",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "fi-FI",
+   "pageCaption": "Ostotilaus",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Välitön yksikkökustannus",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetDirectUnitCost",
+   "locale": "nb-NO",
+   "pageCaption": "Bestilling",
+   "pageUnit": "Base Application | Page Purchase Order - Property Caption",
+   "fieldCaption": "Direkte enhetskost",
+   "controlUnit": "Base Application | Table Purchase Line - Field Direct Unit Cost - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "en-US",
+   "pageCaption": "Purchase Return Order",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Return Reason Code",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "sv-SE",
+   "pageCaption": "Inköpsreturorder",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Returorsakskod",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "fr-FR",
+   "pageCaption": "Retour achat",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Code motif retour",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "de-DE",
+   "pageCaption": "Einkaufsreklamation",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Reklamationsgrundcode",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "es-ES",
+   "pageCaption": "Devolución compra",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Cód. auditoría dev.",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "da-DK",
+   "pageCaption": "Købsreturvareordre",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Returårsagskode",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "fi-FI",
+   "pageCaption": "Ostopalautustilaus",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Palautuksen syykoodi",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.SetReturnReasonCode",
+   "locale": "nb-NO",
+   "pageCaption": "Bestillingsretur",
+   "pageUnit": "Base Application | Page Purchase Return Order - Property Caption",
+   "fieldCaption": "Returårsakskode",
+   "controlUnit": "Base Application | Table Purchase Line - Field Return Reason Code - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "en-US",
+   "pageCaption": "Purchase Credit Memo",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Copy Document",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "sv-SE",
+   "pageCaption": "Inköpskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Kopiera dokument",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "fr-FR",
+   "pageCaption": "Avoir achat",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Copier document",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "de-DE",
+   "pageCaption": "Einkaufsgutschrift",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Beleg kopieren",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "es-ES",
+   "pageCaption": "Nota abono compra",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Copiar líneas",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "da-DK",
+   "pageCaption": "Købskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Kopiér dokument",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "fi-FI",
+   "pageCaption": "Ostohyvityslasku",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Kopioi asiakirja",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.CopyToCreditMemo",
+   "locale": "nb-NO",
+   "pageCaption": "Kjøpskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Kopier dokument",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Copy Document - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "en-US",
+   "pageCaption": "Purchase Credit Memo",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Post",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "sv-SE",
+   "pageCaption": "Inköpskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Bokför",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "fr-FR",
+   "pageCaption": "Avoir achat",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Valider",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "de-DE",
+   "pageCaption": "Einkaufsgutschrift",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Buchen",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "es-ES",
+   "pageCaption": "Nota abono compra",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Registrar",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "da-DK",
+   "pageCaption": "Købskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Bogfør",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "fi-FI",
+   "pageCaption": "Ostohyvityslasku",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Kirjaa",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Purchase.PostPurchaseCreditMemo",
+   "locale": "nb-NO",
+   "pageCaption": "Kjøpskreditnota",
+   "pageUnit": "Base Application | Page Purchase Credit Memo - Property Caption",
+   "actionCaption": "Bokfør",
+   "controlUnit": "Base Application | Page Purchase Credit Memo - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "en-US",
+   "pageCaption": "Warehouse Receipt",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Post Receipt",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "sv-SE",
+   "pageCaption": "Distributionslagerinleverans",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Bokför inleverans",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "fr-FR",
+   "pageCaption": "Réception entrepôt",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Valider réception",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "de-DE",
+   "pageCaption": "Wareneingang",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Wareneingang buchen",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "es-ES",
+   "pageCaption": "Recep. almacén",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Registrar recep.",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "da-DK",
+   "pageCaption": "Lagerstedsmodtagelse",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Bogfør leverance",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "fi-FI",
+   "pageCaption": "F. varastoinnin vastaanotto",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Kirjaa vast.otto",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostReceipt",
+   "locale": "nb-NO",
+   "pageCaption": "Lagermottak",
+   "pageUnit": "Base Application | Page Warehouse Receipt - Property Caption",
+   "actionCaption": "Bokfør mottak",
+   "controlUnit": "Base Application | Page Warehouse Receipt - Action Post Receipt - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "en-US",
+   "pageCaption": "Warehouse Shipment",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Post Shipment",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "sv-SE",
+   "pageCaption": "Distributionslagerutleverans",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Bokför utleverans",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "fr-FR",
+   "pageCaption": "Expédition entrepôt",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Valider expédition",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "de-DE",
+   "pageCaption": "Warenausgang",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Warenausgang buchen",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "es-ES",
+   "pageCaption": "Envío almacén",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Registrar envío",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "da-DK",
+   "pageCaption": "Lagerstedsforsendelse",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Bogfør lev.",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "fi-FI",
+   "pageCaption": "F.var. toimitus",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Kirjaa toimitus",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "Warehouse.PostShipment",
+   "locale": "nb-NO",
+   "pageCaption": "Lagerlevering",
+   "pageUnit": "Base Application | Page Warehouse Shipment - Property Caption",
+   "actionCaption": "Bokfør følgeseddel",
+   "controlUnit": "Base Application | Page Warehouse Shipment - Action P&amp;ost Shipment - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "en-US",
+   "pageCaption": "Payment Reconciliation Journal",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Post Payments and Reconcile Bank Account",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "sv-SE",
+   "pageCaption": "Betalningsavstämningsjournal",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Bokför betalningar och stäm av bankkonton",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "fr-FR",
+   "pageCaption": "Feuille rapprochement bancaire",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Valider les paiements et rapprocher les comptes bancaires",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "de-DE",
+   "pageCaption": "Zahlungsabstimmungsbuch.-Blatt",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Zahlungen buchen und Bankkonto abstimmen",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "es-ES",
+   "pageCaption": "Diario de conciliación de pagos",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Registrar pagos y conciliar banco",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "da-DK",
+   "pageCaption": "Betalingsudligningskladde",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Bogfør betalinger og afstem bankkonti",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "fi-FI",
+   "pageCaption": "Maksujen täsmäytyskirjauskansio",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Kirjaa maksut ja täsmäytä pankkitili",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+   "locale": "nb-NO",
+   "pageCaption": "Betalingsavstemmingskladd",
+   "pageUnit": "Base Application | Page Payment Reconciliation Journal - Property Caption",
+   "actionCaption": "Bokfør betalinger og avstem bankkonto",
+   "controlUnit": "Base Application | Page Payment Reconciliation Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "en-US",
+   "pageCaption": "Close Income Statement",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "sv-SE",
+   "pageCaption": "Avslut av resultaträkning",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "fr-FR",
+   "pageCaption": "Clôturer compte de résultat",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "de-DE",
+   "pageCaption": "GuV-Konten Nullstellung",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "es-ES",
+   "pageCaption": "Cerrar balance de ingresos",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "Aceptar",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "da-DK",
+   "pageCaption": "Nulstil resultatopgørelse",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "fi-FI",
+   "pageCaption": "Sulje tuloslaskelma",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "Finance.RunCloseIncomeStatement",
+   "locale": "nb-NO",
+   "pageCaption": "Lukk resultatregnskapet",
+   "pageUnit": "Base Application | Report Close Income Statement - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "en-US",
+   "pageCaption": "Approval User Setup",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "sv-SE",
+   "pageCaption": "Användarinställningar för godkännande",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "fr-FR",
+   "pageCaption": "Paramètres utilisateur approbation",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "de-DE",
+   "pageCaption": "Genehmigungsbenutzereinrichtung",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "es-ES",
+   "pageCaption": "Config. usuario aprobación",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "da-DK",
+   "pageCaption": "Brugeropsætning af godkendelser",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "fi-FI",
+   "pageCaption": "Hyväksynnän käyttäjäasetukset",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "BCExpansion.CreateApprovalUser",
+   "locale": "nb-NO",
+   "pageCaption": "Brukeroppsett for godkjenning",
+   "pageUnit": "Base Application | Page Approval User Setup - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "en-US",
+   "pageCaption": "Sustainability Account Categories",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "sv-SE",
+   "pageCaption": "Kategorier för hållbarhetskonton",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "fr-FR",
+   "pageCaption": "Catégories de compte de durabilité",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "de-DE",
+   "pageCaption": "Kategorien von Nachhaltigkeitskonten",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "es-ES",
+   "pageCaption": "Categorías de cuentas de sostenibilidad",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "da-DK",
+   "pageCaption": "Kategorier af bæredygtighedskonti",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "fi-FI",
+   "pageCaption": "Vastuullisuustilin luokat",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountCategory",
+   "locale": "nb-NO",
+   "pageCaption": "Kategorier for bærekraftskonto",
+   "pageUnit": "Sustainability | Page Sustain. Account Categories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "en-US",
+   "pageCaption": "Sustainability Account Subcategories",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "sv-SE",
+   "pageCaption": "Underkategorier för hållbarhetskonton",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "fr-FR",
+   "pageCaption": "Sous-catégories de compte de durabilité",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "de-DE",
+   "pageCaption": "Unterkategorien des Nachhaltigkeitskontos",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "es-ES",
+   "pageCaption": "Subcategorías de cuenta de sostenibilidad",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "da-DK",
+   "pageCaption": "Underkategorier af bæredygtighedskonti",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "fi-FI",
+   "pageCaption": "Vastuullisuustilin alaluokat",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Sustainability.CreateAccountSubcategory",
+   "locale": "nb-NO",
+   "pageCaption": "Underkategorier for bærekraftskonto",
+   "pageUnit": "Sustainability | Page Sustain. Account Subcategories - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "en-US",
+   "pageCaption": "Customer Subscription Contract",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Type",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "sv-SE",
+   "pageCaption": "Prenumerationskontrakt för kund",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Typ",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "fr-FR",
+   "pageCaption": "Contrat Souscription client",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Type",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "de-DE",
+   "pageCaption": "Debitoren-Abonnementvertrag",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Typ",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "es-ES",
+   "pageCaption": "Contrato de suscripción de cliente",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Tipo",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "da-DK",
+   "pageCaption": "Debitors abonnementskontrakt",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Type",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "fi-FI",
+   "pageCaption": "Asiakkaan tilaussopimus",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Tyyppi",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "SubscriptionBilling.ManualContractLine",
+   "locale": "nb-NO",
+   "pageCaption": "Abonnementskontrakt for kunde",
+   "pageUnit": "Subscription Billing | Page Customer Contract - Property Caption",
+   "fieldCaption": "Type",
+   "controlUnit": "Subscription Billing | Table Cust. Sub. Contract Line - Field Contract Line Type - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "en-US",
+   "pageCaption": "Quality Inspection",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Create Purchase Return Order",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "sv-SE",
+   "pageCaption": "Kvalitetsgranskning",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Skapa inköpsreturorder",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "fr-FR",
+   "pageCaption": "Inspection de la qualité",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Créer un ordre de retour d’achat",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "de-DE",
+   "pageCaption": "Qualitätsinspektion",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Einkaufsretoure erstellen",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "es-ES",
+   "pageCaption": "Inspección de calidad",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Crear pedido de devolución de compra",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "da-DK",
+   "pageCaption": "Kvalitetskontrol",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Opret købsreturordre",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "fi-FI",
+   "pageCaption": "Laadun tarkastus",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Luo ostopalautustilaus",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+   "locale": "nb-NO",
+   "pageCaption": "Kvalitetsinspeksjon",
+   "pageUnit": "Quality Management | Page Qlty. Inspection - Property Caption",
+   "actionCaption": "Opprett bestillingsretur",
+   "controlUnit": "Quality Management | Page Qlty. Inspection - Action CreatePurchaseReturnOrder - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "en-US",
+   "pageCaption": "Transfer GL Entries to CA",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Yes",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "sv-SE",
+   "pageCaption": "Överför redovisningstransaktioner till kostnadsredovisning",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Ja",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "fr-FR",
+   "pageCaption": "Transférer les écritures comptables vers CA",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Oui",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "de-DE",
+   "pageCaption": "Sachposten in Kostenrechnung übertragen",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Ja",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "es-ES",
+   "pageCaption": "Transferir movs. contabilidad a costes",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Sí",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "da-DK",
+   "pageCaption": "Overfør finansposter til omkostningsregnskab",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Ja",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "fi-FI",
+   "pageCaption": "Siirrä KP-tapahtumat kustannuslaskentaan",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Kyllä",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+   "locale": "nb-NO",
+   "pageCaption": "Overfør finansposter til KR",
+   "pageUnit": "Base Application | Report Transfer GL Entries to CA - Property Caption",
+   "actionCaption": "Ja",
+   "controlUnit": "Business Central web client 26.18.55014.0 | ConfirmYes"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "en-US",
+   "pageCaption": "Cost Budgets",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "sv-SE",
+   "pageCaption": "Kostnadsbudgetar",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "fr-FR",
+   "pageCaption": "Budgets des coûts",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "de-DE",
+   "pageCaption": "Kostenbudgets",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "es-ES",
+   "pageCaption": "Presupuestos de costes",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "da-DK",
+   "pageCaption": "Omkostningsbudgetter",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "fi-FI",
+   "pageCaption": "Kustannusbudjetit",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostBudget",
+   "locale": "nb-NO",
+   "pageCaption": "Kostbudsjetter",
+   "pageUnit": "Base Application | Page Cost Budget Names - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "en-US",
+   "pageCaption": "Chart of Cost Centers",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "sv-SE",
+   "pageCaption": "Lista över kostnadsställen",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "fr-FR",
+   "pageCaption": "Plan comptable des centres de coûts",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "de-DE",
+   "pageCaption": "Kostenstellenplan",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "es-ES",
+   "pageCaption": "Plan centros coste",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "da-DK",
+   "pageCaption": "Omkostningssteder",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "fi-FI",
+   "pageCaption": "Kustannuspaikkakartta",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostCenter",
+   "locale": "nb-NO",
+   "pageCaption": "Diagram med kostsentre",
+   "pageUnit": "Base Application | Page Chart of Cost Centers - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "en-US",
+   "pageCaption": "Chart of Cost Objects",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "sv-SE",
+   "pageCaption": "Lista över kostnadsbärare",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "fr-FR",
+   "pageCaption": "Plan comptable des coûts associés",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "de-DE",
+   "pageCaption": "Kostenträgerplan",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "es-ES",
+   "pageCaption": "Plan objetos coste",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "da-DK",
+   "pageCaption": "Omkostningsemner",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "fi-FI",
+   "pageCaption": "Kustannuskohdekartta",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.CreateCostObject",
+   "locale": "nb-NO",
+   "pageCaption": "Diagram med kostobjekter",
+   "pageUnit": "Base Application | Page Chart of Cost Objects - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "en-US",
+   "pageCaption": "Cost Journals",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Post",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "sv-SE",
+   "pageCaption": "Kostnadsjournaler",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Bokför",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "fr-FR",
+   "pageCaption": "Feuilles des coûts",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Valider",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "de-DE",
+   "pageCaption": "Kosten-Buch.-Blätter",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Buchen",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "es-ES",
+   "pageCaption": "Diarios de costes",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Registrar",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "da-DK",
+   "pageCaption": "Omkostningskladder",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Bogføring",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "fi-FI",
+   "pageCaption": "Kustannuspäiväkirjat",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Kirjaa",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.PostCostJournal",
+   "locale": "nb-NO",
+   "pageCaption": "Kostkladder",
+   "pageUnit": "Base Application | Page Cost Journal - Property Caption",
+   "actionCaption": "Bokfør",
+   "controlUnit": "Base Application | Page Cost Journal - Action Post - Property Caption"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "en-US",
+   "pageCaption": "Delete Cost Budget Entries",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "sv-SE",
+   "pageCaption": "Ta bort kostnadsbudgettransaktioner",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "fr-FR",
+   "pageCaption": "Supprimer écritures budget des coûts",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "de-DE",
+   "pageCaption": "Kostenbudgetposten löschen",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "es-ES",
+   "pageCaption": "Eliminar movs. ppto. costes",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "Aceptar",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "da-DK",
+   "pageCaption": "Slet omkostningsbudgetposter",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "fi-FI",
+   "pageCaption": "Poista kustannusbudjettitapahtumat",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+   "locale": "nb-NO",
+   "pageCaption": "Slett kostbudsjettposter",
+   "pageUnit": "Base Application | Report Delete Cost Budget Entries - Property Caption",
+   "actionCaption": "OK",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Ok"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "en-US",
+   "pageCaption": "Campaigns",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "sv-SE",
+   "pageCaption": "Kampanjer",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "fr-FR",
+   "pageCaption": "Campagnes",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "de-DE",
+   "pageCaption": "Kampagnen",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "es-ES",
+   "pageCaption": "Campañas",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "da-DK",
+   "pageCaption": "Kampagner",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "fi-FI",
+   "pageCaption": "Kampanjat",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateCampaign",
+   "locale": "nb-NO",
+   "pageCaption": "Kampanjer",
+   "pageUnit": "Base Application | Page Campaign List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "en-US",
+   "pageCaption": "Opportunities",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Update",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "sv-SE",
+   "pageCaption": "Affärsmöjligheter",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Uppdatera",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "fr-FR",
+   "pageCaption": "Opportunités",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Mettre à jour",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "de-DE",
+   "pageCaption": "Verkaufschancen",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Aktualisieren",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "es-ES",
+   "pageCaption": "Oportunidades",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Actualizar",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "da-DK",
+   "pageCaption": "Salgsmuligheder",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Opdater",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "fi-FI",
+   "pageCaption": "Mahdollisuudet",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Päivitä",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.UpdateOpportunityStage",
+   "locale": "nb-NO",
+   "pageCaption": "Salgsmuligheter",
+   "pageUnit": "Base Application | Page Opportunity List - Property Caption",
+   "actionCaption": "Oppdater",
+   "controlUnit": "Base Application | Page Opportunity List - Action Update - Property Caption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "en-US",
+   "pageCaption": "Segments",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "sv-SE",
+   "pageCaption": "Segment",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "fr-FR",
+   "pageCaption": "Segments",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "de-DE",
+   "pageCaption": "Segmente",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "es-ES",
+   "pageCaption": "Segmentos",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "da-DK",
+   "pageCaption": "Målgrupper",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "fi-FI",
+   "pageCaption": "Segmentit",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "ContactMarketing.CreateSegment",
+   "locale": "nb-NO",
+   "pageCaption": "Segmenter",
+   "pageUnit": "Base Application | Page Segment List - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "en-US",
+   "pageCaption": "Customers",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Delete",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "sv-SE",
+   "pageCaption": "Kunder",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Ta bort",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "fr-FR",
+   "pageCaption": "Clients",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Supprimer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "de-DE",
+   "pageCaption": "Debitoren",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Löschen",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "es-ES",
+   "pageCaption": "Clientes",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Eliminar",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "da-DK",
+   "pageCaption": "Debitorer",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Slet",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "fi-FI",
+   "pageCaption": "Asiakkaat",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Poista",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.DeleteRecord",
+   "locale": "nb-NO",
+   "pageCaption": "Kunder",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Slett",
+   "controlUnit": "Business Central web client 26.18.55014.0 | DeleteContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "en-US",
+   "pageCaption": "Customers",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Edit",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "sv-SE",
+   "pageCaption": "Kunder",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Redigera",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "fr-FR",
+   "pageCaption": "Clients",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Modifier",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "de-DE",
+   "pageCaption": "Debitoren",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Bearbeiten",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "es-ES",
+   "pageCaption": "Clientes",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Editar",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "da-DK",
+   "pageCaption": "Debitorer",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Rediger",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "fi-FI",
+   "pageCaption": "Asiakkaat",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Muokkaa",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.EditRecord",
+   "locale": "nb-NO",
+   "pageCaption": "Kunder",
+   "pageUnit": "Base Application | Page Customer List - Property Caption",
+   "actionCaption": "Rediger",
+   "controlUnit": "Business Central web client 26.18.55014.0 | EditContextMenucaption"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "en-US",
+   "pageCaption": "Customer Card",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Back",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "sv-SE",
+   "pageCaption": "Kundkort",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Bakåt",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "fr-FR",
+   "pageCaption": "Fiche client",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Précédent",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "de-DE",
+   "pageCaption": "Debitorenkarte",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Zurück",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "es-ES",
+   "pageCaption": "Ficha cliente",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Atrás",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "da-DK",
+   "pageCaption": "Debitorkort",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Tilbage",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "fi-FI",
+   "pageCaption": "Asiakaskortti",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Takaisin",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "Core.NavigateBack",
+   "locale": "nb-NO",
+   "pageCaption": "Kundekort",
+   "pageUnit": "Base Application | Page Customer Card - Property Caption",
+   "actionCaption": "Tilbake",
+   "controlUnit": "Business Central web client 26.18.55014.0 | Back_Title"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "en-US",
+   "pageCaption": "Quality Inspection Generation Rules",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "New",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Schedule Group",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "sv-SE",
+   "pageCaption": "Regler för generering av kvalitetsgranskning",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Schemalägg grupp",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "fr-FR",
+   "pageCaption": "Règles de génération d’inspection de la qualité",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Créer",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Planifier un groupe",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "de-DE",
+   "pageCaption": "Regel zur Generierung von Qualitätsinspektionen",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Neu",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Gruppe planen",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "es-ES",
+   "pageCaption": "Reglas de generación de inspecciones de calidad",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Nuevo",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Programar grupo",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "da-DK",
+   "pageCaption": "Regler for generering af kvalitetskontrol",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Planlæg gruppe",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "fi-FI",
+   "pageCaption": "Laaduntarkastukseen liittyvän tarkistuksen luontisäännöt",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Uusi",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Ajoita ryhmä",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
+  },
+  {
+   "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+   "locale": "nb-NO",
+   "pageCaption": "Regler for generering av kvalitetsinspeksjoner",
+   "pageUnit": "Quality Management | Page Qlty. Inspection Gen. Rules - Property Caption",
+   "actionCaption": "Ny",
+   "controlUnit": "Business Central web client 26.18.55014.0 | CreateActionCaption",
+   "fieldCaption": "Planlegg gruppen",
+   "fieldUnit": "Quality Management | Table Qlty. Inspection Gen. Rule - Field Schedule Group - Property Caption"
   }
  ]
 }
