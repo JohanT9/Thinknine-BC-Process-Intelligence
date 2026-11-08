@@ -1,3 +1,7 @@
+## 4.7.240
+- Removed the Windows report sharing helper. Its button was removed earlier, so nobody could reach it; the extension no longer accepts its message, and the helper, its registration script, documentation and texts are gone. Reports already saved by the helper under LocalAppData\Thinknine\BCProcessStudio\SharedReports are not touched and can be deleted by hand.
+- Document library: the Export, Import and Sync buttons no longer sit right against the search row.
+
 ## 4.7.239
 - Security: the extension can ask only for access to Microsoft Graph (for Outlook) beyond its fixed sites; the broad optional access to every HTTPS site, left from the removed AI analysis, is gone.
 - Knowledge MCP host for Windows: only the methods the extension uses are passed to the knowledge server (initialize, tools/list, tools/call for the two read-only tools, ping), one request at a time; anything else is answered with an error without reaching the server.

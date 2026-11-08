@@ -144,7 +144,6 @@ async function requireRecordingLicense(url) {
     return { source: "consultant", ...result };
   }
 }
-const windowsSharePorts = new Set();
 const KNOWLEDGE_MCP_CACHE_KEY = "t9KnowledgeMcpLookupCacheV1";
 const KNOWLEDGE_MCP_KEEP_ALIVE_MS = 60 * 1000;
 const knowledgeMcpClientManager = globalThis.T9KnowledgeMcpClientManager.create(() =>
@@ -1912,7 +1911,7 @@ chrome.runtime.onStartup.addListener(async () => {
 // What the capture scripts in Business Central pages send. Every other message changes or
 // reads the library, settings, licenses or files and is taken only from the extension's own
 // pages, so a script running in a web page cannot delete recordings, change settings, start
-// downloads or reach the Windows helper.
+// downloads or reach a native helper.
 const PAGE_MESSAGE_TYPES = new Set(["T9_PING", "T9_GET_STATE", "T9_REQUEST_STOP_DIALOG",
   "T9_CAPTURE_GUIDANCE", "T9_CAPTURE_DIAGNOSTIC", "T9_RECORD_EVENT", "T9_CAPTURE_BC_ERROR",
   "T9_CAPTURE_BEFORE_ACTION"]);
@@ -2611,56 +2610,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const result = await saveStepRepairScreenshot(message.sessionId,
           message.assetKey, message.image);
         sendResponse({ ok: true, ...result });
-        break;
-      }
-
-      case "T9_SHARE_BUG_REPORT_WINDOWS": {
-        if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(
-          chrome.runtime.getURL("technical-report.html") + "?")) {
-          throw new Error("Windows-delning får bara startas från felrapportvyn.");
-        }
-        const payload = message.payload;
-        const legacy = payload?.action === "shareBugReport" && payload?.schemaVersion === 1;
-        const pdf = payload?.action === "shareBugReportPdf" && payload?.schemaVersion === 2 &&
-          typeof payload?.pdfBase64 === "string" && typeof payload?.includeTechnicalPackage === "boolean";
-        if (!payload || (!legacy && !pdf) ||
-            typeof payload.reportJson !== "string" || typeof payload.markdown !== "string" ||
-            new TextEncoder().encode(JSON.stringify(payload)).length > 24 * 1024 * 1024) {
-          throw new Error("Felrapporten är ogiltig eller för stor för Windows-delning (max 24 MB).");
-        }
-        const result = await new Promise((resolve, reject) => {
-          const port = chrome.runtime.connectNative("com.thinknine.bcprocessstudio.share");
-          windowsSharePorts.add(port);
-          let replied = false;
-          const timer = setTimeout(() => {
-            if (!replied) {
-              replied = true;
-              reject(new Error("Windows-hjälparen svarade inte. Ingen rapport har skickats."));
-              port.disconnect();
-              windowsSharePorts.delete(port);
-            }
-          }, 30000);
-          port.onMessage.addListener(response => {
-            if (replied) return;
-            replied = true;
-            clearTimeout(timer);
-            if (!response?.ok) {
-              reject(new Error(response?.error || "Windows-delning kunde inte startas."));
-              port.disconnect();
-              windowsSharePorts.delete(port);
-            } else resolve(response);
-          });
-          port.onDisconnect.addListener(() => {
-            const error = chrome.runtime.lastError;
-            clearTimeout(timer);
-            windowsSharePorts.delete(port);
-            if (!replied) reject(new Error(error
-              ? "Windows-hjälparen kunde inte anslutas. Installera och registrera hjälparen för detta tillägg."
-              : "Windows-hjälparen stängdes innan rapporten kunde förberedas."));
-          });
-          port.postMessage(payload);
-        });
-        sendResponse(result);
         break;
       }
 
