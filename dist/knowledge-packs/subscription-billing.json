@@ -235,7 +235,10 @@
         ],
         "actionPatterns": [],
         "fieldPatterns": [
-          "^Type$"
+          "^Type$",
+          "^Typ$",
+          "^Tipo$",
+          "^Tyyppi$"
         ],
         "automationIdPatterns": []
       },
@@ -250,9 +253,7 @@
         "fi-FI",
         "nb-NO"
       ],
-      "verifiedRuntimeLocales": [
-        "en-US"
-      ],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-srb-manual-contract-lines-en-us"

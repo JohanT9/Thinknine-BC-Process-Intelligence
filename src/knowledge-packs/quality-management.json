@@ -628,7 +628,15 @@
         ],
         "actionPatterns": [
           "^Create Purchase Return$",
-          "^Skapa inköpsretur$"
+          "^Skapa inköpsretur$",
+          "^Create Purchase Return Order$",
+          "^Skapa inköpsreturorder$",
+          "^Créer un ordre de retour d’achat$",
+          "^Einkaufsretoure erstellen$",
+          "^Crear pedido de devolución de compra$",
+          "^Opret købsreturordre$",
+          "^Luo ostopalautustilaus$",
+          "^Opprett bestillingsretur$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -853,11 +861,23 @@
       "match": {
         "pagePatterns": [
           "^Inspection Generation Rules$",
-          "^Regler för inspektionsgenerering$"
+          "^Regler för inspektionsgenerering$",
+          "^Quality Inspection Generation Rules$",
+          "^Regler för generering av kvalitetsgranskning$",
+          "^Règles de génération d’inspection de la qualité$",
+          "^Regel zur Generierung von Qualitätsinspektionen$",
+          "^Reglas de generación de inspecciones de calidad$",
+          "^Regler for generering af kvalitetskontrol$",
+          "^Laaduntarkastukseen liittyvän tarkistuksen luontisäännöt$",
+          "^Regler for generering av kvalitetsinspeksjoner$"
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [
           "^Schedule Group$",

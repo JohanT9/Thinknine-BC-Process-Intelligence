@@ -425,25 +425,30 @@
     await storage.remove(meta);
   }
 
-  // Writes the documents. Before anything is replaced, the entries it replaces are kept;
-  // when writing fails, everything is put back as it was and the error is rethrown.
-  // lines: a fresh reading of the same file. saveLibrary(tree, records) stores the records.
+  // Writes the documents. Before anything is replaced or removed, the entries it replaces are
+  // kept; when writing fails, everything is put back as it was and the error is rethrown.
+  // lines: a fresh reading of the same file (not needed when nothing is written).
+  // saveLibrary(tree, records) stores the records. A synchronization also removes documents
+  // (change.removed: [{ id, localRecord }]) and passes old folders to restore on undo.
   async function apply({ storage, keys, lines, change, saveLibrary, fileName = "",
     importId = `import-${Date.now().toString(36)}`, now = new Date().toISOString(),
-    onProgress = () => {} }) {
+    kind = "import", oldFolders = null, onProgress = () => {} }) {
     const { meta: metaKey, entry: entryPrefix } = undoKeys(keys);
     const ids = change.written.map(item => item.id);
     const writing = new Set(ids);
-    const meta = { schemaVersion: UNDO_SCHEMA_VERSION, importId, fileName, startedAt: now,
+    const removed = change.removed || [];
+    const meta = { schemaVersion: UNDO_SCHEMA_VERSION, importId, kind, fileName, startedAt: now,
       state: "running", phase: "keeping", newIds: change.newIds, replacedIds: change.replacedIds,
-      oldRecords: Object.fromEntries(change.written.filter(item => item.localRecord)
-        .map(item => [item.id, item.localRecord])),
-      createdFolderIds: change.createdFolderIds, keptEntries: 0 };
+      removedIds: removed.map(item => item.id),
+      oldRecords: Object.fromEntries([...change.written, ...removed]
+        .filter(item => item.localRecord).map(item => [item.id, item.localRecord])),
+      createdFolderIds: change.createdFolderIds || [], keptEntries: 0,
+      ...(oldFolders ? { oldFolders, newFolders: folderModel.serialize(change.tree) } : {}) };
     await clearUndo(storage, keys);
     await storage.set({ [metaKey]: meta });
     try {
-      // Keep the entries that are replaced, then remove them.
-      const owned = await inventory(storage, keys, change.replacedIds);
+      // Keep the entries that are replaced or removed, then remove them.
+      const owned = await inventory(storage, keys, [...change.replacedIds, ...meta.removedIds]);
       let kept = 0;
       for (const list of owned.values()) {
         for (let offset = 0; offset < list.length; offset += BATCH) {
@@ -471,16 +476,18 @@
         size = 0;
       };
       const expected = new Map(change.written.map(item => [item.id, item.digest]));
-      const second = await read(lines, keys, { only: writing, onProgress,
-        visit: async (id, key, value) => {
-          batch[key] = value;
-          size += 1;
-          if (size >= BATCH) await flush();
-        } });
-      await flush();
-      for (const id of ids) {
-        const item = second.items.find(value => value.id === id);
-        if (!item || item.digest !== expected.get(id)) throw transferError("changedFile");
+      if (ids.length) {
+        const second = await read(lines, keys, { only: writing, onProgress,
+          visit: async (id, key, value) => {
+            batch[key] = value;
+            size += 1;
+            if (size >= BATCH) await flush();
+          } });
+        await flush();
+        for (const id of ids) {
+          const item = second.items.find(value => value.id === id);
+          if (!item || item.digest !== expected.get(id)) throw transferError("changedFile");
+        }
       }
       await saveLibrary(change.tree, change.records);
       meta.state = "complete";
@@ -508,7 +515,8 @@
     if (meta.phase === "keeping") return;
     const keptKeys = (await storedKeys(storage)).filter(key => key.startsWith(entryPrefix)).sort();
     if (keptKeys.length !== Number(meta.keptEntries)) throw transferError("rollbackFailed");
-    const ids = [...(meta.newIds || []), ...(meta.replacedIds || [])].filter(validId);
+    const ids = [...(meta.newIds || []), ...(meta.replacedIds || []), ...(meta.removedIds || [])]
+      .filter(validId);
     const owned = await inventory(storage, keys, ids);
     for (const list of owned.values()) await removeKeys(storage, list);
     await readBatches(storage, keptKeys, async (_key, kept) => {
@@ -523,6 +531,38 @@
     const nextRecords = records.filter(record => !added.has(record.projectId || record.sessionId))
       .map(record => old[record.projectId || record.sessionId]
         ? normalize(old[record.projectId || record.sessionId]) : record);
+    // Documents a synchronization removed come back.
+    const present = new Set(nextRecords.map(record => record.projectId || record.sessionId));
+    for (const id of meta.removedIds || []) {
+      if (old[id] && !present.has(id)) nextRecords.push(normalize(old[id]));
+    }
+    // A synchronization puts back the folders it changed. A folder changed after it is left
+    // as it is now; one the synchronization added is removed when nothing is left in it.
+    if (meta.oldFolders) {
+      const restored = folderModel.read(meta.oldFolders);
+      const synced = meta.newFolders ? folderModel.read(meta.newFolders) : { supported: false };
+      if (restored.supported) {
+        const key = folder => folder ? JSON.stringify([folder.name, folder.parentId || ""]) : "";
+        const before = new Map(restored.tree.folders.map(folder => [folder.folderId, folder]));
+        const after = synced.supported ? new Map(synced.tree.folders.map(folder => [folder.folderId, folder])) : null;
+        const now = new Map(tree.folders.map(folder => [folder.folderId, folder]));
+        const used = id => nextRecords.some(record => String(record.folderId || "") === id);
+        const folders = [];
+        for (const id of new Set([...before.keys(), ...now.keys()])) {
+          const old = before.get(id);
+          const current = now.get(id);
+          // Without the folders after the synchronization (an older undo record), every
+          // folder is put back as it was, as before.
+          const untouchedSince = after ? key(current) === key(after.get(id)) : true;
+          if (untouchedSince) {
+            if (old) folders.push({ ...(current || {}), ...old });
+            else if (current && used(id)) folders.push(current);
+          } else if (current) folders.push(current);
+        }
+        const merged = folderModel.read({ ...folderModel.serialize(restored.tree), folders });
+        if (merged.supported) return { records: nextRecords, tree: merged.tree };
+      }
+    }
     // A folder the import created is removed again when nothing is left in it.
     let nextTree = tree;
     for (const folderId of [...(meta.createdFolderIds || [])].reverse()) {
@@ -559,6 +599,6 @@
     FORMAT, FORMAT_VERSION, FILE_EXTENSION, UNDO_SCHEMA_VERSION,
     ownership, inventory, localDigests, exportFolders, exportLines, splitLines, read,
     mapFolders, plan, changes, apply, undo, undoLibrary, readUndo, clearUndo,
-    recordFingerprint, fileName, validId
+    recordFingerprint, fileName, validId, canonical, sha256, transferError
   });
 });

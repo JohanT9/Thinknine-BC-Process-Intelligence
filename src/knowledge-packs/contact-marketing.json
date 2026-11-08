@@ -11,10 +11,10 @@
       "entity": "MarketingCampaign",
       "priority": 1360,
       "confidence": 0.95,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
         "pagePatterns": ["^Campaigns$", "^Kampanjer$", "^Campagnes$", "^Kampagnen$", "^Campañas$", "^Kampagner$", "^Kampanjat$"],
-        "actionPatterns": ["^New$", "^Ny$"],
+        "actionPatterns": ["^New$", "^Ny$", "^Créer$", "^Neu$", "^Nuevo$", "^Uusi$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -173,10 +173,10 @@
       "entity": "SalesOpportunity",
       "priority": 1350,
       "confidence": 0.96,
-      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
-        "pagePatterns": ["^Opportunity List$", "^Affärsmöjlighetslista$"],
-        "actionPatterns": ["^Update$", "^Uppdatera$"],
+        "pagePatterns": ["^Opportunity List$", "^Affärsmöjlighetslista$", "^Opportunities$", "^Affärsmöjligheter$", "^Opportunités$", "^Verkaufschancen$", "^Oportunidades$", "^Salgsmuligheder$", "^Mahdollisuudet$", "^Salgsmuligheter$"],
+        "actionPatterns": ["^Update$", "^Uppdatera$", "^Mettre à jour$", "^Aktualisieren$", "^Actualizar$", "^Opdater$", "^Päivitä$", "^Oppdater$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -282,7 +282,11 @@
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

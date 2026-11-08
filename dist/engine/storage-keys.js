@@ -21,6 +21,9 @@
   // kept so that it can be undone. Not under any document prefix, so never exported.
   const LIBRARY_IMPORT_UNDO_KEY = "t9_library_import_undo";
   const LIBRARY_IMPORT_UNDO_ENTRY_PREFIX = "t9_library_import_undo_entry_";
+  // Synchronizing the library through a shared folder (document/library-sync.js): this
+  // computer's id and what it last agreed with the folder. Never exported.
+  const LIBRARY_SYNC_STATE_KEY = "t9_library_sync_state";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
   const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
   // One entry per test run, keyed by its own id; each names the recording it tests.
@@ -48,6 +51,7 @@
     DOCUMENT_FOLDERS_KEY,
     LIBRARY_IMPORT_UNDO_KEY,
     LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
+    LIBRARY_SYNC_STATE_KEY,
     REVIEW_PREFIX,
     REVIEW_PROGRESS_PREFIX,
     RECORDING_PREFIX,

@@ -25,7 +25,10 @@
         ],
         "actionPatterns": [
           "^Yes$",
-          "^Ja$"
+          "^Ja$",
+          "^Oui$",
+          "^Sí$",
+          "^Kyllä$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -215,7 +218,11 @@
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -263,11 +270,23 @@
       "match": {
         "pagePatterns": [
           "^Cost Centers$",
-          "^Kostnadsställen$"
+          "^Kostnadsställen$",
+          "^Chart of Cost Centers$",
+          "^Lista över kostnadsställen$",
+          "^Plan comptable des centres de coûts$",
+          "^Kostenstellenplan$",
+          "^Plan centros coste$",
+          "^Omkostningssteder$",
+          "^Kustannuspaikkakartta$",
+          "^Diagram med kostsentre$"
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -323,11 +342,23 @@
       "match": {
         "pagePatterns": [
           "^Cost Objects$",
-          "^Kostnadsbärare$"
+          "^Kostnadsbärare$",
+          "^Chart of Cost Objects$",
+          "^Lista över kostnadsbärare$",
+          "^Plan comptable des coûts associés$",
+          "^Kostenträgerplan$",
+          "^Plan objetos coste$",
+          "^Omkostningsemner$",
+          "^Kustannuskohdekartta$",
+          "^Diagram med kostobjekter$"
         ],
         "actionPatterns": [
           "^New$",
-          "^Ny$"
+          "^Ny$",
+          "^Créer$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -385,11 +416,25 @@
           "^Cost Accounting Journal$",
           "^Cost Journal$",
           "^Kostnadsredovisningsjournal$",
-          "^Kostnadsjournal$"
+          "^Kostnadsjournal$",
+          "^Cost Journals$",
+          "^Kostnadsjournaler$",
+          "^Feuilles des coûts$",
+          "^Kosten-Buch\\.-Blätter$",
+          "^Diarios de costes$",
+          "^Omkostningskladder$",
+          "^Kustannuspäiväkirjat$",
+          "^Kostkladder$"
         ],
         "actionPatterns": [
           "^Post$",
-          "^Bokför$"
+          "^Bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogføring$",
+          "^Kirjaa$",
+          "^Bokfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -442,9 +487,7 @@
       "entity": "CostBudgetEntry",
       "priority": 1380,
       "confidence": 0.97,
-      "verifiedRuntimeLocales": [
-        "en-US"
-      ],
+      "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
         "pagePatterns": [
           "^Delete Cost Budget Entries$",
@@ -457,7 +500,8 @@
           "^Slett kostbudsjettposter$"
         ],
         "actionPatterns": [
-          "^OK$"
+          "^OK$",
+          "^Aceptar$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

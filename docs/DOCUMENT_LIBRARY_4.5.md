@@ -75,9 +75,10 @@ references existing projects.
 
 ## Known limitations
 
-- Data is local to the extension; there is no cloud sync, sharing or
+- Data is local to the extension; there is no cloud service, sharing or
   collaboration. Documents are moved to another computer with an export file
-  (see Moving documents to another computer).
+  (see Moving documents to another computer) or kept alike on several computers
+  through a folder that a file service syncs (see Syncing through a folder).
 - Tags, author and thumbnails can be displayed/indexed but do not yet have a
   dedicated metadata-editing workflow.
 - Health and section metadata remain minimal until Document Workspace has been
@@ -158,4 +159,89 @@ only reads and writes the file and shows the result.
   usage statistics.
 - **Not included.** This is a manual transfer, not synchronization. A document
   deleted on one computer comes back when an older file is imported. There is no
-  merging of two versions of the same document; one of them is kept.
+  merging of two versions of the same document; one of them is kept. Syncing
+  through a folder (below) carries deletions and asks about conflicts.
+
+## Syncing through a folder
+
+Sync… in the library heading keeps the library alike on several computers
+through a folder that is already synced between them, for example an empty
+folder in OneDrive. The user chooses the folder with the browser's folder
+picker on each computer. BC Process Studio writes and reads files in that
+folder only; the service that syncs the folder moves them between computers.
+`document/library-sync.js` holds the format and the rules; the dashboard keeps
+the folder handle, asks for permission and shows the result.
+
+- **Privacy.** The extension sends nothing itself and contacts no service. The
+  files contain the same document entries as an export file (recordings,
+  screenshots, reviews, evidence), which can include customer data from Business
+  Central; the sync dialog says so. Whoever can read the folder can read the
+  documents. Settings, licenses, language preferences and the sync state are
+  never written to the folder. Syncing sends no usage statistics.
+- **Folder layout.** Each computer writes only its own manifest,
+  `devices/device-<id>.json` (format `bc-process-studio-sync`, format version
+  1), listing the version, file, title and change time of each document it has
+  and the documents it has deleted, plus its folder tree. Document files are
+  `documents/<sha256(id)>/<version>.bcps` in the export file format and are never
+  overwritten: a new version is a new file. A version is a SHA-256 of the
+  document's entry digest and its library record, so the same content gives the
+  same version on every computer. Files that are not named like a manifest are
+  ignored; a manifest that cannot be read (a copy a service is still writing,
+  for example) is counted as unreadable. A file no manifest names is removed
+  once it is older than seven days, but not while any manifest is unreadable,
+  since it may name the file.
+- **Comparing.** Each computer keeps, per document, the version it had and the
+  version the folder had at its last sync (`t9_library_sync_state`). The folder's
+  version is the newest entry by change time across all manifests, including
+  what this computer last saved. Changed only here: saved in the folder. Changed
+  only elsewhere: fetched. Changed the same way on both: nothing to do. Changed
+  differently on both, or changed on one and deleted on the other: a conflict.
+  Deleted elsewhere: removed here only when the user lets it. A file named in a
+  manifest that has not arrived, cannot be read or does not hold the listed
+  version is waiting and is fetched on a later sync. The document being
+  recorded is left as it is. Folders are merged per folder: a rename or new
+  folder on either computer survives; a folder changed on both keeps this
+  computer's. The newest folder list decides which folders there are, and a
+  folder another computer changed after that list was made counts with its
+  newer name and place.
+- **Change times.** A new version or deletion is stamped later than the folder
+  version it replaces, also when another computer's clock is ahead, so that a
+  decision such as Keep this computer's versions holds.
+- **Decisions.** Conflicts offer Decide later (default), Keep this computer's
+  versions and Use the versions from the other computer. Decide later syncs
+  everything else and leaves those documents as they are on both computers.
+  Documents deleted on another computer are listed with Delete them here too.
+  The automatic sync when the library opens never deletes and never decides a
+  conflict; the status next to Sync… then says the sync is waiting for a
+  decision. While an import can still be undone, the automatic sync also fetches
+  nothing (that would replace the import's undo); it saves this computer's
+  changes and waits. When Sync is chosen after a decision, the library is
+  compared again; if what needs a decision changed meanwhile, it is shown again
+  instead of being applied.
+- **Order and recovery.** Document files are written first, then fetched and
+  removed documents are written here like an import (undo copies, rollback on a
+  failed write), then this computer's manifest, then its sync state. The latest
+  sync that fetched or removed documents can be undone from the library notice;
+  the restored versions then count as changes here and the next sync saves them
+  in the folder. Undo puts back the folders the sync changed; folders created
+  or changed after it stay. A sync refuses to start while an interrupted import
+  or sync still has to be restored. Sync, import, undo and keep share one Web
+  Lock, so only one of them writes at a time.
+- **Permission.** The folder handle is kept in IndexedDB
+  (`bc-process-studio-library-sync`). The browser may ask again for access to
+  the folder after a restart; the automatic sync then does nothing and the
+  status asks the user to choose Sync. Disconnect forgets the folder and what
+  was compared with it but keeps the computer's id, so its own manifest is
+  replaced when it connects again; the files in the folder stay. A sync state
+  saved by a later version is neither used nor overwritten.
+- **Compatibility.** A manifest from a newer format version stops the sync before
+  anything is written. Browsers without the File System Access API do not offer
+  the folder; Export and Import still work there.
+- **Limitations.** Syncing happens when the library opens and when the user
+  chooses Sync now, not in the background. Comparison is per document: two
+  computers that change the same document get a conflict, never a merge of the
+  two. Every sync reads and hashes all local documents to compare them, which
+  takes longer for a large library. The sync was tested with a
+  folder in the browser's private file system standing in for a synced folder,
+  not with OneDrive itself; how quickly and in what order a service delivers the
+  files is up to the service, and files that have not arrived wait.

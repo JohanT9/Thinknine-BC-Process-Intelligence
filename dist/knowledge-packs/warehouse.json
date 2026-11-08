@@ -361,7 +361,15 @@
         ],
         "actionPatterns": [
           "^Bokför$",
-          "^Post$"
+          "^Post$",
+          "^Post Receipt$",
+          "^Bokför inleverans$",
+          "^Valider réception$",
+          "^Wareneingang buchen$",
+          "^Registrar recep\\.$",
+          "^Bogfør leverance$",
+          "^Kirjaa vast\\.otto$",
+          "^Bokfør mottak$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -425,7 +433,15 @@
         ],
         "actionPatterns": [
           "^Bokför$",
-          "^Post$"
+          "^Post$",
+          "^Post Shipment$",
+          "^Bokför utleverans$",
+          "^Valider expédition$",
+          "^Warenausgang buchen$",
+          "^Registrar envío$",
+          "^Bogfør lev\\.$",
+          "^Kirjaa toimitus$",
+          "^Bokfør følgeseddel$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

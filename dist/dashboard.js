@@ -5119,6 +5119,7 @@ function libraryTransferErrorText(error) {
   if (["notLibrary", "newerVersion", "damaged", "incomplete", "foreignEntry", "changedFile",
     "documentMissing", "rollbackFailed", "nothingToUndo", "foldersUnsupported",
     "downloadNotSaved", "cancelled"].includes(code)) return uiT(`transfer.${code}`);
+  if (code === "busySync") return uiT("sync.busySync");
   return uiTf("transfer.failed", { error: error?.message || String(error) });
 }
 
@@ -5429,15 +5430,15 @@ $("libraryImportForm").addEventListener("submit", async event => {
   progress.value = 0;
   setLibraryImportBusy(true, uiTf("transfer.importingFile", { done: 0, total: run.planned.items.length }));
   try {
-    await libraryTransfer.apply({ storage: chrome.storage.local, keys: globalThis.T9StorageKeys,
-      lines: await libraryFileLines(run.file), planned: run.planned, change, fileName: run.file.name,
+    await withLibraryWriteLock(async () => libraryTransfer.apply({ storage: chrome.storage.local,
+      keys: globalThis.T9StorageKeys, lines: await libraryFileLines(run.file), planned: run.planned, change, fileName: run.file.name,
       saveLibrary: (tree, records) => saveLibraryFolders(tree,
         records.map(record => globalThis.T9DocumentLibrary.normalize(record))),
       onProgress: ({ done, total }) => {
         progress.max = total;
         progress.value = done;
         $("libraryImportStatus").textContent = uiTf("transfer.importingFile", { done, total });
-      } });
+      } }));
     await releaseLibraryDocuments(change.replacedIds);
     libraryImportRun = null;
     $("libraryImportDialog").close();
@@ -5501,22 +5502,32 @@ async function renderLibraryImportNotice() {
   notice.hidden = !meta;
   if (!meta) return;
   const running = meta.state !== "complete";
+  const synced = meta.kind === "sync";
   notice.dataset.state = running ? "running" : "complete";
-  $("libraryImportNoticeText").textContent = running
-    ? uiTf("transfer.interrupted", { file: meta.fileName || "", date: libraryTransferDate(meta.startedAt) })
-    : uiTf("transfer.lastImport", { file: meta.fileName || "", date: libraryTransferDate(meta.completedAt),
-      added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length });
-  $("libraryImportUndo").textContent = uiT(running ? "transfer.restore" : "transfer.undo");
+  const counts = { added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length,
+    removed: (meta.removedIds || []).length };
+  $("libraryImportNoticeText").textContent = synced
+    ? running ? uiTf("sync.interrupted", { date: libraryTransferDate(meta.startedAt) })
+      : uiTf("sync.lastSync", { date: libraryTransferDate(meta.completedAt), ...counts })
+    : running
+      ? uiTf("transfer.interrupted", { file: meta.fileName || "", date: libraryTransferDate(meta.startedAt) })
+      : uiTf("transfer.lastImport", { file: meta.fileName || "", date: libraryTransferDate(meta.completedAt),
+        ...counts });
+  $("libraryImportUndo").textContent = uiT(running ? "transfer.restore" : synced ? "sync.undo" : "transfer.undo");
+  // The keys are swapped too, so that a change of interface language keeps the right text.
+  $("libraryImportKeep").dataset.i18n = synced ? "sync.keep" : "transfer.keep";
+  $("libraryImportKeep").textContent = uiT($("libraryImportKeep").dataset.i18n);
   $("libraryImportKeep").hidden = running;
 }
 
 async function undoLibraryImport() {
   const meta = libraryImportUndo;
-  const result = await libraryTransfer.undo({ storage: chrome.storage.local,
+  const result = await withLibraryWriteLock(() => libraryTransfer.undo({ storage: chrome.storage.local,
     keys: globalThis.T9StorageKeys, records: documentLibraryRecords, tree: documentFolders,
     normalize: globalThis.T9DocumentLibrary.normalize,
-    saveLibrary: (tree, records) => saveLibraryFolders(tree, records) });
-  await releaseLibraryDocuments([...(meta?.newIds || []), ...(meta?.replacedIds || [])]);
+    saveLibrary: (tree, records) => saveLibraryFolders(tree, records) }));
+  await releaseLibraryDocuments([...(meta?.newIds || []), ...(meta?.replacedIds || []),
+    ...(meta?.removedIds || [])]);
   await loadSessions();
   await renderLibraryImportNotice();
   return result;
@@ -5545,8 +5556,14 @@ $("libraryImportUndo").addEventListener("click", async () => {
     }
     return;
   }
-  $("libraryImportUndoBody").textContent = uiTf("transfer.undoBody", {
-    added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length });
+  const synced = meta.kind === "sync";
+  $("libraryImportUndoBody").textContent = uiTf(synced ? "sync.undoBody" : "transfer.undoBody", {
+    added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length,
+    removed: (meta.removedIds || []).length });
+  for (const [id, key] of [["libraryImportUndoTitle", "undoTitle"], ["libraryImportUndoSubmit", "undo"]]) {
+    $(id).dataset.i18n = `${synced ? "sync" : "transfer"}.${key}`;
+    $(id).textContent = uiT($(id).dataset.i18n);
+  }
   $("libraryImportUndoError").textContent = "";
   $("libraryImportUndoDialog").showModal();
 });
@@ -5556,9 +5573,10 @@ $("libraryImportUndoForm").addEventListener("submit", async event => {
   const submit = $("libraryImportUndoSubmit");
   submit.disabled = true;
   try {
+    const synced = libraryImportUndo?.kind === "sync";
     await undoLibraryImport();
     $("libraryImportUndoDialog").close();
-    const message = uiT("transfer.undone");
+    const message = uiT(synced ? "sync.undone" : "transfer.undone");
     announceLibraryFolders(message);
     show(message);
   } catch (error) {
@@ -5577,9 +5595,10 @@ $("libraryImportUndoDialog").addEventListener("close", () => {
 $("libraryImportKeep").addEventListener("click", async () => {
   $("libraryImportKeep").disabled = true;
   try {
-    await libraryTransfer.clearUndo(chrome.storage.local, globalThis.T9StorageKeys);
+    const synced = libraryImportUndo?.kind === "sync";
+    await withLibraryWriteLock(() => libraryTransfer.clearUndo(chrome.storage.local, globalThis.T9StorageKeys));
     await renderLibraryImportNotice();
-    announceLibraryFolders(uiT("transfer.kept"));
+    announceLibraryFolders(uiT(synced ? "sync.kept" : "transfer.kept"));
     $("librarySearch").focus();
   } catch (error) {
     show(libraryTransferErrorText(error), true);
@@ -5587,6 +5606,370 @@ $("libraryImportKeep").addEventListener("click", async () => {
     $("libraryImportKeep").disabled = false;
   }
 });
+
+// Synchronizing the library through a folder the user's computers share
+// (document/library-sync.js). The folder is reached through the browser's File System Access
+// API; its handle is kept in this page's IndexedDB, since extension storage cannot hold it.
+const librarySync = globalThis.T9LibrarySync;
+const LIBRARY_SYNC_LOCK = "bc-process-studio-library-sync";
+let librarySyncPrepared = null;
+let librarySyncRunning = false;
+let librarySyncLastError = "";
+
+function librarySyncSupported() {
+  return typeof globalThis.showDirectoryPicker === "function" && typeof indexedDB !== "undefined" &&
+    typeof CompressionStream === "function" && Boolean(navigator.locks);
+}
+
+function librarySyncDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("bc-process-studio-library-sync", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("handles");
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function librarySyncHandle(operation = "get", value = undefined) {
+  const database = await librarySyncDatabase();
+  try {
+    return await new Promise((resolve, reject) => {
+      const transaction = database.transaction("handles", operation === "get" ? "readonly" : "readwrite");
+      const store = transaction.objectStore("handles");
+      const request = operation === "get" ? store.get("folder")
+        : operation === "put" ? store.put(value, "folder") : store.delete("folder");
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+  } finally {
+    database.close();
+  }
+}
+
+// A state saved by a later version is neither used nor overwritten.
+async function librarySyncStored() {
+  const key = globalThis.T9StorageKeys.LIBRARY_SYNC_STATE_KEY;
+  const read = librarySync.readState((await chrome.storage.local.get(key))[key]);
+  if (!read.supported) throw Object.assign(new Error("sync.newerVersion"), { code: "newerVersion" });
+  return read;
+}
+
+async function librarySyncState() {
+  return (await librarySyncStored()).state;
+}
+
+// Imports, undo and synchronization write the same undo record; one runs at a time.
+function withLibraryWriteLock(task) {
+  return navigator.locks.request(LIBRARY_SYNC_LOCK, { ifAvailable: true }, lock => {
+    if (!lock) throw Object.assign(new Error("sync.busySync"), { code: "busySync" });
+    return task();
+  });
+}
+
+async function saveLibrarySyncState(state) {
+  const key = globalThis.T9StorageKeys.LIBRARY_SYNC_STATE_KEY;
+  if (state) await chrome.storage.local.set({ [key]: state });
+  else await chrome.storage.local.remove(key);
+}
+
+function librarySyncErrorText(error) {
+  const code = error?.code || error?.name || "";
+  if (["newerVersion", "permissionDenied", "folderMissing", "unsupported", "busySync", "restoreFirst"]
+    .includes(code)) {
+    return uiT(`sync.${code}`);
+  }
+  if (code === "NotFoundError" || code === "NotReadableError") return uiT("sync.folderMissing");
+  if (code === "NotAllowedError" || code === "SecurityError") return uiT("sync.permissionDenied");
+  if (["damaged", "rollbackFailed", "changedFile", "foldersUnsupported"].includes(code)) {
+    return libraryTransferErrorText(error);
+  }
+  return uiTf("sync.failed", { error: error?.message || String(error) });
+}
+
+// Reading and writing the folder needs the user's permission; asking for it needs a click.
+async function librarySyncFolder({ ask }) {
+  const handle = await librarySyncHandle("get");
+  if (!handle) throw Object.assign(new Error("sync.folderMissing"), { code: "folderMissing" });
+  const options = { mode: "readwrite" };
+  let permission = await handle.queryPermission(options);
+  if (permission !== "granted" && ask) permission = await handle.requestPermission(options);
+  if (permission !== "granted") {
+    throw Object.assign(new Error("sync.permissionDenied"), { code: ask ? "permissionDenied" : "permission" });
+  }
+  return librarySync.folderAdapter(handle);
+}
+
+function renderLibrarySyncStatus(state) {
+  const status = $("librarySyncStatus");
+  status.hidden = !state;
+  if (!state) return;
+  const result = state.lastResult || {};
+  const waiting = result.conflictsLeft || result.deletionsLeft || result.deferred;
+  status.dataset.state = librarySyncLastError ? "failed" : waiting ? "decision" : "synced";
+  status.textContent = librarySyncLastError === "permission" ? uiT("sync.statusPermission")
+    : librarySyncLastError ? uiT("sync.statusFailed")
+      : waiting ? uiT("sync.statusDecision")
+        : state.lastSyncAt ? uiTf("sync.statusSynced", { time: libraryTransferDate(state.lastSyncAt) })
+          : uiT("sync.never");
+}
+
+function librarySyncSummary(result) {
+  const lines = [
+    [result.pushed, "sync.resultPushed"], [result.pulled, "sync.resultPulled"],
+    [result.removedHere, "sync.resultRemoved"], [result.removedThere, "sync.resultRemovedThere"],
+    [result.conflictsLeft, "sync.resultConflicts"], [result.deletionsLeft, "sync.resultDeletions"],
+    [result.waiting, "sync.resultWaiting"], [result.changedDuring, "sync.resultChanged"],
+    [result.unreadable, "sync.resultUnreadable"]
+  ].filter(([count]) => count > 0).map(([count, key]) => uiTf(key, { count }));
+  if (result.busy) lines.push(uiT("sync.resultBusy"));
+  return lines;
+}
+
+function setLibrarySyncBusy(busy, label = "") {
+  librarySyncRunning = busy;
+  for (const id of ["librarySyncNow", "librarySyncChoose", "librarySyncDisconnect", "librarySyncClose"]) {
+    $(id).disabled = busy;
+  }
+  $("librarySyncConflicts").disabled = busy;
+  $("librarySyncRemovals").disabled = busy;
+  $("librarySyncProgress").hidden = !busy;
+  if (busy) {
+    $("librarySyncProgress").removeAttribute("value");
+    $("librarySyncMessage").textContent = label;
+  }
+}
+
+async function renderLibrarySyncDialog() {
+  const supported = librarySyncSupported();
+  let state = null;
+  try { state = supported ? await librarySyncState() : null; } catch (error) {
+    $("librarySyncError").textContent = librarySyncErrorText(error);
+  }
+  const connected = Boolean(state);
+  $("librarySyncFolder").hidden = !connected;
+  $("librarySyncFolder").textContent = connected ? [uiTf("sync.folder", { name: state.folderName }),
+    state.lastSyncAt ? uiTf("sync.last", { date: libraryTransferDate(state.lastSyncAt) }) : uiT("sync.never")]
+    .join(" ") : "";
+  $("librarySyncChoose").hidden = !supported || connected;
+  $("librarySyncNow").hidden = !supported || !connected;
+  $("librarySyncDisconnect").hidden = !connected;
+  $("librarySyncNow").dataset.i18n = librarySyncPrepared ? "sync.submit" : "sync.now";
+  $("librarySyncNow").textContent = uiT($("librarySyncNow").dataset.i18n);
+  if (!supported) $("librarySyncError").textContent = uiT("sync.unsupported");
+  return state;
+}
+
+function resetLibrarySyncDecisions() {
+  librarySyncPrepared = null;
+  $("librarySyncConflicts").hidden = true;
+  $("librarySyncRemovals").hidden = true;
+  $("librarySyncForm").querySelector("[name=librarySyncConflict][value=later]").checked = true;
+  $("librarySyncRemove").checked = true;
+}
+
+async function openLibrarySyncDialog(opener) {
+  libraryTransferOpener = opener;
+  resetLibrarySyncDecisions();
+  $("librarySyncMessage").textContent = "";
+  $("librarySyncSummary").hidden = true;
+  $("librarySyncError").textContent = "";
+  setLibrarySyncBusy(false);
+  $("librarySyncDialog").showModal();
+  await renderLibrarySyncDialog();
+  const first = ["librarySyncNow", "librarySyncChoose", "librarySyncClose"].map($).find(button => !button.hidden);
+  first.focus();
+}
+
+// The documents that need the user before synchronizing.
+function renderLibrarySyncDecisions(prepared) {
+  const conflicts = prepared.items.filter(item => item.action === "conflict");
+  const removals = prepared.items.filter(item => item.action === "deleteHere");
+  $("librarySyncConflicts").hidden = !conflicts.length;
+  $("librarySyncConflictList").innerHTML = conflicts.map(item => {
+    const mine = libraryTransferDate(item.local?.record?.modifiedAt);
+    const theirs = libraryTransferDate(item.remote?.modifiedAt);
+    const text = item.conflict === "deletedHere" ? uiTf("sync.conflictDeletedHere", { title: item.title })
+      : item.conflict === "deletedThere" ? uiTf("sync.conflictDeletedThere", { title: item.title })
+        : mine && theirs && mine !== theirs ? uiTf("sync.conflictItem", { title: item.title, mine, theirs })
+          : item.title;
+    return `<li>${escapeHtml(text)}</li>`;
+  }).join("");
+  $("librarySyncRemovals").hidden = !removals.length;
+  $("librarySyncRemovalLegend").textContent = uiTf("sync.removals", { count: removals.length });
+  $("librarySyncRemovalList").innerHTML = removals.map(item => `<li>${escapeHtml(item.title)}</li>`).join("");
+  $("librarySyncMessage").textContent = uiT("sync.decide");
+}
+
+// One synchronization. interactive: started by the user, who decides conflicts and
+// deletions; otherwise those wait and everything else is synchronized.
+// What the user decides about: the conflicts and deletions with the versions shown.
+function librarySyncDecisionKey(prepared) {
+  return JSON.stringify(prepared.items.filter(item => item.action === "conflict" || item.action === "deleteHere")
+    .map(item => [item.id, item.action, item.local?.version || "", item.remote?.version || ""]));
+}
+
+async function runLibrarySync({ interactive, decisions = null }) {
+  if (!documentFoldersEditable) {
+    throw Object.assign(new Error("transfer.foldersUnsupported"), { code: "foldersUnsupported" });
+  }
+  return withLibraryWriteLock(async () => {
+    // An import or synchronization that stopped halfway is restored first: writing again
+    // would discard what it kept.
+    const pending = await libraryTransfer.readUndo(chrome.storage.local, globalThis.T9StorageKeys);
+    if (pending && pending.state !== "complete") {
+      throw Object.assign(new Error("sync.restoreFirst"), { code: "restoreFirst" });
+    }
+    const dir = await librarySyncFolder({ ask: interactive });
+    const state = await librarySyncState();
+    if (!state) throw Object.assign(new Error("sync.folderMissing"), { code: "folderMissing" });
+    const context = { dir, storage: chrome.storage.local, keys: globalThis.T9StorageKeys, state };
+    if (interactive) setLibrarySyncBusy(true, uiT("sync.reading"));
+    // Compared afresh also after the user decided, so that changes made while the decisions
+    // were shown are not overwritten.
+    const prepared = await librarySync.prepare({ ...context, records: documentLibraryRecords,
+      tree: documentFolders, activeId: await libraryActiveRecordingId() });
+    const shown = decisions ? librarySyncPrepared : null;
+    if (interactive && prepared.needsDecision &&
+      (!shown || librarySyncDecisionKey(shown) !== librarySyncDecisionKey(prepared))) {
+      // Asked first, or asked again when what needs a decision changed meanwhile.
+      librarySyncPrepared = prepared;
+      return { prepared };
+    }
+    // The automatic synchronization does not replace an import that can still be undone.
+    const importPending = !interactive && pending?.supported && pending.kind !== "sync";
+    const result = await librarySync.commit({ ...context, prepared, records: documentLibraryRecords,
+      tree: documentFolders, decisions: decisions && shown
+        ? decisions : { conflicts: "later", deleteHere: false, receive: !importPending },
+      appVersion: APP_VERSION, normalize: globalThis.T9DocumentLibrary.normalize,
+      saveLibrary: (tree, records) => saveLibraryFolders(tree,
+        records.map(record => globalThis.T9DocumentLibrary.normalize(record))),
+      saveState: saveLibrarySyncState,
+      reload: async () => { await loadSessions(); return documentLibraryRecords; },
+      onProgress: ({ phase, done, total }) => {
+        if (!interactive) return;
+        const progress = $("librarySyncProgress");
+        if (total) { progress.max = total; progress.value = done; }
+        $("librarySyncMessage").textContent = uiTf(phase === "sending" ? "sync.sending" : "sync.receiving",
+          { done, total });
+      } });
+    await releaseLibraryDocuments([...result.replacedIds, ...result.removedIds]);
+    await renderLibraryImportNotice();
+    return { result };
+  });
+}
+
+async function finishLibrarySync(promise, { interactive }) {
+  try {
+    const outcome = await promise;
+    librarySyncLastError = "";
+    if (outcome.prepared) {
+      setLibrarySyncBusy(false);
+      renderLibrarySyncDecisions(outcome.prepared);
+      await renderLibrarySyncDialog();
+      $("librarySyncNow").focus();
+      return;
+    }
+    renderLibrarySyncStatus(outcome.result.state);
+    if (!interactive) return;
+    resetLibrarySyncDecisions();
+    setLibrarySyncBusy(false);
+    const lines = librarySyncSummary(outcome.result);
+    $("librarySyncMessage").textContent = lines.length ? uiT("sync.done") : uiT("sync.upToDate");
+    $("librarySyncSummary").hidden = !lines.length;
+    $("librarySyncSummary").innerHTML = lines.map(line => `<li>${escapeHtml(line)}</li>`).join("");
+    await renderLibrarySyncDialog();
+    announceLibraryFolders(lines.length ? [uiT("sync.done"), ...lines].join(" ") : uiT("sync.upToDate"));
+    $("librarySyncClose").focus();
+  } catch (error) {
+    librarySyncLastError = error?.code === "permission" ? "permission" : "failed";
+    renderLibrarySyncStatus(await librarySyncState().catch(() => null));
+    if (!interactive) return;
+    resetLibrarySyncDecisions();
+    setLibrarySyncBusy(false);
+    $("librarySyncMessage").textContent = "";
+    $("librarySyncError").textContent = librarySyncErrorText(error);
+    await loadSessions().catch(() => {});
+    await renderLibraryImportNotice();
+    await renderLibrarySyncDialog();
+    $("librarySyncClose").focus();
+  }
+}
+
+$("librarySync").addEventListener("click", event => openLibrarySyncDialog(event.currentTarget));
+
+$("librarySyncChoose").addEventListener("click", async () => {
+  $("librarySyncError").textContent = "";
+  let handle;
+  try {
+    handle = await globalThis.showDirectoryPicker({ id: "bc-process-studio-sync", mode: "readwrite" });
+  } catch (error) {
+    if (error?.name !== "AbortError") $("librarySyncError").textContent = librarySyncErrorText(error);
+    return;
+  }
+  try {
+    const { previous } = await librarySyncStored();
+    await librarySyncHandle("put", handle);
+    await saveLibrarySyncState(librarySync.connect(previous, handle.name));
+  } catch (error) {
+    $("librarySyncError").textContent = librarySyncErrorText(error);
+    return;
+  }
+  announceLibraryFolders(uiTf("sync.connected", { name: handle.name }));
+  await renderLibrarySyncDialog();
+  // The first synchronization starts right away; the picker's click allows the access.
+  finishLibrarySync(runLibrarySync({ interactive: true }), { interactive: true });
+});
+
+$("librarySyncForm").addEventListener("submit", event => {
+  event.preventDefault();
+  if (librarySyncRunning) return;
+  $("librarySyncError").textContent = "";
+  $("librarySyncSummary").hidden = true;
+  const decisions = librarySyncPrepared ? {
+    conflicts: $("librarySyncForm").querySelector("[name=librarySyncConflict]:checked")?.value || "later",
+    deleteHere: $("librarySyncRemove").checked } : null;
+  finishLibrarySync(runLibrarySync({ interactive: true, decisions }), { interactive: true });
+});
+
+$("librarySyncDisconnect").addEventListener("click", async () => {
+  try {
+    // The computer keeps its id; the folder and what was compared with it are forgotten.
+    const { previous } = await librarySyncStored();
+    await librarySyncHandle("delete");
+    await saveLibrarySyncState(librarySync.disconnect(previous));
+  } catch (error) {
+    $("librarySyncError").textContent = librarySyncErrorText(error);
+    return;
+  }
+  librarySyncLastError = "";
+  resetLibrarySyncDecisions();
+  renderLibrarySyncStatus(null);
+  $("librarySyncSummary").hidden = true;
+  $("librarySyncMessage").textContent = uiT("sync.disconnected");
+  await renderLibrarySyncDialog();
+  $("librarySyncChoose").focus();
+});
+
+$("librarySyncClose").addEventListener("click", () => $("librarySyncDialog").close());
+$("librarySyncDialog").addEventListener("cancel", event => {
+  if (librarySyncRunning) event.preventDefault();
+});
+$("librarySyncDialog").addEventListener("close", () => {
+  resetLibrarySyncDecisions();
+  (libraryTransferOpener?.isConnected && !libraryTransferOpener.hidden ? libraryTransferOpener
+    : $("librarySearch")).focus();
+});
+
+// When the library opens, a connected folder is synchronized if the browser still allows
+// access; conflicts and deletions wait for the user.
+async function startLibrarySync() {
+  if (!librarySyncSupported()) return;
+  let state = null;
+  try { state = await librarySyncState(); } catch { return; }
+  renderLibrarySyncStatus(state);
+  if (!state) return;
+  await finishLibrarySync(runLibrarySync({ interactive: false }), { interactive: false });
+}
 
 async function loadDocumentLibrary(sessions, bootstrap = {}) {
   // Folders saved by a later version are neither shown nor overwritten.
@@ -11220,7 +11603,7 @@ async function initializeDashboard() {
   try {
     await loadSessions(libraryRequest);
     sessionsLoaded = true;
-    renderLibraryImportNotice().catch(() => {});
+    renderLibraryImportNotice().catch(() => {}).then(() => startLibrarySync()).catch(() => {});
   } catch (error) {
     console.error("BC Process Studio loadSessions failed", error);
     show(

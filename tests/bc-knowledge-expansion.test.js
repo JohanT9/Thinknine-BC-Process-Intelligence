@@ -108,7 +108,7 @@ const sustainabilityPack=packs.find(p=>p.packId==='bc-sustainability');
 const sustainabilityRules=sustainabilityPack.rules.filter(r=>r.ruleId.startsWith('Sustainability.'));
 assert.equal(sustainabilityRules.length,4);
 for(const rule of sustainabilityRules){
-  assert.deepEqual(rule.verifiedRuntimeLocales,['Sustainability.CreateAccountCategory','Sustainability.CreateAccountSubcategory'].includes(rule.ruleId)?['en-US','sv-SE']:['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
+  assert.deepEqual(rule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
   assert.match(rule.localizedExplanations['sv-SE'],/journal|konto|underkategori|faktor/i);
   assert.ok(rule.sourceIds.includes('microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us'));
   assert.ok(rule.sourceIds.includes('microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se'));

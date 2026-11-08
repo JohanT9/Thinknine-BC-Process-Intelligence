@@ -6,7 +6,7 @@ const knowledge = require('../src/engine/knowledge-domain');
 
 const manual=pack.rules.find(r=>r.ruleId==='SubscriptionBilling.ManualContractLine');
 assert.ok(manual);
-assert.deepEqual(manual.verifiedRuntimeLocales,['en-US']);
+assert.deepEqual(manual.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 assert.match(manual.localizedExplanations['sv-SE'],/obligatoriska fält/);
 assert.match(manual.localizedExplanations['sv-SE'],/negativt antal/);
 for(const [page,field,locale] of [['Customer Subscription Contract','Type','en-US'],['Vendor Subscription Contract Card','Type','en-US']]){const result=knowledge.apply([{taskId:'manual-line',pageCaption:page,fieldCaption:field,language:locale}], [pack]).tasks[0];assert.equal(result.contextualExplanationRuleId,'SubscriptionBilling.ManualContractLine');}
