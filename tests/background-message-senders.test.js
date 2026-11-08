@@ -38,7 +38,7 @@ for (const type of PAGE_MESSAGE_TYPES) assert.ok(sent.has(type), `${type} is sti
 
 // What changes or reads the library, settings, licenses or files is refused from a page.
 for (const type of ["T9_DELETE_SESSION", "T9_SAVE_SETTINGS", "T9_DOWNLOAD_FILE", "T9_SAVE_DOCUMENT_LIBRARY",
-  "T9_SAVE_DOCUMENT_FOLDERS", "T9_SHARE_BUG_REPORT_WINDOWS", "T9_GET_SESSION_DATA", "T9_SAVE_REVIEW",
+  "T9_SAVE_DOCUMENT_FOLDERS", "T9_GET_SESSION_DATA", "T9_SAVE_REVIEW",
   "T9_START", "T9_STOP", "T9_LICENSE_CHECK", "T9_MICROSOFT_SIGN_IN", "T9_SAVE_TELEMETRY_CONFIGURATION"]) {
   assert.equal(messageAllowed({ type }, bcPage), false, `${type} refused from a page`);
   assert.equal(messageAllowed({ type }, { id: "studio", url: "chrome-extension://studio/dashboard.html" }), true,

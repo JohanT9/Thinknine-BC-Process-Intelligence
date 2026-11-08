@@ -1941,12 +1941,7 @@
     ,["Bifoga även tekniskt ZIP-paket", "Also attach technical ZIP package"]
     ,["PDF-rapporten har sparats.", "PDF report saved."]
     ,["Öppna felrapport i e-post", "Open bug report in email"]
-    ,["Windows-delning (kräver Windows-hjälpare)", "Windows sharing (requires Windows helper)"]
     ,["Ladda ned .eml-fil", "Download .eml file"]
-    ,["Välj Outlook i delningsdialogen. Supportadress och ämne kan behöva klistras in.",
-      "Choose Outlook in the share dialog. You may need to paste the support address and subject."]
-    ,["Windows-hjälparen är öppnad. Välj Dela bifogad rapport och sedan Outlook.",
-      "Windows helper is open. Choose Share attached report and then Outlook."]
     ,["Används när en felrapport skapas som adresserat e-postutkast.", "Used when a bug report is prepared as an addressed email draft."]
     ,["Visa avancerade dataskyddsinställningar", "Show advanced privacy settings"]
     ,["Dataskydd", "Privacy"]
@@ -2130,10 +2125,6 @@
     ,["Ingen aktiv inspelning finns.", "There is no active recording."]
     ,["Kunde inte öppna inspelningsdialogen. Öppna tillägget för att stoppa inspelningen.", "The recording dialog could not be opened. Open the extension to stop the recording."]
     ,["För många skärmbilder begärdes samtidigt.", "Too many screenshots were requested at the same time."]
-    ,["Windows-delning får bara startas från felrapportvyn.", "Windows sharing can only be started from the bug report view."]
-    ,["Felrapporten är ogiltig eller för stor för Windows-delning (max 24 MB).", "The bug report is invalid or too large for Windows sharing (max. 24 MB)."]
-    ,["Windows-hjälparen svarade inte. Ingen rapport har skickats.", "The Windows helper did not respond. No report has been sent."]
-    ,["Windows-delning kunde inte startas.", "Windows sharing could not be started."]
     ,["Supportadressen är inte en giltig e-postadress.", "The support address is not a valid email address."]
     ,["Konsultinloggning är inte konfigurerad ännu.", "Consultant sign-in is not configured yet."]
     ,["Entra-inloggningen kunde inte verifieras.", "The Entra sign-in could not be verified."]

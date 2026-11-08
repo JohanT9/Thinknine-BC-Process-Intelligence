@@ -385,8 +385,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .document-library{margin:0 0 var(--space24)}
 .library-continue{margin-top:var(--space20)}
 .library-continue h3,.library-heading h3{margin:0 0 var(--space8);font-size:var(--fontSizeSubtitle)}
-.library-heading{margin-top:var(--space24);display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--space8)}
-.library-heading h3{margin-right:auto!important}
+/* The heading row keeps its actions apart from the search row below it. */
+.library-heading{margin:var(--space24) 0 var(--space16);display:flex;flex-wrap:wrap;align-items:center;gap:var(--space8) var(--space12)}
+.library-heading h3{margin:0 auto 0 0!important}
 .library-transfer-actions{display:flex;flex-wrap:wrap;gap:var(--space8)}
 .library-transfer-actions button{margin:0}
 .library-sync-status{align-self:center;color:var(--colorTextSecondary);font-size:13px;overflow-wrap:anywhere}
