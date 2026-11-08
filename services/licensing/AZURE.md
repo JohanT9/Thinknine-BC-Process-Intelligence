@@ -129,8 +129,9 @@ origins (`chrome-extension://`, `edge-extension://`, and Edge's `extension://`)
 with a valid 32-character extension ID; it allows only POST, OPTIONS,
 Authorization and Content-Type. Admin routes do not enable CORS. Key
 comparisons use a fixed-length SHA-256 timing-safe compare.
-Admin traffic has separate in-memory rate limiting. Proxy-level limits are still
-needed, especially when several clients share the proxy socket address.
+Admin traffic has separate in-memory rate limiting. On App Service both limits
+count per caller, by the last `X-Forwarded-For` entry the platform appends.
+Proxy-level limits are still useful, and the in-memory counts are per instance.
 
 The interface can add/name/delete tenants, set UTC expiration, enable/disable
 licenses, show trial contact addresses, and show the latest 500 registration

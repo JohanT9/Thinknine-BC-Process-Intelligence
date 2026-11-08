@@ -104,7 +104,10 @@
         unreadable += 1;
         continue;
       }
-      if (!value || value.format !== FORMAT || value.deviceId !== match[1]) { unreadable += 1; continue; }
+      if (!value || value.format !== FORMAT) { unreadable += 1; continue; }
+      // A copy a synchronizing service made under another name (device-…-LAPTOP.json) is not
+      // that computer's manifest.
+      if (value.deviceId !== match[1]) continue;
       if (!Number.isInteger(value.formatVersion) || value.formatVersion > FORMAT_VERSION) {
         throw syncError("newerVersion");
       }
@@ -217,7 +220,9 @@
   //   conflict      changed both here and elsewhere (the user decides)
   //   busy          being recorded now; left as it is
   //   waiting       its file has not arrived in the folder yet
-  async function prepare({ dir, storage, keys, records, state, tree, activeId = "" }) {
+  // activeIds: documents being recorded or edited now; they are left as they are.
+  async function prepare({ dir, storage, keys, records, state, tree, activeId = "", activeIds = [] }) {
+    const active = new Set([activeId, ...activeIds].filter(Boolean));
     const { manifests, unreadable } = await readManifests(dir);
     const others = manifests.filter(manifest => manifest.deviceId !== state.deviceId);
     // What this computer last saved in the folder takes part as well: when it is the newest,
@@ -234,6 +239,10 @@
     const tombstones = plain(state.deleted);
     const ids = [...new Set([...local.keys(), ...Object.keys(base), ...remote.keys()])]
       .filter(transfer.validId);
+    // A document that is stored here but missing from the records given is not deleted here:
+    // the records are out of date. It is left as it is rather than deleted on every computer.
+    const unlisted = await transfer.localDigests(storage, keys,
+      ids.filter(id => !local.has(id) && (base[id] || remote.has(id))));
     const items = [];
     for (const id of ids) {
       const mine = local.get(id);
@@ -246,9 +255,11 @@
       const changedThere = theirs ? (was ? remoteVersion !== was.remote : remoteVersion !== DELETED) : false;
       const title = String(mine?.record?.title || theirs?.title || id);
       const item = { id, title, local: mine || null, remote: theirs, action: "same" };
-      if (id === activeId) item.action = "busy";
+      if (active.has(id) || unlisted.has(id)) item.action = "busy";
       else if (!changedHere && !changedThere) {
-        item.action = mine && !published[id] ? "push" : "same";
+        // Saved again when it is not in the folder: never saved, or its file was removed there.
+        item.action = mine && (!published[id] || published[id].version === mine.version &&
+          !files.has(published[id].file)) ? "push" : "same";
       } else if (changedHere && !changedThere) {
         item.action = mine ? "push" : "deleteThere";
       } else if (!changedHere && changedThere) {
@@ -364,6 +375,17 @@
 
     // 2. Documents fetched or removed here, and the folders, are written like an import.
     const recordById = new Map(records.map(record => [record.projectId || record.sessionId, record]));
+    // A document changed here since it was compared (in another tab, say) is not replaced or
+    // removed; it is compared again next time.
+    if (pulls.length || removeHere.length) {
+      const current = await transfer.localDigests(storage, keys, [...pulls, ...removeHere].map(item => item.id));
+      const unchanged = item => (current.get(item.id)?.digest || "") === (item.local?.digest || "");
+      for (const list of [pulls, removeHere]) {
+        const kept = list.filter(unchanged);
+        changedDuring += list.length - kept.length;
+        list.splice(0, list.length, ...kept);
+      }
+    }
     const removedIds = new Set(removeHere.map(item => item.id));
     const fetched = pulls.map(item => ({ id: item.id, digest: item.incoming.digest,
       status: recordById.has(item.id) ? "different" : "new", localRecord: recordById.get(item.id) || null,
@@ -454,6 +476,9 @@
     next.publishedFolders = folders;
     next.foldersChangedAt = foldersChangedAt;
     next.lastSyncAt = now;
+    // When this computer first saw each file no manifest refers to.
+    next.unreferenced = unreferencedSince([...prepared.others, manifest], prepared.files,
+      plain(state.unreferenced), now);
     const result = { pushed: pushed.length, pulled: fetched.length, removedHere: removeHere.length,
       removedThere: removeThere.length, conflictsLeft: left.conflict, deletionsLeft: left.deleteHere,
       deferred: left.deferred,
@@ -469,16 +494,30 @@
     // 6. Files no manifest refers to any more.
     // A manifest that could not be read may name files too, so nothing is removed then.
     if (!prepared.unreadable) {
-      await removeUnreferenced(dir, [...prepared.others, manifest], prepared.files, Date.parse(now)).catch(() => {});
+      await removeUnreferenced(dir, prepared.files, next.unreferenced, Date.parse(now)).catch(() => {});
     }
     return { ...result, state: next };
   }
 
-  async function removeUnreferenced(dir, manifests, files, nowMs) {
+  function unreferencedSince(manifests, files, seen, now) {
     const referenced = new Set(manifests.flatMap(manifest => Object.values(manifest.documents || {})
       .map(entry => entry?.file)));
-    for (const [path, file] of files) {
-      if (referenced.has(path) || !(nowMs - Number(file.lastModified || nowMs) > UNREFERENCED_AGE_MS)) continue;
+    const since = {};
+    for (const path of files.keys()) {
+      if (!referenced.has(path)) since[path] = typeof seen[path] === "string" && seen[path] <= now ? seen[path] : now;
+    }
+    return since;
+  }
+
+  // A file is removed when no manifest has referred to it for as long as this computer has
+  // looked, at least UNREFERENCED_AGE_MS, and it was not written recently either. Its own
+  // modification time alone is not enough: a service may deliver an old file long after it
+  // was written, before the manifest that names it.
+  async function removeUnreferenced(dir, files, since, nowMs) {
+    for (const [path, first] of Object.entries(since)) {
+      const file = files.get(path);
+      if (!file || !(nowMs - Date.parse(first) > UNREFERENCED_AGE_MS) ||
+        !(nowMs - Number(file.lastModified || nowMs) > UNREFERENCED_AGE_MS)) continue;
       await dir.remove(path).catch(() => {});
     }
   }

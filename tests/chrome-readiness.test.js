@@ -27,4 +27,14 @@ const packageJson = JSON.parse(fs.readFileSync(
 assert.strictEqual(manifest.version, packageJson.version);
 assert(!manifest.description.includes("Edge-only"));
 assert(packageJson.description.includes("Business Process Intelligence"));
+// Optional host access is only what the extension asks for: Microsoft Graph for Outlook.
+const requested = new Set();
+for (const file of fs.readdirSync(path.join(root, "src/ui")).filter(name => name.endsWith(".js"))) {
+  const text = fs.readFileSync(path.join(root, "src/ui", file), "utf8");
+  for (const match of text.matchAll(/permissions\.request\(\{\s*origins:\s*\[([^\]]*)\]/g)) {
+    for (const origin of match[1].matchAll(/"([^"]+)"/g)) requested.add(origin[1]);
+  }
+}
+assert.deepStrictEqual([...requested].sort(), ["https://graph.microsoft.com/*"]);
+assert.deepStrictEqual(manifest.optional_host_permissions, [...requested].sort());
 console.log("Chrome static readiness checks passed; manual product verification remains required.");

@@ -22,6 +22,13 @@ function createDocumentUsage({ dataDirectory, storage, now = Date.now }) {
       : { updated: { ...current, [key]: { ...value, entraTenantId: identity.tid,
         objectId: identity.oid, name: identity.name || "", email: identity.preferredUsername || "" } },
         value: { accepted: true, duplicate: false } };
+    // Each document is its own row: it is created once, without reading the other rows, so a
+    // record stays fast however many documents have been counted.
+    if (storage?.createOnce) {
+      const { updated } = mutate({});
+      return storage.createOnce("documentUsage", key, updated[key])
+        .then(created => ({ accepted: true, duplicate: !created }));
+    }
     if (storage) return storage.mutateMap("documentUsage", mutate);
     const pending = writes.then(async () => {
       const result = mutate(await read());

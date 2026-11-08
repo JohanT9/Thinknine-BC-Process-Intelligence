@@ -77,6 +77,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
   consultants, mutateConsultants, tenantUsers, mutateTenantUsers, registrations = null, now, adminKey = "",
   usageSummary = async () => [], notificationConfigured = false, auditEvents = async () => [], recordAudit = async () => {},
   sendTestNotification = async () => ({ sent: false, configured: false }),
+  clientAddress = request => request.socket.remoteAddress,
   validateAdminEntra = null, entraClientId = "", entraScope = "", entraAdminRole = "License.Administrator" }) {
   if (adminKey && !/^[0-9a-f]{64}$/i.test(adminKey)) {
     throw new Error("LICENSE_ADMIN_KEY must be a random 64-character hexadecimal key.");
@@ -155,7 +156,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       if (!keyHash && !(entraClientId && entraScope && validateAdminEntra)) {
         return reply(503, { error: "admin-not-configured" });
       }
-      if (limited(request.socket.remoteAddress)) return reply(429, { error: "rate-limit" });
+      if (limited(clientAddress(request))) return reply(429, { error: "rate-limit" });
       const authorization = request.headers.authorization || "";
       const supplied = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
       let adminActor = "";

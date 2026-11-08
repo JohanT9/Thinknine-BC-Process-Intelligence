@@ -100,10 +100,11 @@ function computer(name) {
     async connect(dir) { self.state = sync.connect(self.state, dir.name, at()); },
     async prepare(dir) {
       return sync.prepare({ dir, storage: self.area, keys, records: self.records, state: self.state,
-        tree: self.tree, activeId: self.activeId });
+        tree: self.tree, activeId: self.activeId, activeIds: self.activeIds || [] });
     },
     async sync(dir, decisions = {}) {
       const prepared = await self.prepare(dir);
+      if (self.beforeCommit) await self.beforeCommit();
       const result = await sync.commit({ prepared, dir, storage: self.area, keys, records: self.records,
         tree: self.tree, state: self.state, decisions, now: at(), appVersion: "4.7.238",
         normalize: library.normalize,
@@ -350,9 +351,21 @@ function computer(name) {
   assert.equal(run.result.unreadable, 1);
   assert.equal(dir.files.has(stale), true, "kept while a manifest is unreadable");
   dir.files.delete("devices/device-halfway.json");
+  // An old file seen for the first time is kept: a service may deliver it before the manifest
+  // that names it.
+  await a.sync(dir);
+  assert.equal(dir.files.has(stale), true, "kept when first seen, however old the file is");
+  assert.ok(a.state.unreferenced[stale], "the time it was first seen is kept");
+  const firstSeen = a.state.unreferenced[stale];
+  await a.sync(dir);
+  assert.equal(a.state.unreferenced[stale], firstSeen, "first seen stays the first time");
+  // Once no manifest has named it for seven days it is removed; a recently written file is not.
+  for (const path of [stale, fresh]) a.state.unreferenced[path] = "2026-10-30T00:00:00.000Z";
   await a.sync(dir);
   assert.equal(dir.files.has(stale), false);
   assert.equal(dir.files.has(fresh), true);
+  await a.sync(dir);
+  assert.equal(a.state.unreferenced[stale], undefined, "forgotten once the file is gone");
   const referenced = new Set([...dir.files].filter(([key]) => key.startsWith("devices/"))
     .flatMap(([, value]) => Object.values(JSON.parse(value.text).documents).map(entry => entry.file)));
   for (const file of referenced) assert.ok(dir.files.has(file), `${file} is still there`);
@@ -438,6 +451,53 @@ function computer(name) {
   assert.equal(folderModel.find(g.tree, "folder-h"), null, "the folder the sync added goes");
   assert.equal(folderModel.find(g.tree, "folder-q4").name, "Q4", "a folder made after the sync stays");
   assert.equal(folderModel.find(g.tree, "folder-shared").name, "Delad 2026", "a rename after the sync stays");
+
+  // Holes closed after the first release.
+  const k = computer("K");
+  const l = computer("L");
+  const holes = folder();
+  k.add("d8");
+  k.add("d9");
+  await k.connect(holes);
+  await l.connect(holes);
+  await k.sync(holes);
+  await l.sync(holes);
+  // A copy a synchronizing service made of a manifest is ignored, not unreadable.
+  const original = holes.files.get(`devices/${k.state.deviceId}.json`);
+  holes.files.set(`devices/${k.state.deviceId}-LAPTOP.json`, { ...original });
+  prepared = await l.prepare(holes);
+  assert.equal(prepared.unreadable, 0, "a renamed copy is not an unreadable manifest");
+  holes.files.delete(`devices/${k.state.deviceId}-LAPTOP.json`);
+  // A document stored here but missing from out-of-date records is not deleted everywhere.
+  const listed = l.records;
+  l.records = l.records.filter(record => record.projectId !== "d8");
+  prepared = await l.prepare(holes);
+  assert.equal(prepared.items.find(item => item.id === "d8").action, "busy");
+  assert.equal(prepared.counts.deleteThere, 0);
+  l.records = listed;
+  // A document open for review here is left as it is.
+  await k.edit("d9", "k1");
+  await k.sync(holes);
+  l.activeIds = ["d9"];
+  prepared = await l.prepare(holes);
+  assert.equal(prepared.items.find(item => item.id === "d9").action, "busy");
+  l.activeIds = [];
+  // A document changed here after it was compared is neither replaced nor removed.
+  l.beforeCommit = () => l.edit("d9", "l-during");
+  run = await l.sync(holes);
+  l.beforeCommit = null;
+  assert.deepEqual([run.result.pulled, run.result.changedDuring], [0, 1]);
+  assert.equal(l.entries("d9")["t9_review_d9"].tasks[0].title, "Steg l-during", "the edit is kept");
+  prepared = await l.prepare(holes);
+  assert.equal(prepared.items.find(item => item.id === "d9").action, "conflict", "compared again next time");
+  // A file of this computer's that was removed from the folder is saved again.
+  const ownFile = k.state.published.d8.file;
+  holes.files.delete(ownFile);
+  run = await k.sync(holes);
+  assert.equal(run.result.pushed, 1);
+  assert.ok(holes.files.has(ownFile), "written again");
+  run = await k.sync(holes);
+  assert.equal(run.result.pushed, 0, "and then left alone");
 
   // The dashboard is wired to the module and has its texts in every language.
   const root = path.join(__dirname, "..");

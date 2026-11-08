@@ -1909,7 +1909,26 @@ chrome.runtime.onStartup.addListener(async () => {
   await registerRecorderContentScript();
 });
 
+// What the capture scripts in Business Central pages send. Every other message changes or
+// reads the library, settings, licenses or files and is taken only from the extension's own
+// pages, so a script running in a web page cannot delete recordings, change settings, start
+// downloads or reach the Windows helper.
+const PAGE_MESSAGE_TYPES = new Set(["T9_PING", "T9_GET_STATE", "T9_REQUEST_STOP_DIALOG",
+  "T9_CAPTURE_GUIDANCE", "T9_CAPTURE_DIAGNOSTIC", "T9_RECORD_EVENT", "T9_CAPTURE_BC_ERROR",
+  "T9_CAPTURE_BEFORE_ACTION"]);
+function extensionPageSender(sender) {
+  return sender?.id === chrome.runtime.id &&
+    String(sender.url || "").startsWith(chrome.runtime.getURL(""));
+}
+function messageAllowed(message, sender) {
+  return extensionPageSender(sender) || PAGE_MESSAGE_TYPES.has(message?.type);
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!messageAllowed(message, sender)) {
+    sendResponse({ ok: false, error: "not-allowed" });
+    return false;
+  }
   (async () => {
     switch (message.type) {
       case "T9_PING": {

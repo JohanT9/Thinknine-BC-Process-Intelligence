@@ -185,11 +185,16 @@ the folder handle, asks for permission and shows the result.
   `documents/<sha256(id)>/<version>.bcps` in the export file format and are never
   overwritten: a new version is a new file. A version is a SHA-256 of the
   document's entry digest and its library record, so the same content gives the
-  same version on every computer. Files that are not named like a manifest are
-  ignored; a manifest that cannot be read (a copy a service is still writing,
-  for example) is counted as unreadable. A file no manifest names is removed
-  once it is older than seven days, but not while any manifest is unreadable,
-  since it may name the file.
+  same version on every computer. Files that are not named like a manifest, and
+  copies a service makes of a manifest under another name
+  (`device-…-LAPTOP.json`), are ignored; a manifest that cannot be read (one a
+  service is still writing, for example) is counted as unreadable. A file no
+  manifest names is removed when this computer has seen it unnamed for seven
+  days and it was written more than seven days ago, but not while any manifest
+  is unreadable, since it may name the file. The file's own time is not enough:
+  a service may deliver an old file before the manifest that names it. When a
+  file of this computer's is missing from the folder, the next sync writes it
+  again.
 - **Comparing.** Each computer keeps, per document, the version it had and the
   version the folder had at its last sync (`t9_library_sync_state`). The folder's
   version is the newest entry by change time across all manifests, including
@@ -198,8 +203,13 @@ the folder handle, asks for permission and shows the result.
   differently on both, or changed on one and deleted on the other: a conflict.
   Deleted elsewhere: removed here only when the user lets it. A file named in a
   manifest that has not arrived, cannot be read or does not hold the listed
-  version is waiting and is fetched on a later sync. The document being
-  recorded is left as it is. Folders are merged per folder: a rename or new
+  version is waiting and is fetched on a later sync. The library is read again
+  from storage before it is compared, since another tab may have changed it. The
+  document being recorded, the one open for review in this tab and a document
+  stored here but missing from the library list are left as they are, so that an
+  out-of-date list never deletes a document on the other computers. A document
+  changed here between comparing and writing (in another tab, say) is neither
+  replaced nor removed; it is compared again on the next sync. Folders are merged per folder: a rename or new
   folder on either computer survives; a folder changed on both keeps this
   computer's. The newest folder list decides which folders there are, and a
   folder another computer changed after that list was made counts with its

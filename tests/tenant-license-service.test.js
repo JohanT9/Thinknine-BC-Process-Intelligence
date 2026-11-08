@@ -15,6 +15,7 @@ async function main() {
   } }));
   const server = await createService({ dataDirectory: directory, now: () => timestamp,
     entraValidator: async authorization => {
+      if (authorization === "Bearer broken") throw new Error("table https://secret.table.core.windows.net failed");
       if (authorization !== "Bearer signed-in") {
         const error = new Error("unauthorized"); error.status = 401; throw error;
       }
@@ -52,6 +53,17 @@ async function main() {
       body: JSON.stringify(value) });
     assert.equal(userRegistration.status, 200);
     assert.equal((await userRegistration.json()).email, "user@example.com");
+    // An unexpected failure is not described to the caller.
+    const errorLog = console.error;
+    console.error = () => {};
+    let broken;
+    try {
+      broken = await fetch(userEndpoint, { method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer broken" },
+        body: JSON.stringify(value) });
+    } finally { console.error = errorLog; }
+    assert.equal(broken.status, 503);
+    assert.deepEqual(await broken.json(), { error: "service-unavailable" });
     const tenantUsers = JSON.parse(await fs.readFile(path.join(directory, "tenant-users.json"), "utf8"));
     const registeredUser = Object.values(tenantUsers)[0];
     assert.equal(registeredUser.tenantId, tenant);
