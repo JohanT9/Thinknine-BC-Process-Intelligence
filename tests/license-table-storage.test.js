@@ -58,6 +58,21 @@ async function main() {
     usage.record(identity, { ...document, kind: "bug-report" })]);
   assert.deepEqual((await usage.summary())[0].periods.all, { documents: 2, reports: 1 });
   assert.equal(Object.keys(await storage.readMap("documentUsage")).length, 3);
+  // Recording a document writes one row and does not read the table, however large it is.
+  const usageRows = tables.get(TABLES.documentUsage);
+  const list = FakeTableClient.prototype.listEntities;
+  let usageListed = 0;
+  FakeTableClient.prototype.listEntities = function (...args) {
+    if (this.table === usageRows) usageListed += 1;
+    return list.apply(this, args);
+  };
+  try {
+    assert.deepEqual(await usage.record(identity, { ...document, documentId: "c".repeat(64) }),
+      { accepted: true, duplicate: false });
+    assert.deepEqual(await usage.record(identity, { ...document, documentId: "c".repeat(64) }),
+      { accepted: true, duplicate: true });
+    assert.equal(usageListed, 0, "the usage table is not listed to record a document");
+  } finally { FakeTableClient.prototype.listEntities = list; }
   console.log("License Azure Table Storage and concurrent document usage tests passed.");
 }
 

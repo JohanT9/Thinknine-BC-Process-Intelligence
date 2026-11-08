@@ -1,3 +1,10 @@
+## 4.7.239
+- Security: the extension can ask only for access to Microsoft Graph (for Outlook) beyond its fixed sites; the broad optional access to every HTTPS site, left from the removed AI analysis, is gone.
+- Knowledge MCP host for Windows: only the methods the extension uses are passed to the knowledge server (initialize, tools/list, tools/call for the two read-only tools, ping), one request at a time; anything else is answered with an error without reaching the server.
+- Security: the background worker takes from Business Central pages only the messages its capture scripts send. Deleting recordings, changing settings, downloads, the Windows helper and every other operation are accepted only from the extension's own pages.
+- License service: a new Microsoft Entra signing key is accepted as soon as Microsoft starts using it instead of after up to six hours. Unexpected failures answer service-unavailable without internal error text. On Azure App Service the request limits count per caller instead of per platform front end. Document usage is recorded with one write per document, so recording stays fast as the statistics grow.
+- Document library sync: an out-of-date library list in one tab can no longer delete a document on the other computers; the library is read again before every sync, and a document stored here but missing from the list, or open for review, is left as it is. A document changed here while a sync runs is not replaced or removed. A file no manifest names is removed only after this computer has seen it unnamed for seven days, since a service may deliver an old file before its manifest, and a missing file of this computer's is written again. Copies a sync service makes of a manifest no longer stop the cleanup, and the automatic sync no longer reports a failure when another tab is already syncing.
+
 ## 4.7.238
 - Document library: Sync… keeps the library alike on several computers through a folder that is already synced between them, for example an empty folder in OneDrive. Choose the folder once on each computer; the library then saves what changed here in the folder and fetches what changed on the other computers, when it opens and when you choose Sync now. A document changed on two computers is a conflict: decide later (the default), keep this computer's version or use the other computer's. A document deleted on another computer is removed here only when you let it. A sync that fetched or removed documents can be undone like an import. The extension sends nothing itself; the files, which can contain customer data from Business Central, are moved by the service that syncs the folder.
 - Knowledge catalog: actions the Business Central web client provides itself (New, OK, Yes, Delete, Edit, Back, Open record) are recognized in all eight languages, with captions from the client's own language resources (version 26.18) rather than translations; French New is Créer, for example. 178 more captions from Business Central 28.1 were added, and seven more rules now have a test case in every language. Captions not found in Business Central 28.1 are listed as gaps in docs/KNOWLEDGE_LOCALE_COVERAGE.md.
@@ -1927,7 +1934,7 @@
 - Kept automatic capture as the default and added safe feedback when no step or
   screenshot is available to mark.
 
-## Unreleased
+## 4.7.239
 
 - Redesigned SVG process-map exports with a presentation-ready title area,
   rounded responsibility lanes, numbered cards, stronger connectors, subtle
@@ -2622,7 +2629,7 @@
 - Preserved stable package names, extension identity, storage keys, namespaces, schema versions and the legacy `thinknine` theme ID for compatibility.
 - Positioned BC Process Maps and broad BC Process AI capabilities as future areas rather than available functionality.
 
-## Unreleased
+## 4.7.239
 
 - Recording starts immediately; the process or Bug Report is now named in an accessible dialog when Stop is selected.
 - Added first-class Process Documentation and Bug Reporting start modes.

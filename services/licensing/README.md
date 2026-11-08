@@ -63,10 +63,20 @@ installation ID is observational only and never grants or consumes a license.
 - Use one service process with this file-based store. For multiple replicas or
   many installations use a database with a unique installation/tenant key.
 - Set registry/log file permissions, backups and a retention/deletion policy.
-- Configure gateway rate limits and request size/time limits. This prototype
-  uses in-memory rate limiting by socket address and ignores forwarded headers;
-  behind a proxy all callers may share that address. Do not trust arbitrary
-  client-supplied forwarded addresses.
+- Configure gateway rate limits and request size/time limits. The service
+  limits requests in memory per caller address. On Azure App Service
+  (`WEBSITE_SITE_NAME` set) that address is the last `X-Forwarded-For` entry,
+  the one the platform's front end appends, so callers do not share the front
+  end's socket address and cannot choose their own. Elsewhere forwarded headers
+  are ignored and the socket address is used; behind another proxy all callers
+  may share that address.
+- Unexpected failures answer `503 service-unavailable` and are logged on the
+  server; internal error text is not returned to the caller.
+- Microsoft Entra signing keys are cached for six hours. A token signed with a
+  key that is not in the cache fetches the keys again, at most once every five
+  minutes, so a key rotation is accepted at once.
+- Document usage is stored one row per document in Azure Table Storage and
+  written with a single create, so recording does not read the table.
 - Publish the data registration notice before activating the extension.
 - Decide the recipient and notification provider before implementing email.
 - Complete active-recording tenant-switch checks in the extension.

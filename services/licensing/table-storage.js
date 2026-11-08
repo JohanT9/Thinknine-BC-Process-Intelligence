@@ -75,6 +75,18 @@ async function createTableStorage({ accountUrl, managedIdentityClientId = "",
       } catch (error) { if (!conflict(error) || attempt === 4) throw error; }
     }
   }
+  // Writes one entity unless it exists; false when it already did. One request, whatever the
+  // size of the table.
+  async function createOnce(name, key, value) {
+    try {
+      await clients.get(name).createEntity({ partitionKey: PARTITION, rowKey: escapeKey(key),
+        json: JSON.stringify(value) });
+      return true;
+    } catch (error) {
+      if (error?.statusCode === 409) return false;
+      throw error;
+    }
+  }
   async function append(name, value) {
     const timestamp = Date.parse(value.occurredAt || value.registeredAt) || Date.now();
     const reverse = String(9999999999999 - timestamp).padStart(13, "0");
@@ -109,7 +121,7 @@ async function createTableStorage({ accountUrl, managedIdentityClientId = "",
     }
     return { count: values.length, checksum: checksum(ordered(values)) };
   }
-  return Object.freeze({ readMap, mutateMap, append, readList, importMap, importList,
+  return Object.freeze({ readMap, mutateMap, createOnce, append, readList, importMap, importList,
     tables: TABLES, mode: "table" });
 }
 

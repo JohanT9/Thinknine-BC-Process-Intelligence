@@ -27,6 +27,25 @@ function email(value) {
 function validTrialRequest(v) {
   return validRequest(v);
 }
+// The address a request comes from. Behind Azure App Service every request arrives from the
+// platform's front end, which appends the caller's address (with its port) to
+// X-Forwarded-For; the last entry is the one it added, so a caller cannot choose it.
+function clientAddress(request, trustProxy) {
+  if (trustProxy) {
+    const last = String(request.headers["x-forwarded-for"] || "").split(",").pop().trim();
+    const bracketed = /^\[([^\]]+)\](?::\d+)?$/.exec(last);
+    if (bracketed) return bracketed[1];
+    if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(last)) return last.replace(/:\d+$/, "");
+    if (last) return last;
+  }
+  return request.socket.remoteAddress;
+}
+// A known refusal keeps its code; anything else is logged here and not shown to the caller.
+function failure(error) {
+  if (Number.isInteger(error?.status)) return { status: error.status, body: { error: error.message } };
+  console.error("License request failed:", error?.message || error);
+  return { status: 503, body: { error: "service-unavailable" } };
+}
 function validConsultantRegistration(v) {
   return exact(v, ["installationId", "version"]) && GUID.test(v.installationId) &&
     typeof v.version === "string" && /^\d+\.\d+\.\d+$/.test(v.version);
@@ -39,7 +58,8 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   notificationWebhookUrl = "", notificationWebhookToken = "",
   notificationRecipient = "", notifier = null, tableAccountUrl = "",
   managedIdentityClientId = "", migrateFromFiles = false, backupEnabled = false, adminUrl = "",
-  backupContainer = "license-backups", backupCredential = null, backupFetcher = null }) {
+  backupContainer = "license-backups", backupCredential = null, backupFetcher = null,
+  trustProxy = false }) {
   await fs.mkdir(dataDirectory, { recursive: true, mode: 0o700 });
   const registryFile = path.join(dataDirectory, "tenants.json");
   const claimsFile = path.join(dataDirectory, "trial-claims.json");
@@ -345,6 +365,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     deleteTrialClaim, claims, restoreTrialClaim, deletedLicenses, mutateDeletedLicenses, now, adminKey,
     backup, notificationConfigured: notifications.configured,
     auditEvents: audit.read, recordAudit, usageSummary: usage.summary,
+    clientAddress: request => clientAddress(request, trustProxy),
     validateAdminEntra, entraClientId: entraClientId || entraAudience.replace(/^api:\/\//, ""),
     entraScope: entraAudience ? `${entraAudience.startsWith("api://") ? entraAudience : `api://${entraAudience}`}/${entraScope}` : "",
     entraAdminRole,
@@ -386,7 +407,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     }
     if (!apiRoutes.includes(request.url)) return reply(404, { error: "not-found" });
     if (request.method !== "POST") return reply(405, { error: "method-not-allowed" });
-    if (throttled(request.socket.remoteAddress)) return reply(429, { error: "rate-limit" });
+    if (throttled(clientAddress(request, trustProxy))) return reply(429, { error: "rate-limit" });
     if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") return reply(415, { error: "json-required" });
     try {
       let body = "", size = 0;
@@ -406,14 +427,14 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
             user.entraTenantId === identity.tid && user.objectId === identity.oid && active(tenants[user.tenantId]));
           if (!active(consultant) && !registered) return reply(403, { error: "license-inactive" });
           return reply(200, await usage.record(identity, value));
-        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+        } catch (error) { const { status, body } = failure(error); return reply(status, body); }
       }
       if (request.url === "/v1/license/user/register") {
         if (!validRequest(value)) return reply(400, { error: "invalid-request" });
         try {
           const identity = await validateEntra(request.headers.authorization || "");
           return reply(200, await registerTenantUserIdentity(value, identity));
-        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+        } catch (error) { const { status, body } = failure(error); return reply(status, body); }
       }
       if (request.url === "/v1/license/consultant/register") {
         if (!validConsultantRegistration(value)) return reply(400, { error: "invalid-request" });
@@ -447,7 +468,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
           const allowed = Boolean(entry.enabled && Date.parse(entry.expiresAt) > now());
           return reply(200, { allowed, status: allowed ? "active" : entry.enabled ? "expired" : "pending",
             expiresAt: entry.expiresAt, licenseType: "consultant", consultantName: entry.name });
-        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+        } catch (error) { const { status, body } = failure(error); return reply(status, body); }
       }
       if (request.url === "/v1/license/consultant/check") {
         if (!validRequest(value)) return reply(400, { error: "invalid-request" });
@@ -464,7 +485,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
             expiresAt: entry?.expiresAt || new Date(now() + 60000).toISOString(),
             licenseType: "consultant", consultantName: entry?.name || identity.name,
             targetTenantId: value.tenantId });
-        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+        } catch (error) { const { status, body } = failure(error); return reply(status, body); }
       }
       if (request.url.endsWith("/trial")) {
         if (!validTrialRequest(value)) return reply(400, { error: "invalid-request" });
@@ -544,12 +565,13 @@ if (require.main === module) {
     migrateFromFiles: process.env.LICENSE_STORAGE_MIGRATE_FROM_FILES === "true",
     backupEnabled: process.env.LICENSE_BACKUP_ENABLED === "true",
     adminUrl: process.env.WEBSITE_HOSTNAME ? `https://${process.env.WEBSITE_HOSTNAME}/admin#licenser` : "",
-    backupContainer: process.env.LICENSE_BACKUP_CONTAINER || "license-backups" }).then(server => {
+    backupContainer: process.env.LICENSE_BACKUP_CONTAINER || "license-backups",
+    trustProxy: Boolean(process.env.WEBSITE_SITE_NAME) }).then(server => {
     const cloud = Boolean(process.env.WEBSITE_SITE_NAME);
     server.listen(Number(process.env.PORT || process.env.LICENSE_PORT) || 8787,
       cloud ? "0.0.0.0" : "127.0.0.1", () => console.log("License service started (HTTPS provided by deployment gateway)."));
     server.on("close", startKeepWarm({ url: keepWarmUrl(process.env) }));
   }).catch(error => { console.error(error.message); process.exitCode = 1; });
 }
-module.exports = { createService, validRequest, validTrialRequest,
+module.exports = { createService, clientAddress, validRequest, validTrialRequest,
   validConsultantRegistration, startKeepWarm, keepWarmUrl };

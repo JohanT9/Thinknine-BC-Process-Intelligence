@@ -10,6 +10,10 @@ internal static class Program
         "bc_process_resolve_object",
         "bc_process_resolve_action"
     };
+    private static readonly HashSet<string> AllowedMethods = new(StringComparer.Ordinal)
+    {
+        "initialize", "notifications/initialized", "tools/list", "tools/call", "ping"
+    };
 
     private static async Task<int> Main()
     {
@@ -103,9 +107,22 @@ internal static class Program
             using (message)
             {
                 var root = message.RootElement;
-                if (root.TryGetProperty("method", out var method) && method.GetString() == "tools/call" &&
+                // One request object at a time (no batches), using only the methods the
+                // extension's client sends, so nothing else the server offers is reachable.
+                if (root.ValueKind != JsonValueKind.Object) return;
+                var method = root.TryGetProperty("method", out var methodValue) &&
+                    methodValue.ValueKind == JsonValueKind.String ? methodValue.GetString() : null;
+                if (method is null || !AllowedMethods.Contains(method))
+                {
+                    await WriteErrorAsync(Console.OpenStandardOutput(), root, -32601,
+                        "Only the read-only BC Process Studio knowledge methods are allowed.");
+                    continue;
+                }
+                if (method == "tools/call" &&
                     (!root.TryGetProperty("params", out var parameters) ||
+                     parameters.ValueKind != JsonValueKind.Object ||
                      !parameters.TryGetProperty("name", out var name) ||
+                     name.ValueKind != JsonValueKind.String ||
                      !AllowedTools.Contains(name.GetString() ?? "")))
                 {
                     await WriteErrorAsync(Console.OpenStandardOutput(), root, -32602,

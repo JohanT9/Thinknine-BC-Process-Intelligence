@@ -5824,10 +5824,15 @@ async function runLibrarySync({ interactive, decisions = null }) {
     if (!state) throw Object.assign(new Error("sync.folderMissing"), { code: "folderMissing" });
     const context = { dir, storage: chrome.storage.local, keys: globalThis.T9StorageKeys, state };
     if (interactive) setLibrarySyncBusy(true, uiT("sync.reading"));
+    // The library is read again first: another tab may have changed it, and a document
+    // missing from an out-of-date list would look deleted here.
+    await loadSessions();
     // Compared afresh also after the user decided, so that changes made while the decisions
-    // were shown are not overwritten.
+    // were shown are not overwritten. The document being recorded and the one open for
+    // review are left as they are.
     const prepared = await librarySync.prepare({ ...context, records: documentLibraryRecords,
-      tree: documentFolders, activeId: await libraryActiveRecordingId() });
+      tree: documentFolders, activeId: await libraryActiveRecordingId(),
+      activeIds: activeReviewSession ? [activeReviewSession.id] : [] });
     const shown = decisions ? librarySyncPrepared : null;
     if (interactive && prepared.needsDecision &&
       (!shown || librarySyncDecisionKey(shown) !== librarySyncDecisionKey(prepared))) {
@@ -5881,6 +5886,8 @@ async function finishLibrarySync(promise, { interactive }) {
     announceLibraryFolders(lines.length ? [uiT("sync.done"), ...lines].join(" ") : uiT("sync.upToDate"));
     $("librarySyncClose").focus();
   } catch (error) {
+    // Another tab is synchronizing: nothing failed, and its result shows when it is done.
+    if (!interactive && error?.code === "busySync") return;
     librarySyncLastError = error?.code === "permission" ? "permission" : "failed";
     renderLibrarySyncStatus(await librarySyncState().catch(() => null));
     if (!interactive) return;
