@@ -10870,29 +10870,6 @@ $("settingsPanel").querySelector(".settings-nav").addEventListener("click", even
     $(item.getAttribute("aria-controls")).hidden = item !== button;
   }
 });
-$("newRecording").addEventListener("click", () => {
-  $("newRecordingStatus").textContent = "";
-  $("newRecordingDialog").showModal();
-});
-$("closeNewRecording").addEventListener("click", () => $("newRecordingDialog").close());
-$("newRecordingDialog").addEventListener("close", () => $("newRecording").focus());
-// Switches to an open Business Central tab; recording starts from the extension there.
-$("openBusinessCentral").addEventListener("click", async () => {
-  try {
-    const [tab] = await chrome.tabs.query({ url: ["https://businesscentral.dynamics.com/*",
-      "https://*.businesscentral.dynamics.com/*"] });
-    if (!tab) {
-      $("newRecordingStatus").textContent = uiT(
-        "Ingen Business Central-flik är öppen. Öppna Business Central och följ stegen ovan.");
-      return;
-    }
-    await chrome.tabs.update(tab.id, { active: true });
-    await chrome.windows.update(tab.windowId, { focused: true });
-    $("newRecordingDialog").close();
-  } catch (error) {
-    $("newRecordingStatus").textContent = uiT(error.message || String(error));
-  }
-});
 for (const id of ["librarySearch", "libraryProfileFilter",
   "libraryThemeFilter", "libraryLanguageFilter", "librarySort",
   "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",

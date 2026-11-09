@@ -369,7 +369,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <button id="homeViewDocuments" type="button" data-home-view="documents" aria-controls="documentsView" aria-current="page">Dokument</button>
     <button id="homeViewSettings" type="button" data-home-view="settings" aria-controls="settingsPanel">Inställningar</button>
   </nav>
-  <button id="newRecording" type="button" class="primary home-new-recording" aria-haspopup="dialog" aria-controls="newRecordingDialog">+ Ny inspelning</button>
 </header>
 
 <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -666,21 +665,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 </div>
 </div>
 </section>
-
-<dialog id="newRecordingDialog" class="new-recording-dialog" aria-labelledby="newRecordingTitle">
-  <h2 id="newRecordingTitle">Starta en ny inspelning</h2>
-  <p class="muted" data-i18n="Inspelningen startas från Business Central-fliken.">Inspelningen startas från Business Central-fliken.</p>
-  <ol>
-    <li data-i18n="Öppna Business Central i en flik i den här webbläsaren.">Öppna Business Central i en flik i den här webbläsaren.</li>
-    <li data-i18n="Välj BC Process Studio i webbläsarens verktygsfält.">Välj BC Process Studio i webbläsarens verktygsfält.</li>
-    <li data-i18n="Välj Dokumentera en process eller Rapportera ett fel.">Välj Dokumentera en process eller Rapportera ett fel.</li>
-  </ol>
-  <p id="newRecordingStatus" class="muted" role="status" aria-live="polite"></p>
-  <footer>
-    <button id="closeNewRecording" type="button" class="secondary">Stäng</button>
-    <button id="openBusinessCentral" type="button" class="primary">Gå till Business Central</button>
-  </footer>
-</dialog>
 
 <dialog id="libraryBatchMetadataDialog" class="library-batch-dialog"
   aria-labelledby="libraryBatchMetadataTitle">
