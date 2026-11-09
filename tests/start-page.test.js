@@ -76,11 +76,12 @@ for (const locale of uiLocales) {
   assert(!next.includes("steps approved"), `${locale}: continue card`);
 }
 
-// The page: two views, a new recording dialog, grouped settings without save buttons.
+// The page: two views and grouped settings without save buttons. Recording starts from the
+// extension in the Business Central tab, so the page offers no button that cannot start one.
 const page = read("src/ui/dashboard.html");
 assert(page.includes('<header class="home-appbar">') &&
   page.includes('data-home-view="documents" aria-controls="documentsView" aria-current="page"'));
-assert(page.includes('<dialog id="newRecordingDialog" class="new-recording-dialog" aria-labelledby="newRecordingTitle">'));
+assert(!page.includes("newRecording") && !page.includes("openBusinessCentral"), "no New recording button or dialog");
 for (const section of ["settingsGeneral", "settingsDocuments", "settingsRecording",
   "settingsBugReports"]) {
   assert(page.includes(`id="${section}" class="settings-section"`), section);
@@ -125,7 +126,7 @@ assert(background.includes("[SESSION_PREFIX, BUG_REPORT_PREFIX],") &&
 
 // New start page texts are translated in every interface language.
 for (const text of ["Alla dokument", "Fortsätt där du slutade", "Välj flera", "Behöver granskas",
-  "Arkiverade", "Ändringar sparas direkt.", "Starta en ny inspelning", "Gå till Business Central",
+  "Arkiverade", "Ändringar sparas direkt.",
   "Inställningarna kunde inte sparas. {detail}", "Tillgängliga variabler: {variables}",
   "Förhandsvisning: {filename}", "Felaktiga variabler: {variables}. Använd formatet {namn}."]) {
   const english = i18n.translate(text, "en-US");
