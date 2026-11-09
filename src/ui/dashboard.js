@@ -17,7 +17,6 @@ const DEFAULTS = {
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
-  knowledgeMcpEnabled: false,
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -328,9 +327,6 @@ let loadedKnowledgeRepository = null;
 let loadedKnowledgeRules = [];
 let knowledgePacksReady = Promise.resolve();
 let unmatchedKnowledgeItems = [];
-let externalKnowledgeSuggestionState = {
-  sessionId: "", requestId: "", status: "idle", requestCount: 0, suggestions: []
-};
 
 async function loadKnowledgePacks() {
   const indexUrl = chrome.runtime.getURL("knowledge-packs/index.json");
@@ -2838,77 +2834,6 @@ function scheduleSettingsSave(event) {
   else settingsSaveTimer = setTimeout(autoSaveSettings, 700);
 }
 
-async function testKnowledgeMcpConnection() {
-  const button = $("testKnowledgeMcp");
-  const status = $("knowledgeMcpStatus");
-  button.disabled = true;
-  status.textContent = uiT("settings.knowledgeMcpChecking");
-  try {
-    if ($("knowledgeMcpEnabled").checked !== applicationSettings.knowledgeMcpEnabled) {
-      await saveSettings();
-    }
-    if (!applicationSettings.knowledgeMcpEnabled) {
-      status.textContent = uiT("settings.knowledgeMcpConsentRequired");
-      return;
-    }
-    const response = await send({ type: "T9_TEST_KNOWLEDGE_MCP_CONNECTION" });
-    if (response?.ok) {
-      status.textContent = uiTf("settings.knowledgeMcpConnected", { count: response.toolCount });
-    } else {
-      const detail = String(response?.detail || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-      status.textContent = `${uiT("settings.knowledgeMcpUnavailable")}${detail
-        ? ` ${uiTf("settings.knowledgeMcpFailureDetail", { detail })}` : ""}`;
-    }
-  } catch (error) {
-    const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-    status.textContent = `${uiT("settings.knowledgeMcpUnavailable")}${detail
-      ? ` ${uiTf("settings.knowledgeMcpFailureDetail", { detail })}` : ""}`;
-  } finally {
-    button.disabled = false;
-  }
-}
-
-async function testKnowledgeMcpSampleLookup() {
-  const button = $("testKnowledgeMcpSampleLookup");
-  const status = $("knowledgeMcpSampleLookupStatus");
-  button.disabled = true;
-  status.textContent = uiT("settings.knowledgeMcpSampleChecking");
-  try {
-    if ($("knowledgeMcpEnabled").checked !== applicationSettings.knowledgeMcpEnabled) {
-      await saveSettings();
-    }
-    if (!applicationSettings.knowledgeMcpEnabled) {
-      status.textContent = uiT("settings.knowledgeMcpSampleConsentRequired");
-      return;
-    }
-    const response = await send({ type: "T9_TEST_KNOWLEDGE_MCP_SAMPLE_LOOKUP" });
-    if (!response?.ok) {
-      const detail = String(response?.detail || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-      status.textContent = uiT("settings.knowledgeMcpUnavailable") + (detail
-        ? " " + uiTf("settings.knowledgeMcpFailureDetail", { detail }) : "");
-      return;
-    }
-    const result = response.result;
-    const candidate = result?.candidates?.[0];
-    if (result?.status === "suggested" && candidate?.objectRef) {
-      const source = (candidate.provenance?.sourceId || "unknown") + "@" + (candidate.provenance?.sourceVersion || "unknown");
-      status.textContent = uiTf("settings.knowledgeMcpSampleFound", {
-        count: result.candidates.length,
-        objectId: candidate.objectRef.objectId,
-        source,
-        confidence: Math.round(Number(candidate.confidence || 0) * 100)
-      });
-    } else {
-      status.textContent = uiTf("settings.knowledgeMcpSampleUnresolved", { objectId: "22" });
-    }
-  } catch (error) {
-    const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-    status.textContent = uiT("settings.knowledgeMcpUnavailable") + (detail
-      ? " " + uiTf("settings.knowledgeMcpFailureDetail", { detail }) : "");
-  } finally {
-    button.disabled = false;
-  }
-}
 async function changeUiLocale(event) {
   const previousLocale = applicationSettings.uiLocale;
   const uiLocale = globalThis.T9UiI18n.normalizeLocale(event.target.value);
@@ -2964,205 +2889,6 @@ function interpretLegacyCompatibility(input) {
   return { contextEvents, contextCandidates, interpretedSteps, businessSteps,
     businessTasks: confidenceResult.tasks, sessionGraph, confidenceResult,
     unmatchedKnowledgeItems: [] };
-}
-
-async function fetchExternalKnowledgeSuggestions(tasks) {
-  if (!applicationSettings.knowledgeMcpEnabled ||
-      !globalThis.T9KnowledgeMcpWorkflow) return { enabled: false,
-        status: "disabled", requestCount: 0, suggestions: [] };
-  const requests = globalThis.T9KnowledgeMcpWorkflow.buildRequests(
-    tasks, applicationSettings.uiLocale, 12);
-  if (!requests.length) return { enabled: true, status: "no-unresolved",
-    requestCount: 0, suggestions: [] };
-  try {
-    const response = await send({ type: "T9_LOOKUP_KNOWLEDGE_MCP_BATCH",
-      lookups: requests.map(({ key, kind, request }) => ({ key, kind, request })) });
-    if (!response?.ok) return { enabled: true, status: "unavailable",
-      requestCount: requests.length, suggestions: [] };
-    const suggestions = globalThis.T9KnowledgeMcpWorkflow.collectSuggestions(
-      requests, response.results);
-    return { enabled: true,
-      status: suggestions.length ? "suggestions" : "no-suggestions",
-      requestCount: requests.length, suggestions,
-      fromCache: response.fromCache === true,
-      cacheHitCount: Number(response.cacheHitCount) || 0,
-      cacheMissCount: Number(response.cacheMissCount) || 0,
-      failureCount: Number(response.failureCount) || 0,
-      cacheTtlDays: Number(response.cacheTtlDays) || 30 };
-  } catch {
-    return { enabled: true, status: "unavailable",
-      requestCount: requests.length, suggestions: [] };
-  }
-}
-
-function externalKnowledgeLabels() {
-  const locale = activeDocumentLanguage();
-  const labels = {
-    "sv-SE": { loading: "Kontrollerar sparade kunskapsförslag…",
-      cached: "Återanvände sparade externa kunskapsförslag.",
-      counts: (hits, misses, failures) => `Cache: ${hits} återanvända, ${misses} nya, ${failures} misslyckade uppslag.`,
-      found: count => `Externa kunskapsförslag: ${count}. De är obekräftade och visas bara som granskningsunderlag.`,
-      none: "Inga externa kandidater hittades för steg utan lokal kunskapsmatchning.",
-      failed: "Externa kunskapsförslag kunde inte hämtas. Den lokala dokumentationen är opåverkad.",
-      heading: "Externt kunskapsförslag · obekräftat", object: "Business Central-objekt",
-      action: "Föreslagen åtgärd", source: "Källa", confidence: "matchningsgrad",
-      advisory: "Kontrollera förslaget innan du använder det i processdokumentationen." },
-    "en-US": { loading: "Checking saved knowledge suggestions…",
-      cached: "Reused cached external knowledge suggestions.",
-      counts: (hits, misses, failures) => `Cache: ${hits} reused, ${misses} new, ${failures} failed lookups.`,
-      found: count => `External knowledge suggestions: ${count}. Unverified; shown for review only.`,
-      none: "No external candidates were found for steps without a local knowledge match.",
-      failed: "External knowledge suggestions could not be retrieved. Local documentation is unaffected.",
-      heading: "External knowledge suggestion · unverified", object: "Business Central object",
-      action: "Suggested action", source: "Source", confidence: "match confidence",
-      advisory: "Verify the suggestion before using it in process documentation." },
-    "fr-FR": { loading: "Vérification des suggestions de connaissances enregistrées…",
-      cached: "Suggestions externes mises en cache réutilisées.",
-      counts: (hits, misses, failures) => `Cache : ${hits} réutilisées, ${misses} nouvelles, ${failures} recherches en échec.`,
-      found: count => `Suggestions externes : ${count}. Non vérifiées, affichées pour examen.`,
-      none: "Aucun candidat externe n’a été trouvé pour les étapes sans correspondance locale.",
-      failed: "Les suggestions externes sont indisponibles. La documentation locale reste accessible.",
-      heading: "Suggestion externe · non vérifiée", object: "Objet Business Central",
-      action: "Action suggérée", source: "Source", confidence: "confiance",
-      advisory: "Vérifiez la suggestion avant de l’utiliser dans la documentation." },
-    "de-DE": { loading: "Gespeicherte Wissensvorschläge werden geprüft…",
-      cached: "Zwischengespeicherte externe Wissensvorschläge wiederverwendet.",
-      counts: (hits, misses, failures) => `Cache: ${hits} wiederverwendet, ${misses} neu, ${failures} fehlgeschlagen.`,
-      found: count => `Externe Wissensvorschläge: ${count}. Ungeprüft und nur zur Prüfung angezeigt.`,
-      none: "Für Schritte ohne lokalen Wissenstreffer wurden keine externen Kandidaten gefunden.",
-      failed: "Externe Vorschläge konnten nicht abgerufen werden. Die lokale Dokumentation bleibt verfügbar.",
-      heading: "Externer Wissensvorschlag · ungeprüft", object: "Business Central-Objekt",
-      action: "Vorgeschlagene Aktion", source: "Quelle", confidence: "Trefferwahrscheinlichkeit",
-      advisory: "Prüfen Sie den Vorschlag, bevor Sie ihn in der Prozessdokumentation verwenden." },
-    "es-ES": { loading: "Comprobando sugerencias de conocimiento guardadas…",
-      cached: "Se reutilizaron sugerencias externas guardadas.",
-      counts: (hits, misses, failures) => `Caché: ${hits} reutilizadas, ${misses} nuevas, ${failures} fallidas.`,
-      found: count => `Sugerencias externas: ${count}. Sin verificar; solo para revisión.`,
-      none: "No se encontraron candidatos externos para pasos sin coincidencia local.",
-      failed: "No se pudieron obtener sugerencias externas. La documentación local sigue disponible.",
-      heading: "Sugerencia externa · sin verificar", object: "Objeto de Business Central",
-      action: "Acción sugerida", source: "Fuente", confidence: "confianza",
-      advisory: "Verifique la sugerencia antes de usarla en la documentación del proceso." },
-    "da-DK": { loading: "Kontrollerer gemte vidensforslag…",
-      cached: "Gemte eksterne vidensforslag blev genbrugt.",
-      counts: (hits, misses, failures) => `Cache: ${hits} genbrugt, ${misses} nye, ${failures} mislykkede opslag.`,
-      found: count => `Eksterne vidensforslag: ${count}. Ikke bekræftet; vises kun til gennemgang.`,
-      none: "Der blev ikke fundet eksterne kandidater til trin uden et lokalt vidensmatch.",
-      failed: "Eksterne forslag kunne ikke hentes. Den lokale dokumentation er stadig tilgængelig.",
-      heading: "Eksternt vidensforslag · ikke bekræftet", object: "Business Central-objekt",
-      action: "Foreslået handling", source: "Kilde", confidence: "matchsikkerhed",
-      advisory: "Kontrollér forslaget, før du bruger det i procesdokumentationen." },
-    "fi-FI": { loading: "Tarkistetaan tallennetut tietoehdotukset…",
-      cached: "Välimuistissa olevat ulkoiset tietoehdotukset käytettiin uudelleen.",
-      counts: (hits, misses, failures) => `Välimuisti: ${hits} uudelleenkäytetty, ${misses} uutta, ${failures} epäonnistunutta hakua.`,
-      found: count => `Ulkoiset tietoehdotukset: ${count}. Vahvistamattomia, vain tarkastelua varten.`,
-      none: "Paikallista tietovastaavuutta vailla oleville vaiheille ei löytynyt ulkoisia ehdokkaita.",
-      failed: "Ulkoisia ehdotuksia ei voitu hakea. Paikallinen dokumentaatio on käytettävissä.",
-      heading: "Ulkoinen tietoehdotus · vahvistamaton", object: "Business Central -objekti",
-      action: "Ehdotettu toiminto", source: "Lähde", confidence: "osuman luotettavuus",
-      advisory: "Tarkista ehdotus ennen sen käyttöä prosessidokumentaatiossa." },
-    "nb-NO": { loading: "Kontrollerer lagrede kunnskapsforslag…",
-      cached: "Bufrede eksterne kunnskapsforslag ble brukt på nytt.",
-      counts: (hits, misses, failures) => `Hurtigbuffer: ${hits} gjenbrukt, ${misses} nye, ${failures} mislykkede oppslag.`,
-      found: count => `Eksterne kunnskapsforslag: ${count}. Ikke bekreftet; vises bare til gjennomgang.`,
-      none: "Fant ingen eksterne kandidater for trinn uten lokalt kunnskapstreff.",
-      failed: "Eksterne forslag kunne ikke hentes. Den lokale dokumentasjonen er tilgjengelig.",
-      heading: "Eksternt kunnskapsforslag · ikke bekreftet", object: "Business Central-objekt",
-      action: "Foreslått handling", source: "Kilde", confidence: "treffsikkerhet",
-      advisory: "Kontroller forslaget før du bruker det i prosessdokumentasjonen." }
-  };
-  return labels[locale] || labels["en-US"];
-}
-
-function externalKnowledgeCandidateMarkup(suggestion) {
-  const labels = externalKnowledgeLabels();
-  const candidate = suggestion?.candidate || {};
-  let description = "";
-  if (suggestion.kind === "object") {
-    const ref = candidate.objectRef || {};
-    description = `${labels.object}: ${[ref.objectType, ref.objectId,
-      ref.publisher, ref.appVersion].filter(Boolean).join(" · ")}`;
-  } else {
-    const action = candidate.action || {};
-    description = `${labels.action}: ${[action.taskType, action.semanticAction,
-      action.entity].filter(Boolean).join(" · ")}`;
-  }
-  const provenance = candidate.provenance || {};
-  const sourceUri = /^https:\/\//u.test(String(provenance.sourceUri || ""))
-    ? provenance.sourceUri : "";
-  const source = provenance.sourceId || "MCP";
-  const confidence = Number.isFinite(candidate.confidence)
-    ? ` · ${labels.confidence}: ${Math.round(candidate.confidence * 100)}%` : "";
-  return `<li><strong>${escapeHtml(description)}</strong>${confidence}
-    <span class="external-knowledge-source"> · ${escapeHtml(labels.source)}:
-      ${sourceUri ? `<a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>` : escapeHtml(source)}
-    </span></li>`;
-}
-
-function externalKnowledgeMarkupForTask(taskId) {
-  const suggestions = externalKnowledgeSuggestionState.suggestions.filter(item =>
-    item.taskId === taskId
-  );
-  if (!suggestions.length) return "";
-  const labels = externalKnowledgeLabels();
-  return `<details class="review-external-disclosure"><summary>${escapeHtml(labels.heading)}</summary><aside class="external-knowledge-suggestions" data-external-knowledge>
-    <p>${escapeHtml(labels.advisory)}</p>
-    <ul>${suggestions.map(externalKnowledgeCandidateMarkup).join("")}</ul>
-  </aside></details>`;
-}
-
-function updateExternalKnowledgeReviewUi() {
-  const status = $("externalKnowledgeStatus");
-  if (!status) return;
-  const state = externalKnowledgeSuggestionState;
-  if (!state.sessionId || state.sessionId !== activeReviewSession?.id ||
-      state.status === "disabled" || state.status === "no-unresolved" ||
-      state.status === "idle") {
-    status.hidden = true;
-    status.textContent = "";
-  } else {
-    status.hidden = false;
-    const labels = externalKnowledgeLabels();
-    const counts = state.cacheHitCount !== undefined
-      ? ` ${labels.counts(state.cacheHitCount, state.cacheMissCount || 0,
-        state.failureCount || 0)}` : "";
-    status.textContent = state.status === "loading" ? labels.loading
-      : state.status === "suggestions" ? `${labels.found(state.suggestions.length)}${counts}`
-      : state.failureCount ? `${labels.failed}${counts}`
-      : state.status === "no-suggestions" ? `${labels.none}${counts}`
-      : `${labels.failed}${counts}`;
-  }
-  for (const card of $("reviewList").querySelectorAll("[data-review-task-id]")) {
-    const slot = card.querySelector("[data-external-knowledge-slot]");
-    if (slot) slot.innerHTML = externalKnowledgeMarkupForTask(card.dataset.reviewTaskId);
-  }
-}
-
-function startExternalKnowledgeSuggestions(model, sessionId) {
-  const requestId = `${sessionId}:${Date.now()}:${Math.random()}`;
-  externalKnowledgeSuggestionState = { sessionId, requestId,
-    status: applicationSettings.knowledgeMcpEnabled ? "loading" : "disabled",
-    requestCount: 0, suggestions: [] };
-  updateExternalKnowledgeReviewUi();
-  if (!applicationSettings.knowledgeMcpEnabled) return;
-  fetchExternalKnowledgeSuggestions(model?.externalKnowledgeTasks || [])
-    .then(result => {
-      if (activeReviewSession?.id !== sessionId ||
-          externalKnowledgeSuggestionState.requestId !== requestId) return;
-      externalKnowledgeSuggestionState = { sessionId, requestId,
-        status: result.status, requestCount: result.requestCount || 0,
-        suggestions: result.suggestions || [], fromCache: result.fromCache === true,
-        cacheHitCount: result.cacheHitCount, cacheMissCount: result.cacheMissCount,
-        failureCount: result.failureCount };
-      updateExternalKnowledgeReviewUi();
-    })
-    .catch(() => {
-      if (activeReviewSession?.id !== sessionId ||
-          externalKnowledgeSuggestionState.requestId !== requestId) return;
-      externalKnowledgeSuggestionState = { sessionId, requestId,
-        status: "unavailable", requestCount: 0, suggestions: [] };
-      updateExternalKnowledgeReviewUi();
-    });
 }
 
 async function prepareSessionModel(session, options = {}) {
@@ -3236,27 +2962,6 @@ async function prepareSessionModel(session, options = {}) {
           actionCaption: step.observation.operation || "" }
       }, loadedKnowledgeRelease?.releaseId) })) : [];
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
-  const externalKnowledgeTasks = model.businessTasks.map((task, index) => {
-    // An invalid process model leaves the steps without its references; it never stops the review.
-    const step = canonicalProcess?.ok ? canonicalProcess.process.steps[index] : undefined;
-    const localResolution = canonicalKnowledgeResolutions[index];
-    return { ...task,
-      knowledgeObjectRef: task.knowledgeObjectRef?.objectId
-        ? task.knowledgeObjectRef : step?.target.objectRef || {},
-      knowledgeControlRef: task.knowledgeControlRef?.controlId ||
-        task.knowledgeControlRef?.automationId ? task.knowledgeControlRef
-        : step?.target.controlRef || {},
-      knowledgeResolution: task.knowledgeResolution || {
-        object: localResolution?.object || { status: "unresolved" },
-        action: localResolution?.action || { status: "unresolved" }
-      },
-      pageCaption: task.pageCaption || step?.target.capturedCaption || "",
-      actionCaption: task.actionCaption || step?.observation.operation || ""
-    };
-  });
-  const externalKnowledgeLookup = options.includeExternalKnowledge
-    ? await fetchExternalKnowledgeSuggestions(externalKnowledgeTasks)
-    : { enabled: false, status: "disabled", requestCount: 0, suggestions: [] };
 
   return {
     response,
@@ -3265,8 +2970,6 @@ async function prepareSessionModel(session, options = {}) {
     screenshotData,
     canonicalProcess,
     canonicalKnowledgeResolutions,
-    externalKnowledgeTasks,
-    externalKnowledgeLookup,
     ...model
   };
 }
@@ -8685,7 +8388,6 @@ function renderReviewContent() {
           ? `<details class="review-knowledge-disclosure"><summary>${escapeHtml(({ "sv-SE": "Förklaring", "en-US": "Explanation", "fr-FR": "Explication", "de-DE": "Erklärung", "es-ES": "Explicación", "da-DK": "Forklaring", "fi-FI": "Selitys", "nb-NO": "Forklaring" })[activeDocumentLanguage()] || "Explanation")}</summary>${knowledgeExplanationMarkup(task)}</details>`
           : ""}
         ${processQualityMarkup(task)}
-        <div data-external-knowledge-slot>${externalKnowledgeMarkupForTask(task.taskId)}</div>
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="${uiT("a11y.textFormatting")}">
           <button type="button" class="secondary" data-instruction-format="bold"
@@ -9670,8 +9372,6 @@ async function openReview(session) {
   const requestId = reviewOpenRequestId;
   reviewSaveState = { status: "idle", at: null };
   $("saveReviewBottom").hidden = true;
-  externalKnowledgeSuggestionState = { sessionId: session.id, requestId: "",
-    status: "idle", requestCount: 0, suggestions: [] };
   annotationChangesPending = false;
   updateFilenamePreview();
   const existing = await send({
@@ -9748,8 +9448,6 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
     const model = await prepareSessionModel(session);
     if (!isCurrent()) return;
     activeReviewModel = model;
-    // Look up external knowledge while the review renders instead of after it.
-    startExternalKnowledgeSuggestions(activeReviewModel, session.id);
 
     const reviewUnchanged = activeReview?.updatedAt === initialUpdatedAt;
     const emptyReview = storedReview &&
@@ -9841,9 +9539,6 @@ async function closeReview() {
   activeReview = null;
   activeReviewModel = null;
   reviewOpenRequestId = "";
-  externalKnowledgeSuggestionState = { sessionId: "", requestId: "",
-    status: "idle", requestCount: 0, suggestions: [] };
-  updateExternalKnowledgeReviewUi();
   activeProcessModel = null;
   activeProcessAnalysis = null;
   processAnalysisRequest = null;
@@ -11149,8 +10844,6 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
   move: moveReviewTasksTo
 });
 
-$("testKnowledgeMcp").addEventListener("click", testKnowledgeMcpConnection);
-$("testKnowledgeMcpSampleLookup").addEventListener("click", testKnowledgeMcpSampleLookup);
 $("uiLocale").addEventListener("change", changeUiLocale);
 $("settingsPanel").addEventListener("change", scheduleSettingsSave);
 $("settingsPanel").addEventListener("input", scheduleSettingsSave);

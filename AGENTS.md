@@ -27,7 +27,6 @@ These instructions apply to the entire repository. The architecture and product 
 - `src/bug-report/`: bug report models, technical evidence, report projection, integrations, PDF and email export.
 - `src/ui/`: interface orchestration, views and styles. Keep domain transformations in their owning modules.
 - `services/licensing/`: authenticated licensing service, separate admin interface and usage statistics.
-- `native/`: native integration helpers; verify their contracts separately when affected.
 - `tests/`, `scripts/`, `docs/`: verification, build/release tooling and supporting documentation.
 - Edit authored files under `src/`, then regenerate `dist/` with the build script. Do not fix only the generated copy. Confirm the built files contain the final change.
 - Use the actual registry, schemas, package scripts and workflows as sources of truth. Update this guide when those contracts change; do not assume a historical handbook diagram describes every subsystem.
@@ -55,7 +54,7 @@ These instructions apply to the entire repository. The architecture and product 
 - Check the runtime in `.github/workflows/ci.yml` and package engine declarations. The extension CI currently uses Node 20; the licensing service declares Node 24 or later. Success on a newer local Node version does not prove compatibility with CI.
 - For affected language behavior and user-facing text, follow the mandatory language checks below. For storage/default changes, test fresh installation, existing preferences and legacy records. For export changes, exercise the actual affected output and verify content, order, links/images and relevant layout.
 - Run targeted checks while developing. Run `npm run build` and `npm run check` for extension runtime/UI changes. Run `npm run ci` for release preparation or changes spanning shared runtime paths. After a later fix, rerun affected checks; do not report a previous result as verification of code that changed afterward.
-- Service and native checks are not all included in root CI. Inspect the relevant scripts/tests and run them separately when those components change. Ensure their dependencies are available before interpreting a test failure.
+- Service checks are not all included in root CI. Inspect the relevant scripts/tests and run them separately when those components change. Ensure their dependencies are available before interpreting a test failure.
 - Inspect every command's result. In a shell sequence, a final successful command does not erase an earlier failure. Do not weaken a failing test simply to make it pass; change an obsolete expectation only when the intended behavior changed and replacement coverage verifies that behavior.
 - Documentation/rules-only changes require checking content, links and `git diff --check`, not unrelated application tests or builds. This does not exempt any accompanying user-facing product change from language verification.
 - Update documentation and release notes when applicable. Report what changed, what was verified, relevant limitations and what remains. Do not claim complete language or visual coverage without evidence.

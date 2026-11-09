@@ -1,3 +1,7 @@
+## 4.7.242
+- Extension popup: Report the error shown now has a frame in the brand colour, so it reads as a choice next to the two filled cards instead of looking disabled.
+- Removed the external knowledge lookups over MCP. The setting was hidden and needed a local host and server that were never installed with the extension, so nobody could use it. The extension no longer asks to talk to native applications, and the host, the knowledge server, their documentation, settings texts and review suggestions are gone. The built-in Business Central knowledge is unchanged. A cached lookup result an earlier version may have stored is left untouched in the extension's storage.
+
 ## 4.7.241
 - Document library: a bug report's Modified date follows edits made in the report, including undo and redo, and an open library shows the new date and title without being reloaded. Emailing a report does not count as an edit. Reports edited before this version keep their old date until they are edited again.
 - Bug report: Copy summary moved from the main buttons to More options, next to Export Markdown.

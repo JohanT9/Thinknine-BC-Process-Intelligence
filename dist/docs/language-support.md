@@ -46,5 +46,5 @@ Microsoft-termer och lokaliserade officiella källor där de finns. Om en term
 eller källa inte går att verifiera ska den konkreta luckan dokumenteras; hitta
 inte på en översättning och beskriv inte språkstödet som likvärdigt förrän
 luckan är åtgärdad. Kör `npm run knowledge:validate` och
-`npm run test:knowledge-mcp` samt relevanta språk- och gränssnittstester innan
+`npm run test:knowledge` samt relevanta språk- och gränssnittstester innan
 det nya språket betraktas som klart.

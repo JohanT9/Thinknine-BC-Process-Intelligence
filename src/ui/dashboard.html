@@ -100,10 +100,10 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-step-workspace[data-layout="focus"] .review-card.selected:not([data-active-step="true"]){display:grid;grid-template-columns:40px minmax(0,1fr) auto;margin:12px 0 0;box-shadow:0 1px 4px rgba(15,23,42,.08)}
 .review-step-workspace[data-filter-empty="true"] .review-card{display:none!important}
 .review-step-layout-toggle[aria-pressed="true"]{border-color:var(--c-bd-008489)!important;background:var(--c-bg-e4f5f5)!important;color:var(--c-fg-064f52)!important}
-.review-knowledge-disclosure,.review-external-disclosure{margin:10px 0;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-f8fafb)}
-.review-knowledge-disclosure>summary,.review-external-disclosure>summary{cursor:pointer;padding:9px 12px;font-weight:600;color:var(--c-fg-334155)}
-.review-knowledge-disclosure[open],.review-external-disclosure[open]{padding-bottom:8px}
-.review-knowledge-disclosure>aside,.review-external-disclosure>aside{margin:0 10px}
+.review-knowledge-disclosure{margin:10px 0;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-f8fafb)}
+.review-knowledge-disclosure>summary{cursor:pointer;padding:9px 12px;font-weight:600;color:var(--c-fg-334155)}
+.review-knowledge-disclosure[open]{padding-bottom:8px}
+.review-knowledge-disclosure>aside{margin:0 10px}
 .review-step-empty{margin:16px 24px;padding:28px;text-align:center;color:var(--c-fg-52606d);background:var(--c-bg-f7f9fa);border:1px solid var(--c-bd-d8dee5);border-radius:8px}
 .review-card{border:1px solid var(--c-bd-d8dee5);border-left:4px solid transparent;border-radius:8px;margin-bottom:16px;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr) minmax(150px,auto);gap:16px;background:var(--c-bg-ffffff)}
 .review-card.approved{border-color:var(--c-bd-d8dee5);border-left-color:var(--c-bd-5a9f5a);background:var(--c-bg-f7fbf7)}
@@ -192,7 +192,6 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .process-overview-detail-explanation p{line-height:1.5}.process-overview-detail-source{display:block;margin-top:7px;font-size:12px}
 .review-knowledge-explanation{margin:8px 0 12px;padding:9px 11px;border-left:3px solid var(--c-bd-087f7e);background:var(--c-bg-f0f8f7)}.review-knowledge-explanation strong{display:block;margin-bottom:4px}.review-knowledge-explanation p{margin:0;line-height:1.5}.review-knowledge-source{display:block;margin-top:5px;font-size:12px}.review-knowledge-export-choice{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;cursor:pointer}.review-knowledge-export-choice input{margin:0}.review-knowledge-explanation-actions,.review-knowledge-explanation-editor-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.review-knowledge-explanation-editor textarea{box-sizing:border-box;width:100%;min-height:90px;margin:4px 0 0;padding:8px;font:inherit;line-height:1.45;resize:vertical}
 .review-knowledge-basis{display:block;margin-top:4px;font-size:12px;color:var(--c-fg-4b5563)}
-.external-knowledge-status{margin:8px 0;padding:8px 10px;border-left:3px solid var(--c-bd-c47b00);background:var(--c-bg-fff8e8);color:var(--c-fg-4a3b1c)}.external-knowledge-suggestions{margin:8px 0 12px;padding:9px 11px;border-left:3px solid var(--c-bd-c47b00);background:var(--c-bg-fff8e8)}.external-knowledge-suggestions strong{display:block;margin-bottom:4px}.external-knowledge-suggestions p{margin:3px 0 6px;font-size:12px}.external-knowledge-suggestions ul{margin:0;padding-left:20px}.external-knowledge-suggestions li{margin:4px 0;line-height:1.45}.external-knowledge-source{font-size:12px;color:var(--c-fg-536477)}
 .review-load-status{margin:8px 0;padding:6px 0;color:var(--c-fg-536477);font-size:13px}
 .process-overview-detail-explanation p{line-height:1.5}.process-overview-detail-source{display:block;margin-top:7px;font-size:12px}
 .process-map-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 14px 12px}.process-map-levels{display:inline-flex;border:1px solid var(--c-bd-aeb8c2);border-radius:6px;overflow:hidden}.process-map-levels button{margin:0;border:0;border-right:1px solid var(--c-bd-aeb8c2);border-radius:0;background:var(--c-bg-ffffff);min-height:34px}.process-map-levels button:last-child{border-right:0}.process-map-levels button[aria-pressed="true"]{background:var(--c-bg-087f7e);color:var(--c-fg-ffffff)}.process-map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-left:auto;font-size:12px;color:var(--c-fg-526273)}.process-map-legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:4px;border-radius:2px;vertical-align:-1px}.process-map-legend .observed::before{background:var(--c-bg-dff3e5);border:1px solid var(--c-bd-15803d)}.process-map-legend .suggested::before{background:var(--c-bg-fff8e1);border:1px dashed var(--c-bd-a16207)}.process-map-legend .conditional::before{background:var(--c-bg-f5f3ff);border:1px dashed var(--c-bd-7c3aed)}.process-map-legend .customerSpecific::before{background:var(--c-bg-e0f2fe);border:1px solid var(--c-bd-0369a1)}.process-overview-semantic-state{display:inline-flex;margin-top:7px;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:600}.process-overview-semantic-state.observed{background:var(--c-bg-dff3e5);color:var(--c-fg-166534)}.process-overview-semantic-state.suggested{background:var(--c-bg-fff8e1);color:var(--c-fg-854d0e)}.process-overview-semantic-state.conditional{background:var(--c-bg-f5f3ff);color:var(--c-fg-6d28d9)}.process-overview-semantic-state.customerSpecific{background:var(--c-bg-e0f2fe);color:var(--c-fg-075985)}.process-overview-semantic-state.reference{background:var(--c-bg-eef1f4);color:var(--c-fg-44546a)}.process-overview-semantic-suggested .process-overview-action{border-style:dashed;border-color:var(--c-bd-a16207);background:var(--c-bg-fffdf5)}.process-overview-semantic-conditional .process-overview-action{border-style:dashed;border-color:var(--c-bd-7c3aed);background:var(--c-bg-faf8ff)}.process-overview-semantic-customerSpecific .process-overview-action{border-color:var(--c-bd-0369a1);background:var(--c-bg-f0f9ff)}.process-overview-semantic-observed .process-overview-action{border-color:var(--c-bd-4d9f63);background:var(--c-bg-f7fcf8)}@media(max-width:760px){.process-map-legend{width:100%;margin-left:0}.process-map-levels{width:100%}.process-map-levels button{flex:1}}
@@ -354,10 +353,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 @media(prefers-reduced-motion:reduce){.review-step-progress-bar span{transition:none}}
 /* The step and selection counts repeat the summary under the title; keep them for screen readers only. */
 .review-header>#reviewStatus{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.review-knowledge-disclosure>summary,.review-external-disclosure>summary{list-style:none}
-.review-knowledge-disclosure>summary::-webkit-details-marker,.review-external-disclosure>summary::-webkit-details-marker{display:none}
-.review-knowledge-disclosure>summary::after,.review-external-disclosure>summary::after{content:"＋";float:right;color:var(--c-fg-52606d)}
-.review-knowledge-disclosure[open]>summary::after,.review-external-disclosure[open]>summary::after{content:"−"}
+.review-knowledge-disclosure>summary{list-style:none}
+.review-knowledge-disclosure>summary::-webkit-details-marker{display:none}
+.review-knowledge-disclosure>summary::after{content:"＋";float:right;color:var(--c-fg-52606d)}
+.review-knowledge-disclosure[open]>summary::after{content:"−"}
 .review-toolbar-more-panel{max-height:min(70vh,640px);overflow:auto}
 @media(max-width:800px){.review-step-workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);min-height:0}.review-step-navigation{border-right:0;border-bottom:1px solid var(--c-bd-d8dee5);max-height:180px;padding:8px 10px}.review-step-navigation h3{margin:2px 6px 6px}.review-step-navigation-list{display:flex;overflow:auto;gap:5px;padding:0 2px 6px}.review-step-nav-item{flex:0 0 min(230px,70vw);grid-template-columns:25px minmax(0,1fr);padding:7px}.review-step-content{min-height:0}.review-step-workspace[data-layout="focus"] .review-list{padding:12px}.review-step-workspace[data-layout="focus"] .review-card{grid-template-columns:32px minmax(0,1fr)!important;padding:12px;gap:10px}.review-step-workspace[data-layout="focus"] .review-actions{grid-column:1/-1;flex-direction:row;align-items:center}.review-step-layout-toggle{order:6}}
 </style>
@@ -526,7 +525,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   <button type="button" data-settings-section="documents" aria-controls="settingsDocuments">Dokument</button>
   <button type="button" data-settings-section="recording" aria-controls="settingsRecording">Inspelning</button>
   <button type="button" data-settings-section="bug-reports" aria-controls="settingsBugReports">Felrapporter</button>
-  <button type="button" data-settings-section="advanced" aria-controls="settingsAdvanced">Avancerat</button>
 </nav>
 <div class="settings-sections">
 
@@ -665,22 +663,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <p id="supportEmailHelp" class="muted" data-i18n="Används när en felrapport skapas som adresserat e-postutkast.">Används när en felrapport skapas som adresserat e-postutkast.</p>
 </section>
 
-<section id="settingsAdvanced" class="settings-section" aria-labelledby="knowledgeMcpLegend" hidden>
-<h3 id="knowledgeMcpLegend" data-i18n="settings.knowledgeMcpLegend">External knowledge suggestions</h3>
-<label for="knowledgeMcpEnabled">
-  <input id="knowledgeMcpEnabled" type="checkbox" aria-describedby="knowledgeMcpHelp">
-  <span data-i18n="settings.knowledgeMcpEnable">Allow read-only MCP knowledge lookups</span>
-</label>
-<p id="knowledgeMcpHelp" class="hint" data-i18n="settings.knowledgeMcpHelp">
-  Off by default. When enabled, only unresolved object/action IDs, app identity and version, visible page/control captions and the interface language may be sent to the local read-only knowledge service. Recordings, screenshots, entered values and tenant, environment or company details are not sent. Results are unverified suggestions for review.
-</p>
-<div class="settings-actions">
-<button id="testKnowledgeMcp" class="secondary" type="button" data-i18n="settings.knowledgeMcpTest">Test local connection</button>
-<button id="testKnowledgeMcpSampleLookup" class="secondary" type="button" data-i18n="settings.knowledgeMcpSampleLookup">Test sample lookup (sends BC page 22 only)</button>
-</div>
-<p id="knowledgeMcpStatus" class="settings-save-status" role="status" aria-live="polite"></p>
-<p id="knowledgeMcpSampleLookupStatus" class="settings-save-status" role="status" aria-live="polite"></p>
-</section>
 </div>
 </div>
 </section>
@@ -909,7 +891,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div id="reviewProgressBar" class="review-progress-bar"></div>
       </div>
       <p id="reviewLoadStatus" class="review-load-status" role="status" aria-live="polite" hidden></p>
-      <p id="externalKnowledgeStatus" class="external-knowledge-status" role="status" aria-live="polite" hidden></p>
       <p id="reviewKeyboardHelp" class="sr-only" data-i18n="review.keyboardHelp">Välj steg med piltangenterna. Använd Ctrl för flerval och Shift för intervall. Alt plus N går till nästa ogranskade steg. Tryck Enter för att redigera. I instruktionen skapar Enter en ny rad, Ctrl eller Cmd plus Enter sparar och Escape avbryter. Alt plus pil flyttar valda steg.</p>
       <div id="reviewStatus" role="status" aria-live="polite" aria-atomic="true" aria-label="Dokumentstatus">
         <dl class="review-status">
@@ -1335,10 +1316,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="engine/canonical-process-schema.js"></script>
 <script src="engine/canonical-process-adapter.js"></script>
 <script src="engine/knowledge-repository.js"></script>
-<script src="engine/knowledge-mcp-adapter.js"></script>
 <script src="engine/knowledge-ai-fallback.js"></script>
 <script src="engine/knowledge-resolution.js"></script>
-<script src="engine/knowledge-mcp-workflow.js"></script>
 <script src="engine/feature-flags.js"></script>
 <script src="engine/screenshot-asset-paths.js"></script>
 <script src="engine/screenshot-batch-loader.js"></script>
