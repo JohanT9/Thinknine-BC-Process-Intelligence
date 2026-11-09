@@ -111,6 +111,28 @@ for (const locale of i18n.SUPPORTED_LOCALES) {
     assert.ok(i18n.translate(key, locale) !== key, `${key} missing in ${locale}`);
   }
 }
+// The popup fits without scrolling: each choice and license state says one sentence, in its own
+// language, and the choices' descriptions stay short enough for a single line.
+const popupDescriptions = ["recorder.processHelp", "recorder.bugHelp", "recorder.reportVisibleErrorHelp"];
+const popupStates = ["license.cardUnknown", "license.cardNeedsConsent", "license.cardChecking",
+  "license.cardCheckFailed", "license.cardTrialAvailable", "license.cardTrialReady", "license.cardNoTrial",
+  "license.cardSignInHelp", "license.cardLastKnown", "license.cardRechecking", "license.cardWorking"];
+for (const locale of i18n.SUPPORTED_LOCALES) {
+  for (const key of [...popupDescriptions, ...popupStates]) {
+    const text = i18n.translate(key, locale);
+    assert.ok(text !== key, `${key} missing in ${locale}`);
+    if (locale !== "en-US") assert.notEqual(text, i18n.translate(key, "en-US"), `${key} untranslated in ${locale}`);
+    assert.equal(text.split(/[.!?…](?:\s|$)/).filter(part => part.trim()).length, 1, `${key} is one sentence in ${locale}: ${text}`);
+  }
+  for (const key of popupDescriptions) {
+    assert.ok(i18n.translate(key, locale).length <= 55, `${key} fits one line in ${locale}`);
+  }
+  // The library's Export, Import and Sync buttons are named without an ellipsis in every language.
+  for (const key of ["transfer.export", "transfer.import", "sync.button"]) {
+    const label = i18n.translate(key, locale);
+    assert.ok(label !== key && !/…|\.\.\./.test(label), `${key} in ${locale}: ${label}`);
+  }
+}
 assert.match(license, /T9_GET_SETTINGS/);
 assert.match(license, /Intl\.DateTimeFormat\(currentUiLocale/);
 assert.match(content, /uiText\("Inspelning pågår", "Recording in progress"\)/);

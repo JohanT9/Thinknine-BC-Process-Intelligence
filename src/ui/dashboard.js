@@ -4418,6 +4418,11 @@ function reviewProgressSummary(review) {
     completed: review.status === "completed" };
 }
 
+function latestTimestamp(...values) {
+  const valid = values.filter(value => value && Number.isFinite(Date.parse(value)));
+  return valid.sort((a, b) => Date.parse(b) - Date.parse(a))[0] || values.find(Boolean) || "";
+}
+
 function librarySessionRecord(session) {
   const bugReport = session.recordingPurpose === "bug-report";
   const companyName = session.settings?.businessCentralCompany ||
@@ -4618,8 +4623,8 @@ function libraryDelivery(report) {
     deliveries.at(-1) || null;
 }
 
-// A bug report is emailed from its own tab. When its email history changes, the library
-// shows the new state without being reloaded.
+// A bug report is edited and emailed from its own tab. When its email history, title or edit
+// time changes, the library shows the new state without being reloaded.
 let libraryDeliveryRender = 0;
 function updateLibraryDeliveries(changes, area) {
   if (area !== "local") return;
@@ -4628,6 +4633,7 @@ function updateLibraryDeliveries(changes, area) {
     if (!key.startsWith(globalThis.T9StorageKeys.BUG_REPORT_PREFIX)) continue;
     const recordingId = change.newValue?.recordingId || change.oldValue?.recordingId;
     if (!recordingId) continue;
+    if (change.newValue && refreshLibraryReportRecord(recordingId, change.newValue)) changed = true;
     const latest = change.newValue ? libraryDelivery(change.newValue) : null;
     const current = documentLibraryDeliveries.get(recordingId) || null;
     if (JSON.stringify(latest) === JSON.stringify(current)) continue;
@@ -4638,7 +4644,23 @@ function updateLibraryDeliveries(changes, area) {
   if (!changed || !documentLibraryRecords.length) return;
   // Several reports can be saved together; render once.
   clearTimeout(libraryDeliveryRender);
-  libraryDeliveryRender = setTimeout(renderDocumentLibrary, 100);
+  libraryDeliveryRender = setTimeout(() => {
+    rebuildDocumentLibraryIndex();
+    renderDocumentLibrary();
+  }, 100);
+}
+
+function refreshLibraryReportRecord(recordingId, report) {
+  const session = documentLibrarySessions.get(recordingId);
+  const index = documentLibraryRecords.findIndex(record => record.projectId === recordingId);
+  if (!session || index < 0) return false;
+  const record = documentLibraryRecords[index];
+  const title = report.summary?.title || record.title;
+  const modifiedAt = latestTimestamp(librarySessionRecord(session).modifiedAt, report.updatedAt);
+  if (title === record.title && Date.parse(modifiedAt) === Date.parse(record.modifiedAt)) return false;
+  documentLibraryRecords = documentLibraryRecords.map((value, position) => position === index
+    ? globalThis.T9DocumentLibrary.merge(value, { title, modifiedAt }) : value);
+  return true;
 }
 chrome.storage?.onChanged?.addListener(updateLibraryDeliveries);
 
@@ -5999,10 +6021,14 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
     const sessionRecord = librarySessionRecord(session);
-    const reportTitle = bugReports.get(session.id)?.summary?.title;
+    const report = bugReports.get(session.id);
+    const reportTitle = report?.summary?.title;
     return globalThis.T9DocumentLibrary.merge(storedRecord, {
       ...sessionRecord,
       title: reportTitle || sessionRecord.title,
+      // A bug report is edited in its own view, so it is changed when either it or its
+      // recording last changed.
+      modifiedAt: latestTimestamp(sessionRecord.modifiedAt, report?.updatedAt),
       documentLanguage: storedRecord.documentLanguage ||
         sessionRecord.documentLanguage,
       // A document is filed where it was put; a new bug report from a test starts in the

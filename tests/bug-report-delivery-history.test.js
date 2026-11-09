@@ -187,7 +187,13 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
     const context = vm.createContext({ globalThis: {}, JSON, Array, Object, clearTimeout() {},
       setTimeout: callback => callback(), renderDocumentLibrary: () => renders.push(1) });
     context.globalThis.T9StorageKeys = require("../src/engine/storage-keys");
+    context.globalThis.T9DocumentLibrary = require("../src/document/document-library");
+    const latestTimestamp = dashboard.match(/function latestTimestamp[\s\S]*?\n\}\n/u)[0];
     vm.runInContext(`let documentLibraryDeliveries = new Map(); let documentLibraryRecords = [{}];
+      let documentLibrarySessions = new Map(); let rebuilt = 0;
+      function rebuildDocumentLibraryIndex() { rebuilt += 1; }
+      function librarySessionRecord(session) { return { modifiedAt: session.updatedAt }; }
+      ${latestTimestamp}
       ${dashboard.slice(start, end)}`, context);
     const update = (changes, area = "local") => vm.runInContext("updateLibraryDeliveries",
       context)(changes, area);
@@ -211,6 +217,21 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
     update({ t9_session_x: { newValue: {} } });
     update({ [key]: { newValue: sentReport } }, "sync");
     assert.strictEqual(renders.length, 2, "other storage changes are ignored");
+    // An edit saved in the report's tab updates the card's title and Modified date at once.
+    vm.runInContext(`documentLibrarySessions.set("rec-2", { updatedAt: "2026-11-06T10:00:00.000Z" });
+      documentLibraryRecords = [globalThis.T9DocumentLibrary.normalize({ projectId: "rec-2",
+        title: "Business Central-fel", modifiedAt: "2026-11-06T10:00:00.000Z" })];`, context);
+    const card = () => vm.runInContext("documentLibraryRecords[0]", context);
+    const before = renders.length;
+    update({ t9_bug_report_r2: { newValue: { recordingId: "rec-2", updatedAt: "2026-11-09T08:00:00.000Z",
+      summary: { title: "Bokföring misslyckas" } } } });
+    assert.strictEqual(card().title, "Bokföring misslyckas");
+    assert.strictEqual(Date.parse(card().modifiedAt), Date.parse("2026-11-09T08:00:00.000Z"));
+    assert.strictEqual(renders.length, before + 1);
+    assert.ok(vm.runInContext("rebuilt", context) > 0, "the search index follows the new title");
+    update({ t9_bug_report_r2: { newValue: { recordingId: "rec-2", updatedAt: "2026-11-09T08:00:00.000Z",
+      summary: { title: "Bokföring misslyckas" } } } });
+    assert.strictEqual(renders.length, before + 1, "an unchanged report does not redraw");
   }
   console.log("Bug report delivery history tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -1,3 +1,9 @@
+## 4.7.241
+- Document library: a bug report's Modified date follows edits made in the report, including undo and redo, and an open library shows the new date and title without being reloaded. Emailing a report does not count as an edit. Reports edited before this version keep their old date until they are edited again.
+- Bug report: Copy summary moved from the main buttons to More options, next to Export Markdown.
+- Document library: Export and Import together are as wide as the sort list, and Sync, Select multiple and Filter are equally wide, in every language; the buttons are named without an ellipsis. The sync status is shown beside the heading, and an open Filter keeps its place.
+- Extension popup: fits without a scroll bar in every language. Each recording choice and license state is described in one sentence, and the header, cards and license panel take less room.
+
 ## 4.7.240
 - Removed the Windows report sharing helper. Its button was removed earlier, so nobody could reach it; the extension no longer accepts its message, and the helper, its registration script, documentation and texts are gone. Reports already saved by the helper under LocalAppData\Thinknine\BCProcessStudio\SharedReports are not touched and can be deleted by hand.
 - Document library: the Export, Import and Sync buttons no longer sit right against the search row.

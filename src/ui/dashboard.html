@@ -385,14 +385,20 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <div id="libraryContinueList" class="library-continue-list"></div>
   </section>
 
+  <!-- The heading, search and quick filter rows share columns, so the actions line up. -->
+  <div class="library-toolbar">
   <div class="library-heading">
-    <h3 id="libraryAllTitle">Alla dokument</h3>
-    <div class="library-transfer-actions" role="group" aria-label="Flytta dokument till en annan dator" data-i18n-aria-label="transfer.actions">
-      <button id="libraryExport" type="button" class="secondary" data-i18n="transfer.export">Exportera…</button>
-      <button id="libraryImport" type="button" class="secondary" data-i18n="transfer.import">Importera…</button>
-      <input id="libraryImportFile" type="file" accept=".bcps" hidden tabindex="-1">
-      <button id="librarySync" type="button" class="secondary" data-i18n="sync.button">Synka…</button>
+    <div class="library-heading-title">
+      <h3 id="libraryAllTitle">Alla dokument</h3>
       <span id="librarySyncStatus" class="library-sync-status" role="status" aria-live="polite" hidden></span>
+    </div>
+    <div class="library-transfer-actions" role="group" aria-label="Flytta dokument till en annan dator" data-i18n-aria-label="transfer.actions">
+      <div class="library-transfer-pair">
+        <button id="libraryExport" type="button" class="secondary" data-i18n="transfer.export">Exportera</button>
+        <button id="libraryImport" type="button" class="secondary" data-i18n="transfer.import">Importera</button>
+      </div>
+      <input id="libraryImportFile" type="file" accept=".bcps" hidden tabindex="-1">
+      <button id="librarySync" type="button" class="secondary" data-i18n="sync.button">Synka</button>
     </div>
   </div>
   <div id="libraryImportNotice" class="library-import-notice" hidden>
@@ -460,6 +466,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         </div>
       </div>
     </details>
+  </div>
   </div>
   <div id="libraryFolders" class="library-folders">
     <div class="library-folder-head">

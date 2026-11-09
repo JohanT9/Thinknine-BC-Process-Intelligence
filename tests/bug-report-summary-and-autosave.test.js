@@ -77,6 +77,35 @@ assert.strictEqual(exporter.summary(bare).text, "Only a title\n");
   controller.undo();
   assert.ok(controller.state().revision > edited);
 
+  // A save that changes what the report says records when it was edited, so the library shows
+  // the edit; an email recorded on an unchanged report does not move the time.
+  const times = ["2026-11-09T08:00:00.000Z", "2026-11-09T09:00:00.000Z", "2026-11-09T10:00:00.000Z"];
+  const saved = [];
+  const timed = workspace.create({ report: report("en-US"), errorEvidence: evidence,
+    now: () => times.shift(), store: { save: async value => { saved.push(value);
+      return model.normalize(value); } } });
+  await timed.save();
+  assert.strictEqual(saved.at(-1).updatedAt, evidence[0].capturedAt, "an unchanged report keeps its time");
+  timed.edit({ summary: { title: "Posting fails" } });
+  await timed.save();
+  assert.strictEqual(saved.at(-1).updatedAt, "2026-11-09T08:00:00.000Z");
+  assert.strictEqual(timed.state().report.updatedAt, "2026-11-09T08:00:00.000Z");
+  timed.recordDelivery({ deliveryId: "d1", method: "outlook-send", outcome: "sent",
+    at: "2026-11-09T08:30:00.000Z", to: ["support@example.com"] });
+  await timed.save();
+  assert.strictEqual(saved.at(-1).updatedAt, "2026-11-09T08:00:00.000Z", "an email is not an edit");
+  timed.undo();
+  await timed.save();
+  assert.strictEqual(saved.at(-1).updatedAt, "2026-11-09T09:00:00.000Z", "undo is an edit");
+
+  // The library shows the later of the recording's and the report's edit time, also while open.
+  const dashboard = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.js"), "utf8");
+  assert.match(dashboard, /modifiedAt: latestTimestamp\(sessionRecord\.modifiedAt, report\?\.updatedAt\)/);
+  assert.match(dashboard, /refreshLibraryReportRecord\(recordingId, change\.newValue\)/);
+  const latest = new Function(`${dashboard.match(/function latestTimestamp[\s\S]*?\n}\n/)[0]}return latestTimestamp;`)();
+  assert.strictEqual(latest("2026-11-06T10:00:00Z", "2026-11-09T08:00:00Z"), "2026-11-09T08:00:00Z");
+  assert.strictEqual(latest("2026-11-06T10:00:00Z", undefined), "2026-11-06T10:00:00Z");
+
   // The view updates the save status in place and leaves the fields alone.
   class Element {
     constructor(tag) { this.tagName = tag; this.children = []; this.dataset = {};
@@ -122,6 +151,9 @@ assert.strictEqual(exporter.summary(bare).text, "Only a title\n");
   assert.doesNotMatch(page, /felrapport\.pdf|includeTechnicalPackage|JSON\.stringify\(offline/);
   assert.match(html, /<main id="technicalReport"><\/main>/, "the report is not one live region");
   assert.match(html, /id="copySummary"[^>]*data-i18n="technical\.copySummary"/);
+  // Copying the summary is a secondary action, next to Markdown export under More options.
+  assert.match(html, /class="report-options"[\s\S]*id="downloadMarkdown"[\s\S]*id="copySummary"[\s\S]*<\/details>/);
+  assert.doesNotMatch(html.slice(html.indexOf('class="primary-actions"'), html.indexOf('class="report-options"')), /copySummary/);
 
   // The new messages exist in every interface language.
   globalThis.T9LanguageRegistry = languages;
