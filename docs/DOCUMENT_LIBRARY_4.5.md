@@ -108,8 +108,8 @@ document.
 
 ## Moving documents to another computer
 
-Export… in the library heading writes a file with the whole library, the folder
-shown with its subfolders, or the selected documents. Import… reads such a file
+Export in the library heading writes a file with the whole library, the folder
+shown with its subfolders, or the selected documents. Import reads such a file
 on another computer. Nothing is sent anywhere; the user moves the file.
 `document/library-transfer.js` holds the format and the rules; the dashboard
 only reads and writes the file and shows the result.
@@ -164,7 +164,7 @@ only reads and writes the file and shows the result.
 
 ## Syncing through a folder
 
-Sync… in the library heading keeps the library alike on several computers
+Sync in the library heading keeps the library alike on several computers
 through a folder that is already synced between them, for example an empty
 folder in OneDrive. The user chooses the folder with the browser's folder
 picker on each computer. BC Process Studio writes and reads files in that
@@ -222,7 +222,7 @@ the folder handle, asks for permission and shows the result.
   everything else and leaves those documents as they are on both computers.
   Documents deleted on another computer are listed with Delete them here too.
   The automatic sync when the library opens never deletes and never decides a
-  conflict; the status next to Sync… then says the sync is waiting for a
+  conflict; the status beside the library heading then says the sync is waiting for a
   decision. While an import can still be undone, the automatic sync also fetches
   nothing (that would replace the import's undo); it saves this computer's
   changes and waits. When Sync is chosen after a decision, the library is

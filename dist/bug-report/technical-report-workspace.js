@@ -23,6 +23,10 @@
     let revision = 0;
     const history = [clone(report)];
     let historyIndex = 0;
+    // A save that changes what the report says marks when it was edited, so the library shows
+    // the edit; an email recorded on it, which changes no content, does not.
+    let savedContent = model.contentRevision(report);
+    const now = () => options.now ? options.now() : new Date().toISOString();
     const listeners = new Set();
     const notify = () => listeners.forEach(listener => listener(api.state()));
     function commit(next) {
@@ -82,9 +86,11 @@
         if (inFlightSave) return savePromise.then(() => api.flush());
         const savingRevision = revision;
         const snapshot = clone(report);
+        const content = model.contentRevision(snapshot);
+        if (content !== savedContent) snapshot.updatedAt = now();
         inFlightSave = true;
         saveState = "saving"; notify(); savePromise = options.store.save(snapshot)
-        .then(saved => { if (revision === savingRevision) {
+        .then(saved => { savedContent = content; if (revision === savingRevision) {
           report = model.normalize(saved); saveState = "saved";
         } else saveState = "unsaved";
           notify(); return report; })
