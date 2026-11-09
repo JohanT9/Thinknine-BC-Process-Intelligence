@@ -82,10 +82,15 @@ assert(page.includes('<header class="home-appbar">') &&
   page.includes('data-home-view="documents" aria-controls="documentsView" aria-current="page"'));
 assert(page.includes('<dialog id="newRecordingDialog" class="new-recording-dialog" aria-labelledby="newRecordingTitle">'));
 for (const section of ["settingsGeneral", "settingsDocuments", "settingsRecording",
-  "settingsBugReports", "settingsAdvanced"]) {
+  "settingsBugReports"]) {
   assert(page.includes(`id="${section}" class="settings-section"`), section);
   assert(page.includes(`aria-controls="${section}"`), `${section} navigation`);
 }
+// Every settings group button opens a section that exists; the removed Advanced group is gone.
+for (const [, target] of page.matchAll(/data-settings-section="[^"]+" aria-controls="([^"]+)"/gu)) {
+  assert(page.includes(`id="${target}" class="settings-section"`), `${target} exists`);
+}
+assert(!page.includes("settingsAdvanced"), "no Advanced settings group");
 assert(!page.includes('id="save"') && !page.includes('id="saveSupportEmail"'),
   "settings save automatically");
 assert(page.includes('id="settingsSaveState"') && page.includes('id="settingsSaveRetry"'),

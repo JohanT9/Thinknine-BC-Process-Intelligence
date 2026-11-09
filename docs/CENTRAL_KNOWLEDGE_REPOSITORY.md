@@ -91,15 +91,12 @@ those lookups remain unresolved until source metadata supplies them. A hosted ce
 service needs separate platform, identity, authorization, publishing and
 customer-scope decisions.
 
-The phase 3 MCP boundary is described in
-[`KNOWLEDGE_MCP_CONTRACT.md`](KNOWLEDGE_MCP_CONTRACT.md). It is opt-in and injected;
-there is no configured MCP client or remote server in this application. Remote
-answers remain unverified review suggestions and cannot change classifications or
-the active repository release.
+The phase 3 external lookup over MCP has been removed: the extension
+has no MCP client, native host or knowledge server and sends no knowledge lookups.
 
 The phase 4 AI fallback and confidence limits are described in
-[`KNOWLEDGE_AI_FALLBACK.md`](KNOWLEDGE_AI_FALLBACK.md). It follows the local and
-MCP resolvers, requires explicit consent, and returns only unselected suggestions.
+[`KNOWLEDGE_AI_FALLBACK.md`](KNOWLEDGE_AI_FALLBACK.md). It follows the local
+resolver, requires explicit consent, and returns only unselected suggestions.
 
 The phase 5 local learning proposal contract is described in
 [`KNOWLEDGE_FEEDBACK_LEARNING.md`](KNOWLEDGE_FEEDBACK_LEARNING.md). Proposals are

@@ -4,7 +4,6 @@ importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/storage-queries.js");
 importScripts("engine/review-progress-store.js");
-importScripts("engine/knowledge-mcp-client-manager.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
 importScripts("engine/recording-license-guard.js");
@@ -41,9 +40,6 @@ importScripts("document/semantic-interaction-engine.js");
 importScripts("engine/task-consolidation.js");
 importScripts("engine/knowledge-domain.js");
 importScripts("engine/knowledge-repository.js");
-importScripts("engine/knowledge-native-mcp-client.js");
-importScripts("engine/knowledge-mcp-cache.js");
-importScripts("engine/knowledge-mcp-adapter.js");
 importScripts("engine/process-decision-code-registry.js");
 importScripts("review/task-visibility.js");
 importScripts("engine/process-quality-guard.js");
@@ -144,26 +140,6 @@ async function requireRecordingLicense(url) {
     return { source: "consultant", ...result };
   }
 }
-const KNOWLEDGE_MCP_CACHE_KEY = "t9KnowledgeMcpLookupCacheV1";
-const KNOWLEDGE_MCP_KEEP_ALIVE_MS = 60 * 1000;
-const knowledgeMcpClientManager = globalThis.T9KnowledgeMcpClientManager.create(() =>
-  globalThis.BCKnowledgeNativeMcpClient.create({
-    connectNative: host => chrome.runtime.connectNative(host)
-  }));
-async function knowledgeMcpCacheKey(lookup) {
-  const stable = value => Array.isArray(value) ? value.map(stable)
-    : value && typeof value === "object"
-      ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])]))
-      : value;
-  const source = JSON.stringify({ cacheVersion: globalThis.T9KnowledgeMcpCache.VERSION,
-    kind: lookup?.kind, request: stable(lookup?.request || {}) });
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(source));
-  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
-}
-function isKnowledgeMcpSettingsSender(sender) {
-  return sender.id === chrome.runtime.id &&
-    sender.url === chrome.runtime.getURL("dashboard.html");
-}
 const pageKnowledgePacksReady = globalThis.BCKnowledgeRepository.load({
   indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
   resolveUrl: file => chrome.runtime.getURL(file)
@@ -228,7 +204,6 @@ const DEFAULT_SETTINGS = {
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
-  knowledgeMcpEnabled: false,
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -2799,185 +2774,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_TEST_KNOWLEDGE_MCP_CONNECTION": {
-        if (!isKnowledgeMcpSettingsSender(sender)) {
-          sendResponse({ ok: false, reason: "dashboard-only" });
-          break;
-        }
-        if (!(await getSettings()).knowledgeMcpEnabled) {
-          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
-          break;
-        }
-        let knowledgeMcpLease = null;
-        try {
-          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
-          const tools = await knowledgeMcpLease.client.listTools();
-          sendResponse({ ok: true, toolCount: tools.length });
-        } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
-            ...(detail ? { detail } : {}) });
-        } finally {
-          knowledgeMcpLease?.release();
-        }
-        break;
-      }
-
-      case "T9_TEST_KNOWLEDGE_MCP_SAMPLE_LOOKUP": {
-        if (!isKnowledgeMcpSettingsSender(sender)) {
-          sendResponse({ ok: false, reason: "dashboard-only" });
-          break;
-        }
-        const settings = await getSettings();
-        if (!settings.knowledgeMcpEnabled) {
-          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
-          break;
-        }
-        let knowledgeMcpLease = null;
-        try {
-          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
-          const response = await knowledgeMcpLease.client.callTool({
-            name: globalThis.BCKnowledgeMcpAdapter.TOOL_OBJECT,
-            arguments: { objectType: "page", objectId: "22",
-              productFamily: "business-central",
-              ...(settings.uiLocale ? { locale: settings.uiLocale } : {}) }
-          });
-          const result = globalThis.BCKnowledgeMcpAdapter.parseToolResult("object", response);
-          sendResponse({ ok: true, result });
-        } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
-            ...(detail ? { detail } : {}) });
-        } finally {
-          knowledgeMcpLease?.release();
-        }
-        break;
-      }
-      case "T9_LOOKUP_KNOWLEDGE_MCP_BATCH": {
-        if (!isKnowledgeMcpSettingsSender(sender)) {
-          sendResponse({ ok: false, reason: "dashboard-only" });
-          break;
-        }
-        const settings = await getSettings();
-        if (!settings.knowledgeMcpEnabled) {
-          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
-          break;
-        }
-        const repositoryState = await pageKnowledgePacksReady;
-        if (!repositoryState.repository) {
-          sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
-          break;
-        }
-        const lookups = Array.isArray(message.lookups) ? message.lookups.slice(0, 12) : [];
-        const results = new Array(lookups.length);
-        const cacheUpdates = [];
-        let knowledgeMcpLease = null;
-        let cacheHitCount = 0;
-        try {
-          const cacheData = await chrome.storage.local.get(KNOWLEDGE_MCP_CACHE_KEY);
-          const cache = cacheData[KNOWLEDGE_MCP_CACHE_KEY] || {};
-          const misses = [];
-          for (const [index, lookup] of lookups.entries()) {
-            const cacheKey = await knowledgeMcpCacheKey(lookup);
-            const cached = globalThis.T9KnowledgeMcpCache.read(cache, cacheKey);
-            const resultKey = typeof lookup?.key === "string"
-              ? lookup.key.slice(0, 160) : "lookup-" + index;
-            if (cached) {
-              results[index] = { key: resultKey, kind: lookup?.kind,
-                result: cached, fromCache: true };
-              cacheHitCount++;
-            } else misses.push({ lookup, index, cacheKey, resultKey });
-          }
-          if (misses.length) {
-            knowledgeMcpLease = knowledgeMcpClientManager.acquire();
-            const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
-              client: knowledgeMcpLease.client, repository: repositoryState.repository, consent: true
-            });
-            const resolveLookup = async item => {
-              const { lookup, cacheKey, resultKey } = item;
-              const kind = lookup?.kind;
-              const request = lookup?.request || {};
-              const result = kind === "object" ? await adapter.resolveObject(request)
-                : kind === "action" ? await adapter.resolveAction(request)
-                  : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
-              if (result?.status === "suggested" && result?.source === "mcp-unverified" &&
-                  result?.requiresReview === true) cacheUpdates.push({ key: cacheKey, result });
-              else if (globalThis.T9KnowledgeMcpCache.isTransientFailure(result)) {
-                cacheUpdates.push({ key: cacheKey, result,
-                  ttlMs: globalThis.T9KnowledgeMcpCache.TRANSIENT_FAILURE_TTL_MS });
-              }
-              return { key: resultKey, kind, result, fromCache: false };
-            };
-            // Native MCP requests are bounded by the client timeout. Up to four run at once,
-            // and each finished lookup starts the next instead of waiting for the slowest of four.
-            let nextMiss = 0;
-            await Promise.all(Array.from({ length: Math.min(4, misses.length) }, async () => {
-              while (nextMiss < misses.length) {
-                const item = misses[nextMiss++];
-                results[item.index] = await resolveLookup(item);
-              }
-            }));
-            if (cacheUpdates.length) {
-              const nextCache = globalThis.T9KnowledgeMcpCache.write(cache, cacheUpdates);
-              await chrome.storage.local.set({ [KNOWLEDGE_MCP_CACHE_KEY]: nextCache });
-            }
-          }
-          sendResponse({ ok: true, results,
-            fromCache: results.length > 0 && results.every(item => item?.fromCache === true),
-            cacheHitCount, cacheMissCount: misses.length,
-            failureCount: results.filter(item => item?.result?.status === "unresolved").length,
-            cacheTtlDays: 30 });
-        } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
-            ...(detail ? { detail } : {}) });
-        } finally {
-          // Documents opened shortly after this one reuse the started host.
-          knowledgeMcpLease?.release({ keepAliveMs: KNOWLEDGE_MCP_KEEP_ALIVE_MS });
-        }
-        break;
-      }
-      case "T9_LOOKUP_KNOWLEDGE_MCP": {
-        if (!isKnowledgeMcpSettingsSender(sender)) {
-          sendResponse({ ok: false, reason: "dashboard-only" });
-          break;
-        }
-        if (!(await getSettings()).knowledgeMcpEnabled) {
-          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
-          break;
-        }
-        const repositoryState = await pageKnowledgePacksReady;
-        if (!repositoryState.repository) {
-          sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
-          break;
-        }
-        let knowledgeMcpLease = null;
-        try {
-          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
-          const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
-            client: knowledgeMcpLease.client, repository: repositoryState.repository,
-            consent: true
-          });
-          const request = message.request || {};
-          const result = message.kind === "object"
-            ? await adapter.resolveObject(request)
-            : message.kind === "action"
-              ? await adapter.resolveAction(request)
-              : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
-          sendResponse({ ok: true, result });
-        } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
-          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
-            ...(detail ? { detail } : {}) });
-        } finally {
-          knowledgeMcpLease?.release();
-        }
-        break;
-      }
-
       case "T9_SAVE_SETTINGS": {
         const settings = { ...(await getSettings()), ...(message.settings || {}) };
-        settings.knowledgeMcpEnabled = settings.knowledgeMcpEnabled === true;
         settings.uiLocale = globalThis.T9LanguageRegistry.normalize(
           settings.uiLocale, "ui");
         settings.documentLanguage = globalThis.T9LanguageRegistry.normalize(
