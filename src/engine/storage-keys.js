@@ -28,6 +28,13 @@
   const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
   // One entry per test run, keyed by its own id; each names the recording it tests.
   const TEST_RUN_PREFIX = "t9_test_run_";
+  // Screenshots taken during a test run: prefix + recording id + ":" + test run id + ":" +
+  // screenshot id, so they belong to the tested document like its other screenshots.
+  const TEST_SCREENSHOT_PREFIX = "t9_test_shot_";
+  // The test run being worked on, offered in the toolbar popup. Not part of any document.
+  const ACTIVE_TEST_RUN_KEY = "t9_active_test_run";
+  // Session storage: the Business Central tabs the toolbar button has been used on.
+  const TEST_ACCESS_TABS_KEY = "t9_test_access_tabs";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -46,6 +53,9 @@
     BUG_REPORT_PREFIX,
     BC_ERROR_EVIDENCE_PREFIX,
     TEST_RUN_PREFIX,
+    TEST_SCREENSHOT_PREFIX,
+    ACTIVE_TEST_RUN_KEY,
+    TEST_ACCESS_TABS_KEY,
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     DOCUMENT_FOLDERS_KEY,

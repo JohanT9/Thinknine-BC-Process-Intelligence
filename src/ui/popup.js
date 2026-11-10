@@ -652,11 +652,53 @@ $("nameForm").addEventListener("submit", event => {
   finishRecording(name, $("recordingDocumentLanguage").value);
 });
 
+// The test being worked on, continued beside Business Central from here. Opening this popup
+// is also what lets the extension take screenshots of the tab: Edge allows that only after the
+// user has used the extension's toolbar button on the tab.
+let testRunTab = null;
+let activeTestRunId = "";
+const isBusinessCentralTab = tab => {
+  try {
+    const host = new URL(String(tab?.url || "")).hostname;
+    return host === "businesscentral.dynamics.com" || host.endsWith(".businesscentral.dynamics.com");
+  } catch { return false; }
+};
+async function showActiveTest() {
+  const card = $("activeTestCard");
+  try {
+    const tab = await currentTab();
+    if (!isBusinessCentralTab(tab)) { card.hidden = true; return; }
+    void send({ type: "T9_TEST_TAB_OPENED", tabId: tab.id }, 3000).catch(() => {});
+    const state = await send({ type: "T9_GET_STATE" }, 3000);
+    const run = state?.state?.recording ? null
+      : (await send({ type: "T9_GET_ACTIVE_TEST_RUN" }, 3000))?.run;
+    if (!run || !(run.summary?.notRun > 0)) { card.hidden = true; return; }
+    testRunTab = tab;
+    activeTestRunId = run.testRunId;
+    updateText($("activeTestTitle"), run.title);
+    updateText($("activeTestProgress"), tf("test.stepsTested",
+      { done: run.summary.total - run.summary.notRun, total: run.summary.total }));
+    card.hidden = false;
+    $("continueTest").focus();
+  } catch {
+    card.hidden = true;
+  }
+}
+// The browser opens a panel only straight from a click, so nothing is awaited before it.
+function continueTest(testRunId) {
+  const tab = testRunTab;
+  if (!chrome.sidePanel?.open || !tab) { showMessage(t("test.panelUnavailable"), true); return; }
+  chrome.sidePanel.setOptions({ enabled: true,
+    path: `test-panel.html?testRunId=${encodeURIComponent(testRunId)}` }).catch(() => {});
+  chrome.sidePanel.open({ windowId: tab.windowId }).then(() => window.close(),
+    () => showMessage(t("test.panelUnavailable"), true));
+}
+$("continueTest").addEventListener("click", () => continueTest(activeTestRunId));
 $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 $("knowledgeAdmin").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("knowledge-admin.html") });
 });
-loadUiLocale().then(refresh).then(updateLicenseCard).then(async () => {
+loadUiLocale().then(refresh).then(() => { void showActiveTest(); }).then(updateLicenseCard).then(async () => {
   try {
     const access = await send({ type: "T9_GET_KNOWLEDGE_ADMIN_ACCESS" }, 3000);
     $("knowledgeAdmin").hidden = access?.authorized !== true;

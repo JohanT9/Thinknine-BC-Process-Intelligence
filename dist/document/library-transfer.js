@@ -48,8 +48,9 @@
       keys.SCREENSHOT_MANIFEST_PREFIX, keys.REVIEW_PREFIX, keys.REVIEW_PROGRESS_PREFIX];
     // Event logs: the header is prefix + id, each event prefix + id + ":event:…".
     const logs = [keys.RECORDING_PREFIX, keys.RAW_RECORDING_PREFIX];
-    // Screenshots: prefix + id + ":" + screenshot key or hash.
-    const assets = [keys.SCREENSHOT_ASSET_PREFIX, keys.SCREENSHOT_BLOB_PREFIX];
+    // Screenshots: prefix + id + ":" + screenshot key or hash (test screenshots: + run id too).
+    const assets = [keys.SCREENSHOT_ASSET_PREFIX, keys.SCREENSHOT_BLOB_PREFIX,
+      keys.TEST_SCREENSHOT_PREFIX].filter(Boolean);
     const evidenceIndex = `${keys.BC_ERROR_EVIDENCE_PREFIX}index_`;
     // Entries named by their own id that record the document in their value.
     const byValue = [
