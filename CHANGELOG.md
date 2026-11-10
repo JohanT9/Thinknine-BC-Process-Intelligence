@@ -1,3 +1,8 @@
+## 4.7.247
+- Test suites: Test protocol on a suite's page gives one protocol for the whole suite to print or save as PDF, for example to sign off an upgrade: the result, environment and version, an overview of every test, each test's steps and results on its own page, and lines for the signatures.
+- Test protocol: When printed with background graphics, the page margins are white in the dark theme too.
+- Removed code the extension no longer used: the old Word exporter, the legacy documentation engine and an unused screenshot loader, with the two tests that only covered the old exporter.
+
 ## 4.7.246
 - Test suites: select documents in the library and choose Create test suite to test them together, for example before a Business Central upgrade, with the environment and version tested. The suite's page shows how many tests are run and failed and where each test stands, and opens each test; New round runs the same tests again in a new suite after the next upgrade, with the expected results carried over. The suites are listed in the library. They are included in library export and sync together with the first of their documents, and move to another of their documents when that one is deleted.
 - Test runs: Steps the document words in its own way, such as Välj Leverantörsnamn 11976 or Ange 5000 i Antal, could not be compared with a recording and were left as not comparable. They are now compared like other steps. Tests created before this version keep the old steps; create the test again from the document to compare them.

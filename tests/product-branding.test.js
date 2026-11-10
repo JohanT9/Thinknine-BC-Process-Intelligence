@@ -47,8 +47,7 @@ assert(!primarySurfaces.includes("BC Process AI"),
 console.log("BC Process Studio branding and compatibility tests passed.");
 
 const visibleBrandSurfaces = ["src/ui/popup.html", "src/ui/dashboard.html",
-  "src/engine/product-brand.js", "src/engine/documentation-engine.js",
-  "src/exporters/word-exporter.js", "src/document/document-planner.js"];
+  "src/engine/product-brand.js", "src/document/document-planner.js"];
 for (const file of visibleBrandSurfaces) {
   assert(!/thinknine|\bT9\b/i.test(read(file)), `Removed branding remains in ${file}`);
 }
