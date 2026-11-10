@@ -105,6 +105,9 @@ assert.ok(dashboardPage.includes('id="libraryBatchSuite"') && dashboardPage.incl
 const dashboard = read("src/ui/dashboard.js");
 assert.ok(dashboard.includes('type: "T9_CREATE_TEST_SUITE"') && dashboard.includes('type: "T9_LIST_TEST_SUITES"'));
 assert.ok(read("src/ui/test-run.js").includes('suite.partOf'));
+// The suite's protocol: the protocol page with the suite, opened from the suite's page.
+assert.ok(read("src/ui/test-suite.js").includes("test-protocol.html?suiteId="));
+assert.ok(read("src/ui/test-protocol.js").includes('type: "T9_LOAD_TEST_SUITE"'));
 
 // Every suite text in every registered language, with the same placeholders.
 const vm = require("vm");
@@ -117,7 +120,8 @@ for (const file of ["src/engine/locale-catalogs.js", "src/engine/language-regist
 const i18n = context.globalThis.T9UiI18n;
 const locales = context.globalThis.T9LanguageRegistry.DEFAULT_DEFINITIONS.filter(item => item.ui).map(item => item.locale);
 assert.strictEqual(locales.length, 8);
-const used = new Set([page, dashboardPage, read("src/ui/test-suite.js"), dashboard, read("src/ui/test-run.js")]
+const used = new Set([page, dashboardPage, read("src/ui/test-suite.js"), dashboard, read("src/ui/test-run.js"),
+  read("src/ui/test-protocol.js")]
   .flatMap(source => [...source.matchAll(/["'`](suite\.[a-zA-Z.-]+)["'`]/gu)].map(match => match[1])));
 assert.ok(used.size >= 25, `suite texts found: ${used.size}`);
 for (const key of [...used, ...["not-started", "in-progress", "passed", "failed", "missing"].map(status => `suite.status.${status}`)]) {

@@ -48,11 +48,9 @@ Their contracts contain content and intent, never `docx` objects, Word XML,
 twips, browser nodes or PDF primitives. Capabilities affect inclusion only in
 Planner. The Word adapter only maps already planned components to Word.
 
-The old `word-exporter.js` is retained only as a quarantined compatibility
-implementation for isolated tests. It is not loaded by the production dashboard.
-`documentation-engine.js` remains a separately tested legacy documentation
-engine but its unused dashboard script load was removed. It is not part of the
-active Word path.
+The old `word-exporter.js` and the legacy `documentation-engine.js` were removed
+in 4.7.247; neither was loaded by the extension. Word export goes only through
+the path described above.
 
 ## Output parity
 

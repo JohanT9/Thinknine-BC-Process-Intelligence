@@ -203,6 +203,10 @@
       if (Object.keys(changes).some(key => runKeys.has(key)) && !Object.keys(pending).length) void reload();
     });
     document.getElementById("nextRound").addEventListener("click", nextRound);
+    document.getElementById("openSuiteProtocol").addEventListener("click", async () => {
+      await save().catch(() => {});
+      openPage(`test-protocol.html?suiteId=${encodeURIComponent(suiteId)}`);
+    });
     document.getElementById("deleteSuite").addEventListener("click", () => showDeleteConfirm(
       document.getElementById("deleteConfirm").hidden));
     document.getElementById("deleteCancel").addEventListener("click", () => showDeleteConfirm(false));
