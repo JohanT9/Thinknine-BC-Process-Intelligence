@@ -56,6 +56,7 @@
     .run-suggestion[data-state=done]{border-left:4px solid var(--c-bd-15803d)}
     .run-suggestion[data-state=not-found]{border-left:4px solid var(--c-bd-8392a5)}
     .run-suggestion[data-state=unknown]{border-left:4px solid var(--c-bd-ccd5df);color:var(--c-fg-526273)}
+    .run-suite{margin:0 0 12px;font-size:.875rem}.run-suite button{margin:0;padding:0;min-height:0;border:0;background:none;color:var(--colorLink,#0b5cad);text-decoration:underline;font:inherit;cursor:pointer;text-align:left;overflow-wrap:anywhere}
     .expected-resolved{margin:4px 0 0;font-size:.875rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
     @media(max-width:760px){.run-setup{grid-template-columns:1fr}}
     .run-shots-title{margin:12px 0 6px;font-weight:600}
@@ -88,6 +89,7 @@
   <main id="testRun" aria-labelledby="runTitle">
     <h1 id="runTitle" data-i18n-ignore></h1>
     <p id="saveState" class="save-state" role="status"></p>
+    <p id="runSuite" class="run-suite" hidden><button id="runSuiteLink" type="button" data-i18n-ignore></button></p>
     <p class="run-intro" data-i18n="test.intro">The steps come from the reviewed document as it was when the test was created. Write the expected result for each step; it is kept for the next run.</p>
     <p id="runSummary" class="run-summary" tabindex="-1" data-i18n-ignore></p>
     <div class="run-fields">

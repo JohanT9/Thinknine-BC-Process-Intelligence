@@ -3607,7 +3607,7 @@ async function exportLibraryDocument(record, exportSettings) {
 
 // A manual test from the document as it reads now: its steps in the document language,
 // with the user's edits. The run opens on its own page.
-async function createTestRun(record) {
+async function createTestRun(record, options = {}) {
   const session = documentLibrarySessions.get(record.projectId);
   if (!session || session.status === "recording" || session.recordingPurpose === "bug-report") {
     throw new Error(uiT("test.noSteps"));
@@ -3631,7 +3631,13 @@ async function createTestRun(record) {
   } catch {
     throw new Error(uiT("test.noSteps"));
   }
-  const response = await send({ type: "T9_CREATE_TEST_RUN", run });
+  // A run made for a test suite names the suite and the environment tested, and is opened
+  // from the suite's page.
+  if (options.suiteId) {
+    run = { ...run, suiteId: options.suiteId, environment: String(options.environment || "") };
+  }
+  const response = await send({ type: "T9_CREATE_TEST_RUN", run,
+    ...(options.suiteId ? { open: false } : {}) });
   if (!response?.ok) throw new Error(uiT(response?.error || "test.runNotFound"));
   return response.run;
 }
@@ -4294,7 +4300,7 @@ function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
   $("libraryBatchMove").hidden = !documentFoldersEditable;
-  for (const id of ["libraryBatchExport", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
+  for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
     "libraryBatchTags", "libraryBatchProfile", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
@@ -4818,6 +4824,132 @@ $("libraryFolders").addEventListener("click", event => {
 });
 $("libraryBatchMove").addEventListener("click", event =>
   openLibraryMoveDialog([...documentLibrarySelection.selectedIds], event.currentTarget));
+
+// Test suites (document/test-suite.js): the tests of the selected documents, run together
+// with the environment and version tested. One test run is made per document, as Run test
+// makes it; a document that cannot become a test is left out and named.
+let libraryTestSuiteOpener = null;
+let libraryTestSuiteBusy = false;
+function openLibraryTestSuiteDialog(opener) {
+  if (!documentLibrarySelection.selectedIds.length) return;
+  libraryTestSuiteOpener = opener;
+  $("libraryTestSuiteName").value = uiTf("suite.defaultTitle", {
+    date: new Date().toLocaleDateString(applicationSettings.uiLocale || "en-US") });
+  $("libraryTestSuiteEnvironment").value = "";
+  $("libraryTestSuiteVersion").value = "";
+  $("libraryTestSuiteStatus").textContent = "";
+  $("libraryTestSuiteError").textContent = "";
+  $("libraryTestSuiteSubmit").disabled = false;
+  $("libraryTestSuiteDialog").showModal();
+  $("libraryTestSuiteName").select();
+}
+async function createLibraryTestSuite() {
+  if (libraryTestSuiteBusy) return;
+  const ids = [...documentLibrarySelection.selectedIds];
+  const records = ids.map(id => documentLibraryRecords.find(record => record.projectId === id))
+    .filter(Boolean);
+  const environment = $("libraryTestSuiteEnvironment").value.trim();
+  const version = $("libraryTestSuiteVersion").value.trim();
+  const suiteId = `test-suite-${crypto.randomUUID()}`;
+  const items = [];
+  const skipped = [];
+  libraryTestSuiteBusy = true;
+  $("libraryTestSuiteSubmit").disabled = true;
+  $("libraryTestSuiteError").textContent = "";
+  try {
+    for (const [index, record] of records.entries()) {
+      $("libraryTestSuiteStatus").textContent = uiTf("suite.creating", {
+        current: index + 1, total: records.length, title: record.title });
+      try {
+        const run = await createTestRun(record, { suiteId,
+          environment: [environment, version].filter(Boolean).join(", ") });
+        items.push({ sessionId: record.projectId, title: record.title, testRunId: run.testRunId });
+      } catch { skipped.push(record.title); }
+    }
+    if (!items.length) {
+      $("libraryTestSuiteStatus").textContent = "";
+      $("libraryTestSuiteError").textContent = uiT("suite.noneTestable");
+      return;
+    }
+    const suite = globalThis.T9TestSuite.create({ suiteId, items, environment, version,
+      title: $("libraryTestSuiteName").value.trim() || uiTf("suite.defaultTitle", {
+        date: new Date().toLocaleDateString(applicationSettings.uiLocale || "en-US") }) });
+    const response = await send({ type: "T9_CREATE_TEST_SUITE", suite });
+    if (!response?.ok) throw new Error(uiT(response?.error || "suite.notFound"));
+    $("libraryTestSuiteDialog").close();
+    show(skipped.length ? uiTf("suite.skipped", { titles: skipped.join(", ") }) : "");
+    void refreshLibraryTestSuites();
+  } catch (error) {
+    $("libraryTestSuiteStatus").textContent = "";
+    $("libraryTestSuiteError").textContent = error?.message || String(error);
+  } finally {
+    libraryTestSuiteBusy = false;
+    $("libraryTestSuiteSubmit").disabled = false;
+  }
+}
+// The suites, newest first, with their progress. Shown above the documents while nothing is
+// searched; each opens its own page.
+async function refreshLibraryTestSuites() {
+  let suites = [];
+  try { suites = (await send({ type: "T9_LIST_TEST_SUITES" }))?.suites || []; } catch { suites = []; }
+  const list = $("libraryTestSuiteList");
+  list.replaceChildren(...suites.map(suite => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "library-continue-card";
+    card.dataset.testSuiteId = suite.suiteId;
+    const kind = document.createElement("span");
+    kind.className = "library-continue-kind";
+    // Rounds of the same suite share a name; the environment, or else the date, tells them apart.
+    kind.textContent = [suite.environment, suite.version].filter(Boolean).join(" · ") ||
+      uiTf("suite.created", { date: new Date(suite.createdAt).toLocaleDateString(
+        applicationSettings.uiLocale || "en-US") });
+    const title = document.createElement("strong");
+    title.textContent = suite.title || uiT("suite.pageTitle");
+    const bar = document.createElement("span");
+    bar.className = "library-progress";
+    bar.setAttribute("aria-hidden", "true");
+    const fill = document.createElement("span");
+    fill.style.width = `${suite.progress.total ? Math.round(100 * suite.progress.done / suite.progress.total) : 0}%`;
+    bar.append(fill);
+    const next = document.createElement("span");
+    next.className = "library-continue-next";
+    next.textContent = uiTf("suite.progress", { done: suite.progress.done,
+      total: suite.progress.total, failed: suite.progress.failed });
+    card.append(kind, title, bar, next);
+    return card;
+  }));
+  $("libraryTestSuites").hidden = suites.length === 0;
+}
+$("libraryBatchSuite").addEventListener("click", event => openLibraryTestSuiteDialog(event.currentTarget));
+$("libraryTestSuiteForm").addEventListener("submit", event => {
+  event.preventDefault();
+  void createLibraryTestSuite();
+});
+$("libraryTestSuiteDialog").addEventListener("click", event => {
+  if (event.target.closest("[data-folder-cancel]") && !libraryTestSuiteBusy) $("libraryTestSuiteDialog").close();
+});
+$("libraryTestSuiteDialog").addEventListener("cancel", event => {
+  if (libraryTestSuiteBusy) event.preventDefault();
+});
+$("libraryTestSuiteDialog").addEventListener("close", () => {
+  (libraryTestSuiteOpener?.isConnected ? libraryTestSuiteOpener : $("librarySearch")).focus();
+});
+$("libraryTestSuiteList").addEventListener("click", event => {
+  const card = event.target.closest("[data-test-suite-id]");
+  if (card) void chrome.tabs.create({ url: chrome.runtime.getURL(
+    `test-suite.html?suiteId=${encodeURIComponent(card.dataset.testSuiteId)}`) });
+});
+// Progress changes on the test pages; the list follows, a little later.
+let libraryTestSuiteTimer = null;
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local") return;
+  const storageKeys = globalThis.T9StorageKeys;
+  if (!Object.keys(changes).some(key => key.startsWith(storageKeys.TEST_SUITE_PREFIX) ||
+      key.startsWith(storageKeys.TEST_RUN_PREFIX))) return;
+  clearTimeout(libraryTestSuiteTimer);
+  libraryTestSuiteTimer = setTimeout(() => { void refreshLibraryTestSuites(); }, 500);
+});
 
 // Moving documents to another computer (document/library-transfer.js): an export file with
 // everything stored for the documents, and its import with a preview, a choice for documents
@@ -9586,6 +9718,7 @@ async function loadSessions(request = null) {
     ? response.sessions
     : [];
   await loadDocumentLibrary(sessions, response || {});
+  void refreshLibraryTestSuites();
 }
 
 async function openRequestedReview() {

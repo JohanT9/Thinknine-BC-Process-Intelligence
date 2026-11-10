@@ -383,6 +383,11 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <div id="libraryContinueList" class="library-continue-list"></div>
   </section>
 
+  <section id="libraryTestSuites" class="library-continue" aria-labelledby="libraryTestSuitesTitle" hidden>
+    <h3 id="libraryTestSuitesTitle" data-i18n="suite.librarySection">Testsviter</h3>
+    <div id="libraryTestSuiteList" class="library-continue-list"></div>
+  </section>
+
   <!-- The heading, search and quick filter rows share columns, so the actions line up. -->
   <div class="library-toolbar">
   <div class="library-heading">
@@ -490,6 +495,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <span id="libraryBatchCount" class="library-batch-count"></span>
     <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
     <button id="libraryBatchExport" class="primary">Exportera Word</button>
+    <button id="libraryBatchSuite" class="secondary" data-i18n="suite.create">Skapa testsvit</button>
     <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
     <button id="libraryBatchArchive" class="secondary">Arkivera</button>
     <button id="libraryBatchMove" class="secondary" data-i18n="folder.moveSelected">Flytta till mapp</button>
@@ -702,6 +708,23 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <p id="libraryFolderError" class="library-folder-error" role="alert"></p>
     <footer><button type="button" value="cancel" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
       <button id="libraryFolderSubmit" type="submit" class="primary"></button></footer>
+  </form>
+</dialog>
+<dialog id="libraryTestSuiteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryTestSuiteTitle" aria-describedby="libraryTestSuiteHelp">
+  <form id="libraryTestSuiteForm" class="library-test-suite-form" method="dialog" novalidate>
+    <h3 id="libraryTestSuiteTitle" data-i18n="suite.createTitle">Skapa testsvit</h3>
+    <p id="libraryTestSuiteHelp" data-i18n="suite.createHelp">Ett test skapas för varje valt dokument.</p>
+    <label class="library-folder-field" for="libraryTestSuiteName"><span data-i18n="suite.title">Namn</span>
+      <input id="libraryTestSuiteName" type="text" maxlength="120" autocomplete="off"></label>
+    <label class="library-folder-field" for="libraryTestSuiteEnvironment"><span data-i18n="suite.environment">Miljö</span>
+      <input id="libraryTestSuiteEnvironment" type="text" maxlength="120" autocomplete="off"></label>
+    <label class="library-folder-field" for="libraryTestSuiteVersion"><span data-i18n="suite.version">Business Central-version</span>
+      <input id="libraryTestSuiteVersion" type="text" maxlength="60" autocomplete="off" aria-describedby="libraryTestSuiteVersionHelp">
+      <span id="libraryTestSuiteVersionHelp" class="library-test-suite-help" data-i18n="suite.versionHelp">Till exempel BC 28 eller den version som testas.</span></label>
+    <p id="libraryTestSuiteStatus" role="status" aria-live="polite"></p>
+    <p id="libraryTestSuiteError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" class="secondary" data-folder-cancel data-i18n="suite.cancel">Avbryt</button>
+      <button id="libraryTestSuiteSubmit" type="submit" class="primary" data-i18n="suite.createButton">Skapa</button></footer>
   </form>
 </dialog>
 <dialog id="libraryMoveDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryMoveTitle">
@@ -1344,6 +1367,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document/library-transfer.js"></script>
 <script src="document/library-sync.js"></script>
 <script src="document/test-recording-match.js"></script>
+<script src="document/test-suite.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>

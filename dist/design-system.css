@@ -466,6 +466,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-folder-field input,.library-folder-field select{width:100%;box-sizing:border-box;font-weight:400}
 .library-folder-error{color:var(--colorStatusDanger);font-size:13px}
 .library-folder-error:empty{display:none}
+.library-test-suite-form input,.library-test-suite-form label{margin:0}
+.library-test-suite-form [role=status]:empty{display:none}
+.library-test-suite-help{color:var(--colorTextSecondary);font-size:13px;font-weight:400}
 .library-folder-counts{margin:0;padding-left:20px}
 .library-folder-dialog footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space8);margin:0!important}
 .library-folder-dialog footer button{margin:0}

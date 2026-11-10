@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Test suite</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    html{overflow-x:hidden}body{font:16px system-ui;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-eef2f6);overflow-x:hidden}
+    header{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 24px;background:var(--c-bg-ffffff);border-bottom:1px solid var(--c-bd-ccd5df)}
+    header .actions{display:flex;flex-wrap:wrap;gap:8px}header button{min-height:40px;padding:8px 12px;margin:0}
+    #suiteMessage{flex:1 1 220px;min-width:0;font-size:.9375rem}
+    main{box-sizing:border-box;max-width:1100px;margin:auto;background:var(--c-bg-ffffff);padding:24px}
+    h1{margin:0 0 4px;font-size:1.5rem;overflow-wrap:anywhere}h2{font-size:1.15rem;margin:24px 0 8px}
+    .save-state{margin:0 0 12px;font-size:.875rem;color:var(--c-fg-526273)}.save-state button{margin-left:8px;min-height:32px}
+    .save-state[data-state=failed]{color:var(--c-fg-8a1c14);font-weight:600}
+    .suite-meta{margin:0 0 12px;font-size:.875rem;color:var(--c-fg-526273);display:flex;flex-wrap:wrap;gap:4px 16px}
+    .suite-meta button{margin:0;padding:0;min-height:0;border:0;background:none;color:var(--colorLink,#0b5cad);text-decoration:underline;font:inherit;cursor:pointer}
+    .suite-summary{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin:0 0 16px;padding:10px 14px;border:1px solid var(--c-bd-dfe5ec);border-radius:6px}
+    .suite-summary strong[data-outcome=passed]{color:var(--c-fg-166534)}.suite-summary strong[data-outcome=failed]{color:var(--c-fg-8a1c14)}
+    .suite-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 16px;margin:0 0 8px}
+    label{display:block;font-weight:600}input[type=text]{box-sizing:border-box;width:100%;padding:8px;font:inherit;margin-top:4px}
+    .field-help{margin:4px 0 0;font-size:.875rem;color:var(--c-fg-526273);font-weight:400}
+    .suite-tests{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+    .suite-test{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:12px 16px;border:1px solid var(--c-bd-ccd5df);border-left:4px solid var(--c-bd-ccd5df);border-radius:6px;min-width:0}
+    .suite-test[data-status=passed]{border-left-color:var(--c-bd-15803d)}.suite-test[data-status=failed]{border-left-color:var(--c-bd-b42318);background:var(--c-bg-fff4f2)}
+    .suite-test[data-status=in-progress]{border-left-color:var(--c-bg-008c95)}.suite-test[data-status=missing]{color:var(--c-fg-526273)}
+    .suite-test-text{flex:1 1 260px;min-width:0}
+    .suite-test-title{margin:0;font-weight:600;overflow-wrap:anywhere}
+    .suite-test-status{margin:2px 0 0;font-size:.875rem;color:var(--c-fg-526273)}
+    .suite-test-status strong{color:var(--c-fg-172b4d)}
+    .suite-test[data-status=failed] .suite-test-status strong{color:var(--c-fg-8a1c14)}
+    .suite-test[data-status=passed] .suite-test-status strong{color:var(--c-fg-166534)}
+    .suite-test button{margin:0;min-height:40px}
+    .suite-delete{margin:24px 0 0;padding:12px 14px;border:1px solid var(--c-bd-b42318);border-radius:6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+    .suite-delete p{margin:0;flex:1 1 260px;min-width:0}.suite-delete button{margin:0;min-height:40px}
+    @media(max-width:640px){header{padding:10px 16px}main{padding:16px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="actions">
+      <button id="nextRound" type="button" class="primary" aria-describedby="nextRoundHelp" data-i18n="suite.nextRound">New round</button>
+      <button id="deleteSuite" type="button" aria-controls="deleteConfirm" aria-expanded="false" data-i18n="suite.delete">Delete suite</button>
+      <button id="closeSuite" type="button" data-i18n="test.close">Close</button>
+    </div>
+    <span id="suiteMessage" role="status"></span>
+  </header>
+  <main id="testSuite" aria-labelledby="suiteTitle">
+    <h1 id="suiteTitle" data-i18n-ignore></h1>
+    <p id="saveState" class="save-state" role="status"></p>
+    <p id="suiteMeta" class="suite-meta" data-i18n-ignore></p>
+    <p id="suiteSummary" class="suite-summary" data-i18n-ignore></p>
+    <div class="suite-fields">
+      <div><label for="suiteName" data-i18n="suite.title">Name</label><input id="suiteName" type="text"></div>
+      <div><label for="suiteEnvironment" data-i18n="suite.environment">Environment</label><input id="suiteEnvironment" type="text"></div>
+      <div><label for="suiteVersion" data-i18n="suite.version">Business Central version</label><input id="suiteVersion" type="text" aria-describedby="suiteVersionHelp">
+        <p id="suiteVersionHelp" class="field-help" data-i18n="suite.versionHelp">For example BC 28, or the version being tested.</p></div>
+    </div>
+    <p id="nextRoundHelp" class="field-help" data-i18n="suite.nextRoundHelp">Run the same tests again in a new suite, for example after the next upgrade. Expected results are carried over.</p>
+    <h2 id="suiteTestsTitle" data-i18n="suite.tests">Tests</h2>
+    <ol id="suiteTests" class="suite-tests" aria-labelledby="suiteTestsTitle" data-i18n-ignore></ol>
+    <div id="deleteConfirm" class="suite-delete" role="group" aria-labelledby="deleteConfirmText" hidden>
+      <p id="deleteConfirmText" data-i18n="suite.deleteConfirm">The suite is deleted. The test runs are kept with their documents.</p>
+      <button id="deleteConfirmButton" type="button" class="danger" data-i18n="suite.deleteButton">Delete</button>
+      <button id="deleteCancel" type="button" data-i18n="suite.cancel">Cancel</button>
+    </div>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="engine/storage-keys.js"></script>
+  <script src="document/test-suite.js"></script>
+  <script src="test-suite.js"></script>
+</body>
+</html>

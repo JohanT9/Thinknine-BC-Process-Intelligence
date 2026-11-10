@@ -509,6 +509,16 @@
     const value = await client.load();
     void send({ type: "T9_SET_ACTIVE_TEST_RUN", testRunId }).catch(() => {});
     document.title = `${t("test.pageTitle")}: ${value.title}`;
+    // A run made for a test suite leads back to the suite's page.
+    if (value.suiteId) {
+      send({ type: "T9_LOAD_TEST_SUITE", suiteId: value.suiteId }).then(response => {
+        const link = document.getElementById("runSuiteLink");
+        link.textContent = t("suite.partOf", { title: response.suite.title || t("suite.pageTitle") });
+        link.addEventListener("click", () => { void chrome.tabs.create({ url: chrome.runtime.getURL(
+          `test-suite.html?suiteId=${encodeURIComponent(value.suiteId)}`) }); });
+        document.getElementById("runSuite").hidden = false;
+      }).catch(() => {});
+    }
     const title = document.getElementById("runTitle");
     title.textContent = value.title;
     title.lang = value.documentLanguage.split("-")[0];

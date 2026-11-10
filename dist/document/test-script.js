@@ -56,7 +56,9 @@
       // What the step does and where, so that a recording made during the test can be
       // compared with it (T9TestRecordingMatch); a step without it cannot be compared.
       const signer = globalThis.T9TestRecordingMatch;
-      const signature = signer && block.interaction ? signer.signature(block.interaction) : null;
+      // A step the document's rules rewrote keeps its semantic action instead.
+      const described = block.interaction || block.semanticAction;
+      const signature = signer && described ? signer.signature(described) : null;
       steps.push({ stepId: String(block.blockId || `step-${steps.length + 1}`),
         number: steps.length + 1, heading, instruction, expected: checks.join("\n"),
         status: "not-run", comment: "",
@@ -209,8 +211,11 @@
   function rerun(run, options = {}) {
     const value = normalize(run);
     const now = options.now || new Date().toISOString();
+    // A run belongs to the suite it was made for; a new run belongs to one only when it is
+    // made for that suite's next round.
     return normalize({ ...value, testRunId: String(options.testRunId || ""), createdAt: now,
-      updatedAt: now, environment: "", recordingCheck: undefined,
+      updatedAt: now, environment: text(options.environment), recordingCheck: undefined,
+      suiteId: options.suiteId ? String(options.suiteId) : undefined,
       steps: value.steps.map(step => ({ ...step, recordingSuggestion: undefined,
         status: "not-run", comment: "", bugReportId: null, screenshots: [] })) });
   }

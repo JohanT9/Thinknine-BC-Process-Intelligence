@@ -274,3 +274,137 @@ for (const [a, b] of [["Document No.", "Posting Date"], ["No.", "Name"], ["Buy-f
     [field(b)]).steps[0].state, "not-found", `${a} / ${b}`);
 }
 console.log("Test recording match: records chosen another way passed.");
+
+// A real test of a purchase order (Swedish Business Central) and the recording made while it
+// was run. The test was made from an older document that wrote the search as three steps;
+// the order page is captioned with the order shown on it, which is another order in the test;
+// the item was picked from the list in the document and searched for in the test.
+const order = "Inköpsorder - 2600074 ∙ Exempelleverantören";
+const testedOrder = "Inköpsorder - 2600078 ∙ Exempelleverantören";
+const realStep = (taskType, fields, instruction) => ({ stepId: `real:${instruction.slice(0, 12)}`,
+  instruction, signature: matcher.signature({ taskType, ...fields }) });
+const realTest = [
+  realStep("SearchAndOpenPage", { pageCaption: "Inköpsorder", actionCaption: "Sök", fieldCaption: "Sök" },
+    "Välj **Sök**, ange söktext i **Sök** och välj **Inköpsorder**."),
+  realStep("EnterFieldValue", { pageCaption: "Rhloqw RDG", fieldCaption: "Berätta vad du vill göra." },
+    "Ange __ink ord__ i **Berätta vad du vill göra.**."),
+  realStep("SelectRecord", { pageCaption: "Inköpsorder", actionCaption: "Inköpsorder Listor" },
+    "Välj posten **Inköpsorder Listor** på sidan **Inköpsorder**."),
+  realStep("CreateRecord", { pageCaption: "Inköpsorder", actionCaption: "Ny" },
+    "Börja skapa en ny inköpsorder genom att välja **Ny** på sidan **Inköpsorder**."),
+  realStep("SelectLookupValue", { pageCaption: order, fieldCaption: "Leverantörsnamn" },
+    "Välj **Leverantörsnamn** __11976__."),
+  realStep("SelectLookupValue", { pageCaption: order, fieldCaption: "Sortera efter Nr" },
+    `Välj __30043__ i **Sortera efter Nr** på sidan **${order}**.`),
+  realStep("EnterQuantity", { pageCaption: order, fieldCaption: "Antal" }, "Ange __5000__ i **Antal**."),
+  realStep("ReleaseDocument", { pageCaption: order, actionCaption: "Släpp" },
+    `Välj **Släpp** på sidan **${order}**.`)
+];
+const realRecording = [
+  { taskType: "SearchAndOpenPage", pageCaption: "Rhloqw RDG", actionCaption: "Alt+Q",
+    selectedCaption: "ink ord", instruction: "Sök efter __ink ord__ och öppna listan **Inköpsorder**.",
+    resultVerification: { outcomes: [{ kind: "navigation", pageCaption: "Inköpsorder (RDG)" }] } },
+  { taskType: "CreateRecord", pageCaption: "Inköpsorder", actionCaption: "Ny",
+    instruction: "Börja skapa en ny inköpsorder genom att välja **Ny** på sidan **Inköpsorder**." },
+  { taskType: "SelectVendor", pageCaption: testedOrder, fieldCaption: "Leverantörsnamn",
+    instruction: "Välj __11976__ i **Leverantörsnamn**." },
+  { taskType: "SelectItem", pageCaption: testedOrder, fieldCaption: "Artikelnr.",
+    instruction: "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten." },
+  { taskType: "EnterQuantity", pageCaption: testedOrder, fieldCaption: "Antal",
+    instruction: "Ange __5 000__ i **Antal**." },
+  { taskType: "ReleaseDocument", pageCaption: testedOrder, actionCaption: "Släpp",
+    instruction: `Välj **Släpp** på sidan **${testedOrder}**.` }
+];
+assert.strictEqual(matcher.pageName(order), "inköpsorder");
+assert.strictEqual(matcher.pageName("Inköpsorder (RDG)"), "inköpsorder");
+assert.strictEqual(matcher.pageName("Sales Order - Dynamics 365 Business Central"), "sales order");
+assert.strictEqual(matcher.signature(realRecording[0]).openedPage, "inköpsorder");
+assert.strictEqual(matcher.signature(realRecording[1]).openedPage, undefined, "only a search opens a page");
+const realCheck = matcher.check(realTest, realRecording);
+assert.deepStrictEqual(realCheck.steps.map(step => step.state), Array(8).fill("done"));
+assert.deepStrictEqual(realCheck.steps.map(step => step.taskIndex), [0, 0, 0, 1, 2, 3, 4, 5],
+  "the three steps of the old search are the one recorded search");
+assert.deepStrictEqual(realCheck.additional, []);
+assert.deepStrictEqual(realCheck.recorded.map(item => item.stepId),
+  realTest.filter((_, index) => index !== 1 && index !== 2).map(step => step.stepId));
+// A search that opened another page is not the test's search, and its parts stay with it.
+const otherPage = [{ ...realRecording[0], instruction: "Sök efter __förs__ och öppna listan **Försäljningsorder**.",
+  resultVerification: { outcomes: [{ kind: "navigation", pageCaption: "Försäljningsorder (RDG)" }] } }];
+assert.deepStrictEqual(matcher.check(realTest.slice(0, 3), otherPage).steps.map(step => step.state),
+  ["not-found", "not-found", "not-found"]);
+// A number in the page caption is the record shown, not what was chosen; another item is
+// another step.
+const otherItem = [{ ...realRecording[3], instruction: `Sök efter __1896__ i **Artikelnr.** på sidan **${order}**.`,
+  pageCaption: order }];
+assert.strictEqual(matcher.check([realTest[5]], otherItem).steps[0].state, "not-found");
+// Another order on the page is the same page; another page is not.
+assert.ok(matcher.score(realTest[6].signature, matcher.signature(realRecording[4])) > matcher.MATCH_THRESHOLD);
+assert.strictEqual(matcher.score(realTest[6].signature, matcher.signature({ ...realRecording[4],
+  pageCaption: "Försäljningsorder - 1001 ∙ Adatum" })), 0);
+console.log("Test recording match: a real purchase order test passed.");
+
+// The same test where the knowledge named pages and fields differently when the document was
+// made than when the test was recorded, the recorded search kept no page it opened, and the
+// chosen search result was interpreted as an action: the captions still decide.
+const idsOf = (sig, pageObjectId, controlId) => ({ ...sig, pageObjectId, controlId });
+const knowledgeTest = realTest.map((step, index) => index === 2
+  ? realStep("RunAction", { pageCaption: "Inköpsorder", actionCaption: "Inköpsorder Listor" }, step.instruction)
+  : index === 4 || index === 6 ? { ...step, signature: idsOf(step.signature, "50", `Control-${index}`) } : step);
+const knowledgeRecording = realRecording.map((task, index) => index === 0
+  ? { ...task, resultVerification: { outcomes: [] } }
+  : index === 2 || index === 4 ? { ...task, pageObjectId: "54", knowledgeControlRef: { controlId: `Field-${index}` } }
+    : task);
+const knowledgeCheck = matcher.check(knowledgeTest, knowledgeRecording);
+assert.deepStrictEqual(knowledgeCheck.steps.map(step => step.state), Array(8).fill("done"));
+assert.deepStrictEqual(knowledgeCheck.steps.map(step => step.taskIndex), [0, 0, 0, 1, 2, 3, 4, 5]);
+// Ids that differ on pages with other names still rule a pair out.
+assert.strictEqual(matcher.score(idsOf(realTest[6].signature, "50", "Control-6"), matcher.signature({
+  ...knowledgeRecording[4], pageCaption: "Försäljningsorder - 1001 ∙ Adatum" })), 0);
+console.log("Test recording match: ids from another knowledge passed.");
+
+// The steps of the real test as the document gives them. Steps the document's rules rewrote
+// ("Välj Leverantörsnamn 11976") have no interaction, only their semantic action, and are
+// still compared. The recording is what the test recording held: one search step, the vendor
+// by number, the item searched for, the quantity twice and the release on another order.
+const purchaseRun = readJson("tests/fixtures/test-recording/purchase-order-run.json").steps;
+assert.ok(purchaseRun.every(step => matcher.hasSignature(step.signature)), "every step can be compared");
+const testedPage = "Inköpsorder - 2600082 ∙ Exempelleverantören";
+const purchaseRecording = [
+  { taskType: "SearchAndOpenPage", pageCaption: "Rhloqw RDG", actionCaption: "Alt+Q",
+    instruction: "Sök efter __ink ord__ och öppna listan **Inköpsorder**.",
+    resultVerification: { outcomes: [{ kind: "navigation", pageCaption: "Inköpsorder (RDG)" }] } },
+  { taskType: "CreatePurchaseOrder", pageObjectId: "9307", pageCaption: "Inköpsorder", fieldCaption: "Ny",
+    actionCaption: "Ny", instruction: "Börja skapa en ny **inköpsorder** genom att välja **Ny** på sidan **Inköpsorder**." },
+  { taskType: "SelectVendor", pageObjectId: "50", pageCaption: "Ny - Inköpsorder", fieldCaption: "Leverantörsnamn",
+    actionCaption: "Leverantörsnamn", instruction: "Välj **11976** i **Leverantörsnamn**." },
+  { taskType: "SelectRecord", pageObjectId: "50", pageCaption: "Inköpsorder", fieldCaption: "Artikel Nr",
+    actionCaption: "Nr, sorterade i Stigande order Välj posten \"30043\"",
+    instruction: "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten." },
+  { taskType: "EnterQuantity", pageObjectId: "50", pageCaption: testedPage, fieldCaption: "Antal",
+    actionCaption: "Antal", instruction: "Ange __5000__ i **Antal**." },
+  { taskType: "EnterQuantity", pageObjectId: "50", pageCaption: testedPage, fieldCaption: "Antal",
+    actionCaption: "Antal", instruction: "Ange __5 000__ i **Antal**." },
+  { taskType: "ReleasePurchaseDocument", pageObjectId: "50", pageCaption: "Inköpsorder", actionCaption: "Släpp",
+    instruction: `Välj **Släpp** på sidan **${testedPage}**.` }
+];
+const purchaseCheck = matcher.check(purchaseRun, purchaseRecording);
+assert.deepStrictEqual(purchaseCheck.steps.map(step => step.state), Array(8).fill("done"));
+assert.deepStrictEqual(purchaseCheck.steps.map(step => step.taskIndex), [0, 0, 0, 1, 2, 3, 4, 6]);
+assert.deepStrictEqual(purchaseCheck.additional, ["Ange 5 000 i Antal."], "the quantity entered again");
+// A page captioned for a new record ("Ny - Inköpsorder") and for a saved one are the same page;
+// the number of a record is not a page name.
+assert.ok(matcher.score(purchaseRun[6].signature, matcher.signature({ ...purchaseRecording[4],
+  pageObjectId: "", pageCaption: "Ny - Inköpsorder" })) >= matcher.MATCH_THRESHOLD);
+assert.strictEqual(matcher.score(purchaseRun[6].signature, matcher.signature({ ...purchaseRecording[4],
+  pageObjectId: "", pageCaption: "Leverantörskort - 2600074 ∙ Exempelleverantören" })), 0);
+
+// A test made from a document: a step the document's rules rewrote has a semantic action
+// instead of an interaction, and gets its signature from it.
+const rewritten = script.create({ metadata: { title: "Inköp", documentLanguage: "sv-SE" }, sections: [
+  { kind: "workflow", blocks: [{ kind: "step", blockId: "block:step:v", semanticAction: { actionType: "SelectVendor",
+    pageObjectId: "50", pageCaption: "Ny - Inköpsorder", targetField: "Leverantörsnamn", selectedValue: "11976" },
+  blocks: [{ kind: "paragraph", blockId: "block:instruction:v", text: "Välj Leverantörsnamn 11976." }] }] }] },
+{ testRunId: "rewritten", sessionId: "s" });
+assert.deepStrictEqual(rewritten.steps[0].signature, { taskType: "SelectVendor", pageObjectId: "50",
+  pageCaption: "ny - inköpsorder", controlId: "", fieldCaption: "leverantörsnamn", actionCaption: "" });
+console.log("Test recording match: a test from a rewritten document passed.");

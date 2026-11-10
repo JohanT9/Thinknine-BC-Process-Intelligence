@@ -31,6 +31,9 @@
   // Screenshots taken during a test run: prefix + recording id + ":" + test run id + ":" +
   // screenshot id, so they belong to the tested document like its other screenshots.
   const TEST_SCREENSHOT_PREFIX = "t9_test_shot_";
+  // One entry per test suite, keyed by its own id; it refers to test runs of several
+  // documents and belongs to none of them.
+  const TEST_SUITE_PREFIX = "t9_test_suite_";
   // The test run being worked on, offered in the toolbar popup. Not part of any document.
   const ACTIVE_TEST_RUN_KEY = "t9_active_test_run";
   // Session storage: the Business Central tabs the toolbar button has been used on.
@@ -53,6 +56,7 @@
     BUG_REPORT_PREFIX,
     BC_ERROR_EVIDENCE_PREFIX,
     TEST_RUN_PREFIX,
+    TEST_SUITE_PREFIX,
     TEST_SCREENSHOT_PREFIX,
     ACTIVE_TEST_RUN_KEY,
     TEST_ACCESS_TABS_KEY,
