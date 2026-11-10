@@ -46,7 +46,11 @@ function documentEntries(id, marker = "a") {
     [`t9_test_run_run-${id}`]: { testRunId: `run-${id}`, sessionId: id },
     [`t9_test_shot_${id}:run-${id}:shot-1`]: { image: "data:image/png;base64,iVBORw0KGgo=",
       capturedAt: "2026-10-02T08:00:00.000Z" },
-    [`t9_bug_report_bug-${id}`]: { bugReportId: `bug-${id}`, recordingId: id }
+    [`t9_bug_report_bug-${id}`]: { bugReportId: `bug-${id}`, recordingId: id },
+    // A suite also names tests of other documents; it travels with its owner.
+    [`t9_test_suite_suite-${id}`]: { schemaVersion: 1, suiteId: `suite-${id}`, ownerSessionId: id,
+      title: "Uppgradering BC 28", items: [{ sessionId: id, testRunId: `run-${id}` },
+        { sessionId: "doc-elsewhere", testRunId: "run-elsewhere" }] }
   };
 }
 const unrelated = { t9_settings: { uiLocale: "sv-SE" }, t9_state: { recording: false },
@@ -96,6 +100,12 @@ const snapshot = area => JSON.stringify([...area.data].sort(([a], [b]) => a.loca
   assert.equal(ownerOf("t9_screenshot_asset_doc-1"), "", "a screenshot key names its screenshot");
   assert.equal(ownerOf("t9_bug_report_bug-1", { recordingId: "other" }), "other");
   assert.ok(needsValue("t9_test_run_x") && !needsValue("t9_review_x"));
+  assert.ok(needsValue("t9_test_suite_x"));
+  assert.equal(ownerOf("t9_test_suite_x", { items: [{ sessionId: "first" }, { sessionId: "second" }] }),
+    "first", "a suite without an owner travels with its first document");
+  assert.equal(ownerOf("t9_test_suite_x", { ownerSessionId: "second", items: [{ sessionId: "first" }] }),
+    "second");
+  assert.equal(ownerOf("t9_test_suite_x", { items: [] }), "");
   // A test screenshot belongs to the document by its key, so its image is never read to tell.
   assert.ok(!needsValue("t9_test_shot_doc-1:run-1:shot-1"));
   assert.equal(ownerOf("t9_test_shot_doc-1"), "", "a test screenshot key names its run and screenshot");

@@ -16,18 +16,55 @@
   const caption = value => text(value).normalize("NFKC").trim().toLocaleLowerCase()
     .replace(/\s+/gu, " ");
   const id = value => value == null || value === "" ? "" : text(value).trim();
+  // An instruction without the document's marks for captions (**) and values (__).
+  const plain = value => text(value).replace(/\*\*([^*]+)\*\*/gu, "$1")
+    .replace(/__([^_]+)__/gu, "$1");
 
-  // The parts of a recorded or documented step that say what was done, and where.
+  // Opening a page: the same page is the same step, whatever was typed to find it.
+  const OPENS_PAGE = new Set(["SearchAndOpenPage", "OpenPage", "NavigateToPage"]);
+
+  // A page's name without the record shown on it or the company: Business Central captions a
+  // document page "Inköpsorder - 2600074 ∙ Exempelleverantören" and a list "Inköpsorder (RDG)",
+  // and the browser adds " - Dynamics 365 Business Central". A test of the same process uses
+  // another record, so only the name is the page.
+  function pageName(value) {
+    return pageNames(value)[0] || "";
+  }
+  // Every part of a caption that can be the page's name: a new record's page is captioned
+  // "Ny - Inköpsorder", a saved one "Inköpsorder - 2600074 ∙ Exempelleverantören". The record
+  // after "∙" and parts with digits (a number, or "Dynamics 365 Business Central") are not.
+  function pageNames(value) {
+    return caption(value).split(/\s+[-–]\s+/u)
+      .map(part => part.split(/[∙·•]/u)[0].replace(/\s*\([^()]*\)\s*$/u, "").trim())
+      .filter((part, index) => part && (index === 0 || !/\d/u.test(part)));
+  }
+  // Two captions of the same page share a name.
+  const samePage = (a, b) => pageNames(a).some(name => pageNames(b).includes(name));
+
+  // The page a step that searches for a page opened: the last page the recording showed.
+  function openedPage(task) {
+    const pages = ((task.resultVerification || {}).outcomes || [])
+      .filter(item => item?.kind === "navigation" && item.pageCaption);
+    return pages.length ? pageName(pages.at(-1).pageCaption) : "";
+  }
+
+  // The parts of a recorded or documented step that say what was done, and where. A
+  // documented step the document's rules rewrote (such as "Välj Leverantörsnamn 11976") is
+  // described by its semantic action: its kind (actionType) and its field (targetField).
   function signature(task = {}) {
     const objectRef = task.knowledgeObjectRef || {};
     const controlRef = task.knowledgeControlRef || {};
+    const named = value => typeof value === "string" ? value : "";
+    const taskType = named(task.taskType) || named(task.semanticAction) || named(task.actionType);
+    const opened = OPENS_PAGE.has(taskType) ? openedPage(task) : "";
     return {
-      taskType: text(task.taskType || task.semanticAction),
+      taskType,
       pageObjectId: id(task.pageObjectId || objectRef.objectId),
       pageCaption: caption(task.pageCaption),
       controlId: id(controlRef.fieldId || controlRef.controlId || controlRef.automationId),
-      fieldCaption: caption(task.fieldCaption),
-      actionCaption: caption(task.actionCaption)
+      fieldCaption: caption(task.fieldCaption || task.targetField),
+      actionCaption: caption(task.actionCaption),
+      ...(opened ? { openedPage: opened } : {})
     };
   }
 
@@ -51,8 +88,6 @@
     SelectPurchaseLineItem: "item", SelectProductionItem: "item", SelectLocation: "location",
     SelectBin: "bin" });
   const SAME_RECORD = 0.85;
-  // Opening a page: the same page is the same step, whatever was typed to find it.
-  const OPENS_PAGE = new Set(["SearchAndOpenPage", "OpenPage", "NavigateToPage"]);
   const SAME_PAGE_OPENED = 0.9;
 
   // A field's caption without the word for number, name or code, so that "Vendor No." and
@@ -74,18 +109,75 @@
     return stem.length >= 3 ? { stem, marked } : { stem: "", marked };
   }
 
+  // Steps that choose something, and steps that enter a value.
+  const chooses = taskType => /^(?:Select|SearchAndSelect)/u.test(text(taskType)) ||
+    Boolean(CHOSEN_RECORD[taskType]);
+  const enters = taskType => /^(?:Enter|Fill|Change)/u.test(text(taskType));
+  // Numbers of three or more digits in an instruction, written without spaces or separators,
+  // leaving out the page the step names ("på sidan Inköpsorder - 2600074"): that is the
+  // record shown, not what was chosen.
+  const numbers = sig => (text(sig.instruction).split(sig.pageCaption || "\u0000").join(" ")
+    .match(/\d[\d\s.,]*\d/gu) || [])
+    .map(item => item.replace(/[\s.,]/gu, "")).filter(item => item.length >= 3);
+  const word = (value, name) => Boolean(name) && new RegExp(`(?:^|[^\\p{L}\\p{N}])${
+    name.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}(?:$|[^\\p{L}\\p{N}])`, "u").test(text(value));
+  // A step that searched for a page and opened it: the page it opened is what matters, not
+  // where the search started or what was typed. The page can also be named in the other
+  // step's instruction: an older document's search may end at the search dialog.
+  function opensSamePage(expected, recorded) {
+    if (!OPENS_PAGE.has(expected.taskType) || !OPENS_PAGE.has(recorded.taskType)) return false;
+    const pairs = [[expected, recorded], [recorded, expected]];
+    return pairs.some(([opening, other]) => opening.destination &&
+      (other.destination === opening.destination || word(other.instruction, opening.destination)));
+  }
+  // Where a step that opens a page went: the page the recording showed, or else the last
+  // caption its instruction names ("… öppna listan **Inköpsorder**", "… och välj
+  // **Inköpsorder**").
+  function destination(sig, instruction) {
+    if (!OPENS_PAGE.has(sig.taskType)) return "";
+    const named = [...text(instruction).matchAll(/\*\*([^*]+)\*\*/gu)].map(item => item[1]);
+    return sig.openedPage || (named.length ? pageName(named.at(-1)) : "");
+  }
+
+  // Older documents wrote a search as three steps: the search, the text typed in Business
+  // Central's search box, and the result chosen in the list of results ("Välj posten
+  // Inköpsorder Listor"). A recording now shows it as one step that opens the page. The two
+  // parts after a found search are done with it.
+  function partOfSearch(sig, opened) {
+    if (!sig || !opened) return false;
+    const searchBox = globalThis.T9BCClientCaptions ||
+      (typeof require === "function" ? require("../engine/bc-client-captions") : null);
+    if (enters(sig.taskType) && searchBox?.matches("tellMe", sig.fieldCaption)) return true;
+    return (chooses(sig.taskType) && word(sig.instruction, opened)) ||
+      /^(?:RunAction|Select)/u.test(sig.taskType) && ["listor", "lists"]
+        .some(results => word(sig.instruction, `${opened} ${results}`));
+  }
+
   // How well the field or button agrees, from 0 to 1.
   function targetScore(expected, recorded) {
     if (expected.controlId && recorded.controlId && expected.controlId === recorded.controlId) return 1;
     const labels = [[expected.fieldCaption, recorded.fieldCaption],
       [expected.actionCaption, recorded.actionCaption]].filter(([a, b]) => a && b);
-    if (!(expected.controlId && recorded.controlId) && labels.length &&
-        labels.every(([a, b]) => a === b)) return 0.9;
+    if (labels.length && labels.every(([a, b]) => a === b)) {
+      // Control ids come from the Business Central knowledge and can name the same field
+      // differently from one version of it to another; the same captions still count.
+      return expected.controlId && recorded.controlId ? 0.8 : 0.9;
+    }
     const chosen = CHOSEN_RECORD[expected.taskType];
     if (chosen && chosen === CHOSEN_RECORD[recorded.taskType]) return SAME_RECORD;
     if (OPENS_PAGE.has(expected.taskType) && OPENS_PAGE.has(recorded.taskType) &&
         expected.pageObjectId && expected.pageObjectId === recorded.pageObjectId) {
       return SAME_PAGE_OPENED;
+    }
+    if (opensSamePage(expected, recorded)) return SAME_PAGE_OPENED;
+    // The same number chosen on both sides, such as item 30043 picked from a list one time and
+    // searched for the other: a step that chooses something and a step that chooses or enters
+    // something, with the same number in them.
+    const valueSteps = [expected.taskType, recorded.taskType];
+    if (valueSteps.some(type => chooses(type) || enters(type)) &&
+        !valueSteps.some(type => OPENS_PAGE.has(type)) &&
+        numbers(expected).some(value => numbers(recorded).includes(value))) {
+      return 0.8;
     }
     // Number and name of the same thing: at least one caption names a number or a name.
     const family = [fieldFamily(expected.fieldCaption), fieldFamily(recorded.fieldCaption)];
@@ -103,11 +195,17 @@
     const target = targetScore(expected, recorded);
     if (!target) return 0;
     let page = 0.5;
-    if (expected.pageObjectId && recorded.pageObjectId) {
-      if (expected.pageObjectId !== recorded.pageObjectId) return 0;
+    if (opensSamePage(expected, recorded)) {
+      // The search starts wherever the user was; the page it opened has been compared.
       page = 1;
+    } else if (expected.pageObjectId && recorded.pageObjectId) {
+      if (expected.pageObjectId === recorded.pageObjectId) page = 1;
+      // Page ids, too, come from the knowledge: a page captioned with the same name is the
+      // same page, with a lower score.
+      else if (expected.pageCaption && samePage(expected.pageCaption, recorded.pageCaption)) page = 0.8;
+      else return 0;
     } else if (expected.pageCaption && recorded.pageCaption) {
-      if (expected.pageCaption !== recorded.pageCaption) return 0;
+      if (!samePage(expected.pageCaption, recorded.pageCaption)) return 0;
       page = 0.9;
     }
     return Math.round((0.6 * target + 0.4 * page) * kind * 100) / 100;
@@ -116,9 +214,12 @@
   // Test steps against recorded steps, in order: the pairing with the highest total score,
   // where each recorded step counts for at most one test step.
   function match(expectedSteps = [], recordedTasks = []) {
+    // The instructions as plain text: a few comparisons look for a page or a number in them.
+    const prepared = (sig, instruction) => ({ ...sig, instruction: caption(plain(instruction)),
+      destination: destination(sig, instruction) });
     const expected = expectedSteps.map(step => ({ stepId: text(step.stepId),
-      signature: step.signature || null }));
-    const recorded = recordedTasks.map(signature);
+      signature: step.signature ? prepared(step.signature, step.instruction) : null }));
+    const recorded = recordedTasks.map(task => prepared(signature(task), task.instruction || task.displayText));
     const rows = expected.length;
     const cols = recorded.length;
     const best = Array.from({ length: rows + 1 }, () => new Float64Array(cols + 1));
@@ -145,6 +246,15 @@
         j += 1;
       }
     }
+    // The parts of a search right after a search found in the recording.
+    for (const [index, found] of [...matches]) {
+      const opened = recorded[found.taskIndex].destination;
+      if (!OPENS_PAGE.has(recorded[found.taskIndex].taskType)) continue;
+      for (let next = index + 1; next < Math.min(rows, index + 3) && !matches.has(next) &&
+          partOfSearch(expected[next].signature, opened); next += 1) {
+        matches.set(next, found);
+      }
+    }
     const used = new Set([...matches.values()].map(item => item.taskIndex));
     return {
       steps: expected.map((step, index) => {
@@ -166,12 +276,14 @@
   // `error` when it showed an error after the step; such a step is suggested as failed.
   function check(expectedSteps = [], recordedTasks = []) {
     const result = match(expectedSteps, recordedTasks);
-    const pairedWith = new Map(result.steps.filter(step => step.state === "done")
-      .map(step => [step.taskIndex, step.stepId]));
+    // A recorded search can stand for several steps of an older test; it is shown with the first.
+    const pairedWith = new Map();
+    for (const step of result.steps) {
+      if (step.state === "done" && !pairedWith.has(step.taskIndex)) pairedWith.set(step.taskIndex, step.stepId);
+    }
     // The recorded instruction as plain text: the marks for captions (**) and values (__)
     // are for the document only.
-    const said = task => text(task?.instruction || task?.displayText)
-      .replace(/\*\*([^*]+)\*\*/gu, "$1").replace(/__([^_]+)__/gu, "$1").trim();
+    const said = task => plain(task?.instruction || task?.displayText).trim();
     return {
       recordedSteps: recordedTasks.filter(task => hasSignature(signature(task))).length,
       steps: result.steps.map(step => {
@@ -190,5 +302,5 @@
     };
   }
 
-  return { MATCH_THRESHOLD, signature, hasSignature, score, match, check, fieldFamily };
+  return { MATCH_THRESHOLD, signature, hasSignature, score, match, check, fieldFamily, pageName };
 });

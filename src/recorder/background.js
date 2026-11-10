@@ -83,6 +83,7 @@ importScripts("document/document-library.js");
 importScripts("document/document-folders.js");
 importScripts("document/test-recording-match.js");
 importScripts("document/test-script.js");
+importScripts("document/test-suite.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
@@ -234,6 +235,7 @@ const {
   BC_ERROR_EVIDENCE_PREFIX,
   BUG_REPORT_PREFIX,
   TEST_RUN_PREFIX,
+  TEST_SUITE_PREFIX,
   TEST_SCREENSHOT_PREFIX,
   EVENT_PREFIX,
   RAW_RECORDING_PREFIX,
@@ -2101,6 +2103,63 @@ async function listTestRuns(recordingId = "") {
     .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
+// Test suites: the tests of several documents run together. A suite refers to its runs and
+// counts its progress from them; a run's document can be deleted, and the suite then shows
+// that test as missing.
+async function loadTestSuite(suiteId) {
+  const key = TEST_SUITE_PREFIX + String(suiteId || "");
+  const value = (await chrome.storage.local.get(key))[key];
+  return value ? globalThis.T9TestSuite.normalize(value) : null;
+}
+async function saveTestSuite(suite) {
+  const value = globalThis.T9TestSuite.normalize(suite);
+  await chrome.storage.local.set({ [TEST_SUITE_PREFIX + value.suiteId]: value });
+  return value;
+}
+async function listTestSuites() {
+  const all = await globalThis.T9StorageQueries.getByPrefixes(chrome.storage.local,
+    [TEST_SUITE_PREFIX]);
+  return Object.entries(all).filter(([key]) => key.startsWith(TEST_SUITE_PREFIX))
+    .flatMap(([, value]) => { try { return [globalThis.T9TestSuite.normalize(value)]; }
+      catch { return []; } })
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+// The suite with its progress, counted from the runs as they are stored now.
+async function testSuiteProgress(suite) {
+  const keys = suite.items.filter(item => item.testRunId)
+    .map(item => TEST_RUN_PREFIX + item.testRunId);
+  const runs = keys.length ? await chrome.storage.local.get(keys) : {};
+  const summaries = {};
+  for (const value of Object.values(runs)) {
+    try {
+      const run = globalThis.T9TestScript.normalize(value);
+      summaries[run.testRunId] = globalThis.T9TestScript.summary(run);
+    } catch { /* A run that cannot be read counts as missing. */ }
+  }
+  return globalThis.T9TestSuite.progress(suite, summaries);
+}
+// The next round of a suite: a new run of each test still there, with the expected results
+// carried over, in a new suite that names the previous one.
+async function nextTestSuiteRound(suiteId) {
+  const suite = await loadTestSuite(suiteId);
+  if (!suite) throw new Error("suite.notFound");
+  const newSuiteId = `test-suite-${crypto.randomUUID()}`;
+  const runIds = {};
+  for (const item of suite.items) {
+    const previous = item.testRunId ? await loadTestRun(item.testRunId) : null;
+    if (!previous) continue;
+    const run = globalThis.T9TestScript.rerun(previous, {
+      testRunId: `test-run-${crypto.randomUUID()}`, suiteId: newSuiteId });
+    runIds[item.sessionId] = (await saveTestRun(globalThis.T9TestScript.carryOver(run, previous))).testRunId;
+  }
+  if (!Object.keys(runIds).length) throw new Error("suite.noTests");
+  return saveTestSuite(globalThis.T9TestSuite.nextRound(suite, runIds, { suiteId: newSuiteId }));
+}
+async function openTestSuitePage(suiteId) {
+  return chrome.tabs.create({ url: chrome.runtime.getURL(
+    `test-suite.html?suiteId=${encodeURIComponent(suiteId)}`) });
+}
+
 // A bug report from a failed test step. Nothing was recorded for it, so it gets a recording
 // of its own without events, and the steps, expected and actual result come from the test:
 // the document's steps up to the failed one, its checks and the tester's description.
@@ -2169,7 +2228,23 @@ async function createBugReportFromTestStep(testRunId, stepId) {
   return { report: saved, workspaceUrl, tabId: tab.id };
 }
 
+// The suites a deleted document owned move to another of their documents, so they are still
+// exported and synchronized; a suite with no other document left is deleted.
+async function reanchorTestSuites(id) {
+  const owned = (await listTestSuites()).filter(suite => suite.ownerSessionId === id);
+  if (!owned.length) return;
+  const sessionIds = new Set(owned.flatMap(suite => suite.items.map(item => item.sessionId)));
+  const sessions = await chrome.storage.local.get([...sessionIds].map(sessionId => SESSION_PREFIX + sessionId));
+  const present = sessionId => sessionId !== id && Boolean(sessions[SESSION_PREFIX + sessionId]);
+  for (const suite of owned) {
+    const next = globalThis.T9TestSuite.withoutOwner(suite, present);
+    if (next) await saveTestSuite(next);
+    else await chrome.storage.local.remove(TEST_SUITE_PREFIX + suite.suiteId);
+  }
+}
+
 async function deleteSession(id) {
+  await reanchorTestSuites(id);
   // The document's test runs go with it; reports made from them are kept.
   const runs = await listTestRuns(id);
   if (runs.length) {
@@ -2568,9 +2643,60 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Expected results written in the latest earlier run of the document are kept.
         const previous = (await listTestRuns(String(message.run?.sessionId || "")))[0];
         const run = await saveTestRun(globalThis.T9TestScript.carryOver(message.run, previous));
-        const tab = await chrome.tabs.create({ url: chrome.runtime.getURL(
+        // A run made for a suite is opened from the suite's page.
+        const tab = message.open === false ? null : await chrome.tabs.create({ url: chrome.runtime.getURL(
           `test-run.html?testRunId=${encodeURIComponent(run.testRunId)}`) });
-        sendResponse({ ok: true, run, tabId: tab.id });
+        sendResponse({ ok: true, run, tabId: tab?.id });
+        break;
+      }
+
+      case "T9_CREATE_TEST_SUITE": {
+        const suite = await saveTestSuite(message.suite);
+        if (message.open !== false) await openTestSuitePage(suite.suiteId);
+        sendResponse({ ok: true, suite });
+        break;
+      }
+
+      case "T9_LOAD_TEST_SUITE": {
+        const suite = await loadTestSuite(message.suiteId);
+        if (!suite) throw new Error("suite.notFound");
+        sendResponse({ ok: true, suite, progress: await testSuiteProgress(suite) });
+        break;
+      }
+
+      case "T9_LIST_TEST_SUITES": {
+        const suites = await listTestSuites();
+        const listed = [];
+        for (const suite of suites) {
+          const progress = await testSuiteProgress(suite);
+          listed.push({ suiteId: suite.suiteId, title: suite.title, environment: suite.environment,
+            version: suite.version, createdAt: suite.createdAt,
+            progress: { ...progress, items: undefined } });
+        }
+        sendResponse({ ok: true, suites: listed });
+        break;
+      }
+
+      case "T9_UPDATE_TEST_SUITE": {
+        const current = await loadTestSuite(message.suiteId);
+        if (!current) throw new Error("suite.notFound");
+        const suite = await saveTestSuite(globalThis.T9TestSuite.update(current, message.patch || {},
+          new Date().toISOString()));
+        sendResponse({ ok: true, suite, progress: await testSuiteProgress(suite) });
+        break;
+      }
+
+      case "T9_DELETE_TEST_SUITE": {
+        // The suite goes; its runs stay with their documents as earlier runs.
+        await chrome.storage.local.remove(TEST_SUITE_PREFIX + String(message.suiteId || ""));
+        sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_NEXT_TEST_SUITE_ROUND": {
+        const suite = await nextTestSuiteRound(message.suiteId);
+        await openTestSuitePage(suite.suiteId);
+        sendResponse({ ok: true, suite });
         break;
       }
 

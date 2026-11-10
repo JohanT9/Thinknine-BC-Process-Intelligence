@@ -1,0 +1,102 @@
+{
+  "source": "The steps of a test made from a Swedish Business Central purchase order documented with BC Process Studio, with their signatures; the vendor name is replaced.",
+  "steps": [
+    {
+      "stepId": "step-1",
+      "instruction": "Välj Sök, ange söktext i Sök och välj Inköpsorder.",
+      "signature": {
+        "taskType": "SearchAndOpenPage",
+        "pageObjectId": "",
+        "pageCaption": "inköpsorder",
+        "controlId": "",
+        "fieldCaption": "sök",
+        "actionCaption": "",
+        "openedPage": "aktiviteter"
+      }
+    },
+    {
+      "stepId": "step-2",
+      "instruction": "Ange ink ord i Berätta vad du vill göra..",
+      "signature": {
+        "taskType": "EnterFieldValue",
+        "pageObjectId": "",
+        "pageCaption": "aktiviteter",
+        "controlId": "",
+        "fieldCaption": "berätta vad du vill göra.",
+        "actionCaption": ""
+      }
+    },
+    {
+      "stepId": "step-3",
+      "instruction": "Välj posten Inköpsorder Listor  på sidan Inköpsorder.",
+      "signature": {
+        "taskType": "SelectRecord",
+        "pageObjectId": "9307",
+        "pageCaption": "inköpsorder",
+        "controlId": "",
+        "fieldCaption": "ai-genererat innehåll kan vara felaktigtvet du inte vad du ska söka efter? försök <link>utforska sidor</link> eller <link>analysera rapporter</link>hittade du inte det du letade efter? försök utforska sidor eller analysera rapporter",
+        "actionCaption": "ai-genererat innehåll kan vara felaktigtvet du inte vad du ska söka efter? försök <link>utforska sidor</link> eller <link>analysera rapporter</link>hittade du inte det du letade efter? försök utforska sidor eller analysera rapporter"
+      }
+    },
+    {
+      "stepId": "step-4",
+      "instruction": "Börja skapa en ny inköpsorder genom att välja Ny på sidan Inköpsorder.",
+      "signature": {
+        "taskType": "CreatePurchaseOrder",
+        "pageObjectId": "9307",
+        "pageCaption": "inköpsorder",
+        "controlId": "",
+        "fieldCaption": "ny",
+        "actionCaption": "ny"
+      }
+    },
+    {
+      "stepId": "step-5",
+      "instruction": "Välj Leverantörsnamn 11976.",
+      "signature": {
+        "taskType": "SelectVendor",
+        "pageObjectId": "50",
+        "pageCaption": "ny - inköpsorder",
+        "controlId": "",
+        "fieldCaption": "leverantörsnamn",
+        "actionCaption": ""
+      }
+    },
+    {
+      "stepId": "step-6",
+      "instruction": "Välj 30043 i Sortera efter Nr på sidan Inköpsorder - 2600074 ∙ Exempelleverantören.",
+      "signature": {
+        "taskType": "SelectRecord",
+        "pageObjectId": "50",
+        "pageCaption": "inköpsorder",
+        "controlId": "",
+        "fieldCaption": "sortera efter nr",
+        "actionCaption": "nr, sorterade i stigande order välj posten \"30043\""
+      }
+    },
+    {
+      "stepId": "step-7",
+      "instruction": "Ange 5000 i Antal.",
+      "signature": {
+        "taskType": "EnterQuantity",
+        "pageObjectId": "50",
+        "pageCaption": "inköpsorder - 2600074 ∙ exempelleverantören",
+        "controlId": "",
+        "fieldCaption": "antal",
+        "actionCaption": ""
+      }
+    },
+    {
+      "stepId": "step-8",
+      "instruction": "Välj Släpp på sidan Inköpsorder - 2600074 ∙ Exempelleverantören.",
+      "signature": {
+        "taskType": "ReleasePurchaseDocument",
+        "pageObjectId": "50",
+        "pageCaption": "inköpsorder",
+        "controlId": "",
+        "fieldCaption": "",
+        "actionCaption": "släpp"
+      }
+    }
+  ]
+}

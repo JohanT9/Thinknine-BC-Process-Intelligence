@@ -58,10 +58,12 @@
       [keys.TEST_RUN_PREFIX, "sessionId"],
       [keys.BUG_REPORT_PREFIX, "recordingId"]
     ];
+    // A test suite spans several documents; it travels with one of them, its owner.
+    const suites = keys.TEST_SUITE_PREFIX ? [[keys.TEST_SUITE_PREFIX, "suite"]] : [];
     const rules = [
       ...exact.map(prefix => [prefix, "exact"]), ...logs.map(prefix => [prefix, "log"]),
       ...assets.map(prefix => [prefix, "asset"]), [evidenceIndex, "exact"],
-      ...byValue.map(([prefix, field]) => [prefix, field])
+      ...byValue.map(([prefix, field]) => [prefix, field]), ...suites
     ].sort((a, b) => b[0].length - a[0].length);
     function rule(key) {
       return typeof key === "string" ? rules.find(([prefix]) => key.startsWith(prefix)) : null;
@@ -79,7 +81,10 @@
       if (kind === "exact") id = rest;
       else if (kind === "log") id = rest.split(":")[0];
       else if (kind === "asset") id = rest.includes(":") ? rest.split(":")[0] : "";
-      else id = value && typeof value === "object" ? String(value[kind] || "") : "";
+      else if (kind === "suite") {
+        id = value && typeof value === "object" ? String(value.ownerSessionId ||
+          (Array.isArray(value.items) && value.items[0]?.sessionId) || "") : "";
+      } else id = value && typeof value === "object" ? String(value[kind] || "") : "";
       return validId(id) ? id : "";
     }
     return { ownerOf, needsValue };
