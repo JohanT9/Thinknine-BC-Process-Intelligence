@@ -111,7 +111,12 @@ assert.deepStrictEqual(service.regenerate(report, recording, [], {
 const content = fs.readFileSync("src/recorder/content.js", "utf8");
 const background = fs.readFileSync("src/recorder/background.js", "utf8");
 const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
-assert(content.includes('recordingPurpose !== "bug-report"'));
+// Errors are captured only during a bug recording or a test recording, never while a process
+// is documented.
+assert(content.includes('const capturesErrors = state => Boolean(state?.recording) &&\n' +
+  '    (state.recordingPurpose === "bug-report" || Boolean(state.testRunId));'));
+assert(content.includes("if (!errorEvidence || !globalThis.T9BcErrorDetector) {"));
+assert(background.includes('if (!state.recording || (session?.recordingPurpose !== "bug-report" && !session?.testRunId)) {'));
 assert(background.includes("T9_CAPTURE_BC_ERROR"));
 assert(!JSON.stringify(manifest.permissions).includes("clipboard"));
 for (const forbidden of ["ApplicationInsights", "appInsights", "OpenAI", "fetch("]) {

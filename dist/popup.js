@@ -352,17 +352,20 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     const active = Boolean(response?.state?.recording);
     const bugRecording = response?.state?.recordingPurpose === "bug-report";
+    // A recording made while a test is run is compared with the test when it stops.
+    const testRecording = Boolean(response?.state?.testRunId);
 
     $("startPanel").hidden = active;
     $("recordingPanel").hidden = !active;
     updateText($("status"), active
-      ? t(bugRecording ? "recorder.bugActive" : "recorder.processActive")
+      ? t(testRecording ? "test.recordingTestActive"
+        : bugRecording ? "recorder.bugActive" : "recorder.processActive")
       : t("recorder.inactive"));
     $("status").className = "status" + (active ? " rec" : "");
-    updateText($("recordingGuidance"), bugRecording
-      ? t("recorder.bugGuidance") : t("recorder.processGuidance"));
-    updateText($("stop"), bugRecording
-      ? t("recorder.stopBug") : t("recorder.stopProcess"));
+    updateText($("recordingGuidance"), testRecording ? t("test.recordingTestGuidance")
+      : bugRecording ? t("recorder.bugGuidance") : t("recorder.processGuidance"));
+    updateText($("stop"), testRecording ? t("test.stopTest")
+      : bugRecording ? t("recorder.stopBug") : t("recorder.stopProcess"));
 
     if (response?.session) {
       updateText($("sessionName"), response.session.name);
@@ -619,8 +622,22 @@ function openProcessNameDialog() {
   $("recordingName").focus();
 }
 
+async function stopTestRecording() {
+  try {
+    showMessage(t("test.comparingRecording"));
+    const response = await send({ type: "T9_STOP_TEST_RECORDING" }, 240000);
+    if (!response?.ok) throw new Error(response?.error || t("recorder.stopFailed"));
+    showMessage(t("test.testCompared"));
+    await refresh();
+  } catch (error) {
+    showMessage(t(String(error.message)), true);
+  }
+}
+
 async function finishOrNameRecording(state) {
-  if (state?.recordingPurpose === "bug-report") {
+  if (state?.testRunId) {
+    await stopTestRecording();
+  } else if (state?.recordingPurpose === "bug-report") {
     pendingBugRecording = true;
     await finishRecording("", defaultDocumentLanguage);
   } else openProcessNameDialog();
@@ -694,6 +711,16 @@ function continueTest(testRunId) {
     () => showMessage(t("test.panelUnavailable"), true));
 }
 $("continueTest").addEventListener("click", () => continueTest(activeTestRunId));
+// Ending the test here only stops offering it: its results are kept, and opening it again
+// from the document library makes it the active test again.
+$("endActiveTest").addEventListener("click", async () => {
+  try {
+    const response = await send({ type: "T9_CLEAR_ACTIVE_TEST_RUN", testRunId: activeTestRunId }, 3000);
+    if (!response?.ok) throw new Error(response?.error || "");
+    $("activeTestCard").hidden = true;
+    showMessage(t("test.endedActive"));
+  } catch { showMessage(t("test.saveFailed"), true); }
+});
 $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 $("knowledgeAdmin").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("knowledge-admin.html") });

@@ -46,7 +46,11 @@
   let recording = false;
   let sessionId = null;
   let diagnosticsEnabled = false;
-  let recordingPurpose = null;
+  // Business Central errors are kept as evidence during a bug recording and while a test is
+  // recorded, where they suggest that a step failed.
+  let errorEvidence = false;
+  const capturesErrors = state => Boolean(state?.recording) &&
+    (state.recordingPurpose === "bug-report" || Boolean(state.testRunId));
   let uiLocale = "sv-SE";
   const uiText = (swedish, english) => globalThis.T9CaptureIndicatorI18n?.translate
     ? globalThis.T9CaptureIndicatorI18n.translate(english, uiLocale, swedish)
@@ -406,8 +410,7 @@
       if (chrome.runtime.lastError) return;
       recording = Boolean(response?.state?.recording && response.isRecordingTab);
       sessionId = recording ? response?.state?.sessionId || null : null;
-      recordingPurpose = recording
-        ? response?.state?.recordingPurpose || null : null;
+      errorEvidence = recording && capturesErrors(response?.state);
       syncRecordingIndicator();
     });
   } catch {
@@ -427,7 +430,7 @@
         if (response?.state) {
           recording = Boolean(response.state.recording);
           sessionId = response.state.sessionId || null;
-          recordingPurpose = response.state.recordingPurpose || null;
+          errorEvidence = capturesErrors(response.state);
           syncRecordingIndicator();
         }
         diagnosticsEnabled = Boolean(response?.diagnosticsEnabled);
@@ -444,7 +447,7 @@
     if (message.type === "T9_STATE_CHANGED") {
       recording = Boolean(message.recording);
       sessionId = message.sessionId || null;
-      recordingPurpose = message.recordingPurpose || null;
+      errorEvidence = capturesErrors(message);
       syncRecordingIndicator();
       sendResponse({ ok: true });
       return false;
@@ -455,7 +458,7 @@
       // since the state change may not have reached this frame yet.
       recording = true;
       sessionId = message.sessionId || null;
-      recordingPurpose = "bug-report";
+      errorEvidence = true;
       captureVisibleBugErrors().then(captured => sendResponse({ ok: true, captured }),
         () => sendResponse({ ok: true, captured: 0 }));
       return true;
@@ -532,7 +535,7 @@
     if (!changes.t9_state.newValue.recording) {
       recording = false;
       sessionId = null;
-      recordingPurpose = null;
+      errorEvidence = false;
       syncRecordingIndicator();
       return;
     }
@@ -1125,7 +1128,7 @@
   // Resolves with the background's response when the dialog is a new Business Central error
   // for this recording, and with null otherwise.
   function observeBugError(dialog) {
-    if (recordingPurpose !== "bug-report" || !globalThis.T9BcErrorDetector) {
+    if (!errorEvidence || !globalThis.T9BcErrorDetector) {
       return Promise.resolve(null);
     }
     const stored = errorDialogLifecycles.get(dialog);
@@ -1233,7 +1236,7 @@
     return messages;
   }
   function observePageError(banner) {
-    if (recordingPurpose !== "bug-report") return Promise.resolve(null);
+    if (!errorEvidence) return Promise.resolve(null);
     const container = banner ? pageErrorContainer(banner) : document.documentElement;
     const generic = new Set(banner ? bannerLines(banner) : []);
     const lines = banner ? textLines(container) : [];
@@ -1706,7 +1709,7 @@
     });
 
     // During a bug recording the page's error banner is error evidence, like an error dialog.
-    if (recording && recordingPurpose === "bug-report") {
+    if (recording && errorEvidence) {
       new Map(pageErrorBanners().map(banner => [pageErrorContainer(banner), banner]))
         .forEach(observePageError);
     }

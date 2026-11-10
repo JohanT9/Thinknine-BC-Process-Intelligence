@@ -47,6 +47,20 @@
     outcome.textContent = `${t("test.outcome")}: ${t("test.outcome." + total.outcome)}`;
     summary.replaceChildren(outcome, document.createTextNode(" "), element("span", "", t("test.counts", {
       passed: total.passed, failed: total.failed, skipped: total.skipped, notRun: total.notRun })));
+    // Steps a recording of the test showed as done pass only when the tester approves them.
+    const passes = script.suggestedPasses(run());
+    if (passes.length) {
+      const approve = element("button", "", t("test.approveSuggested", { n: passes.length }));
+      approve.type = "button"; approve.id = "approveSuggested";
+      approve.addEventListener("click", () => {
+        client.change({ steps: passes.map(stepId => ({ stepId, patch: { status: "passed" } })) });
+        passes.forEach(stepId => rerenderStep(stepId));
+        showSummary();
+        message.textContent = t("test.suggestionsApproved", { n: passes.length });
+        document.getElementById("runSummary").focus();
+      });
+      summary.append(approve);
+    }
   }
 
   const element = (tag, className = "", text = "") => {
@@ -179,6 +193,32 @@
     heading.append(element("span", "step-number", t("test.stepNumber", { n: step.number })),
       instruction);
     item.append(heading);
+    // What the latest recording of the test showed for the step: a suggestion only.
+    const suggestion = step.recordingSuggestion;
+    if (suggestion && current.recordingCheck?.checkedAt) {
+      const note = element("p", "run-suggestion");
+      note.dataset.state = suggestion.state;
+      note.append(element("strong", "", t({ done: "test.suggestionDone", failed: "test.suggestionFailed",
+        "not-found": "test.suggestionNotFound", unknown: "test.suggestionUnknown" }[suggestion.state])));
+      if (suggestion.state === "failed") {
+        note.append(element("span", "run-suggestion-error", suggestion.error || t("test.errorNoMessage")));
+      }
+      if (["done", "failed"].includes(suggestion.state) && suggestion.instruction) {
+        note.append(document.createTextNode(" " + t("test.suggestionRecorded",
+          { instruction: suggestion.instruction })));
+      }
+      if (suggestion.state === "failed" && step.status !== "failed") {
+        const fail = element("button", "", t("test.failFromSuggestion"));
+        fail.type = "button";
+        fail.addEventListener("click", () => {
+          changeStep(step.stepId, script.failureFromSuggestion(run().steps.find(entry =>
+            entry.stepId === step.stepId)));
+          rerenderStep(step.stepId, "textarea[id^=test-comment]");
+        });
+        note.append(fail);
+      }
+      item.append(note);
+    }
     const grid = element("div", "run-step-grid");
     const field = (key, value, name, help = "") => {
       const wrapper = element("div");

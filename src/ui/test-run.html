@@ -48,6 +48,14 @@
     .test-data-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px;align-items:center}
     .test-data-row input{margin:0}.test-data-row button{margin:0;min-height:36px}
     .test-data-head{font-size:.8125rem;font-weight:600;color:var(--c-fg-526273)}
+    .run-summary button{margin:0 0 0 auto;min-height:34px}
+    .run-suggestion{margin:0 0 10px;padding:6px 10px;border-radius:6px;font-size:.875rem;background:var(--c-bg-eef2f6);overflow-wrap:anywhere}
+    .run-suggestion[data-state=failed]{border-left:4px solid var(--c-bd-b42318)}
+    .run-suggestion-error{display:block;margin:2px 0;color:var(--c-fg-8a1c14);font-weight:600;white-space:pre-wrap}
+    .run-suggestion button{display:block;margin:8px 0 0;min-height:34px}
+    .run-suggestion[data-state=done]{border-left:4px solid var(--c-bd-15803d)}
+    .run-suggestion[data-state=not-found]{border-left:4px solid var(--c-bd-8392a5)}
+    .run-suggestion[data-state=unknown]{border-left:4px solid var(--c-bd-ccd5df);color:var(--c-fg-526273)}
     .expected-resolved{margin:4px 0 0;font-size:.875rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
     @media(max-width:760px){.run-setup{grid-template-columns:1fr}}
     .run-shots-title{margin:12px 0 6px;font-weight:600}
@@ -81,7 +89,7 @@
     <h1 id="runTitle" data-i18n-ignore></h1>
     <p id="saveState" class="save-state" role="status"></p>
     <p class="run-intro" data-i18n="test.intro">The steps come from the reviewed document as it was when the test was created. Write the expected result for each step; it is kept for the next run.</p>
-    <p id="runSummary" class="run-summary" data-i18n-ignore></p>
+    <p id="runSummary" class="run-summary" tabindex="-1" data-i18n-ignore></p>
     <div class="run-fields">
       <div><label for="runTester" data-i18n="test.tester">Tester</label><input id="runTester" type="text" autocomplete="name"></div>
       <div><label for="runEnvironment" data-i18n="test.environment">Environment tested</label><input id="runEnvironment" type="text" aria-describedby="runEnvironmentHelp">
@@ -112,6 +120,7 @@
   <script src="engine/language-registry.js"></script>
   <script src="i18n.js"></script>
   <script src="engine/storage-keys.js"></script>
+  <script src="document/test-recording-match.js"></script>
   <script src="document/test-script.js"></script>
   <script src="test-run-client.js"></script>
   <script src="test-run.js"></script>

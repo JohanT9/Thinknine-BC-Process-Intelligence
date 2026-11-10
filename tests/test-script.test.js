@@ -283,6 +283,66 @@ assert.ok(background.includes("if (count < 7) testTabMarks.set(tabId, setTimeout
 assert.ok(background.includes("await chrome.action.setBadgeText({ tabId, text: null })"));
 // The pointer and the session's access list belong to no document, so they are never exported.
 const storageKeys = require("../src/engine/storage-keys");
+// A recording made while a test is run: started and stopped from the extension's pages only,
+// compared with the test when it stops however it is stopped, then removed, and never listed
+// in the library.
+for (const type of ["T9_START_TEST_RECORDING", "T9_STOP_TEST_RECORDING",
+  "T9_RETRY_TEST_RECORDING_CHECK"]) {
+  assert.ok(background.includes(`case "${type}"`), type);
+  assert.ok(!pageTypes.includes(type), `${type} is taken only from the extension's pages`);
+}
+assert.ok(background.includes('importScripts("document/test-recording-match.js");\nimportScripts("document/test-script.js");') ||
+  /importScripts\("document\/test-recording-match\.js"\);\r?\nimportScripts\("document\/test-script\.js"\);/u.test(background),
+  "the matcher is loaded before the test model that signs steps");
+assert.match(background, /case "T9_STOP": \{\s*\/\/[^\n]*\n\s*if \(\(await getState\(\)\)\.testRunId\) \{\s*sendResponse\(\{ ok: true, \.\.\.\(await stopTestRecording\(\)\) \}\);/u,
+  "stopping from the toolbar button or the page compares a test recording too");
+assert.match(background, /const librarySession = \(\[key, value\]\) => key\.startsWith\(SESSION_PREFIX\) && !value\?\.testRunId;/u);
+assert.strictEqual((background.match(/\.filter\(librarySession\)/gu) || []).length, 2,
+  "neither the session list nor the library shows a test recording");
+const compare = /async function compareTestRecording[\s\S]*?\r?\n\}\r?\n/u.exec(background)[0];
+assert.ok(compare.indexOf("applyRecordingCheck") < compare.lastIndexOf("await deleteSession(recordingId)"),
+  "the recording is removed only after the run keeps what it showed");
+assert.match(compare, /catch \(error\) \{\s*await withTestRun\(run\.testRunId, current => globalThis\.T9TestScript\.recordingCheckFailed\(/u,
+  "a recording that could not be compared is kept for another try");
+assert.ok(compare.includes('maskValues: "secrets"'), "secrets are masked as in a bug report");
+// Errors and screenshots from the recording.
+const contentScript = read("src/recorder/content.js");
+assert.match(contentScript, /const capturesErrors = state => Boolean\(state\?\.recording\) &&\s*\(state\.recordingPurpose === "bug-report" \|\| Boolean\(state\.testRunId\)\);/u,
+  "Business Central errors are captured while a test is recorded");
+assert.ok(!/recordingPurpose !== "bug-report"|recordingPurpose === "bug-report"\)/u.test(contentScript),
+  "error capture depends on one flag only");
+assert.match(background, /if \(!state\.recording \|\| \(session\?\.recordingPurpose !== "bug-report" && !session\?\.testRunId\)\) \{/u);
+assert.match(background, /if \(session\.recordingPurpose === "bug-report" \|\| session\.testRunId\) \{\s*await bcErrorEvidenceStore\.initialize\(id\);/u);
+assert.ok(compare.includes("await testRecordingErrors(recordingId, masked)") &&
+  compare.includes("await testRecordingScreenshots(recordingId, recording, run, check, tasks, now)"));
+assert.ok(compare.indexOf("testRecordingScreenshots(") < compare.lastIndexOf("await deleteSession(recordingId)"),
+  "the screenshots are copied before the recording is removed");
+assert.match(compare, /shot\.source === "recording"/u, "only screenshots from an earlier recording are replaced");
+for (const source of [panelScript, pageScript]) {
+  assert.ok(source.includes("script.failureFromSuggestion("), "a step is failed only on request");
+}
+assert.ok(compare.includes("{ repository: true }"),
+  "the recording is interpreted as the document was, with the knowledge repository");
+assert.ok(!/status: "passed"/u.test(compare), "a comparison never sets a result");
+assert.match(background, /value\?\.testRunId && runIds\.has\(value\.testRunId\)/u,
+  "a kept test recording goes with the tested document");
+assert.ok(!/recordDocumentUsage\(/u.test(compare), "a test recording is not counted as a document");
+assert.match(popupScript, /if \(state\?\.testRunId\) \{\s*await stopTestRecording\(\);/u,
+  "the toolbar button stops a test recording without asking for a document name");
+assert.ok(popupScript.includes('send({ type: "T9_STOP_TEST_RECORDING" }, 240000)'));
+for (const source of [panelScript, pageScript]) {
+  assert.ok(source.includes("script.suggestedPasses("), "only steps the tester approves pass");
+}
+assert.ok(panel.includes('id="panelRecording"') && panel.includes('<script src="document/test-recording-match.js"></script>'));
+assert.ok(page.includes('<script src="document/test-recording-match.js"></script>'));
+assert.match(panelScript, /if \(area === "local" && changes\.t9_state\) void loadRecorderState\(\);/u,
+  "the panel follows a recording stopped from the toolbar button");
+
+// The active test can be ended from the popup; only that test stops being offered.
+assert.ok(background.includes('case "T9_CLEAR_ACTIVE_TEST_RUN"') && !pageTypes.includes("T9_CLEAR_ACTIVE_TEST_RUN"));
+assert.match(background, /if \(!message\.testRunId \|\| pointer\?\.testRunId === String\(message\.testRunId\)\) \{\s*await chrome\.storage\.local\.remove\(key\);/u);
+assert.ok(popup.includes('id="endActiveTest"') && popupScript.includes('type: "T9_CLEAR_ACTIVE_TEST_RUN", testRunId: activeTestRunId'));
+
 for (const key of [storageKeys.ACTIVE_TEST_RUN_KEY, storageKeys.TEST_ACCESS_TABS_KEY]) {
   assert.ok(!key.startsWith(storageKeys.TEST_RUN_PREFIX) && !key.startsWith(storageKeys.TEST_SCREENSHOT_PREFIX), key);
 }
@@ -293,7 +353,12 @@ vm.runInContext(read("src/ui/i18n.js"), ui);
 const keys = [...new Set([...pageScript.matchAll(/t\("(test\.[\w.-]+)"/gu), ...page.matchAll(
   /data-i18n="(test\.[\w.-]+)"/gu), ...panelScript.matchAll(/t\("(test\.[\w.-]+)"/gu),
   ...panel.matchAll(/data-i18n="(test\.[\w.-]+)"/gu), ...protocolScript.matchAll(/[td]\("(test\.[\w.-]+)"/gu),
-  ...protocol.matchAll(/data-i18n="(test\.[\w.-]+)"/gu)].map(match => match[1]).concat([
+  ...protocol.matchAll(/data-i18n="(test\.[\w.-]+)"/gu), ...popupScript.matchAll(/t\("(test\.[\w.-]+)"/gu)]
+  .map(match => match[1]).concat([
+  "test.suggestionDone", "test.suggestionNotFound", "test.suggestionUnknown",
+  "test.recordingNotComparable", "test.recordingCheckFailed", "test.noTestRecording",
+  "test.noBusinessCentralTab", "test.endActive", "test.recordedList", "test.suggestionFailed",
+  "test.errorNoMessage",
   "test.section", "test.screenshots", "test.prerequisites", "test.testData", "test.testedBy",
   "test.approvedBy", "test.signName", "test.signDate", "test.signature",
   "test.screenshotLimit", "test.screenshotFailed", "test.screenshotNeedsAccess", "test.activeTest", "test.continueTest", "test.continueHelp", "test.stepsTested", "test.badgeTitle", "test.accessNotice", "test.accessNoticeUnpinned", "test.noBusinessCentral","test.scriptTitle",
