@@ -81,6 +81,7 @@ importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
 importScripts("document/document-library.js");
 importScripts("document/document-folders.js");
+importScripts("document/test-recording-match.js");
 importScripts("document/test-script.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
@@ -1068,7 +1069,9 @@ async function captureBcErrorEvidence(input, sender) {
   const state = await getState();
   if (state.recording) await requireActiveTenantLicense(state);
   const session = state.sessionId ? await getSession(state.sessionId) : null;
-  if (!state.recording || session?.recordingPurpose !== "bug-report") return null;
+  if (!state.recording || (session?.recordingPurpose !== "bug-report" && !session?.testRunId)) {
+    return null;
+  }
   const recording = await getCanonicalRecording(state.sessionId);
   const preceding = [...recording.events].reverse().find(item =>
     !["focus", "page-state", "dialog-open", "bc-error"].includes(item.raw?.type));
@@ -1406,6 +1409,8 @@ async function startSession(message, tabId) {
     purpose: message.purpose || "",
     recordingPurpose: globalThis.T9CanonicalRecording
       .normalizeRecordingPurpose(message.recordingPurpose),
+    // A recording made while a test is run belongs to that run, not to the library.
+    ...(message.testRunId ? { testRunId: String(message.testRunId) } : {}),
     businessCentral: { environment: observedContext.environmentName || "",
       company: observedContext.companyName || "",
       ...observedContext.businessCentralVersions },
@@ -1418,7 +1423,7 @@ async function startSession(message, tabId) {
     settings
   };
 
-  if (session.recordingPurpose === "bug-report") {
+  if (session.recordingPurpose === "bug-report" || session.testRunId) {
     await bcErrorEvidenceStore.initialize(id);
   }
   await saveSession(session);
@@ -1434,7 +1439,8 @@ async function startSession(message, tabId) {
     tabId,
     startedAt: now,
     licenseTenantId: session.licenseTenantId,
-    recordingPurpose: session.recordingPurpose
+    recordingPurpose: session.recordingPurpose,
+    ...(session.testRunId ? { testRunId: session.testRunId } : {})
   });
   await setDebug(globalThis.T9RecordingLiveStatus.freshSessionDebug(id));
 
@@ -1443,7 +1449,8 @@ async function startSession(message, tabId) {
       type: "T9_STATE_CHANGED",
       recording: true,
       sessionId: id,
-      recordingPurpose: session.recordingPurpose
+      recordingPurpose: session.recordingPurpose,
+      ...(session.testRunId ? { testRunId: session.testRunId } : {})
     });
   } catch (error) {
     session.status = "failed";
@@ -1602,7 +1609,10 @@ async function stopSession(finalName = "", documentLanguage = "") {
   return session;
 }
 
-async function deriveBugReportTasks(recording, screenshotManifest) {
+// A test recording is compared with steps the document library interpreted with the
+// knowledge repository, which can name a step's kind more precisely, so it is interpreted
+// the same way (options.repository).
+async function deriveBugReportTasks(recording, screenshotManifest, options = {}) {
   const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
   const grouped = globalThis.T9EventStepGrouping.group(normalized);
   const legacy = globalThis.T9CanonicalRecording.legacyView(recording);
@@ -1619,11 +1629,155 @@ async function deriveBugReportTasks(recording, screenshotManifest) {
     normalizedEvents: normalized.events, stepGroups: grouped.groups,
     supportingEvents: grouped.supportingEvents,
     groupingDiagnostics: grouped.diagnostics,
-    imagePaths: screenshots, knowledgePacks: packResult.packs || [] });
+    imagePaths: screenshots, knowledgePacks: packResult.packs || [],
+    ...(options.repository && packResult.repository ? { knowledgeRepository: packResult.repository,
+      knowledgeReleaseId: packResult.snapshot?.release?.releaseId || null } : {}) });
   const byCanonicalId = new Map(recording.events.map(event => [event.id, event]));
   return (interpretation.businessTasks || []).map(task => ({ ...task,
     screenshotAssetIds: [...new Set((task.sourceEventIds || []).map(id =>
       byCanonicalId.get(id)?.screenshotAssetId).filter(Boolean))] }));
+}
+
+function privacyMaskLabels(documentLanguage) {
+  const language = globalThis.T9LanguageRegistry.normalize(documentLanguage, "document");
+  const placeholder = (english, swedish) =>
+    globalThis.T9LanguageRegistry.translate(english, language, swedish);
+  return { secret: placeholder("[masked]", "[maskerat]"),
+    email: placeholder("[email address]", "[e-postadress]"),
+    customer: placeholder("[current customer]", "[aktuell kund]"),
+    vendor: placeholder("[current vendor]", "[aktuell leverantör]"),
+    item: placeholder("[current item]", "[aktuell artikel]"),
+    amount: placeholder("[amount]", "[belopp]"), id: placeholder("[ID]", "[id]") };
+}
+
+// A recording made while a test is run. When it stops it is compared with the test's steps
+// and then removed: the run keeps what the recording showed for each step, as suggestions
+// the tester confirms, and the recording never becomes a document in the library. Secrets
+// are masked as in a bug report; other values stay in the run, which is stored only here.
+async function startTestRecording(testRunId, tabId) {
+  const run = await loadTestRun(testRunId);
+  if (!run) throw new Error("test.runNotFound");
+  if (!run.steps.some(step => globalThis.T9TestRecordingMatch.hasSignature(step.signature))) {
+    throw new Error("test.recordingNotComparable");
+  }
+  return startSession({ name: run.title || "Business Central", testRunId: run.testRunId }, tabId);
+}
+
+async function stopTestRecording() {
+  const state = await getState();
+  const active = state.sessionId ? await getSession(state.sessionId) : null;
+  if (!active?.testRunId) throw new Error("test.noTestRecording");
+  const run = await loadTestRun(active.testRunId);
+  const session = await stopSession("", run?.documentLanguage || "");
+  return compareTestRecording(session.id);
+}
+
+// What Business Central showed when a step of a test recording failed: the message of an
+// error dialog, kept as error evidence, or of the page's error banner. The message is shown
+// as Business Central wrote it.
+async function testRecordingErrors(recordingId, recording) {
+  const evidence = new Map((await getBcErrorEvidenceForRecording(recordingId).catch(() => []))
+    .map(item => [item.errorEvidenceId, item]));
+  const events = new Map((recording.events || []).map(event => [event.id, event]));
+  const message = id => {
+    const raw = events.get(id)?.raw || {};
+    const value = raw.type === "bc-error" ? evidence.get(raw.errorEvidenceId)?.displayMessage
+      : raw.accessibleName || raw.label || raw.text;
+    return String(value || "").replace(/\s+/gu, " ").trim();
+  };
+  return task => {
+    const verification = task.resultVerification || {};
+    if (verification.status !== "error") return {};
+    const outcomes = (verification.outcomes || []).filter(item => item.kind === "error-outcome");
+    const text = outcomes.flatMap(item => item.sourceEventIds || []).map(message).find(Boolean) || "";
+    return { failed: true, error: text };
+  };
+}
+
+// For each step found in a test recording, the last screenshot of the recorded step, stored
+// as a test screenshot with the values measured when it was taken.
+async function testRecordingScreenshots(recordingId, recording, run, check, tasks, capturedAt) {
+  const assets = new Map((recording.assets || []).map(asset => [asset.id, asset]));
+  const wanted = check.steps.filter(step => Number.isInteger(step.taskIndex)).map(step => {
+    const assetId = (tasks[step.taskIndex]?.screenshotAssetIds || []).at(-1);
+    const asset = assetId && assets.get(assetId);
+    const eventNo = Number(asset?.metadata?.legacyEventNo);
+    return asset && Number.isSafeInteger(eventNo) ? { stepId: step.stepId, asset, key: String(eventNo) } : null;
+  }).filter(Boolean);
+  if (!wanted.length) return [];
+  const images = (await screenshotAssetStore.load(recordingId, wanted.map(item => item.key))).assets || {};
+  const shots = [];
+  for (const item of wanted) {
+    const image = images[item.key];
+    if (typeof image !== "string" || !image.startsWith("data:image/")) continue;
+    const screenshotId = `shot-${crypto.randomUUID()}`;
+    const key = testScreenshotKey(run, screenshotId);
+    await chrome.storage.local.set({ [key]: { image, capturedAt: item.asset.createdAt || capturedAt,
+      ...(Array.isArray(item.asset.valueRegions) ? { valueRegions: item.asset.valueRegions,
+        valueRegionsComplete: item.asset.valueRegionsComplete !== false } : {}) } });
+    shots.push({ stepId: item.stepId, screenshotId, key, capturedAt: item.asset.createdAt || capturedAt });
+  }
+  return shots;
+}
+
+async function compareTestRecording(recordingId) {
+  const session = await getSession(recordingId);
+  if (!session?.testRunId) throw new Error("test.noTestRecording");
+  const run = await loadTestRun(session.testRunId);
+  if (!run) {
+    await deleteSession(recordingId);
+    throw new Error("test.runNotFound");
+  }
+  try {
+    const recording = await getCanonicalRecording(recordingId);
+    const settings = await getSettings();
+    const labels = privacyMaskLabels(run.documentLanguage);
+    const masked = { ...recording, events: (recording.events || []).map(event =>
+      globalThis.T9PrivacyMask.maskRecordedEvent(event,
+        { ...settings, maskValues: "secrets", labels })) };
+    const timeOf = new Map((recording.events || []).map(event => [event.id, event.timestamp]));
+    const errorOf = await testRecordingErrors(recordingId, masked);
+    const tasks = (await deriveBugReportTasks(masked,
+      await screenshotAssetStore.manifest(recordingId), { repository: true })).map(task => ({ ...task,
+      at: timeOf.get((task.sourceEventIds || [])[0]) || "", ...errorOf(task) }));
+    const check = globalThis.T9TestRecordingMatch.check(run.steps, tasks);
+    const now = new Date().toISOString();
+    // The screenshot of each step found in the recording goes with the step, in place of the
+    // ones an earlier recording gave it; the tester's own screenshots are kept.
+    const shots = await testRecordingScreenshots(recordingId, recording, run, check, tasks, now);
+    const replaced = run.steps.flatMap(step => step.screenshots.filter(shot =>
+      shot.source === "recording").map(shot => ({ stepId: step.stepId, screenshotId: shot.screenshotId })));
+    let saved;
+    try {
+      saved = await withTestRun(run.testRunId, current => {
+        let result = globalThis.T9TestScript.applyRecordingCheck(current, check, now);
+        for (const item of replaced) {
+          result = globalThis.T9TestScript.removeScreenshot(result, item.stepId, item.screenshotId, now);
+        }
+        for (const shot of shots) {
+          const step = result.steps.find(entry => entry.stepId === shot.stepId);
+          if (step && step.screenshots.length < globalThis.T9TestScript.MAX_SCREENSHOTS_PER_STEP) {
+            result = globalThis.T9TestScript.addScreenshot(result, shot.stepId, { screenshotId:
+              shot.screenshotId, capturedAt: shot.capturedAt, source: "recording" }, now);
+          }
+        }
+        return result;
+      });
+    } catch (error) {
+      await chrome.storage.local.remove(shots.map(shot => shot.key)).catch(() => {});
+      throw error;
+    }
+    const kept = new Set(globalThis.T9TestScript.screenshotIds(saved));
+    await chrome.storage.local.remove([...replaced.map(item => testScreenshotKey(run, item.screenshotId)),
+      ...shots.filter(shot => !kept.has(shot.screenshotId)).map(shot => shot.key)]);
+    await deleteSession(recordingId);
+    return { run: saved, check };
+  } catch (error) {
+    await withTestRun(run.testRunId, current => globalThis.T9TestScript.recordingCheckFailed(
+      current, recordingId, new Date().toISOString())).catch(() => {});
+    console.warn("Test recording could not be compared", error);
+    throw new Error("test.recordingCheckFailed");
+  }
 }
 
 async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateCurrent = null) {
@@ -1632,16 +1786,7 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
   // Steps are derived twice: with the captured values, and with them masked as a recording
   // masks them, so that each report can choose. Placeholders follow the document language;
   // the recording itself is not changed.
-  const language = globalThis.T9LanguageRegistry.normalize(
-    recording.metadata?.documentLanguage, "document");
-  const placeholder = (english, swedish) =>
-    globalThis.T9LanguageRegistry.translate(english, language, swedish);
-  const labels = { secret: placeholder("[masked]", "[maskerat]"),
-    email: placeholder("[email address]", "[e-postadress]"),
-    customer: placeholder("[current customer]", "[aktuell kund]"),
-    vendor: placeholder("[current vendor]", "[aktuell leverantör]"),
-    item: placeholder("[current item]", "[aktuell artikel]"),
-    amount: placeholder("[amount]", "[belopp]"), id: placeholder("[ID]", "[id]") };
+  const labels = privacyMaskLabels(recording.metadata?.documentLanguage);
   const settings = await getSettings();
   const maskEvent = (event, maskValues) =>
     globalThis.T9PrivacyMask.maskRecordedEvent(event, { ...settings, maskValues, labels });
@@ -1692,12 +1837,15 @@ async function refreshStoredBugReport(report) {
     ? report : bugReportStore.save(refreshed);
 }
 
+// A recording made during a test is not a document of its own; see stopTestRecording.
+const librarySession = ([key, value]) => key.startsWith(SESSION_PREFIX) && !value?.testRunId;
+
 async function listSessions() {
   const all = await globalThis.T9StorageQueries.getByPrefixes(
     chrome.storage.local, [SESSION_PREFIX]
   );
   return Object.entries(all)
-    .filter(([key]) => key.startsWith(SESSION_PREFIX))
+    .filter(librarySession)
     .map(([, value]) => value)
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
 }
@@ -1714,7 +1862,7 @@ async function getDocumentLibraryBootstrap() {
   const reviewProgress = progress.map(({ sessionId, total, approved, completed }) =>
     ({ sessionId, total, approved, completed }));
   const sessions = Object.entries(all)
-    .filter(([key]) => key.startsWith(SESSION_PREFIX))
+    .filter(librarySession)
     .map(([, value]) => value)
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
   const reports = Object.entries(all)
@@ -2025,6 +2173,14 @@ async function deleteSession(id) {
   // The document's test runs go with it; reports made from them are kept.
   const runs = await listTestRuns(id);
   if (runs.length) {
+    // Recordings made during its tests that were kept because they could not be compared.
+    const runIds = new Set(runs.map(run => run.testRunId));
+    const all = await globalThis.T9StorageQueries.getByPrefixes(chrome.storage.local,
+      [SESSION_PREFIX]);
+    for (const [key, value] of Object.entries(all)) {
+      if (key.startsWith(SESSION_PREFIX) && value?.testRunId && runIds.has(value.testRunId) &&
+          value.id !== id) await deleteSession(value.id);
+    }
     await chrome.storage.local.remove(runs.map(run => TEST_RUN_PREFIX + run.testRunId));
   }
   await removeTestScreenshots(`${TEST_SCREENSHOT_PREFIX}${id}:`);
@@ -2301,7 +2457,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_START_TEST_RECORDING": {
+        const tabId = message.tabId || sender.tab?.id;
+        if (!tabId) throw new Error("test.noBusinessCentralTab");
+        const session = await startTestRecording(message.testRunId, tabId);
+        sendResponse({ ok: true, session });
+        break;
+      }
+
+      case "T9_STOP_TEST_RECORDING": {
+        sendResponse({ ok: true, ...(await stopTestRecording()) });
+        break;
+      }
+
+      case "T9_RETRY_TEST_RECORDING_CHECK": {
+        const run = await loadTestRun(message.testRunId);
+        const recordingId = run?.recordingCheck?.failed ? run.recordingCheck.recordingId : "";
+        if (!recordingId) throw new Error("test.noTestRecording");
+        sendResponse({ ok: true, ...(await compareTestRecording(recordingId)) });
+        break;
+      }
+
       case "T9_STOP": {
+        // A test recording is always compared with its test, whichever page stops it.
+        if ((await getState()).testRunId) {
+          sendResponse({ ok: true, ...(await stopTestRecording()) });
+          break;
+        }
         const session = await stopSession(message.name, message.documentLanguage);
         sendResponse({ ok: true, session });
         break;
@@ -2411,6 +2593,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (run) {
           await chrome.storage.local.set({ [globalThis.T9StorageKeys.ACTIVE_TEST_RUN_KEY]:
             { testRunId: run.testRunId, at: new Date().toISOString() } });
+        }
+        sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_CLEAR_ACTIVE_TEST_RUN": {
+        // Only the test named is ended, so a test opened meanwhile stays active.
+        const key = globalThis.T9StorageKeys.ACTIVE_TEST_RUN_KEY;
+        const pointer = (await chrome.storage.local.get(key))[key];
+        if (!message.testRunId || pointer?.testRunId === String(message.testRunId)) {
+          await chrome.storage.local.remove(key);
         }
         sendResponse({ ok: true });
         break;

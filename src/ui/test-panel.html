@@ -48,6 +48,22 @@
     .panel-setup dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;font-size:.875rem}
     .panel-setup dt{font-weight:600;overflow-wrap:anywhere}.panel-setup dd{margin:0;overflow-wrap:anywhere}
     .panel-access{margin:0;padding:10px 12px;border-left:4px solid var(--c-fg-9a3412);border-radius:6px;background:var(--c-bg-fff7ed);color:var(--c-fg-9a3412);font-size:.875rem;font-weight:600;overflow-wrap:anywhere}
+    .panel-recording{display:grid;gap:8px;padding:10px 12px;border:1px solid var(--c-bd-ccd5df);border-radius:6px;min-width:0}
+    .panel-recording[data-state=recording]{border-color:var(--c-bd-b42318);border-left-width:4px}
+    .panel-recording h2{margin:0;font-size:.8125rem;font-weight:700}
+    .panel-recording p{margin:0;font-size:.875rem;overflow-wrap:anywhere}
+    .panel-recording .rec-dot{display:inline-block;width:.6em;height:.6em;margin-right:6px;border-radius:50%;background:var(--c-bd-b42318);vertical-align:.05em}
+    .panel-recorded summary{cursor:pointer;font-size:.875rem;font-weight:600}
+    .panel-recorded ol{margin:6px 0 10px;padding-left:1.4em;display:grid;gap:4px;font-size:.8125rem}
+    .panel-recorded li{overflow-wrap:anywhere}.panel-recorded-link{display:block;color:var(--c-fg-526273)}
+    .panel-suggestion{margin:0;padding:6px 10px;border-radius:6px;font-size:.875rem;background:var(--c-bg-eef2f6);overflow-wrap:anywhere}
+    .panel-suggestion strong{display:block}
+    .panel-suggestion[data-state=failed]{border-left:4px solid var(--c-bd-b42318)}
+    .panel-suggestion-error{display:block;color:var(--c-fg-8a1c14);font-weight:600;white-space:pre-wrap}
+    .panel-suggestion button{display:block;margin:8px 0 0;min-height:34px}
+    .panel-suggestion[data-state=done]{border-left:4px solid var(--c-bd-15803d)}
+    .panel-suggestion[data-state=not-found]{border-left:4px solid var(--c-bd-8392a5)}
+    .panel-suggestion[data-state=unknown]{border-left:4px solid var(--c-bd-ccd5df);color:var(--c-fg-526273)}
     #panelMessage{margin:0;font-size:.875rem;min-height:1.2em;overflow-wrap:anywhere}
   </style>
 </head>
@@ -59,6 +75,10 @@
       <p id="saveState" class="save-state" role="status"></p>
     </div>
     <p id="panelAccess" class="panel-access" role="status" hidden></p>
+    <section id="panelRecording" class="panel-recording" aria-labelledby="panelRecordingTitle" hidden>
+      <h2 id="panelRecordingTitle" data-i18n="test.recordingTitle">Recording</h2>
+      <div id="panelRecordingContent" data-i18n-ignore></div>
+    </section>
     <details id="panelSetup" class="panel-setup" hidden>
       <summary data-i18n-ignore></summary>
       <div id="panelSetupContent" data-i18n-ignore></div>
@@ -82,6 +102,7 @@
   <script src="engine/language-registry.js"></script>
   <script src="i18n.js"></script>
   <script src="engine/storage-keys.js"></script>
+  <script src="document/test-recording-match.js"></script>
   <script src="document/test-script.js"></script>
   <script src="test-run-client.js"></script>
   <script src="test-panel.js"></script>

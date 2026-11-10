@@ -157,7 +157,10 @@ assert.match(content, /stored\?\.sessionId === sessionId \? stored : null/);
 // an error already shown; the banner sentence itself is left out of the captured message.
 assert.ok(content.includes('surface: banner ? "page-error-banner" : "field-validation-error"'));
 assert.match(content, /\.\.\.banners\.map\(observePageError\)/);
-assert.match(content, /if \(recording && recordingPurpose === "bug-report"\) \{\s+new Map\(pageErrorBanners\(\)/);
+// During a bug recording or a test recording (errorEvidence); reporting a visible error
+// turns it on for the bug recording it starts.
+assert.match(content, /if \(recording && errorEvidence\) \{\s+new Map\(pageErrorBanners\(\)/);
+assert.match(content, /message\.type === "T9_CAPTURE_VISIBLE_BC_ERROR"\) \{[\s\S]{0,400}?errorEvidence = true;/);
 assert.match(content, /\.\.\.lines\.filter\(line => !generic\.has\(line\)\),\s+\.\.\.fieldErrorMessages\(\)/);
 // A field's validation message is the accessible name of the error icon it is labelled by,
 // as the client renders it (aria-invalid, aria-labelledby "<label> validation_tooltip_N").

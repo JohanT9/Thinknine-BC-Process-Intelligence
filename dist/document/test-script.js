@@ -53,9 +53,14 @@
         child.calloutType === "verification")
         .map(child => (child.blocks || []).map(blockText).filter(Boolean).join(" "))
         .filter(Boolean);
+      // What the step does and where, so that a recording made during the test can be
+      // compared with it (T9TestRecordingMatch); a step without it cannot be compared.
+      const signer = globalThis.T9TestRecordingMatch;
+      const signature = signer && block.interaction ? signer.signature(block.interaction) : null;
       steps.push({ stepId: String(block.blockId || `step-${steps.length + 1}`),
         number: steps.length + 1, heading, instruction, expected: checks.join("\n"),
-        status: "not-run", comment: "" });
+        status: "not-run", comment: "",
+        ...(signature && signer.hasSignature(signature) ? { signature } : {}) });
     });
     visit(workflow?.blocks);
     return steps;
@@ -159,7 +164,10 @@
       throw new TypeError("Invalid test screenshot id.");
     }
     if (step.screenshots.length >= MAX_SCREENSHOTS_PER_STEP) throw new Error("test.screenshotLimit");
-    step.screenshots.push({ screenshotId: shot.screenshotId, capturedAt: text(shot.capturedAt) });
+    // A screenshot taken from a recording of the test says so, so that a new recording can
+    // replace it without touching the tester's own.
+    step.screenshots.push({ screenshotId: shot.screenshotId, capturedAt: text(shot.capturedAt),
+      ...(shot.source === "recording" ? { source: "recording" } : {}) });
     result.updatedAt = now || result.updatedAt;
     return normalize(result);
   }
@@ -202,8 +210,67 @@
     const value = normalize(run);
     const now = options.now || new Date().toISOString();
     return normalize({ ...value, testRunId: String(options.testRunId || ""), createdAt: now,
-      updatedAt: now, environment: "", steps: value.steps.map(step => ({ ...step,
+      updatedAt: now, environment: "", recordingCheck: undefined,
+      steps: value.steps.map(step => ({ ...step, recordingSuggestion: undefined,
         status: "not-run", comment: "", bugReportId: null, screenshots: [] })) });
+  }
+
+  // What a recording made while the test was run shows for each step: done, not found, or
+  // unknown for a step that cannot be compared. It is a suggestion beside the step; only
+  // the tester sets a result. A new check replaces the previous one.
+  // "failed": the step was done and Business Central showed an error after it.
+  const SUGGESTION_STATES = Object.freeze(["done", "failed", "not-found", "unknown"]);
+  const MAX_ADDITIONAL = 50;
+  const MAX_RECORDED = 200;
+  function applyRecordingCheck(run, check = {}, now) {
+    const result = normalize(run);
+    const byStep = new Map((Array.isArray(check.steps) ? check.steps : [])
+      .map(item => [String(item?.stepId || ""), item]));
+    result.steps.forEach(step => {
+      const found = byStep.get(step.stepId);
+      delete step.recordingSuggestion;
+      if (!found || !SUGGESTION_STATES.includes(found.state)) return;
+      step.recordingSuggestion = { state: found.state,
+        ...(["done", "failed"].includes(found.state)
+          ? { instruction: text(found.instruction), at: text(found.at) } : {}),
+        ...(found.state === "failed" ? { error: text(found.error) } : {}) };
+    });
+    result.recordingCheck = { checkedAt: now || new Date().toISOString(),
+      recordedSteps: Math.max(0, Number(check.recordedSteps) || 0),
+      additional: (Array.isArray(check.additional) ? check.additional : []).map(text)
+        .filter(Boolean).slice(0, MAX_ADDITIONAL),
+      recorded: (Array.isArray(check.recorded) ? check.recorded : [])
+        .map(item => ({ instruction: text(item?.instruction), stepId: text(item?.stepId),
+          ...(item?.failed ? { failed: true, error: text(item.error) } : {}) }))
+        .filter(item => item.instruction).slice(0, MAX_RECORDED) };
+    result.updatedAt = now || result.updatedAt;
+    return normalize(result);
+  }
+
+  // A recording that stopped but could not be compared yet; it is kept so that the
+  // comparison can be tried again, and the earlier suggestions stay as they were.
+  function recordingCheckFailed(run, recordingId, now) {
+    const result = normalize(run);
+    result.recordingCheck = { ...(result.recordingCheck || {}), failed: true,
+      recordingId: String(recordingId || ""), failedAt: now || new Date().toISOString() };
+    result.updatedAt = now || result.updatedAt;
+    return normalize(result);
+  }
+
+  // The steps the recording shows as done without an error that have no result yet. They
+  // pass only when the tester chooses to approve them.
+  function suggestedPasses(run) {
+    return normalize(run).steps.filter(step => step.status === "not-run" &&
+      step.recordingSuggestion?.state === "done").map(step => step.stepId);
+  }
+
+  // Failing a step the recording suggests failed: the status, with Business Central's
+  // message added to the tester's comment unless it is already there. Only on request.
+  function failureFromSuggestion(step) {
+    const message = text(step?.recordingSuggestion?.error).trim();
+    const comment = text(step?.comment);
+    return { status: "failed", comment: !message || comment.includes(message) ? comment
+      : [comment.trim(), message].filter(Boolean).join("\n") };
   }
 
   // Passed only when every step passed or was deliberately skipped; failed as soon as one
@@ -290,7 +357,8 @@
   }
 
   return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot,
-    applyChanges, bugReportContent, carryOver, countsText, create, csv, markdown, normalize,
+    applyChanges, applyRecordingCheck, bugReportContent, failureFromSuggestion,
+    recordingCheckFailed, suggestedPasses, carryOver, countsText, create, csv, markdown, normalize,
     filledTestData, removeScreenshot, rerun, resolveText, screenshotIds, stepsFromDocument, summary, update,
     updateStep };
 });

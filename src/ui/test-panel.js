@@ -99,6 +99,34 @@
     expected.append(element("p", "panel-label", t("test.expected")), expectedText);
     parts.push(expected);
 
+    // What the latest recording of the test showed for the step: a suggestion only.
+    const suggestion = step.recordingSuggestion;
+    if (suggestion && value.recordingCheck?.checkedAt) {
+      const note = element("p", "panel-suggestion");
+      note.dataset.state = suggestion.state;
+      note.append(element("strong", "", t(SUGGESTION_KEYS[suggestion.state])));
+      if (suggestion.state === "failed") {
+        // Business Central's own message, as it was shown.
+        note.append(element("span", "panel-suggestion-error", suggestion.error || t("test.errorNoMessage")));
+      }
+      if (["done", "failed"].includes(suggestion.state) && suggestion.instruction) {
+        note.append(element("span", "", t("test.suggestionRecorded",
+          { instruction: suggestion.instruction })));
+      }
+      if (suggestion.state === "failed" && step.status !== "failed") {
+        const fail = element("button", "", t("test.failFromSuggestion"));
+        fail.type = "button"; fail.id = "failFromSuggestion";
+        fail.addEventListener("click", () => {
+          client.change({ steps: [{ stepId: step.stepId,
+            patch: script.failureFromSuggestion(run().steps[current]) }] });
+          showStep("#panelComment");
+          showRecording();
+        });
+        note.append(fail);
+      }
+      parts.push(note);
+    }
+
     const status = element("fieldset", "run-status");
     status.append(element("legend", "", t("test.resultFor", { n: step.number })));
     const choices = element("div", "choices");
@@ -182,6 +210,139 @@
     showProgress();
     const target = focusSelector ? stepSection.querySelector(focusSelector) : null;
     if (target && !target.disabled) target.focus();
+  }
+
+  // A recording made while testing, compared with the test's steps when it stops. It only
+  // suggests which steps were done; the tester approves them, one by one or all at once.
+  const SUGGESTION_KEYS = Object.freeze({ done: "test.suggestionDone", failed: "test.suggestionFailed",
+    "not-found": "test.suggestionNotFound", unknown: "test.suggestionUnknown" });
+  let recorder = { recording: false, testRunId: "" };
+  const comparable = value => value.steps.some(step =>
+    globalThis.T9TestRecordingMatch.hasSignature(step.signature));
+  async function loadRecorderState() {
+    try {
+      const state = (await send({ type: "T9_GET_STATE" })).state || {};
+      recorder = { recording: Boolean(state.recording), testRunId: String(state.testRunId || "") };
+    } catch { recorder = { recording: false, testRunId: "" }; }
+    showRecording();
+  }
+
+  function showRecording(focusId = "") {
+    const value = run();
+    const section = document.getElementById("panelRecording");
+    const content = document.getElementById("panelRecordingContent");
+    const hadFocus = section.contains(document.activeElement);
+    const ours = recorder.recording && recorder.testRunId === testRunId;
+    section.hidden = false;
+    section.dataset.state = ours ? "recording" : "";
+    const parts = [];
+    const actions = element("div", "panel-actions");
+    const button = (id, key, onClick) => {
+      const item = element("button", "", key);
+      item.type = "button"; item.id = id;
+      item.addEventListener("click", () => onClick(item));
+      actions.append(item);
+      return item;
+    };
+    const check = value.recordingCheck || {};
+    if (!comparable(value)) {
+      parts.push(element("p", "", t("test.recordingNotComparable")));
+    } else if (ours) {
+      const text = element("p");
+      text.append(element("span", "rec-dot"), document.createTextNode(t("test.recordingActive")));
+      parts.push(text);
+      button("stopTestRecording", t("test.stopRecording"), stopRecording);
+    } else if (recorder.recording) {
+      parts.push(element("p", "", t("test.recordingOther")));
+    } else if (check.failed) {
+      parts.push(element("p", "", t("test.recordingCheckFailed")));
+      button("retryTestRecording", t("test.retryCompare"), retryCheck);
+      button("startTestRecording", t("test.recordAgain"), startRecording);
+    } else if (check.checkedAt) {
+      const done = value.steps.filter(step => step.recordingSuggestion?.state === "done").length;
+      parts.push(element("p", "", t("test.recordingCompared", { done, total: value.steps.length })));
+      const failed = value.steps.filter(step => step.recordingSuggestion?.state === "failed").length;
+      if (failed) parts.push(element("p", "", t("test.recordingFailedCount", { n: failed })));
+      if (check.additional?.length) {
+        parts.push(element("p", "", t("test.recordingAdditional", { n: check.additional.length })));
+      }
+      if (check.recorded?.length) {
+        const details = element("details", "panel-recorded");
+        details.append(element("summary", "", t("test.recordedList", { n: check.recorded.length })));
+        const list = element("ol");
+        const numbers = new Map(value.steps.map(step => [step.stepId, step.number]));
+        check.recorded.forEach(item => {
+          const row = element("li");
+          const said = element("span", "", item.instruction);
+          said.lang = value.documentLanguage.split("-")[0];
+          row.append(said, element("span", "panel-recorded-link", numbers.has(item.stepId)
+            ? t("test.recordedForStep", { n: numbers.get(item.stepId) }) : t("test.recordedNotInTest")));
+          if (item.failed) row.append(element("span", "panel-suggestion-error", item.error || t("test.errorNoMessage")));
+          list.append(row);
+        });
+        details.append(list);
+        parts.push(details);
+      }
+      const passes = script.suggestedPasses(value);
+      if (passes.length) {
+        button("approveSuggested", t("test.approveSuggested", { n: passes.length }), approveSuggested);
+      }
+      button("startTestRecording", t("test.recordAgain"), startRecording);
+    } else {
+      parts.push(element("p", "", t("test.recordHelp")));
+      button("startTestRecording", t("test.recordTest"), startRecording);
+    }
+    if (actions.childElementCount) parts.push(actions);
+    content.replaceChildren(...parts);
+    const target = (focusId && document.getElementById(focusId)) ||
+      (hadFocus ? content.querySelector("button") : null);
+    if (target) target.focus();
+  }
+
+  async function startRecording(button) {
+    button.disabled = true;
+    message.textContent = t("test.startingRecording");
+    try {
+      await client.flush();
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!isBusinessCentralTab(tab)) throw new Error("test.noBusinessCentralTab");
+      await send({ type: "T9_START_TEST_RECORDING", testRunId, tabId: tab.id });
+      recorder = { recording: true, testRunId };
+      message.textContent = t("test.recordingActive");
+      showRecording("stopTestRecording");
+    } catch (error) {
+      message.textContent = errorText(error);
+      button.disabled = false;
+    }
+  }
+
+  async function finishCheck(button, request) {
+    button.disabled = true;
+    message.textContent = t("test.comparingRecording");
+    try {
+      const result = await send(request);
+      client.accept(result.run);
+      recorder = { recording: false, testRunId: "" };
+      const value = run();
+      message.textContent = t("test.recordingCompared", { total: value.steps.length,
+        done: value.steps.filter(step => step.recordingSuggestion?.state === "done").length });
+      showStep();
+      showRecording(script.suggestedPasses(value).length ? "approveSuggested" : "startTestRecording");
+    } catch (error) {
+      message.textContent = errorText(error);
+      await loadRecorderState();
+    }
+  }
+  const stopRecording = button => finishCheck(button, { type: "T9_STOP_TEST_RECORDING" });
+  const retryCheck = button => finishCheck(button, { type: "T9_RETRY_TEST_RECORDING_CHECK", testRunId });
+
+  function approveSuggested() {
+    const passes = script.suggestedPasses(run());
+    if (!passes.length) return;
+    client.change({ steps: passes.map(stepId => ({ stepId, patch: { status: "passed" } })) });
+    message.textContent = t("test.suggestionsApproved", { n: passes.length });
+    showStep();
+    showRecording("startTestRecording");
   }
 
   // What must be in place and the test data, folded away above the step.
@@ -328,6 +489,7 @@
       showProgress();
     }
     showSetup();
+    showRecording();
   }
 
   async function start() {
@@ -351,10 +513,13 @@
     showSaveState("saved");
     showSetup();
     showStep();
+    void loadRecorderState();
     void send({ type: "T9_SET_ACTIVE_TEST_RUN", testRunId }).catch(() => {});
     void showAccess();
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === "session" && changes[globalThis.T9StorageKeys.TEST_ACCESS_TABS_KEY]) void showAccess();
+      // A recording started or stopped elsewhere, such as from the toolbar button.
+      if (area === "local" && changes.t9_state) void loadRecorderState();
     });
     chrome.tabs.onActivated.addListener(() => { void showAccess(); });
     chrome.action.onUserSettingsChanged?.addListener(() => { void showAccess(); });
