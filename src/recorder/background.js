@@ -233,6 +233,7 @@ const {
   BC_ERROR_EVIDENCE_PREFIX,
   BUG_REPORT_PREFIX,
   TEST_RUN_PREFIX,
+  TEST_SCREENSHOT_PREFIX,
   EVENT_PREFIX,
   RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
@@ -587,8 +588,11 @@ function valueRegionsFor(image) {
   return details ? { valueRegions: details.regions, valueRegionsComplete: details.complete } : {};
 }
 
+// Why the latest capture failed, so that a caller can say what the user can do about it.
+let lastCaptureError = "";
 async function capture(tabId, options = {}) {
   const captureId = crypto.randomUUID();
+  lastCaptureError = "";
   let captureFrames = [0];
   try {
     const tab = await chrome.tabs.get(tabId);
@@ -617,6 +621,7 @@ async function capture(tabId, options = {}) {
     }
     return image;
   } catch (error) {
+    lastCaptureError = String(error?.message || error);
     screenshotStats.errors += 1;
     await setDebug({
       lastScreenshotError: String(error),
@@ -633,22 +638,7 @@ async function capture(tabId, options = {}) {
 async function captureStepRepairScreenshot(recordingId, stepId, returnTabId) {
   const session = await getSession(recordingId);
   if (!session) throw new Error("Inspelningen kunde inte hittas.");
-  const tabs = await chrome.tabs.query({ url: [
-    "https://businesscentral.dynamics.com/*",
-    "https://*.businesscentral.dynamics.com/*"
-  ] });
-  const environment = String(session.settings?.environmentName || "").toLowerCase();
-  const candidates = tabs.filter(tab => Number.isInteger(tab.id)).sort((a, b) => {
-    const aContext = globalThis.T9BusinessCentralUrlContext
-      .parseBusinessCentralUrl(a.url || "");
-    const bContext = globalThis.T9BusinessCentralUrlContext
-      .parseBusinessCentralUrl(b.url || "");
-    const aMatch = String(aContext.environmentName || "").toLowerCase() === environment;
-    const bMatch = String(bContext.environmentName || "").toLowerCase() === environment;
-    return Number(bMatch) - Number(aMatch) ||
-      Number(b.lastAccessed || 0) - Number(a.lastAccessed || 0);
-  });
-  const target = candidates[0];
+  const target = await businessCentralTabFor(recordingId);
   if (!target) throw new Error("Ingen öppen Business Central-flik hittades.");
   await chrome.tabs.update(target.id, { active: true });
   await chrome.windows.update(target.windowId, { focused: true });
@@ -1786,6 +1776,173 @@ async function saveTestRun(run) {
   await chrome.storage.local.set({ [TEST_RUN_PREFIX + value.testRunId]: value });
   return value;
 }
+// Changes to one run are applied one at a time to what is stored, so the full page and the
+// panel beside Business Central can both change a run without undoing each other.
+const testRunQueues = new Map();
+function withTestRun(testRunId, change) {
+  const id = String(testRunId || "");
+  const previous = testRunQueues.get(id) || Promise.resolve();
+  const next = previous.catch(() => {}).then(async () => {
+    const run = await loadTestRun(id);
+    if (!run) throw new Error("test.runNotFound");
+    return saveTestRun(await change(run));
+  });
+  testRunQueues.set(id, next);
+  next.finally(() => { if (testRunQueues.get(id) === next) testRunQueues.delete(id); })
+    .catch(() => {});
+  return next;
+}
+function testScreenshotKey(run, screenshotId) {
+  return `${TEST_SCREENSHOT_PREFIX}${run.sessionId}:${run.testRunId}:${screenshotId}`;
+}
+const BUSINESS_CENTRAL_TAB_URLS = ["https://businesscentral.dynamics.com/*",
+  "https://*.businesscentral.dynamics.com/*"];
+function isBusinessCentralUrl(url) {
+  try {
+    const host = new URL(String(url || "")).hostname;
+    return host === "businesscentral.dynamics.com" || host.endsWith(".businesscentral.dynamics.com");
+  } catch { return false; }
+}
+// The open Business Central tab to test in: one in the tested environment first, then the
+// one used last.
+async function businessCentralTabFor(recordingId) {
+  const session = recordingId ? await getSession(recordingId) : null;
+  const environment = String(session?.settings?.environmentName || "").toLowerCase();
+  const tabs = await chrome.tabs.query({ url: BUSINESS_CENTRAL_TAB_URLS });
+  const parse = tab => globalThis.T9BusinessCentralUrlContext.parseBusinessCentralUrl(tab.url || "");
+  return tabs.filter(tab => Number.isInteger(tab.id)).sort((a, b) => {
+    const aMatch = String(parse(a).environmentName || "").toLowerCase() === environment;
+    const bMatch = String(parse(b).environmentName || "").toLowerCase() === environment;
+    return Number(bMatch) - Number(aMatch) ||
+      Number(b.lastAccessed || 0) - Number(a.lastAccessed || 0);
+  })[0] || null;
+}
+// A screenshot of Business Central for a test step. From the panel the Business Central tab
+// is the one shown; from the full page that tab is shown for the capture and the page is
+// shown again afterwards. Values are measured like in a recording, so a bug report made
+// from the step can cover them.
+async function captureTestScreenshot({ testRunId, stepId, tabId, returnTabId }) {
+  const run = await loadTestRun(testRunId);
+  if (!run) throw new Error("test.runNotFound");
+  const step = run.steps.find(item => item.stepId === String(stepId || ""));
+  if (!step) throw new Error("test.runNotFound");
+  if (step.screenshots.length >= globalThis.T9TestScript.MAX_SCREENSHOTS_PER_STEP) {
+    throw new Error("test.screenshotLimit");
+  }
+  let target = Number.isInteger(tabId) ? await chrome.tabs.get(tabId).catch(() => null) : null;
+  if (target && !isBusinessCentralUrl(target.url)) target = null;
+  const switched = !target;
+  if (!target) target = await businessCentralTabFor(run.sessionId);
+  if (!target) throw new Error("test.noBusinessCentral");
+  if (switched) {
+    await chrome.tabs.update(target.id, { active: true });
+    await chrome.windows.update(target.windowId, { focused: true });
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  let image = null;
+  try {
+    image = await capture(target.id, { valueRegions: true });
+  } finally {
+    if (switched && Number.isInteger(returnTabId)) {
+      try {
+        const returnTab = await chrome.tabs.get(returnTabId);
+        await chrome.tabs.update(returnTabId, { active: true });
+        await chrome.windows.update(returnTab.windowId, { focused: true });
+      } catch {}
+    }
+  }
+  // Edge lets an extension capture a tab only after the user has used the extension on that
+  // tab, for example by choosing its toolbar button; the Business Central site access alone is
+  // not enough.
+  if (!image && /activeTab|<all_urls>/u.test(lastCaptureError)) {
+    await setTestTabAccess(target.id, false).catch(() => {});
+    throw new Error("test.screenshotNeedsAccess");
+  }
+  if (!image) throw new Error("test.screenshotFailed");
+  const screenshotId = `shot-${crypto.randomUUID()}`;
+  const capturedAt = new Date().toISOString();
+  const key = testScreenshotKey(run, screenshotId);
+  await chrome.storage.local.set({ [key]: { image, capturedAt, ...valueRegionsFor(image) } });
+  try {
+    const saved = await withTestRun(run.testRunId, current => globalThis.T9TestScript
+      .addScreenshot(current, stepId, { screenshotId, capturedAt }, capturedAt));
+    return { run: saved, screenshotId };
+  } catch (error) {
+    await chrome.storage.local.remove(key);
+    throw error;
+  }
+}
+async function loadTestScreenshots(run, screenshotIds) {
+  const listed = new Set(globalThis.T9TestScript.screenshotIds(run));
+  const wanted = [...new Set((Array.isArray(screenshotIds) ? screenshotIds : [...listed])
+    .map(String))].filter(id => listed.has(id));
+  const keys = wanted.map(id => testScreenshotKey(run, id));
+  const values = keys.length ? await chrome.storage.local.get(keys) : {};
+  return Object.fromEntries(wanted.flatMap((id, index) => {
+    const value = values[keys[index]];
+    return value?.image ? [[id, value]] : [];
+  }));
+}
+async function removeTestScreenshots(prefix) {
+  const stored = await globalThis.T9StorageQueries.getByPrefixes(chrome.storage.local, [prefix]);
+  const keys = Object.keys(stored).filter(key => key.startsWith(prefix));
+  if (keys.length) await chrome.storage.local.remove(keys);
+}
+
+// The test being worked on: the one whose page or panel was opened last.
+async function activeTestRun() {
+  const key = globalThis.T9StorageKeys.ACTIVE_TEST_RUN_KEY;
+  const pointer = (await chrome.storage.local.get(key))[key];
+  return pointer?.testRunId ? loadTestRun(pointer.testRunId).catch(() => null) : null;
+}
+
+// Edge lets the extension capture a tab only after the user has used its toolbar button there.
+// The Business Central tabs where that happened in this browser session are remembered; on
+// another tab where a test runs, the button gets a mark that blinks a few times and then stays
+// until the button is used.
+const TEST_ACCESS_TABS_KEY = globalThis.T9StorageKeys.TEST_ACCESS_TABS_KEY;
+async function testAccessTabs() {
+  const value = (await chrome.storage.session.get(TEST_ACCESS_TABS_KEY))[TEST_ACCESS_TABS_KEY];
+  return Array.isArray(value) ? value.filter(Number.isInteger) : [];
+}
+async function setTestTabAccess(tabId, granted) {
+  const tabs = (await testAccessTabs()).filter(id => id !== tabId);
+  if (granted) tabs.push(tabId);
+  await chrome.storage.session.set({ [TEST_ACCESS_TABS_KEY]: tabs.slice(-50) });
+}
+const testTabMarks = new Map();
+async function markTestTab(tabId, title) {
+  if (!Number.isInteger(tabId) || (await testAccessTabs()).includes(tabId)) return false;
+  if ((await getState()).recording) return false;
+  const tab = await chrome.tabs.get(tabId).catch(() => null);
+  if (!tab || !isBusinessCentralUrl(tab.url)) return false;
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: "#c2410c" });
+  await chrome.action.setBadgeTextColor?.({ tabId, color: "#ffffff" })?.catch(() => {});
+  if (title) await chrome.action.setTitle({ tabId, title: String(title).slice(0, 200) });
+  clearTimeout(testTabMarks.get(tabId));
+  let count = 0;
+  const blink = () => {
+    chrome.action.setBadgeText({ tabId, text: count % 2 === 0 ? "!" : "" }).catch(() => {});
+    count += 1;
+    if (count < 7) testTabMarks.set(tabId, setTimeout(blink, 450));
+    else testTabMarks.delete(tabId);
+  };
+  blink();
+  return true;
+}
+async function clearTestTabMark(tabId) {
+  clearTimeout(testTabMarks.get(tabId));
+  testTabMarks.delete(tabId);
+  // Without text the tab shows the button's own badge again, such as REC while recording.
+  await chrome.action.setBadgeText({ tabId, text: null }).catch(() => {});
+  await chrome.action.setTitle({ tabId,
+    title: chrome.runtime.getManifest().action?.default_title || "" }).catch(() => {});
+}
+chrome.tabs.onRemoved.addListener(tabId => { void setTestTabAccess(tabId, false).catch(() => {}); });
+chrome.tabs.onUpdated.addListener((tabId, change) => {
+  if (change.url && !isBusinessCentralUrl(change.url)) void setTestTabAccess(tabId, false).catch(() => {});
+});
+
 async function listTestRuns(recordingId = "") {
   const all = await globalThis.T9StorageQueries.getByPrefixes(chrome.storage.local,
     [TEST_RUN_PREFIX]);
@@ -1821,7 +1978,23 @@ async function createBugReportFromTestStep(testRunId, stepId) {
     startedAt: now, completedAt: now, updatedAt: now, status: "completed", eventCount: 0,
     version: VERSION, settings, source: content.source });
   await saveEvents(id, []);
-  const recording = await getCanonicalRecording(id);
+  // The step's screenshots go with the report as its evidence, with the values measured
+  // when they were taken so the report can cover them.
+  const shots = Object.values(await loadTestScreenshots(run, content.screenshotIds));
+  for (const [index, shot] of shots.entries()) {
+    await saveScreenshot(id, String(index + 1), shot.image);
+  }
+  let recording = await getCanonicalRecording(id);
+  if (shots.length) {
+    recording = globalThis.T9CanonicalRecording.normalize({ ...recording,
+      assets: recording.assets.map(asset => {
+        const shot = shots[Number(asset.metadata?.legacyEventNo) - 1];
+        return shot && Array.isArray(shot.valueRegions) ? { ...asset,
+          valueRegions: shot.valueRegions, valueRegionsComplete: shot.valueRegionsComplete !== false,
+          createdAt: shot.capturedAt } : asset;
+      }) });
+    await saveCanonicalRecording(recording);
+  }
   const model = globalThis.T9BugReportModel;
   let report = globalThis.T9BugReportService.createBugReportFromRecording(recording, [], {
     extensionVersion: VERSION, productVersion: VERSION, errorEvidence: [],
@@ -1831,8 +2004,16 @@ async function createBugReportFromTestStep(testRunId, stepId) {
   }
   report = model.updateHumanContent({ ...report, source: content.source }, {
     expectedResult: content.expectedResult, actualResult: content.actualResult }, now);
+  if (recording.assets.length) {
+    const assetIds = recording.assets.map(asset => asset.id);
+    report = model.normalize({ ...report,
+      evidence: { ...report.evidence, screenshots: [...(report.evidence?.screenshots || []),
+        ...assetIds.map(assetId => ({ assetId, role: "reproduction" }))] },
+      traceability: { ...report.traceability, screenshotAssetIds: [
+        ...(report.traceability?.screenshotAssetIds || []), ...assetIds] } });
+  }
   const saved = await bugReportStore.save(report);
-  await saveTestRun(globalThis.T9TestScript.updateStep(run, stepId,
+  await withTestRun(run.testRunId, current => globalThis.T9TestScript.updateStep(current, stepId,
     { bugReportId: saved.bugReportId }, now));
   const workspaceUrl = chrome.runtime.getURL(
     `technical-report.html?bugReportId=${encodeURIComponent(saved.bugReportId)}&new=1`);
@@ -1846,6 +2027,7 @@ async function deleteSession(id) {
   if (runs.length) {
     await chrome.storage.local.remove(runs.map(run => TEST_RUN_PREFIX + run.testRunId));
   }
+  await removeTestScreenshots(`${TEST_SCREENSHOT_PREFIX}${id}:`);
   await screenshotAssetStore.remove(id);
   await rawEventLogStorage.remove(id);
   await canonicalEventLogStorage.remove(id);
@@ -2217,8 +2399,72 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_SAVE_TEST_RUN": {
-        sendResponse({ ok: true, run: await saveTestRun(message.run) });
+      case "T9_UPDATE_TEST_RUN": {
+        const run = await withTestRun(message.testRunId, current =>
+          globalThis.T9TestScript.applyChanges(current, message.changes, new Date().toISOString()));
+        sendResponse({ ok: true, run });
+        break;
+      }
+
+      case "T9_SET_ACTIVE_TEST_RUN": {
+        const run = await loadTestRun(String(message.testRunId || ""));
+        if (run) {
+          await chrome.storage.local.set({ [globalThis.T9StorageKeys.ACTIVE_TEST_RUN_KEY]:
+            { testRunId: run.testRunId, at: new Date().toISOString() } });
+        }
+        sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_GET_ACTIVE_TEST_RUN": {
+        const run = await activeTestRun();
+        sendResponse({ ok: true, run: run ? { testRunId: run.testRunId, title: run.title,
+          summary: globalThis.T9TestScript.summary(run) } : null });
+        break;
+      }
+
+      case "T9_MARK_TEST_TAB": {
+        sendResponse({ ok: true, marked: await markTestTab(message.tabId, message.title) });
+        break;
+      }
+
+      case "T9_TEST_TAB_OPENED": {
+        // The toolbar button was used on this tab, so the browser lets the extension capture it.
+        if (Number.isInteger(message.tabId)) {
+          const tab = await chrome.tabs.get(message.tabId).catch(() => null);
+          if (tab && isBusinessCentralUrl(tab.url)) await setTestTabAccess(tab.id, true);
+          await clearTestTabMark(message.tabId);
+        }
+        sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_FIND_TEST_TAB": {
+        // The Business Central tab the panel opens beside.
+        const tab = await businessCentralTabFor(String(message.sessionId || ""));
+        sendResponse({ ok: true, tab: tab ? { id: tab.id, windowId: tab.windowId } : null });
+        break;
+      }
+
+      case "T9_CAPTURE_TEST_SCREENSHOT": {
+        sendResponse({ ok: true, ...await captureTestScreenshot(message) });
+        break;
+      }
+
+      case "T9_LOAD_TEST_SCREENSHOTS": {
+        const run = await loadTestRun(message.testRunId);
+        if (!run) throw new Error("test.runNotFound");
+        const shots = await loadTestScreenshots(run, message.screenshotIds);
+        sendResponse({ ok: true, screenshots: Object.fromEntries(Object.entries(shots)
+          .map(([id, value]) => [id, value.image])) });
+        break;
+      }
+
+      case "T9_DELETE_TEST_SCREENSHOT": {
+        const run = await withTestRun(message.testRunId, current => globalThis.T9TestScript
+          .removeScreenshot(current, message.stepId, message.screenshotId, new Date().toISOString()));
+        await chrome.storage.local.remove(testScreenshotKey(run, String(message.screenshotId || "")));
+        sendResponse({ ok: true, run });
         break;
       }
 
@@ -2226,7 +2472,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Earlier runs of the same document, newest first, with their results counted.
         const runs = await listTestRuns(String(message.sessionId || ""));
         sendResponse({ ok: true, runs: runs.map(run => ({ testRunId: run.testRunId,
-          createdAt: run.createdAt, updatedAt: run.updatedAt, tester: run.tester,
+          title: run.title, createdAt: run.createdAt, updatedAt: run.updatedAt, tester: run.tester,
           environment: run.environment, summary: globalThis.T9TestScript.summary(run) })) });
         break;
       }

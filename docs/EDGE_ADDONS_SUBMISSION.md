@@ -28,6 +28,7 @@ analytics, AI service, or application-content upload is part of the extension.
 | `activeTab` | Active BC page access and visible-tab screenshot capture in `src/recorder/background.js` and popup orchestration | Required | Capture only the tab the user records. |
 | `downloads` | Word/ZIP export through `chrome.downloads.download` in `src/recorder/background.js` | Required | Save user-requested documentation locally. |
 | `scripting` | Register/inject recorder scripts into eligible BC frames in background/popup | Required | Start reliable capture in standard and nested BC UI. |
+| `sidePanel` | Shows a test run beside the Business Central tab (`src/ui/test-panel.html`), opened by the user from the test page | Required | Work through a manual test without leaving Business Central. |
 | `storage` | Persist settings, raw/canonical recordings, reviews, screenshots, documents, and diagnostics locally | Required | Preserve work between browser sessions. |
 | `tabs` | Query the active tab, message frames, open dashboard, and capture the correct window | Required | Coordinate the explicitly selected recording tab and product UI. |
 | `unlimitedStorage` | Retain screenshot-rich recordings and document projects beyond the normal extension quota | Required for current storage model | Avoid losing larger authorized recording projects. |

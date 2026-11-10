@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Test run</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    html{overflow-x:hidden}body{font:15px system-ui;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-ffffff);overflow-x:hidden}
+    main{box-sizing:border-box;padding:12px 14px 16px;display:grid;gap:12px;min-width:0}
+    h1{margin:0;font-size:1.05rem;line-height:1.3;overflow-wrap:anywhere}
+    .panel-top{display:grid;gap:4px;min-width:0}
+    .panel-progress{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:.875rem;color:var(--c-fg-526273)}
+    .panel-progress strong{color:var(--c-fg-172b4d)}
+    .save-state{margin:0;font-size:.8125rem;color:var(--c-fg-526273)}
+    .save-state[data-state=failed]{color:var(--c-fg-8a1c14);font-weight:600}.save-state button{margin:0 0 0 6px;min-height:28px}
+    .panel-step{display:grid;gap:10px;padding:12px;border:1px solid var(--c-bd-ccd5df);border-left:4px solid var(--c-bd-ccd5df);border-radius:6px;min-width:0}
+    .panel-step[data-status=passed]{border-left-color:var(--c-bd-15803d)}.panel-step[data-status=failed]{border-left-color:var(--c-bd-b42318);background:var(--c-bg-fff4f2)}
+    .panel-step[data-status=skipped]{border-left-color:var(--c-bd-8392a5)}
+    .panel-step-heading{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .panel-step h2{margin:0;font-size:1rem;font-weight:400;line-height:1.4;overflow-wrap:anywhere}
+    .panel-step h2 .step-number{display:block;font-size:.8125rem;font-weight:700;margin-bottom:2px}
+    .panel-label{margin:0 0 2px;font-size:.8125rem;font-weight:600}
+    .panel-expected{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.panel-expected[data-empty]{color:var(--c-fg-526273);font-style:italic}
+    .run-status{margin:0;padding:0;border:0;min-width:0;background:none;box-shadow:none}.run-status legend{font-size:.8125rem;font-weight:600;padding:0;margin-bottom:6px}
+    .run-status .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(136px,1fr));gap:6px}
+    .run-status .choice{display:flex;align-items:center;gap:8px;font-weight:400;padding:6px 10px;min-height:38px;border:1px solid var(--c-bd-8392a5);border-radius:8px;cursor:pointer;background:var(--c-bg-ffffff);font-size:.875rem;line-height:1.25;min-width:0;overflow-wrap:break-word}
+    .run-status input{margin:0;accent-color:var(--c-bg-008c95)}
+    .run-status .choice:has(input:checked){border-width:2px;font-weight:700}
+    .run-status .choice:has(input:focus-visible){outline:var(--focusWidth) solid var(--colorFocusIndicator);outline-offset:2px}
+    label{display:block;font-weight:600;font-size:.8125rem}
+    textarea{box-sizing:border-box;width:100%;min-height:72px;padding:8px;font:inherit;margin-top:2px;resize:vertical}
+    .field-help{margin:4px 0 0;font-size:.8125rem;color:var(--c-fg-526273)}
+    .panel-actions{display:flex;flex-wrap:wrap;gap:8px}.panel-actions button{margin:0;min-height:36px}
+    .run-shot-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+    .run-shot-list li{position:relative;min-width:0}
+    .run-shot-list a{display:block;border:1px solid var(--c-bd-ccd5df);border-radius:4px;overflow:hidden;line-height:0}
+    .run-shot-list img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top left;background:var(--c-bg-eef2f6)}
+    .run-shot-remove{position:absolute;top:3px;right:3px;margin:0;min-width:26px;min-height:26px;padding:0 6px;line-height:1}
+    .panel-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}.panel-nav button{margin:0;min-height:36px}
+    .panel-jump select{box-sizing:border-box;width:100%;margin-top:2px;min-height:34px;font:inherit}
+    .panel-footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}.panel-footer button{margin:0;min-height:34px}
+    .panel-setup{border:1px solid var(--c-bd-ccd5df);border-radius:6px;padding:8px 10px;min-width:0}
+    .panel-setup summary{cursor:pointer;font-weight:600;font-size:.875rem}
+    .panel-setup h2{margin:8px 0 2px;font-size:.8125rem}.panel-setup p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.875rem}
+    .panel-setup dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;font-size:.875rem}
+    .panel-setup dt{font-weight:600;overflow-wrap:anywhere}.panel-setup dd{margin:0;overflow-wrap:anywhere}
+    .panel-access{margin:0;padding:10px 12px;border-left:4px solid var(--c-fg-9a3412);border-radius:6px;background:var(--c-bg-fff7ed);color:var(--c-fg-9a3412);font-size:.875rem;font-weight:600;overflow-wrap:anywhere}
+    #panelMessage{margin:0;font-size:.875rem;min-height:1.2em;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+  <main id="testPanel" aria-labelledby="panelTitle">
+    <div class="panel-top">
+      <h1 id="panelTitle" data-i18n-ignore></h1>
+      <p id="panelProgress" class="panel-progress" data-i18n-ignore></p>
+      <p id="saveState" class="save-state" role="status"></p>
+    </div>
+    <p id="panelAccess" class="panel-access" role="status" hidden></p>
+    <details id="panelSetup" class="panel-setup" hidden>
+      <summary data-i18n-ignore></summary>
+      <div id="panelSetupContent" data-i18n-ignore></div>
+    </details>
+    <section id="panelStep" class="panel-step" aria-labelledby="panelStepTitle" data-i18n-ignore></section>
+    <div class="panel-nav">
+      <button id="previousStep" type="button" data-i18n="test.previous">Previous</button>
+      <button id="nextStep" type="button" data-i18n="test.next">Next</button>
+    </div>
+    <div class="panel-jump">
+      <label for="stepJump" data-i18n="test.stepJump">Go to step</label>
+      <select id="stepJump" data-i18n-ignore></select>
+    </div>
+    <p id="panelMessage" role="status" aria-live="polite"></p>
+    <div class="panel-footer">
+      <button id="openFullRun" type="button" data-i18n="test.openFull">Open the whole test</button>
+      <button id="closePanel" type="button" data-i18n="test.close">Close</button>
+    </div>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="engine/storage-keys.js"></script>
+  <script src="document/test-script.js"></script>
+  <script src="test-run-client.js"></script>
+  <script src="test-panel.js"></script>
+</body>
+</html>

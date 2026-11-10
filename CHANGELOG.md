@@ -1,3 +1,11 @@
+## 4.7.244
+- Test runs: Run beside Business Central opens the test in the browser's side panel next to Business Central, one step at a time; Passed and Skipped move on to the next step. The full test page and the panel can be open at once and show each other's changes. The extension now asks for the side panel permission.
+- Test runs: Take screenshot stores a picture of Business Central with a step, up to ten per step; they can be opened and deleted, go with the document in export and sync, and follow a bug report made from the step, where values are covered as in other reports.
+- Test runs: Prerequisites and test data. Test data names values such as a customer or an item, and an expected result can show a value by writing {Name}. A later run keeps both.
+- Test runs: Export now also saves a CSV file for Excel, and Test protocol opens a page to print or save as PDF with the results, screenshots and lines for the tester's and approver's signatures.
+- Test runs: The toolbar popup on a Business Central tab shows the test being worked on at the top, with Continue test, which opens it beside Business Central with screenshots working right away. Edge lets the extension capture a tab only after its toolbar button has been used there; until then the button is marked with a blinking ! and the panel says what to do, pointing to the Extensions menu when the button is not pinned.
+- Document library: Export saves a .bcps file again; Edge saved it as .txt because the file had no type. Import also opens the .txt files earlier versions saved, so those exports can still be imported.
+
 ## 4.7.243
 - Document library: removed the New recording button. It could not start a recording; it only opened instructions. Recording still starts from BC Process Studio in the browser toolbar on the Business Central tab.
 

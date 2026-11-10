@@ -44,6 +44,8 @@ function documentEntries(id, marker = "a") {
     [`t9_bc_error_evidence_index_${id}`]: [`ev-${id}`],
     [`t9_bc_error_evidence_ev-${id}`]: { evidenceId: `ev-${id}`, recordingId: id, message: "Fel" },
     [`t9_test_run_run-${id}`]: { testRunId: `run-${id}`, sessionId: id },
+    [`t9_test_shot_${id}:run-${id}:shot-1`]: { image: "data:image/png;base64,iVBORw0KGgo=",
+      capturedAt: "2026-10-02T08:00:00.000Z" },
     [`t9_bug_report_bug-${id}`]: { bugReportId: `bug-${id}`, recordingId: id }
   };
 }
@@ -94,6 +96,9 @@ const snapshot = area => JSON.stringify([...area.data].sort(([a], [b]) => a.loca
   assert.equal(ownerOf("t9_screenshot_asset_doc-1"), "", "a screenshot key names its screenshot");
   assert.equal(ownerOf("t9_bug_report_bug-1", { recordingId: "other" }), "other");
   assert.ok(needsValue("t9_test_run_x") && !needsValue("t9_review_x"));
+  // A test screenshot belongs to the document by its key, so its image is never read to tell.
+  assert.ok(!needsValue("t9_test_shot_doc-1:run-1:shot-1"));
+  assert.equal(ownerOf("t9_test_shot_doc-1"), "", "a test screenshot key names its run and screenshot");
 
   // Export, then import into an empty library on another computer.
   const tree = folderModel.create(folderModel.empty(), { name: "Kund Nordbygg", folderId: "f-a" }).tree;
@@ -261,6 +266,11 @@ const snapshot = area => JSON.stringify([...area.data].sort(([a], [b]) => a.loca
     "libraryImportDialog", "libraryImportNotice"]) {
     assert.ok(html.includes(`id="${id}"`), id);
   }
+  // The export is typed as binary: an untyped blob is saved as text/plain and Edge then
+  // replaces .bcps with .txt. Import also opens files an earlier version saved as .txt.
+  const dashboardScript = fs.readFileSync(path.join(__dirname, "..", "src", "ui", "dashboard.js"), "utf8");
+  assert.match(dashboardScript, /const blob = new Blob\(\[await compressed\], \{ type: "application\/octet-stream" \}\);/u);
+  assert.ok(html.includes('id="libraryImportFile" type="file" accept=".bcps,.txt"'), "import accepts .txt");
 
   // Every transfer text exists in every interface language with the same placeholders.
   const vm = require("node:vm");

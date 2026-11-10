@@ -4955,7 +4955,8 @@ async function runLibraryExport(scope) {
     compressed.catch(() => {});
     throw error;
   }
-  const blob = await compressed;
+  // A blob without a type is saved as text/plain, and Edge then replaces .bcps with .txt.
+  const blob = new Blob([await compressed], { type: "application/octet-stream" });
   if (run.cancelled) throw libraryTransferCancelled();
   const filename = libraryTransfer.fileName(new Date(), scope === "folder" ? scopes.folder.name : "");
   progress.removeAttribute("value");
