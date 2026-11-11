@@ -2,6 +2,18 @@
 
 These instructions apply to the entire repository. The architecture and product principles in [.github/AGENTS.md](.github/AGENTS.md) supplement this file. This root file is the authoritative operational guide; nested instructions may add requirements within their scope. User instructions take precedence over repository guidance.
 
+## User-friendliness comes first
+
+Ease of use is the most important quality of BC Process Studio. It must guide every proposal, design decision, implementation and review, not be checked at the end.
+
+- Start from the user's task. Ask what the user is trying to achieve, what they see at each step and what could confuse, slow down or worry them. A change that is technically correct but harder to understand or use is not finished.
+- When proposing work or next steps, rank options by concrete user benefit and describe them in terms of what changes for the user. Call out when a technically attractive option makes the product harder to use, and prefer the simpler experience.
+- Minimize effort: fewer steps, sensible defaults, no unnecessary choices or dialogs, and the common path obvious without documentation. Advanced options stay available but out of the way.
+- Use plain, consistent language in every registered language. Avoid internal or technical terms in the interface unless the user's own domain uses them. Every state, error and empty view tells the user what happened and what to do next.
+- Never leave the user uncertain: show progress, confirm outcomes only when they are confirmed, make actions reversible where possible and keep the user's work safe when something fails.
+- User-friendliness never justifies weakening data integrity, privacy, truthful evidence or accessibility; those are part of a product users can trust. When requirements conflict, explain the trade-off and choose the option that keeps the experience simplest within those limits.
+- Verify usability, not just function: walk through the changed workflow as a user would, including first use, narrow layouts and long translations, and report any remaining friction honestly.
+
 ## Start with evidence and preserve the user's work
 
 - Read the relevant code and current instructions before editing. Check Git status and preserve all existing changes, including work from earlier tasks. Do not reset, discard or include unrelated changes just to obtain a clean working tree.
@@ -22,7 +34,8 @@ These instructions apply to the entire repository. The architecture and product 
 - `src/recorder/`: extension background worker, capture and browser integration.
 - `src/engine/`: recording/domain services, shared storage keys, language registry and catalogs.
 - `src/review/`: review editing, annotations, history and selection.
-- `src/document/`: process document projection, semantic model, themes, planning, quality and library models.
+- `src/knowledge-packs/`: the public Business Central knowledge catalog (JSON packs per process area, listed in `index.json`) with localized captions and aliases for every registered language.
+- `src/document/`: process document projection, semantic model, themes, planning, quality and library models, library export/sync (`library-transfer.js`, `library-sync.js`), and test scripts, runs and suites (`test-script.js`, `test-suite.js`, `test-recording-match.js`; see `docs/TEST_SCRIPTS.md`).
 - `src/exporters/`: process-document renderer adapters and exports.
 - `src/bug-report/`: bug report models, technical evidence, report projection, integrations, PDF and email export.
 - `src/ui/`: interface orchestration, views and styles. Keep domain transformations in their owning modules.
@@ -54,12 +67,13 @@ These instructions apply to the entire repository. The architecture and product 
 - Check the runtime in `.github/workflows/ci.yml` and package engine declarations. The extension CI currently uses Node 20; the licensing service declares Node 24 or later. Success on a newer local Node version does not prove compatibility with CI.
 - For affected language behavior and user-facing text, follow the mandatory language checks below. For storage/default changes, test fresh installation, existing preferences and legacy records. For export changes, exercise the actual affected output and verify content, order, links/images and relevant layout.
 - Run targeted checks while developing. Run `npm run build` and `npm run check` for extension runtime/UI changes. Run `npm run ci` for release preparation or changes spanning shared runtime paths. After a later fix, rerun affected checks; do not report a previous result as verification of code that changed afterward.
-- Service checks are not all included in root CI. Inspect the relevant scripts/tests and run them separately when those components change. Ensure their dependencies are available before interpreting a test failure.
+- Not every test is part of root CI. The licensing service tests (`tests/license-*.test.js`, `tenant-license-admin`, `tenant-license-service`, `consultant-license`) are run directly with `node tests/<name>.test.js`. Run the relevant ones when those components change, and check whether a new test file is wired into a package script. Ensure dependencies (for example `services/licensing/node_modules`) are available before interpreting a failure.
 - Inspect every command's result. In a shell sequence, a final successful command does not erase an earlier failure. Do not weaken a failing test simply to make it pass; change an obsolete expectation only when the intended behavior changed and replacement coverage verifies that behavior.
 - Documentation/rules-only changes require checking content, links and `git diff --check`, not unrelated application tests or builds. This does not exempt any accompanying user-facing product change from language verification.
 - Update documentation and release notes when applicable. Report what changed, what was verified, relevant limitations and what remains. Do not claim complete language or visual coverage without evidence.
 - Distinguish **implemented**, **tested**, **built**, **committed**, **pushed** and **deployed**. A local build or ZIP is not deployment, and a local CI pass is not a successful GitHub run.
-- Commit, push and deploy according to the user's authorization and task scope. Do not infer production deployment from a request to implement a feature. Do not require a clean workspace or a commit to finish an otherwise complete local fix; report pending delivery steps accurately.
+- Commit, push and deploy according to the user's authorization and task scope. Do not infer production deployment from a request to implement a feature. Merging to `main` is itself a production deployment when it touches `services/licensing/**`, `scripts/package-license-service.js` or the deploy workflow: `.github/workflows/deploy-license-service.yml` then deploys the license service automatically. Say so before merging such a change, and check that workflow's run afterwards. The Edge package workflow (`release.yml`) runs only for `v*` tags.
+- A release follows the established procedure: a `release/<version>` branch; the patch version bumped consistently in `package.json`, `package-lock.json` (both root entries) and `src/ui/manifest.json`; the CHANGELOG `## Unreleased` heading renamed to the version; then build, `npm run ci`, commit, push, pull request, merge and a check of CI on `main`. Write CHANGELOG entries in terms of what changes for the user. Do not require a clean workspace or a commit to finish an otherwise complete local fix; report pending delivery steps accurately.
 
 ## Mandatory language support for every change
 
