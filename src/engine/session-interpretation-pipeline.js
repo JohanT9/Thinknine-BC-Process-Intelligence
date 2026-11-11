@@ -116,6 +116,32 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       ? { ...action, hidden: true, hiddenReason: "rejected-and-retried" } : action) : actions;
   }
 
+  // Business Central can repeat a click on a row in a list: the same row, with the same caption,
+  // is reported clicked again a moment later. Choosing the same record again chooses nothing new,
+  // so the repeat is hidden like other non-steps and keeps its events as evidence. A row is
+  // recognised by its list (a repeater) or by the record its caption names.
+  const REPEATED_CHOICE_MS = 1000;
+  const CHOICES = new Set(["RunAction", "Select", "SelectRecord", "SelectOption"]);
+  function hideRepeatedChoices(actions) {
+    const rawOf = action => action.rawInteractions || action.semanticActionModel?.rawInteractions || [];
+    const chosenRow = raw => CHOICES.has(raw?.taskType) && Boolean(String(raw.actionCaption || "").trim()) &&
+      ((raw.uiHierarchy || []).some(item => item?.type === "repeater") ||
+        Boolean(semantic.selectedRecordValue?.(raw)));
+    let previous = null;
+    return actions.map(action => {
+      if (action.hidden) return action;
+      const raw = rawOf(action);
+      const last = previous ? rawOf(previous).at(-1) : null;
+      previous = action;
+      if (raw.length !== 1 || !last || !chosenRow(raw[0]) || !chosenRow(last) ||
+          raw[0].actionCaption !== last.actionCaption) return action;
+      const apart = Date.parse(raw[0].timestamp) - Date.parse(last.timestamp);
+      if (!(apart >= 0 && apart <= REPEATED_CHOICE_MS)) return action;
+      previous = null;
+      return { ...action, hidden: true, hiddenReason: "repeated-choice" };
+    });
+  }
+
   function task(action, index, eventsById, screenshots = {}) {
     const sourceEvents = (action.sourceEventIds || []).map(id =>
       eventsById.get(id)).filter(Boolean);
@@ -128,13 +154,22 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     // it was clicked, not the page after the dialog closed.
     const named = value => String(value || "").replace(/[\uE000-\uF8FF]/gu, "")
       .replace(/\s+/gu, " ").trim().toLocaleLowerCase();
-    const clicksControl = /Action|Dialog/u.test(String(action.actionType || "")) &&
-      action.actionType !== "SearchAndOpenPage";
+    // A step named for what it does, such as starting a new purchase order with New, clicks a
+    // control as much as a step named for the action.
+    const searches = action.actionType === "SearchAndOpenPage";
+    const clickedRaw = (action.rawInteractions || []).find(interaction =>
+      ["RunAction", "ClickAction"].includes(interaction?.taskType) && interaction.actionCaption);
+    const clicksControl = !searches && (/Action|Dialog/u.test(String(action.actionType || "")) ||
+      Boolean(clickedRaw));
     const clickedCaption = !clicksControl ? "" : named(Array.isArray(action.actionPath) &&
       action.actionPath.length ? action.actionPath.at(-1) : action.actionCaption ||
-        action.rawInteractions?.[0]?.actionCaption || action.targetField || "");
-    const choiceAtClick = (/^Select/u.test(String(action.actionType || "")) ? [...sourceEvents]
-      .reverse().find(event => event.preActionCaptureId && screenshots[event.eventNo]) : null) ||
+        clickedRaw?.actionCaption || action.rawInteractions?.[0]?.actionCaption ||
+        action.targetField || "");
+    // A search shows the result being chosen in its list, as it was clicked, rather than the
+    // page it opened; the last click of the search is the result.
+    const choiceAtClick = (/^Select/u.test(String(action.actionType || "")) || searches
+      ? [...sourceEvents].reverse().find(event => event.preActionCaptureId &&
+        screenshots[event.eventNo] && (!searches || event.type === "click")) : null) ||
       (clickedCaption ? [...sourceEvents].reverse().find(event => event.preActionCaptureId &&
         screenshots[event.eventNo] && named(event.label || event.accessibleName) === clickedCaption) : null);
     // A row chosen with Enter in a field's suggestion list has no screenshot of its own; the last
@@ -473,7 +508,8 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const describe = values => values.filter(action => !action.hidden)
       .map((action, index) => ({ ...task(action, index, byId, input.imagePaths),
         language: documentLanguage }));
-    const actions = hideRejectedAttempts(semantic.processStepGroups(activeGroups), describe);
+    const actions = hideRepeatedChoices(hideRejectedAttempts(
+      semantic.processStepGroups(activeGroups), describe));
     const baseTasks = describe(actions);
     // The semantic rules above decided which steps exist; knowledge only describes them.
     const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || [],

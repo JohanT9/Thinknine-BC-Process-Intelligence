@@ -26,7 +26,7 @@ function enabledKnowledgePacks() {
 }
 
 function replay(events, { id = "capture-quality", documentLanguage = "en-US",
-  knowledgePacks = enabledKnowledgePacks() } = {}) {
+  knowledgePacks = enabledKnowledgePacks(), imagePaths = {} } = {}) {
   let recording = canonical.create({ id, name: id });
   const sourceEvents = [];
   events.map(rawEvent).forEach((raw, index) => {
@@ -41,7 +41,7 @@ function replay(events, { id = "capture-quality", documentLanguage = "en-US",
     settings: { documentLanguage } }, events: sourceEvents,
   normalizedEvents: normalized.events, stepGroups: grouped.groups,
   supportingEvents: grouped.supportingEvents, groupingDiagnostics: grouped.diagnostics,
-  imagePaths: {}, knowledgePacks });
+  imagePaths, knowledgePacks });
   return { normalized, grouped, tasks: interpreted.businessTasks, interpretation: interpreted,
     sourceEvents };
 }

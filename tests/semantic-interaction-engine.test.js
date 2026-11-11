@@ -134,6 +134,49 @@ assert.deepStrictEqual(redundantSearchInput[0].sourceEventIds,
   ["search-open", "search-result", "search-input"]);
 assert.strictEqual(redundantSearchInput[0].preferredScreenshotRef,
   "search-result.png");
+// A Swedish recording of a real search: after typing, the user clicked the Tell me dialog beside
+// its controls before choosing the result. That click chooses nothing, so the search, the text
+// typed and the result chosen are still one step, not four.
+const dialogSurface = { type: "interactiveSurface", role: "dialog",
+  identity: { value: "bk_form", source: "id" } };
+const searchWithDialogClick = engine.processInteractions([{
+  taskType: "SearchAndOpenPage", fieldCaption: "Sök", actionCaption: "Sök",
+  sourceEventIds: ["search-open"], screenshot: "search-open.png"
+}, {
+  taskType: "EnterFieldValue", fieldCaption: "Berätta vad du vill göra.",
+  instructionValue: "ink ord", sourceEventIds: ["search-input"]
+}, {
+  taskType: "RunAction", targetControl: dialogSurface,
+  actionCaption: "Berätta Avancerat Förhandsversion Listan med rubriken Gå till sidor och " +
+    "uppgifter har nu 9 objekt för ink ord Gå till sidor och uppgifter Visa alla (9) " +
+    "Inköpsorder Listor Inköpsreturorder Listor", sourceEventIds: ["dialog-click"]
+}, {
+  taskType: "SelectRecord", selectedCaption: "Inköpsorder Listor ",
+  actionCaption: "AI-genererat innehåll kan vara felaktigt", pageCaption: "Inköpsorder",
+  sourceEventIds: ["search-result"], screenshot: "search-result.png"
+}, {
+  taskType: "RunAction", actionCaption: "Ny", pageCaption: "Inköpsorder",
+  sourceEventIds: ["new"]
+}]);
+assert.strictEqual(searchWithDialogClick[0].actionType, "SearchAndOpenPage");
+assert.strictEqual(searchWithDialogClick[0].displayText,
+  "Sök efter __ink ord__ och öppna listan **Inköpsorder**.");
+assert.deepStrictEqual(searchWithDialogClick[0].sourceEventIds,
+  ["search-open", "search-input", "dialog-click", "search-result"]);
+assert.strictEqual(searchWithDialogClick.length, 2, "the step after the search is kept");
+// A click on a control in the dialog is not passed over.
+const searchWithControlClick = engine.processInteractions([{
+  taskType: "SearchAndOpenPage", fieldCaption: "Sök", actionCaption: "Sök"
+}, {
+  taskType: "EnterFieldValue", fieldCaption: "Berätta vad du vill göra.", instructionValue: "ink ord"
+}, {
+  taskType: "RunAction", actionCaption: "Visa alla (9)",
+  targetControl: { type: "button", role: "button" }
+}, {
+  taskType: "SelectRecord", selectedCaption: "Inköpsorder Listor ", pageCaption: "Inköpsorder"
+}]);
+assert.ok(searchWithControlClick.some(item => /Visa alla/u.test(item.displayText)),
+  "a real choice in the dialog stays a step");
 const genericSearchInput = engine.processInteractions([{
   taskType: "SearchAndOpenPage", searchCaption: "Search",
   resultCaption: "Sales Orders", screenshot: "result.png"

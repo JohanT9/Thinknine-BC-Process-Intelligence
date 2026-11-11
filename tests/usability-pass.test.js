@@ -157,4 +157,15 @@ assert.match(testRun, /t\("test\.nextNotRun"\)/u);
 const licenseHtml = read("src/ui/license-status.html");
 assert.match(licenseHtml, /<details id="consultantSection" class="consultant-section">\s*<summary><h2 id="consultantTitle"/u);
 assert.match(read("src/ui/license-status.js"), /if \(result\.signedIn\) \$\("consultantSection"\)\.open = true;/u);
+// The review's More actions menu opens over the document preview's toolbar, not under it.
+{
+  const dashboardHtml = read("src/ui/dashboard.html");
+  const layer = selector => {
+    const start = dashboardHtml.indexOf(`\n${selector}{`);
+    const rule = dashboardHtml.slice(start, dashboardHtml.indexOf("}", start));
+    return Number(rule.match(/z-index:(\d+)/u)?.[1]);
+  };
+  assert.ok(layer(".review-header") > layer(".document-toolbar"),
+    "the review header and its menu stack above the document toolbar");
+}
 console.log("Usability pass tests passed in all registered languages.");

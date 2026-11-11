@@ -78,7 +78,20 @@
   function translateInstruction(value, language) {
     const source = String(value ?? "");
     const locale = normalize(language);
+    // Older documents said "… och välj den filtrerade posten"; the record is entered instead.
+    const filteredSearch = source.match(
+      /^Sök efter ([\s\S]+?) i ([\s\S]+?) och välj den filtrerade posten\.$/u);
+    if (filteredSearch) {
+      const field = filteredSearch[2];
+      return translateInstruction(`Ange ${filteredSearch[1]} i ${field}` +
+        (/\.(?:\*\*)?$/u.test(field) ? "" : "."), language);
+    }
     if (locale === "sv-SE") return source;
+    // A sentence ending with a caption that has its own period, such as **Artikelnr.**, is
+    // translated as a sentence; the caption's period then ends it again.
+    if (/\.\*\*$/u.test(source)) {
+      return translateInstruction(`${source}.`, language).replace(/\.\*\*\.$/u, ".**");
+    }
     if (source === "Inspelningen visar inte vad som hände efter den här åtgärden.") {
       const messages = {
         "en-US": "The recording does not show what happened after this action.",
@@ -313,18 +326,18 @@
       };
       if (templates[locale]) return templates[locale];
     }
-    const filteredSearch = source.match(
-      /^Sök efter ([\s\S]+?) i ([\s\S]+?) och välj den filtrerade posten\.$/u);
-    if (filteredSearch) {
-      const [, query, field] = filteredSearch;
+    // Text typed to find a record, then the record chosen.
+    const enterAndChoose = source.match(/^Ange ([\s\S]+?) i ([\s\S]+?) och välj ([\s\S]+?)\.$/u);
+    if (enterAndChoose) {
+      const [, typed, field, chosen] = enterAndChoose;
       const templates = {
-        "en-US": `Search for ${query} in ${field} and select the matching record.`,
-        "fr-FR": `Recherchez ${query} dans ${field} puis sélectionnez l’enregistrement correspondant.`,
-        "de-DE": `Suchen Sie nach ${query} in ${field} und wählen Sie den passenden Datensatz aus.`,
-        "es-ES": `Busca ${query} en ${field} y selecciona el registro coincidente.`,
-        "da-DK": `Søg efter ${query} i ${field} og vælg den matchende post.`,
-        "fi-FI": `Etsi ${query} kentästä ${field} ja valitse vastaava tietue.`,
-        "nb-NO": `Søk etter ${query} i ${field} og velg den samsvarende posten.`
+        "en-US": `Enter ${typed} in ${field}, and choose ${chosen}.`,
+        "fr-FR": `Saisissez ${typed} dans ${field} et sélectionnez ${chosen}.`,
+        "de-DE": `Geben Sie ${typed} in ${field} ein und wählen Sie ${chosen} aus.`,
+        "es-ES": `Introduzca ${typed} en ${field} y seleccione ${chosen}.`,
+        "da-DK": `Angiv ${typed} i ${field} og vælg ${chosen}.`,
+        "fi-FI": `Syötä ${typed} kenttään ${field} ja valitse ${chosen}.`,
+        "nb-NO": `Angi ${typed} i ${field} og velg ${chosen}.`
       };
       if (templates[locale]) return templates[locale];
     }

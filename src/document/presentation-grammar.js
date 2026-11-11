@@ -149,17 +149,16 @@
     const generatedItemField = actionType === "SelectItem" && rawField === "Artikelnummer";
     const field = (actionType === "EnterItemNumber" && itemRow) || generatedItemField
       ? itemNumberLabels[locale] : contextualNumberField || rawField;
+    // Text typed to find a record, then the record chosen.
+    const enterAndChoose = (typed, caption) => sentence(run(words.enter, "action"),
+      run(typed, "value"), run(words.in), quoted(caption),
+      run(locale === "de-DE" ? " ein und wählen Sie " : words.andChoose), quoted(value),
+      run(locale === "de-DE" ? " aus." : "."));
     if (actionType === "SearchAndSelectRecord" && value) {
-      const phrases = {
-        "sv-SE": ["Sök efter ", " i ", " och välj den filtrerade posten."],
-        "en-US": ["Search for ", " in ", " and select the matching record."],
-        "fr-FR": ["Recherchez ", " dans ", " puis sélectionnez l’enregistrement correspondant."],
-        "de-DE": ["Suchen Sie nach ", " in ", " und wählen Sie den passenden Datensatz aus."],
-        "es-ES": ["Busque ", " en ", " y seleccione el registro coincidente."],
-        "da-DK": ["Søg efter ", " i ", " og vælg den matchende post."],
-        "fi-FI": ["Etsi ", " kentästä ", " ja valitse vastaava tietue."],
-        "nb-NO": ["Søk etter ", " i ", " og velg den samsvarende posten."]
-      }[locale];
+      // The record is entered in the field; text typed to find it, such as a word of the item's
+      // description, is said with the record chosen.
+      const typed = String(action?.typedValue || "").trim();
+      const german = locale === "de-DE";
       const observedSearchField = String(action?.searchFieldCaption || rawField || "").trim();
       const sortByNumberCaptions = {
         "sv-SE": "Sortera efter Nr", "en-US": "Sort by No.",
@@ -176,8 +175,11 @@
         "es-ES": "el campo de número", "da-DK": "nummerfeltet",
         "fi-FI": "numero", "nb-NO": "nummerfeltet"
       }[locale];
-      return sentence(run(phrases[0]), run(value, "value"),
-        run(phrases[1]), quoted(searchField), run(phrases[2]));
+      return typed
+        ? enterAndChoose(typed, searchField)
+        : sentence(run(words.enter, "action"), run(value, "value"), run(words.in),
+          // A caption such as "Artikelnr." ends the sentence with its own period.
+          quoted(searchField), run(german ? " ein." : /\.$/u.test(searchField) ? "" : "."));
     }
     const selectLabels = {
       SelectCustomer: { "sv-SE": "Kund", "en-US": "Customer", "fr-FR": "Client",
@@ -216,6 +218,9 @@
           run(words.in), quoted(searchField), run(words.andChoose),
           quoted(result), run("."));
       }
+    }
+    if (selectLabels[actionType] && value && String(action?.typedValue || "").trim()) {
+      return enterAndChoose(String(action.typedValue).trim(), field || selectLabels[actionType]);
     }
     if (selectLabels[actionType] && value) {
       // The captured Business Central field caption wins over the generic label.

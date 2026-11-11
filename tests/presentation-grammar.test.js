@@ -50,29 +50,55 @@ assert.strictEqual(itemNumber.runs.find(run => run.text === "30043").bold, true)
 const itemRowLookup = { actionType: "SearchAndSelectRecord", targetField: "Artikel Nr",
   searchFieldCaption: "Sortera efter Nr", selectedValue: "30043", selectedEntity: "Item",
   rowTypeContext: { source: "same-row-type", schemaVersion: 1, caption: "Typ", value: "Artikel" } };
+// The record is entered in the field; no step says "the filtered record".
 const itemRowTexts = {
-  "sv-SE": "Sök efter 30043 i Artikelnr. och välj den filtrerade posten.",
-  "en-US": "Search for 30043 in Item No. and select the matching record.",
-  "fr-FR": "Recherchez 30043 dans N° d’article puis sélectionnez l’enregistrement correspondant.",
-  "de-DE": "Suchen Sie nach 30043 in Artikelnr. und wählen Sie den passenden Datensatz aus.",
-  "es-ES": "Busque 30043 en N.º de artículo y seleccione el registro coincidente.",
-  "da-DK": "Søg efter 30043 i Varenr. og vælg den matchende post.",
-  "fi-FI": "Etsi 30043 kentästä Nimikenro ja valitse vastaava tietue.",
-  "nb-NO": "Søk etter 30043 i Varenr. og velg den samsvarende posten."
+  "sv-SE": "Ange 30043 i Artikelnr.",
+  "en-US": "Enter 30043 in Item No.",
+  "fr-FR": "Saisissez 30043 dans N° d’article.",
+  "de-DE": "Geben Sie 30043 in Artikelnr. ein.",
+  "es-ES": "Introduzca 30043 en N.º de artículo.",
+  "da-DK": "Angiv 30043 i Varenr.",
+  "fi-FI": "Syötä 30043 kenttään Nimikenro.",
+  "nb-NO": "Angi 30043 i Varenr."
 };
 for (const [locale, expected] of Object.entries(itemRowTexts)) {
   assert.strictEqual(grammar.presentationFor(itemRowLookup, "", locale).text, expected, locale);
 }
+// A word of the description typed to find the item is said with the item chosen.
+const typedItemTexts = {
+  "sv-SE": "Ange isbergss i Artikelnr. och välj 30043.",
+  "en-US": "Enter isbergss in Item No., and choose 30043.",
+  "fr-FR": "Saisissez isbergss dans N° d’article et sélectionnez 30043.",
+  "de-DE": "Geben Sie isbergss in Artikelnr. ein und wählen Sie 30043 aus.",
+  "es-ES": "Introduzca isbergss en N.º de artículo y seleccione 30043.",
+  "da-DK": "Angiv isbergss i Varenr. og vælg 30043.",
+  "fi-FI": "Syötä isbergss kenttään Nimikenro ja valitse 30043.",
+  "nb-NO": "Angi isbergss i Varenr. og velg 30043."
+};
+for (const [locale, expected] of Object.entries(typedItemTexts)) {
+  const presentation = grammar.presentationFor({ ...itemRowLookup, typedValue: "isbergss" }, "", locale);
+  assert.strictEqual(presentation.text, expected, locale);
+  assert.strictEqual(presentation.runs.find(item => item.text === "isbergss").bold, true, locale);
+}
 // A list sorted by number keeps its observed search field.
 assert.strictEqual(grammar.presentationFor({ ...itemRowLookup, rowTypeContext: undefined,
-  selectedEntity: undefined }, "").text, "Sök efter 30043 i Sortera efter Nr och välj den filtrerade posten.");
+  selectedEntity: undefined }, "").text, "Ange 30043 i Sortera efter Nr.");
 const lineLookup = interactions.processInteractions([{ taskId: "line-no", taskType: "ChangeField",
   fieldCaption: "Sortera efter Nr", value: "30043", inputSources: ["input"],
   rowTypeContext: itemRowLookup.rowTypeContext, sourceEventNos: [1] },
 { taskId: "line-row", taskType: "RunAction", actionCaption: "Välj post",
   selectedCaption: 'Välj posten "30043"', value: "30043", sourceEventNos: [2] }]);
-assert.strictEqual(lineLookup[0].displayText,
-  "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten.");
+assert.strictEqual(lineLookup[0].displayText, "Ange __30043__ i **Artikelnr.**");
+// Text that is not the start of the item chosen is kept: what was typed and what was chosen.
+const typedLookup = interactions.processInteractions([{ taskId: "line-no", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Nr", value: "isbergss", inputSources: ["change"],
+  rowTypeContext: itemRowLookup.rowTypeContext, sourceEventNos: [1] },
+{ taskId: "line-row", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"', sourceEventNos: [2] }]);
+assert.strictEqual(typedLookup[0].displayText,
+  "Ange __isbergss__ i **Artikelnr.** och välj **30043**.");
+assert.strictEqual(typedLookup[0].typedValue, "isbergss");
+assert.strictEqual(typedLookup[0].selectedValue, "30043");
 assert.strictEqual(lineLookup[0].searchFieldCaption, "Sortera efter Nr", "the observed caption stays as evidence");
 
 // Steps the interpretation pipeline decided stay separate in the document: a customer step
@@ -96,7 +122,7 @@ const decidedTexts = grammar.process(language.process(interactions.processDocume
   .filter(block => block.kind === "step")
   .map(step => step.blocks.find(block => block.kind === "paragraph").text);
 assert.deepStrictEqual(decidedTexts, ["Välj Kundnr 905.",
-  "Sök efter 30043 i Artikelnr. och välj den filtrerade posten."]);
+  "Ange 30043 i Artikelnr."]);
 
 const projectedItemNumber = paragraph({
   taskId: "projected-item", taskType: "EnterItemNumber",

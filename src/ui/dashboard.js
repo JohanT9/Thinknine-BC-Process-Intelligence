@@ -3771,9 +3771,8 @@ let documentLibraryProgress = new Map();
 // The latest email made from each bug report, by recording.
 let documentLibraryDeliveries = new Map();
 let libraryQuickFilter = "all";
-// Library folders (document/document-folders.js). libraryFolder is the folder shown: "" for
-// all documents, LIBRARY_UNFILED for documents not in a folder, otherwise a folder id.
-const LIBRARY_UNFILED = ":unfiled";
+// Library folders (document/document-folders.js). libraryFolder is the folder shown: "" for the
+// top of the library, otherwise a folder id.
 let documentFolders = globalThis.T9DocumentFolders.empty();
 let documentFoldersEditable = true;
 let libraryFolder = "";
@@ -3792,16 +3791,26 @@ const LIBRARY_QUICK_FILTERS = Object.freeze({
 });
 
 function libraryMatches(options = libraryOptions()) {
+  const finding = libraryFinding(options);
   return globalThis.T9DocumentLibrary.query(documentLibraryIndex, options)
-    .filter(inLibraryFolder)
+    .filter(record => inLibraryFolder(record, finding))
     .filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter] || LIBRARY_QUICK_FILTERS.all);
 }
 
-// The folder shown includes its subfolders.
-function inLibraryFolder(record) {
-  if (!libraryFolder) return true;
+// Browsing shows the documents in the folder shown, like a folder on the computer: at the top
+// the documents not in a folder, beside the folders. All, Documentation and Bug reports split
+// that by kind. A search, a filter or Needs review, Favorites or Archived finds documents in the
+// folder shown and every folder below it, at the top everywhere.
+const LIBRARY_BROWSE_FILTERS = new Set(["all", "documentation", "bug-report"]);
+function libraryFinding(options = libraryOptions(), quickFilter = libraryQuickFilter) {
+  return Boolean(options.search.trim()) || !LIBRARY_BROWSE_FILTERS.has(quickFilter) ||
+    globalThis.T9DocumentLibraryView.activeFilterCount(options) > 0;
+}
+
+function inLibraryFolder(record, finding) {
   const folderId = globalThis.T9DocumentFolders.folderOf(documentFolders, record);
-  if (libraryFolder === LIBRARY_UNFILED) return !folderId;
+  if (!finding) return folderId === libraryFolder;
+  if (!libraryFolder) return true;
   return globalThis.T9DocumentFolders.descendantIds(documentFolders, libraryFolder).has(folderId);
 }
 
@@ -3893,19 +3902,23 @@ function fillLibraryFilter(id, values, selected) {
 
 function renderDocumentLibrary() {
   const options = libraryOptions();
-  if (libraryFolder && libraryFolder !== LIBRARY_UNFILED &&
-    !globalThis.T9DocumentFolders.find(documentFolders, libraryFolder)) libraryFolder = "";
+  if (libraryFolder && !globalThis.T9DocumentFolders.find(documentFolders, libraryFolder)) {
+    libraryFolder = "";
+  }
   const everywhere = globalThis.T9DocumentLibrary.query(documentLibraryIndex, options);
   renderLibraryFolders(everywhere.filter(
     LIBRARY_QUICK_FILTERS[libraryQuickFilter] || LIBRARY_QUICK_FILTERS.all));
-  const searched = everywhere.filter(inLibraryFolder);
+  // Each quick filter counts what it would show.
   for (const button of $("libraryQuickFilters").querySelectorAll("[data-library-filter]")) {
     const filter = button.dataset.libraryFilter;
+    const findingFor = libraryFinding(options, filter);
     button.setAttribute("aria-pressed", String(filter === libraryQuickFilter));
-    button.querySelector(".library-quick-count").textContent =
-      String(searched.filter(LIBRARY_QUICK_FILTERS[filter]).length);
+    button.querySelector(".library-quick-count").textContent = String(everywhere.filter(record =>
+      inLibraryFolder(record, findingFor) && LIBRARY_QUICK_FILTERS[filter](record)).length);
   }
-  const matches = searched.filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter]);
+  const finding = libraryFinding(options);
+  const matches = everywhere.filter(record => inLibraryFolder(record, finding))
+    .filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter]);
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   visibleDocumentLibraryRecords = records;
   const view = globalThis.T9DocumentLibraryView;
@@ -3915,11 +3928,14 @@ function renderDocumentLibrary() {
     storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
-    // An empty folder says how to fill it, rather than suggesting that a filter hides it.
-    emptyMessage: libraryFolder && !documentLibraryRecords.some(inLibraryFolder)
-      ? libraryFolder === LIBRARY_UNFILED ? uiT("folder.emptyUnfiled")
-        : uiTf("folder.empty", { select: $("librarySelectMode").textContent.trim() })
-      : "" };
+    // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
+    // documents that are all in folders below say where they are.
+    emptyMessage: libraryFolder && !documentLibraryRecords.some(record =>
+      inLibraryFolder(record, true))
+      ? uiTf("folder.empty", { select: $("librarySelectMode").textContent.trim() })
+      : !finding && documentLibraryRecords.some(record => inLibraryFolder(record, true) &&
+        LIBRARY_QUICK_FILTERS.all(record))
+        ? uiT("folder.inFolders") : "" };
   const activeId = view.renderList($("libraryResults"), records, viewState);
   $("libraryResults").dataset.selectMode = String(librarySelectMode);
   // Continue where you left off: started reviews, shown while nothing is searched.
@@ -4051,7 +4067,6 @@ function refreshLibraryReportRecord(recordingId, report) {
 chrome.storage?.onChanged?.addListener(updateLibraryDeliveries);
 
 function libraryFolderName(folderId) {
-  if (folderId === LIBRARY_UNFILED) return uiT("folder.unfiled");
   return globalThis.T9DocumentFolders.find(documentFolders, folderId)?.name ||
     uiT("folder.allDocuments");
 }
@@ -4074,11 +4089,10 @@ function libraryCardFolder(record) {
 function renderLibraryFolders(records) {
   const folders = globalThis.T9DocumentFolders;
   const locale = applicationSettings.uiLocale || "en-US";
-  const real = Boolean(libraryFolder) && libraryFolder !== LIBRARY_UNFILED;
+  const real = Boolean(libraryFolder);
   const trail = [{ id: "", name: uiT("folder.allDocuments") },
-    ...(libraryFolder === LIBRARY_UNFILED ? [{ id: LIBRARY_UNFILED, name: uiT("folder.unfiled") }]
-      : folders.path(documentFolders, libraryFolder).map(folder =>
-        ({ id: folder.folderId, name: folder.name })))];
+    ...folders.path(documentFolders, libraryFolder).map(folder =>
+      ({ id: folder.folderId, name: folder.name }))];
   $("libraryFolderPath").innerHTML = trail.map((item, index) => index === trail.length - 1
     ? `<li><span aria-current="location" tabindex="-1" title="${escapeHtml(item.name)}">${
       escapeHtml(item.name)}</span></li>`
@@ -4091,14 +4105,9 @@ function renderLibraryFolders(records) {
   }
   const total = folderId => [...folders.descendantIds(documentFolders, folderId)]
     .reduce((sum, id) => sum + (counts.get(id) || 0), 0);
-  const items = libraryFolder === LIBRARY_UNFILED ? [] : folders.children(documentFolders,
-    real ? libraryFolder : "", locale).map(folder => ({ id: folder.folderId, name: folder.name,
-    count: total(folder.folderId), kind: "folder" }));
-  // Documents not yet in a folder can be listed on their own once folders exist.
-  if (!libraryFolder && documentFolders.folders.length) {
-    items.push({ id: LIBRARY_UNFILED, name: uiT("folder.unfiled"), count: counts.get("") || 0,
-      kind: "unfiled" });
-  }
+  const items = folders.children(documentFolders, libraryFolder, locale).map(folder => ({
+    id: folder.folderId, name: folder.name, count: total(folder.folderId), kind: "folder" }));
+  delete $("libraryFolderList").dataset.dragTargets;
   $("libraryFolderList").setAttribute("aria-label", uiTf("folder.subfolders",
     { folder: libraryFolderName(libraryFolder) }));
   $("libraryFolderList").innerHTML = items.map(item => `<li><button type="button"
@@ -4107,7 +4116,7 @@ function renderLibraryFolders(records) {
       ? '<span class="library-folder-icon" aria-hidden="true"></span>' : ""}<span
     class="library-folder-name">${escapeHtml(item.name)}</span> <span
     class="library-folder-count">(${item.count.toLocaleString(locale)})</span></button></li>`).join("");
-  $("libraryFolderNew").hidden = !documentFoldersEditable || libraryFolder === LIBRARY_UNFILED;
+  $("libraryFolderNew").hidden = !documentFoldersEditable;
   $("libraryFolderRename").hidden = !documentFoldersEditable || !real;
   $("libraryFolderDelete").hidden = !documentFoldersEditable || !real;
   $("libraryFolderMove").hidden = !documentFoldersEditable || !real;
@@ -4161,7 +4170,7 @@ function openLibraryFolderDialog(mode) {
 $("libraryFolderForm").addEventListener("submit", async event => {
   event.preventDefault();
   const name = $("libraryFolderName").value;
-  const parentId = libraryFolder === LIBRARY_UNFILED ? "" : libraryFolder;
+  const parentId = libraryFolder;
   const fail = error => {
     $("libraryFolderError").textContent = folderErrorText(error);
     $("libraryFolderName").setAttribute("aria-invalid", "true");
@@ -4265,7 +4274,7 @@ function openLibraryMoveDialog(ids, opener) {
     : uiTf("folder.moveTitleMany", { count: records.length });
   const current = globalThis.T9DocumentFolders.folderOf(documentFolders, records[0]);
   // Suggest the folder shown, unless the document is already there.
-  const shown = libraryFolder && libraryFolder !== LIBRARY_UNFILED ? libraryFolder : "";
+  const shown = libraryFolder;
   showLibraryMoveDialog(new Set(), shown && shown !== current ? shown : current);
 }
 
@@ -4281,15 +4290,23 @@ function openLibraryFolderMoveDialog(opener) {
     folder.parentId);
 }
 
+// Documents can also go to a new folder, made in the folder shown, in the same step.
+const LIBRARY_MOVE_NEW = ":new";
 function showLibraryMoveDialog(excluded, selected) {
   const locale = applicationSettings.uiLocale || "en-US";
+  const canCreate = !libraryMoveFolderId && documentFoldersEditable;
   $("libraryMoveDestination").innerHTML = [
     `<option value="">${escapeHtml(uiT("folder.topLevel"))}</option>`,
     ...globalThis.T9DocumentFolders.outline(documentFolders, locale)
       .filter(item => !excluded.has(item.folderId)).map(item =>
-        `<option value="${escapeHtml(item.folderId)}">${escapeHtml(item.path.join(" / "))}</option>`)
+        `<option value="${escapeHtml(item.folderId)}">${escapeHtml(item.path.join(" / "))}</option>`),
+    ...(canCreate ? [`<option value="${LIBRARY_MOVE_NEW}">${escapeHtml(uiTf("folder.newTitle",
+      { folder: libraryFolderName(libraryFolder) }))}…</option>`] : [])
   ].join("");
   $("libraryMoveDestination").value = selected || "";
+  $("libraryMoveNewName").value = "";
+  $("libraryMoveNewName").removeAttribute("aria-invalid");
+  $("libraryMoveNewField").hidden = true;
   $("libraryMoveError").textContent = "";
   $("libraryMoveDialog").showModal();
   $("libraryMoveDestination").focus();
@@ -4341,9 +4358,37 @@ function announceLibraryFolderMoved(folderId) {
     : uiTf("folder.folderMovedTop", { name: folder.name }));
 }
 
+$("libraryMoveDestination").addEventListener("change", () => {
+  const creating = $("libraryMoveDestination").value === LIBRARY_MOVE_NEW;
+  $("libraryMoveNewField").hidden = !creating;
+  $("libraryMoveNewName").required = creating;
+  $("libraryMoveError").textContent = "";
+  if (creating) $("libraryMoveNewName").focus();
+});
+
+// Makes the folder and files the documents in it with one save, so either both happen or
+// neither does. Returns the new folder's id and how many documents moved.
+async function moveLibraryDocumentsToNewFolder(ids, name) {
+  const { tree, folder } = globalThis.T9DocumentFolders.create(documentFolders,
+    { name, parentId: libraryFolder });
+  const wanted = new Set(ids);
+  let moved = 0;
+  const records = documentLibraryRecords.map(record => {
+    if (!wanted.has(record.projectId)) return record;
+    moved++;
+    return globalThis.T9DocumentLibrary.merge(record, { folderId: folder.folderId });
+  });
+  await saveLibraryFolders(tree, records);
+  documentFolders = tree;
+  documentLibraryRecords = records;
+  rebuildDocumentLibraryIndex();
+  return { folderId: folder.folderId, moved };
+}
+
 $("libraryMoveForm").addEventListener("submit", async event => {
   event.preventDefault();
-  const destination = $("libraryMoveDestination").value;
+  let destination = $("libraryMoveDestination").value;
+  const creating = destination === LIBRARY_MOVE_NEW;
   const folder = libraryMoveFolderId
     ? globalThis.T9DocumentFolders.find(documentFolders, libraryMoveFolderId) : null;
   if (libraryMoveFolderId && !folder) {
@@ -4356,11 +4401,18 @@ $("libraryMoveForm").addEventListener("submit", async event => {
   try {
     if (folder) {
       if (folder.parentId !== destination) await moveLibraryFolder(folder.folderId, destination);
+    } else if (creating) {
+      ({ folderId: destination, moved } = await moveLibraryDocumentsToNewFolder(libraryMoveIds,
+        $("libraryMoveNewName").value));
     } else {
       moved = await moveLibraryDocuments(libraryMoveIds, destination);
     }
   } catch (error) {
     $("libraryMoveError").textContent = folderErrorText(error, folder?.name);
+    if (creating && error?.code) {
+      $("libraryMoveNewName").setAttribute("aria-invalid", "true");
+      $("libraryMoveNewName").focus();
+    }
     return;
   } finally {
     submit.disabled = false;
@@ -4379,11 +4431,10 @@ let libraryDrag = null;
 function libraryDropTarget(event) {
   const element = event.target.closest?.("#libraryFolders [data-library-folder]");
   if (!element || !libraryDrag) return null;
-  const id = element.dataset.libraryFolder;
-  const folderId = id === LIBRARY_UNFILED ? "" : id;
+  const folderId = element.dataset.libraryFolder;
   if (libraryDrag.kind === "folder") {
     const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryDrag.folderId);
-    if (!folder || id === LIBRARY_UNFILED || folder.parentId === folderId ||
+    if (!folder || folder.parentId === folderId ||
       globalThis.T9DocumentFolders.descendantIds(documentFolders, folder.folderId).has(folderId)) {
       return null;
     }
@@ -4411,23 +4462,72 @@ function markLibraryCardsDraggable() {
   });
 }
 
+// While documents are dragged, the folder row lists every folder in the library, by its path,
+// and the top level, so documents can go to any folder without opening it first. The folder
+// the documents are all in already is left out. The usual row returns when the drag ends.
+// A dragged folder keeps the usual row: its chip must stay on the page for the drag to end.
+let libraryDragRow = null;
+function libraryDragTargets(drag) {
+  const folders = globalThis.T9DocumentFolders;
+  const locale = applicationSettings.uiLocale || "en-US";
+  const places = new Set(documentLibraryRecords.filter(record => drag.ids.includes(record.projectId))
+    .map(record => folders.folderOf(documentFolders, record)));
+  const skip = places.size === 1 ? places : new Set();
+  return [{ id: "", name: uiT("folder.allDocuments"), kind: "top" },
+    ...folders.outline(documentFolders, locale).map(item =>
+      ({ id: item.folderId, name: item.path.join(" / "), kind: "target" }))]
+    .filter(item => !skip.has(item.id));
+}
+
+function showLibraryDragTargets() {
+  if (libraryDrag?.kind !== "documents") return;
+  const list = $("libraryFolderList");
+  libraryDragRow = { html: list.innerHTML, label: list.getAttribute("aria-label") };
+  list.dataset.dragTargets = "true";
+  list.setAttribute("aria-label", uiT("folder.dropTargets"));
+  // The hint says why the row changed; the list's name says it to screen readers.
+  list.innerHTML = `<li class="library-folder-drop-hint" aria-hidden="true">${
+    escapeHtml(uiT("folder.dropTargets"))}</li>` + libraryDragTargets(libraryDrag).map(item => `<li><button type="button"
+    class="secondary" data-library-folder="${escapeHtml(item.id)}" data-folder-kind="${item.kind}"
+    title="${escapeHtml(item.name)}">${item.kind === "target"
+      ? '<span class="library-folder-icon" aria-hidden="true"></span>' : ""}<span
+    class="library-folder-name">${escapeHtml(item.name)}</span></button></li>`).join("");
+}
+
+// Puts the usual row back when nothing has drawn the library since the drag began.
+function hideLibraryDragTargets() {
+  const list = $("libraryFolderList");
+  if (libraryDragRow && list.dataset.dragTargets) {
+    list.innerHTML = libraryDragRow.html;
+    list.setAttribute("aria-label", libraryDragRow.label || "");
+  }
+  delete list.dataset.dragTargets;
+  libraryDragRow = null;
+}
+
+function startLibraryDrag(event, drag, data) {
+  libraryDrag = drag;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData(LIBRARY_DRAG_TYPE, data);
+  // Changing the page while the browser starts the drag can cancel it, so wait a moment.
+  setTimeout(showLibraryDragTargets, 0);
+}
+
 $("libraryResults").addEventListener("dragstart", event => {
   const card = event.target.closest?.('.library-card[draggable="true"]');
   if (!card) return;
   const id = card.dataset.libraryProjectId;
   const selected = documentLibrarySelection.selectedIds;
   // A selected card carries the whole selection with it.
-  libraryDrag = { kind: "documents", ids: selected.includes(id) ? [...selected] : [id] };
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData(LIBRARY_DRAG_TYPE, libraryDrag.ids.join("\n"));
+  const ids = selected.includes(id) ? [...selected] : [id];
+  startLibraryDrag(event, { kind: "documents", ids }, ids.join("\n"));
 });
 
 $("libraryFolders").addEventListener("dragstart", event => {
   const chip = event.target.closest?.('[data-folder-kind="folder"][draggable="true"]');
   if (!chip) return;
-  libraryDrag = { kind: "folder", folderId: chip.dataset.libraryFolder };
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData(LIBRARY_DRAG_TYPE, chip.dataset.libraryFolder);
+  startLibraryDrag(event, { kind: "folder", folderId: chip.dataset.libraryFolder },
+    chip.dataset.libraryFolder);
 });
 
 $("libraryFolders").addEventListener("dragover", event => {
@@ -4453,6 +4553,7 @@ $("libraryFolders").addEventListener("drop", async event => {
   const drag = libraryDrag;
   libraryDrag = null;
   clearLibraryDropTarget();
+  hideLibraryDragTargets();
   if (!target) return;
   event.preventDefault();
   try {
@@ -4475,6 +4576,7 @@ $("libraryFolders").addEventListener("drop", async event => {
 document.addEventListener("dragend", () => {
   libraryDrag = null;
   clearLibraryDropTarget();
+  hideLibraryDragTargets();
 });
 
 for (const id of ["libraryFolderDialog", "libraryMoveDialog", "libraryFolderDeleteDialog"]) {
@@ -4691,7 +4793,7 @@ function libraryDownloadCompleted(downloadId) {
 
 // The documents each export choice covers.
 function libraryExportScopes() {
-  const folder = libraryFolder && libraryFolder !== LIBRARY_UNFILED
+  const folder = libraryFolder
     ? globalThis.T9DocumentFolders.find(documentFolders, libraryFolder) : null;
   const inFolder = folder ? (() => {
     const ids = globalThis.T9DocumentFolders.descendantIds(documentFolders, folder.folderId);

@@ -19,11 +19,26 @@ const navigationTemplates = [
   "Sök efter __sales ord__ och öppna **Sales Orders**.",
   "Sök efter __1896__ i **No.** och välj den filtrerade posten."
 ];
+// Older documents said "och välj den filtrerade posten"; in Swedish too the record is entered.
+assert.strictEqual(language.translateInstruction(
+  "Sök efter __1896__ i **No.** och välj den filtrerade posten.", "sv-SE"), "Ange __1896__ i **No.**");
+for (const [locale, expected] of Object.entries({
+  "en-US": "Enter __1896__ in **No.**", "de-DE": "Geben Sie __1896__ in **No.** ein.",
+  "fi-FI": "Syötä __1896__ kenttään **No.**" })) {
+  const translated = language.translateInstruction(
+    "Sök efter __1896__ i **No.** och välj den filtrerade posten.", locale);
+  assert.ok(translated === expected || !/\b(?:Ange|Sök)\b/u.test(translated), `${locale}: ${translated}`);
+}
+assert.strictEqual(language.translateInstruction(
+  "Ange __isbergss__ i **Artikelnr.** och välj **30043**.", "de-DE"),
+  "Geben Sie __isbergss__ in **Artikelnr.** ein und wählen Sie **30043** aus.");
 for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
   for (const source of navigationTemplates) {
     const translated = language.translateInstruction(source, locale);
     assert.notStrictEqual(translated, source, `${locale}: ${source}`);
-    assert(!/\b(?:Välj|Sök|öppna|listan|sidan|filtrerade)\b/u.test(translated), `${locale}: ${translated}`);
+    assert(!/\b(?:Välj|Sök|Ange|öppna|listan|sidan|filtrerade)\b/u.test(translated), `${locale}: ${translated}`);
+    assert(!/matching|correspondant|passenden|coincidente|matchende|vastaava|samsvarende/u.test(translated),
+      `${locale} no longer speaks of the matching record: ${translated}`);
     for (const value of source.match(/(?:\*\*|__)[^*_]+(?:\*\*|__)/gu)) {
       assert(translated.includes(value), `${locale} keeps ${value}`);
     }

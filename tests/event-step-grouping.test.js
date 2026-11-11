@@ -600,7 +600,9 @@ assert.ok(Date.now() - started < 5000, "large grouping regression");
     { taskId: "row", taskType: "RunAction", fieldCaption: "Nr, sorterade i Stigande order Välj posten \"905\"",
       actionCaption: "Nr, sorterade i Stigande order Välj posten \"905\"" },
     { taskId: "result", taskType: "ChangeField", fieldCaption: "Kundnr", value: "905", inputSources: ["change"] }]);
-  assert.deepStrictEqual(chosen.map(step => step.instruction), ["Välj **905** i **Kundnr**."]);
+  // The text typed to find the customer is said with the customer chosen.
+  assert.deepStrictEqual(chosen.map(step => step.instruction),
+    ["Ange __iber__ i **Kundnr** och välj **905**."]);
 }
 
 console.log("Event Step Grouping tests passed.");
