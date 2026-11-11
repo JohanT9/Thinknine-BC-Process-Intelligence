@@ -58,10 +58,6 @@ if ($("appearance") && globalThis.T9Appearance) {
   });
 }
 const send = message => chrome.runtime.sendMessage(message);
-const processIntelligenceEnabled = () =>
-  globalThis.T9FeatureFlags?.isEnabled("processIntelligence") === true;
-globalThis.T9FeatureFlags?.apply(document);
-
 
 const CONTEXT_BUILDER_VERSION = "1.0.0";
 
@@ -3697,82 +3693,6 @@ let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
 let reviewOpenRequestId = "";
-let activeProcessModel = null;
-let activeProcessBaseModel = null;
-let selectedProcessMapNodeId = null;
-let processMapDraftOverrides = [];
-let activeProcessAnalysis = null;
-let processAnalysisRequest = null;
-let activeProcessMapLevel = "businessCentral";
-let processMapIncludeReferences = false;
-let processMapResizeFrame = null;
-const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
-const PROCESS_MAP_DIRECTION_STORAGE_KEY = "t9.processMap.direction";
-const PROCESS_MAP_THEME_STORAGE_KEY = "t9.processMap.theme";
-const PROCESS_MAP_DENSITY_STORAGE_KEY = "t9.processMap.density";
-function normalizedProcessMapDensity(value) {
-  return value === "compact" ? "compact" : "standard";
-}
-function normalizedProcessMapDirection(value) {
-  return value === "vertical" ? "vertical" : "adaptive";
-}
-function loadProcessMapZoom() {
-  try {
-    return globalThis.T9ProcessMapViewport.normalize(
-      globalThis.localStorage?.getItem(PROCESS_MAP_ZOOM_STORAGE_KEY)
-    );
-  } catch {
-    return 100;
-  }
-}
-let processMapZoom = loadProcessMapZoom();
-function loadProcessMapDirection() {
-  try {
-    return normalizedProcessMapDirection(
-      globalThis.localStorage?.getItem(PROCESS_MAP_DIRECTION_STORAGE_KEY)
-    );
-  } catch {
-    return "adaptive";
-  }
-}
-let processMapDirection = loadProcessMapDirection();
-function loadProcessMapTheme() {
-  try {
-    return globalThis.T9ProcessMapTheme.normalize(
-      globalThis.localStorage?.getItem(PROCESS_MAP_THEME_STORAGE_KEY)
-    );
-  } catch {
-    return globalThis.T9ProcessMapTheme.DEFAULT_THEME_ID;
-  }
-}
-let processMapTheme = loadProcessMapTheme();
-function loadProcessMapDensity() {
-  try {
-    return normalizedProcessMapDensity(
-      globalThis.localStorage?.getItem(PROCESS_MAP_DENSITY_STORAGE_KEY)
-    );
-  } catch {
-    return "standard";
-  }
-}
-let processMapDensity = loadProcessMapDensity();
-let processMapFocusReturn = null;
-let processMapSearchCursor = -1;
-function setProcessMapFocus(active) {
-  const disclosure = $("processOverviewDisclosure");
-  const button = $("processMapFocus");
-  const enabled = Boolean(active);
-  if (enabled) {
-    processMapFocusReturn = document.activeElement;
-    disclosure.open = true;
-  }
-  disclosure.classList.toggle("process-map-focus", enabled);
-  document.body.classList.toggle("process-map-focus-active", enabled);
-  button.setAttribute("aria-pressed", String(enabled));
-  renderProcessOverview();
-  if (enabled) $("processOverview").querySelector("[data-process-node-action]")?.focus();
-  else processMapFocusReturn?.focus?.();
-}
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let reviewStepLayout = "focus";
 let reviewStepFilter = "all";
@@ -3823,242 +3743,6 @@ function documentBesideActive() {
 const activeDocumentPipelineCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 
-function processAnalysisLabels() {
-  const locale = globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale || "sv-SE");
-  const english = locale !== "sv-SE";
-  const labels = english ? {
-    locale: "en-US",
-    detected: "Detected reference process", unknownDomain: "Domain not identified",
-    match: "match", confirmedConfidence: "manually confirmed",
-    matchDegree: "Classification confidence", confirmed:
-      "Classification confirmed manually", matched: "Matched", missing: "Possible missing",
-    conditional: "Conditional", additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
-      "The recorded process may be a valid customer variant.", matchedSteps: "Matched steps",
-    missingSteps: "Possible missing steps", conditionalSteps: "Configuration-dependent reference steps",
-    referenceComparison: "Compare with other Business Central configurations",
-    referenceComparisonHelp: "These reference steps were not observed in the recording and are not included in the process map.",
-    additionalSteps: "Customer-specific steps", noConditional: "No configuration-dependent steps",
-    none: "None", noMissing: "No expected steps are missing", noAdditional: "No additional steps",
-    alternatives: "Alternative reference processes", noAlternatives: "No relevant alternatives",
-    noMatchTitle: "No reliable process match", noMatchText:
-      "The recording remains valid and can be classified manually later.",
-    "auto-classifiable": "Strong process evidence", "review-required": "Needs confirmation",
-    "insufficient-evidence": "Insufficient process evidence", "manual-confirmed": "Manually selected process",
-    confirmationRecommended:
-      "Confirm the classification before using it.", strongEvidence:
-      "The classification is supported by several independent signals.",
-    configurationVariant: "Business Central configuration", variantUncertain:
-      "Several configurations fit the recording. Other configuration steps are available in the reference comparison.",
-    variantSupported: "The observed sequence supports this configuration variant.",
-    variantConfirmed: "This configuration was selected manually and now controls the process map.",
-    variantAlternatives: "Other possible configurations", mostLikely: "Most likely",
-    evidenceTitle: "Why this assessment?", evidenceDocuments: "Business Central documents",
-    evidenceActions: "Business actions", evidenceQuality: "Evidence quality",
-    actionQualifiers: { shipment: "shipment", receipt: "receipt", invoice: "invoice",
-      pick: "pick", "put-away": "put-away", assembly: "assembly",
-      consumption: "consumption", output: "output", transfer: "transfer" },
-    observedPrecision: "Observed steps fit", referenceCoverage: "Reference process covered",
-    candidateMargin: "Lead over next candidate", percentagePoints: "percentage points",
-    evidenceNone: "None detected", "quality-strong": "Strong", "quality-moderate": "Moderate",
-    "quality-weak": "Weak"
-  } : {
-    locale: "sv-SE",
-    detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
-    match: "matchning", confirmedConfidence: "manuellt bekräftad",
-    matchDegree: "Klassificeringssäkerhet", confirmed:
-      "Klassificeringen är manuellt bekräftad", matched: "Matchade", missing: "Möjligen saknade",
-    conditional: "Villkorliga", additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
-      "Den inspelade processen kan vara en giltig kundvariant.", matchedSteps: "Matchade steg",
-    missingSteps: "Möjligen saknade steg", conditionalSteps: "Konfigurationsberoende referenssteg",
-    referenceComparison: "Jämför med andra Business Central-konfigurationer",
-    referenceComparisonHelp: "Dessa referenssteg observerades inte i inspelningen och tas inte med i processkartan.",
-    additionalSteps: "Kundunika steg", noConditional: "Inga konfigurationsberoende steg",
-    none: "Inga", noMissing: "Inga förväntade steg saknas", noAdditional: "Inga extra steg",
-    alternatives: "Alternativa referensprocesser", noAlternatives: "Inga relevanta alternativ",
-    noMatchTitle: "Ingen säker processmatchning", noMatchText:
-      "Inspelningen är fortfarande giltig och kan klassificeras manuellt senare.",
-    "auto-classifiable": "Starkt processunderlag", "review-required": "Behöver bekräftas",
-    "insufficient-evidence": "Otillräckligt processunderlag", "manual-confirmed": "Manuellt vald process",
-    confirmationRecommended:
-      "Bekräfta klassificeringen innan den används.", strongEvidence:
-      "Klassificeringen stöds av flera oberoende signaler.",
-    configurationVariant: "Business Central-konfiguration", variantUncertain:
-      "Flera konfigurationer passar inspelningen. Andra konfigurationssteg finns i referensjämförelsen.",
-    variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
-    variantConfirmed: "Konfigurationen valdes manuellt och styr nu processkartan.",
-    variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",
-    evidenceTitle: "Varför denna bedömning?", evidenceDocuments: "Business Central-dokument",
-    evidenceActions: "Affärsåtgärder", evidenceQuality: "Underlagskvalitet",
-    actionQualifiers: { shipment: "leverans", receipt: "inleverans", invoice: "faktura",
-      pick: "plockning", "put-away": "inlagring", assembly: "montering",
-      consumption: "förbrukning", output: "utflöde", transfer: "överföring" },
-    observedPrecision: "Träff på observerade steg", referenceCoverage: "Täckning av referensprocess",
-    candidateMargin: "Försprång till nästa kandidat", percentagePoints: "procentenheter",
-    evidenceNone: "Inget identifierat", "quality-strong": "Starkt",
-    "quality-moderate": "Måttligt", "quality-weak": "Svagt",
-    variantNames: {
-      "variant:no-warehouse": "Utan lagerhantering",
-      "variant:basic-warehouse": "Grundläggande lagerhantering",
-      "variant:advanced-warehouse": "Avancerad lagerhantering",
-      "variant:direct-shipment": "Direktleverans",
-      "variant:drop-shipment": "Direktleverans från leverantör",
-      "variant:standard-return": "Standardretur",
-      "variant:make-to-stock": "Tillverkning mot lager",
-      "variant:make-to-order": "Tillverkning mot order"
-    }, processNames: {
-        "Source to Pay": "Inköp till betalning", "domain:source-to-pay": "Inköp till betalning",
-        "Purchase to Pay": "Inköp till betalning",
-        "Simple Purchase Order": "Enkel inköpsorder", "Warehouse Inbound": "Lagerinleverans",
-        "Purchase Receipt and Invoice": "Inköpsinleverans och faktura",
-        "Advanced Warehouse Inbound": "Avancerad lagerinleverans",
-        "Get Source Documents": "Hämta källdokument",
-        "Post Warehouse Receipt": "Bokför lagerinleverans",
-        "Transfer Order": "Överföringsorder", "Inventory Transfer": "Lageröverföring",
-        "Item Transfer": "Artikelöverföring", "Create Transfer Order": "Skapa överföringsorder",
-        "Post Transfer Shipment": "Bokför överföringsutleverans",
-        "Post Transfer Receipt": "Bokför överföringsinleverans",
-        "Assembly Order": "Monteringsorder", "Production Order": "Produktionsorder",
-        "Production Consumption": "Produktionsförbrukning",
-        "Production Output": "Produktionsutflöde",
-        "Production with Warehouse Picking": "Produktion med lagerplockning",
-        "Production with Warehouse Put-away": "Produktion med lagerinlagring",
-        "Make to Stock": "Tillverkning mot lager", "Make to Order": "Tillverkning mot order",
-        "Planning Worksheet": "Planeringsförslag", "Warehouse Movement": "Lagerförflyttning",
-        "Planning Supply Options": "Planeringens försörjningsalternativ",
-        "Create Purchase Orders": "Skapa inköpsorder",
-        "Create Production Orders": "Skapa produktionsorder",
-        "Create Transfer Orders": "Skapa överföringsorder",
-        "Review Action Messages": "Granska åtgärdsmeddelanden",
-        "Accept Action Message": "Acceptera åtgärdsmeddelande",
-        "Sales Order": "Försäljningsorder", "Simple Sales Order": "Enkel försäljningsorder",
-        "Purchase Order": "Inköpsorder", "Warehouse Receipt": "Lagerinleverans",
-        "Warehouse Put-away": "Lagerinlagring",
-        "document:purchase-order": "Inköpsorder",
-        "document:purchase-invoice": "Inköpsfaktura",
-        "document:posted-purchase-invoice": "Bokförd inköpsfaktura",
-        "Create": "Skapa", "Release": "Frisläpp", "Receive": "Ta emot",
-        "Invoice": "Fakturera", "Post": "Bokför", "Unknown step": "Okänt steg",
-        "Inventory Movement": "Lagerflyttning", "Assembly to Stock": "Montering mot lager",
-        "Sales Returns": "Försäljningsreturer", "Purchase Returns": "Inköpsreturer",
-        "Item Tracking": "Artikelspårning",
-        "Lot Tracking": "Partispårning", "Serial Tracking": "Serienummerspårning",
-        "Expiration Date Handling": "Hantering av utgångsdatum",
-        "Assign Lot Number": "Tilldela partinummer",
-        "Assign Serial Number": "Tilldela serienummer",
-        "Enter Expiration Date": "Ange utgångsdatum",
-        "Post Tracked Transaction": "Bokför spårad transaktion",
-        "General Journal Posting": "Bokföring av redovisningsjournal",
-        "Item Adjustment": "Lagerjustering", "Item Reclassification": "Artikelomklassificering",
-        "Physical Inventory": "Inventering",
-        "document:sales-return-order": "Försäljningsreturorder",
-        "document:purchase-return-order": "Inköpsreturorder",
-        "document:inventory-movement": "Lagerflyttning",
-        "document:warehouse-movement": "Lagerförflyttning",
-        "document:item-tracking-lines": "Artikelspårningsrader",
-        "document:general-journal": "Redovisningsjournal",
-        "document:item-journal": "Artikeljournal",
-        "document:item-reclassification-journal": "Artikelomklassificeringsjournal",
-        "document:physical-inventory-journal": "Inventeringsjournal",
-        "Purchase Order → Warehouse Receipt → Put-away → Posted Receipt → Purchase Invoice":
-          "Inköpsorder → Lagerinleverans → Inlagring → Bokförd inleverans → Inköpsfaktura",
-        "Transfer Order → Transfer Shipment → In-transit → Transfer Receipt":
-          "Överföringsorder → Överföringsutleverans → På väg → Överföringsinleverans"
-      }
-  };
-  const localize = (value, key = "") => {
-    if (typeof value === "string") {
-      const messageKey = `processAnalysis.${key}`;
-      const translated = globalThis.T9UiI18n.translate(messageKey, locale);
-      return translated === messageKey
-        ? globalThis.T9UiI18n.translateStaticText(value, locale) : translated;
-    }
-    if (!value || typeof value !== "object") return value;
-    return Object.fromEntries(Object.entries(value).map(([childKey, nested]) =>
-      [childKey, localize(nested, key ? `${key}.${childKey}` : childKey)]));
-  };
-  if (!english) return labels;
-  labels.locale = locale;
-  if (locale !== "en-US") {
-    for (const [key, value] of Object.entries(labels)) labels[key] = localize(value, key);
-  }
-  return labels;
-}
-
-function updateProcessAnalysisBadge() {
-  const badge = $("processAnalysisBadge");
-  const model = activeProcessAnalysis ? globalThis.T9ProcessAnalysisView.normalize(
-    activeProcessAnalysis, activeReview?.processAnalysis
-  ) : null;
-  badge.hidden = !model?.available;
-  badge.textContent = model?.available ? `${Math.round(model.confidence * 100)}%` : "";
-}
-
-async function loadProcessAnalysis(force = false) {
-  if (!activeReviewSession) return null;
-  if (activeProcessAnalysis && !force) return activeProcessAnalysis;
-  if (processAnalysisRequest && !force) return processAnalysisRequest;
-  const sessionId = activeReviewSession.id;
-  processAnalysisRequest = send({ type: "T9_MATCH_REFERENCE_PROCESS", sessionId })
-    .then(response => {
-      if (!response?.ok) throw new Error(response?.error ||
-        uiT("Processanalysen kunde inte genomföras."));
-      if (activeReviewSession?.id !== sessionId) return null;
-      activeProcessAnalysis = response.result;
-      updateProcessAnalysisBadge();
-      renderProcessOverview();
-      return activeProcessAnalysis;
-    }).finally(() => { processAnalysisRequest = null; });
-  return processAnalysisRequest;
-}
-
-function renderProcessAnalysisDialog() {
-  const model = globalThis.T9ProcessAnalysisView.render(
-    $("processAnalysisContent"), { result: activeProcessAnalysis || {},
-      decision: activeReview?.processAnalysis }, processAnalysisLabels()
-  );
-  $("confirmProcessAnalysis").disabled = !model.available;
-  $("useSelectedReference").disabled = true;
-  $("processAnalysisStatus").textContent = "";
-  updateProcessAnalysisBadge();
-  return model;
-}
-
-function persistProcessAnalysisDecision(reference, status, variant = null) {
-  if (!activeReview || !reference?.id) return;
-  activeReview.processAnalysis = {
-    confirmedReferenceId: reference.id,
-    confirmedName: reference.name,
-    confirmedVariantId: variant?.id || null,
-    confirmedVariantName: variant?.name || null,
-    confirmedAt: new Date().toISOString(),
-    classificationSource: "manual",
-    status
-  };
-  activeReview.updatedAt = activeReview.processAnalysis.confirmedAt;
-  reviewAutoSave.schedule();
-  renderProcessAnalysisDialog();
-  renderProcessOverview();
-  $("processAnalysisStatus").textContent = status === "confirmed"
-    ? uiT("Klassificeringen bekräftades.")
-    : uiT("Processvalet sparades.");
-}
-
-async function openProcessAnalysisDialog() {
-  if (!processIntelligenceEnabled()) return;
-  const dialog = $("processAnalysisDialog");
-  $("processAnalysisContent").innerHTML = `<p class="process-analysis-loading">${escapeHtml(
-    uiT("Analyserar processen…"))}</p>`;
-  $("confirmProcessAnalysis").disabled = true;
-  $("useSelectedReference").disabled = true;
-  dialog.showModal();
-  try {
-    await loadProcessAnalysis();
-    renderProcessAnalysisDialog();
-  } catch (error) {
-    $("processAnalysisContent").innerHTML = `<div class="process-analysis-empty" role="alert"><h4>${escapeHtml(
-      uiT("Processanalysen kunde inte visas"))}</h4><p>${escapeHtml(error.message)}</p></div>`;
-  }
-}
 const activeDocumentPresentationCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 const activeScreenshotQualityCache = globalThis.T9WorkspaceController
@@ -4180,7 +3864,6 @@ function libraryOptions() {
     locale: applicationSettings.uiLocale || "sv-SE",
     sort: value("librarySort", "modified"),
     filters: {
-      profile: value("libraryProfileFilter"),
       theme: value("libraryThemeFilter"),
       documentLanguage: value("libraryLanguageFilter"),
       favourite: checked("libraryFavouriteFilter"),
@@ -4226,6 +3909,8 @@ function renderDocumentLibrary() {
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   visibleDocumentLibraryRecords = records;
   const view = globalThis.T9DocumentLibraryView;
+  // Before the first document the tools that work on documents are left out.
+  $("documentsView").classList.toggle("library-empty-store", !documentLibraryRecords.length);
   const viewState = { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
     storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
@@ -4235,11 +3920,7 @@ function renderDocumentLibrary() {
       ? libraryFolder === LIBRARY_UNFILED ? uiT("folder.emptyUnfiled")
         : uiTf("folder.empty", { select: $("librarySelectMode").textContent.trim() })
       : "" };
-  const activeId = $("libraryGroupProfiles").checked
-    ? view.renderGrouped($("libraryResults"),
-      globalThis.T9DocumentLibrary.groupByProfile(records,
-        applicationSettings.uiLocale || "sv-SE"), viewState)
-    : view.renderList($("libraryResults"), records, viewState);
+  const activeId = view.renderList($("libraryResults"), records, viewState);
   $("libraryResults").dataset.selectMode = String(librarySelectMode);
   // Continue where you left off: started reviews, shown while nothing is searched.
   const continueCount = options.search.trim() ? 0 : view.renderContinue(
@@ -4272,7 +3953,7 @@ function renderDocumentLibrary() {
 }
 
 function resetDocumentLibraryFilters() {
-  for (const id of ["libraryProfileFilter", "libraryThemeFilter",
+  for (const id of ["libraryThemeFilter",
     "libraryLanguageFilter", "libraryCreatedFrom", "libraryCreatedTo",
     "libraryModifiedFrom", "libraryModifiedTo"]) {
     $(id).value = "";
@@ -4301,7 +3982,7 @@ function renderLibraryBatchToolbar(message = "") {
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
   $("libraryBatchMove").hidden = !documentFoldersEditable;
   for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
-    "libraryBatchTags", "libraryBatchProfile", "libraryBatchTheme",
+    "libraryBatchTags", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
   }
@@ -4312,14 +3993,10 @@ function renderLibraryBatchToolbar(message = "") {
 }
 
 function refreshLibraryFilters() {
-  const profiles = new Map();
   const themes = new Map();
   documentLibraryRecords.forEach(record => {
-    profiles.set(record.profile.profileId, record.profile.displayName);
     themes.set(record.theme.themeId, record.theme.displayName);
   });
-  fillLibraryFilter("libraryProfileFilter", [...profiles],
-    $("libraryProfileFilter")?.value || "");
   fillLibraryFilter("libraryThemeFilter", [...themes],
     $("libraryThemeFilter")?.value || "");
 }
@@ -5938,10 +5615,6 @@ async function commitLibraryBatch(result, confirmation) {
 }
 
 function populateBatchMetadataOptions() {
-  $("libraryBatchProfileValue").innerHTML = documentProfiles().map(profile =>
-    `<option value="${escapeHtml(profile.profileId)}">` +
-      `${escapeHtml(profile.displayName)}</option>`
-  ).join("");
   const themes = globalThis.T9DocumentThemeRegistry.list(
     globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
   ).filter(theme => theme.themeId !== "base");
@@ -5954,10 +5627,10 @@ function populateBatchMetadataOptions() {
 function openBatchMetadataDialog(mode = "metadata") {
   const count = documentLibrarySelection.selectedIds.length;
   if (!count) return;
-  for (const id of ["Tags", "Profile", "Theme", "Author", "Status", "Archived"]) {
+  for (const id of ["Tags", "Theme", "Author", "Status", "Archived"]) {
     $("libraryBatchUse" + id).checked = false;
   }
-  const modeField = { tags: "Tags", profile: "Profile", theme: "Theme" }[mode];
+  const modeField = { tags: "Tags", theme: "Theme" }[mode];
   if (modeField) $("libraryBatchUse" + modeField).checked = true;
   $("libraryBatchMetadataDescription").textContent =
     uiTf("Endast markerade fält ändras för {count} dokument.", { count });
@@ -5968,7 +5641,6 @@ function openBatchMetadataDialog(mode = "metadata") {
 }
 
 function batchMetadataOperation() {
-  const profileSelect = $("libraryBatchProfileValue");
   const themeSelect = $("libraryBatchThemeValue");
   return {
     type: "metadata",
@@ -5976,9 +5648,6 @@ function batchMetadataOperation() {
       tags: { selected: $("libraryBatchUseTags").checked,
         value: $("libraryBatchTagsValue").value.split(",")
           .map(value => value.trim()).filter(Boolean) },
-      profile: { selected: $("libraryBatchUseProfile").checked,
-        value: { profileId: profileSelect.value,
-          displayName: profileSelect.selectedOptions[0]?.textContent || "" } },
       theme: { selected: $("libraryBatchUseTheme").checked,
         value: { themeId: themeSelect.value,
           displayName: themeSelect.selectedOptions[0]?.textContent || "" } },
@@ -6000,15 +5669,6 @@ function activeDocumentThemeId() {
   return themes.some(theme => theme.themeId === assigned) ? assigned
     : documentProfiles().find(profile => profile.profileId === activeDocumentProfileId)
       ?.theme.themeId || "thinknine";
-}
-
-function renderDocumentProfileChoice() {
-  const select = $("reviewDocumentProfile");
-  select.innerHTML = documentProfiles().map(profile =>
-    '<option value="' + escapeHtml(profile.profileId) + '">' +
-    escapeHtml(uiT("review.profile." + profile.profileId)) + '</option>').join("");
-  select.value = activeDocumentProfileId;
-  $("reviewDocumentProfileHelp").textContent = uiT("review.profileHelp." + activeDocumentProfileId);
 }
 
 function documentProfiles() {
@@ -6361,6 +6021,8 @@ function applyDocumentView(options = {}) {
     panel.clientWidth
   ));
   $("documentZoomValue").textContent = `${zoom}%`;
+  // The reset button shows the zoom it resets, so the toolbar shows the value once.
+  $("documentResetZoom").textContent = `${zoom}%`;
   $("documentFitWidth").setAttribute(
     "aria-pressed",
     String(documentViewState.zoomMode === "fitWidth")
@@ -6716,7 +6378,7 @@ $("documentCheckNext").addEventListener("click", async () => {
   if (!check.nextTaskId) return;
   await switchWorkspace("review");
   if (activeReview !== review) return;
-  activateProcessOverviewTask(check.nextTaskId, true);
+  activateReviewTask(check.nextTaskId, true);
 });
 
 $("documentExportWord").addEventListener("click", event => {
@@ -6825,9 +6487,6 @@ function applyReviewSelection(focusActive = false, publish = true) {
   }
   applyReviewToolbarState();
   applyReviewStatus();
-  globalThis.T9ProcessOverviewView.updateSelection(
-    $("processOverview"), activeReviewSelection.selectedIds
-  );
   if (publish && activeReviewSelection.activeId) {
     publishWorkspaceContext({
       selectedStepId: activeReviewSelection.activeId,
@@ -6934,7 +6593,7 @@ function renderReviewStepNavigation(tasks, presentations) {
   return filteredTasks;
 }
 
-function activateProcessOverviewTask(taskId, focusCard = false) {
+function activateReviewTask(taskId, focusCard = false) {
   if (!taskId || !reviewTaskIds().includes(taskId)) return false;
   activeReviewSelection = globalThis.T9ReviewSelection.reduce(
     activeReviewSelection,
@@ -6955,7 +6614,7 @@ function activateNextUnreviewedStep() {
     show(uiT("review.allStepsReviewed"));
     return false;
   }
-  const activated = activateProcessOverviewTask(
+  const activated = activateReviewTask(
     navigation.nextTaskId, true
   );
   if (activated) {
@@ -6986,9 +6645,6 @@ function renderMovedReview(previousPositions, focusId) {
   invalidateDocumentWorkspace();
   reviewAutoSave.schedule();
   renderReview();
-  loadProcessAnalysis().catch(error => {
-    console.warn("BC Process Studio process analysis preload failed", error);
-  });
   if (focusId) {
     activeReviewSelection = {
       ...activeReviewSelection,
@@ -8063,18 +7719,6 @@ function instructionRunsHtml(runs) {
   }).join("");
 }
 
-function resolveReviewHierarchyForDisplay(tasks, hierarchy) {
-  try {
-    return globalThis.T9DocumentationHierarchy.resolve(tasks, hierarchy);
-  } catch (error) {
-    console.warn("Review hierarchy display fallback", {
-      error: error?.message,
-      taskCount: tasks.length
-    });
-    return { sections: [] };
-  }
-}
-
 function reviewTasksForDisplay(review) {
   let visible = [];
   let activeTasksError = null;
@@ -8420,7 +8064,6 @@ function renderReviewContent() {
     expectedResultEditor.value = displayedExpectedResult();
   }
   $("reviewDocumentLanguage").value = activeDocumentLanguage();
-  renderDocumentProfileChoice();
 
   const displayTasks = reviewTasksForDisplay(activeReview);
   const tasks = globalThis.T9ProcessTaskContext.enrichForDisplay(
@@ -8770,6 +8413,11 @@ function renderReviewContent() {
         invalidateDocumentWorkspace();
         reviewAutoSave.schedule();
         renderReview();
+        // On the open step an unapproved step is approved with Approve and next, so the
+        // checkbox is not shown there; focus moves to that button.
+        if (!event.target.checked) {
+          $("reviewList").querySelector(`[data-review-task-id="${CSS.escape(task.taskId)}"][data-active-step="true"] [data-action="approve-next"]`)?.focus();
+        }
       });
 
     card.querySelector('[data-action="edit-instruction"]')
@@ -9049,25 +8697,25 @@ function renderReviewContent() {
 
     card.querySelector('[data-action="split-step"]')
       .addEventListener("click", () => {
-        activateProcessOverviewTask(task.taskId, false);
+        activateReviewTask(task.taskId, false);
         splitSelectedReviewTask();
       });
 
     card.querySelector('[data-action="move-up"]')
       .addEventListener("click", () => {
-        activateProcessOverviewTask(task.taskId, false);
+        activateReviewTask(task.taskId, false);
         moveReviewTasksByOffset(-1, task.taskId);
       });
 
     card.querySelector('[data-action="move-down"]')
       .addEventListener("click", () => {
-        activateProcessOverviewTask(task.taskId, false);
+        activateReviewTask(task.taskId, false);
         moveReviewTasksByOffset(1, task.taskId);
       });
 
     card.querySelector('[data-action="regenerate-step"]')
       .addEventListener("click", () => {
-        activateProcessOverviewTask(task.taskId, false);
+        activateReviewTask(task.taskId, false);
         runReviewRegeneration([task.taskId]);
       });
 
@@ -9183,258 +8831,7 @@ function renderReview() {
     } catch (error) {
       renderStoredReviewFallback(error);
     }
-    renderProcessOverview();
   });
-}
-
-function renderProcessOverview() {
-  if (!processIntelligenceEnabled()) return;
-  const container = $("processOverview");
-  if (!container || !activeReview || !activeReviewSession) {
-    activeProcessModel = null;
-    if ($("saveProcessVersion")) $("saveProcessVersion").disabled = true;
-    if ($("compareProcessVersions")) $("compareProcessVersions").disabled = true;
-    if ($("exportProcessModel")) $("exportProcessModel").disabled = true;
-    if ($("exportProcessDiagram")) $("exportProcessDiagram").disabled = true;
-    if ($("editProcessMapRelationship")) $("editProcessMapRelationship").disabled = true;
-    return;
-  }
-  try {
-    const resolvedHierarchy = resolveReviewHierarchyForDisplay(
-      activeReview.tasks || [], activeReview.hierarchy
-    );
-    const processMapReviewTasks = globalThis.T9ProcessTaskContext.enrichForDisplay(
-      activeReview.tasks || [], activeReviewModel.businessTasks || []
-    );
-    const procedureModel = globalThis.T9ProcessModel.project({
-      recordingId: activeReviewSession.id,
-      title: activeReviewSession.name,
-        steps: processMapReviewTasks,
-      resolvedHierarchy,
-      overrides: activeReview.processOverrides || []
-    });
-    const hasSemanticAnalysis = Boolean(activeProcessAnalysis?.bestMatch);
-    const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
-    $("editProcessMapNode").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
-    $("editProcessMapRelationship").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
-    const mapLocale = globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale || "sv-SE");
-    processMapZoom = globalThis.T9ProcessMapViewport.normalize(processMapZoom);
-    $("processMapZoomValue").textContent = `${processMapZoom}%`;
-    $("processMapZoomOut").disabled = processMapZoom <=
-      globalThis.T9ProcessMapViewport.MIN_ZOOM;
-    $("processMapZoomIn").disabled = processMapZoom >=
-      globalThis.T9ProcessMapViewport.MAX_ZOOM;
-    $("processMapFit").textContent = uiT("processMap.fit");
-    processMapDirection = normalizedProcessMapDirection(processMapDirection);
-    $("processMapDirection").value = processMapDirection;
-    $("processMapDirection").options[0].textContent = uiT("processMap.automatic");
-    $("processMapDirection").options[1].textContent = uiT("processMap.vertical");
-    $("processMapDirection").title = uiT("processMap.direction");
-    document.querySelector('label[for="processMapDirection"]').textContent = uiT("processMap.layout");
-    processMapTheme = globalThis.T9ProcessMapTheme.normalize(processMapTheme);
-    const themeSelect = $("processMapTheme");
-    themeSelect.innerHTML = globalThis.T9ProcessMapTheme.list(
-      applicationSettings.uiLocale || "sv-SE"
-    ).map(theme => `<option value="${theme.id}">${theme.label}</option>`).join("");
-    themeSelect.value = processMapTheme;
-    themeSelect.title = uiT("processMap.chooseTheme");
-    document.querySelector('label[for="processMapTheme"]').textContent = uiT("processMap.theme");
-    processMapDensity = normalizedProcessMapDensity(processMapDensity);
-    $("processMapDensity").value = processMapDensity;
-    $("processMapDensity").options[0].textContent = uiT("processMap.standard");
-    $("processMapDensity").options[1].textContent = uiT("processMap.compact");
-    $("processMapDensity").title = uiT("processMap.chooseDensity");
-    $("processMapIncludeReferences").checked = processMapIncludeReferences;
-    $("processMapIncludeReferences").parentElement.lastChild.textContent = ` ${uiT("processMap.references")}`;
-    $("processMapIncludeReferences").parentElement.hidden = displayedLevel === "procedure";
-    document.querySelector('label[for="processMapDensity"]').textContent = uiT("processMap.density");
-    const focusActive = $("processOverviewDisclosure").classList.contains("process-map-focus");
-    $("processMapFocus").textContent = focusActive
-      ? uiT("processMap.closeFocus") : uiT("processMap.focus");
-    $("processMapFocus").title = focusActive
-      ? `${uiT("processMap.closeFocus")} (Esc)` : uiT("processMap.focus");
-    $("processMapFocus").setAttribute("aria-pressed", String(focusActive));
-    document.querySelector('label[for="processMapSearch"]').textContent = uiT("processMap.search");
-    $("processMapSearch").placeholder = uiT("processMap.searchPlaceholder");
-    $("processMapSearchNext").textContent = uiT("processMap.nextMatch");
-    $("processMapFit").title = uiT("processMap.fitTitle");
-    $("processMapZoomOut").title = uiT("processMap.zoomOut");
-    $("processMapZoomIn").title = uiT("processMap.zoomIn");
-    $("processMapResetZoom").title = uiT("processMap.resetZoom");
-    $("processMapViewportControls").setAttribute("aria-label", uiT("processMap.size"));
-    const descriptions = { business: uiT("processMap.business"),
-      businessCentral: uiT("processMap.businessCentral"),
-      procedure: uiT("processMap.procedure") };
-    $("processMapDescription").textContent = descriptions[displayedLevel];
-    $("processMapLegend").hidden = displayedLevel === "procedure";
-    for (const item of $("processMapLegend").querySelectorAll(
-      ".suggested,.conditional"
-    )) item.hidden = !processMapIncludeReferences;
-    const model = displayedLevel === "procedure"
-      ? procedureModel : globalThis.T9SemanticProcessMap.project({
-        recordingId: activeReviewSession.id,
-        title: activeReviewSession.name,
-        analysis: activeProcessAnalysis,
-        decision: activeReview.processAnalysis,
-        reviewTasks: processMapReviewTasks,
-        procedureModel
-      }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences,
-        includeBoundaries: true, locale: mapLocale });
-    activeProcessBaseModel = model;
-    activeProcessModel = displayedLevel === "procedure" ? model :
-      globalThis.T9ProcessMapRelationshipOverrides.apply(
-        globalThis.T9ProcessMapOverrides.apply(model, activeReview.processMapOverrides || []),
-        activeReview.processMapRelationshipOverrides || []);
-    for (const button of $("processMapLevels").querySelectorAll(
-      "[data-process-map-level]"
-    )) {
-      button.disabled = false;
-      button.setAttribute("aria-pressed", String(
-        button.dataset.processMapLevel === displayedLevel
-      ));
-    }
-    $("saveProcessVersion").disabled = false;
-    $("compareProcessVersions").disabled =
-      !(activeReview.processVersions || []).length;
-    $("exportProcessModel").disabled = false;
-    $("exportProcessDiagram").disabled = false;
-    const processMapRender = globalThis.T9ProcessOverviewView.render(container, activeProcessModel, {
-      locale: applicationSettings.uiLocale || "sv-SE",
-      selectedTaskIds: activeReviewSelection.selectedIds,
-      reviewTasks: processMapReviewTasks,
-      zoom: processMapZoom,
-      direction: processMapDirection,
-      theme: processMapTheme,
-      density: processMapDensity,
-      reorderable: displayedLevel !== "procedure"
-    });
-    const layoutNames = { horizontal: uiT("processMap.horizontal"),
-      serpentine: uiT("processMap.multiRow"), branched: uiT("processMap.branched"),
-      vertical: uiT("processMap.verticalLayout") };
-    $("processMapLayoutStatus").textContent = layoutNames[processMapRender.layoutStrategy] || "";
-    applyProcessMapSearch(false);
-  } catch (error) {
-    activeProcessModel = null;
-    activeProcessBaseModel = null;
-    $("saveProcessVersion").disabled = true;
-    $("compareProcessVersions").disabled = true;
-    $("exportProcessModel").disabled = true;
-    $("exportProcessDiagram").disabled = true;
-    container.innerHTML = `<p class="muted">${escapeHtml(uiTf(
-      "process.overviewError", { detail: error.message }
-    ))}</p>`;
-  }
-}
-
-async function exportActiveProcess(kind) {
-  if (!activeProcessModel || !activeReviewSession) return;
-  try {
-    const exported = globalThis.T9ProcessExport.create(activeProcessModel, {
-      title: activeReviewSession.name,
-      language: activeReview.documentFields?.documentLanguage || "sv-SE",
-      ...(processMapDirection === "vertical" ? { columns: 1 } : {}),
-      theme: processMapTheme,
-      density: processMapDensity
-    });
-    const file = kind === "diagram" ? exported.diagram : exported.json;
-    await downloadBlob(new Blob([file.content], { type: file.mimeType }),
-      file.filename);
-    show(kind === "diagram"
-      ? uiT("Processdiagrammet har exporterats.")
-      : uiT("Processen har exporterats."));
-  } catch (error) {
-    show(uiTf("process.exportError", { detail: error.message }), true);
-  }
-}
-
-function processVersionOptionLabel(choice) {
-  if (!choice.version) return uiT("Aktuellt");
-  return `v${choice.version.versionNumber}${choice.version.baseline
-    ? ` · ${uiT("Baslinje")}` : ""}`;
-}
-
-function renderProcessVersionComparison() {
-  const fromId = $("processVersionFrom").value;
-  const toId = $("processVersionTo").value;
-  const container = $("processVersionComparison");
-  if (fromId === toId) {
-    container.innerHTML = `<p class="muted">${escapeHtml(uiT(
-      "Välj två olika processversioner."
-    ))}</p>`;
-    return;
-  }
-  try {
-    const comparison = globalThis.T9ProcessVersionWorkflow.compare(
-      activeReview.processVersions || [], fromId, toId, activeProcessModel
-    );
-    globalThis.T9ProcessVersionComparisonView.render(container, comparison, {
-      locale: applicationSettings.uiLocale
-    });
-  } catch (error) {
-    container.innerHTML = `<p class="regeneration-preview-warning">${escapeHtml(
-      error.message
-    )}</p>`;
-  }
-}
-
-function openProcessVersionComparison() {
-  if (!activeReview || !activeProcessModel) return;
-  const choices = globalThis.T9ProcessVersionWorkflow.choices(
-    activeReview.processVersions || [], activeProcessModel
-  );
-  const populate = select => {
-    select.replaceChildren(...choices.map(choice => {
-      const option = document.createElement("option");
-      option.value = choice.id;
-      option.textContent = processVersionOptionLabel(choice);
-      return option;
-    }));
-  };
-  populate($("processVersionFrom"));
-  populate($("processVersionTo"));
-  const saved = choices.filter(choice => choice.version);
-  $("processVersionFrom").value = saved.length > 1
-    ? saved.at(-2).id : saved.at(-1)?.id || choices[0]?.id || "";
-  $("processVersionTo").value = saved.length > 1
-    ? saved.at(-1).id : globalThis.T9ProcessVersionWorkflow.CURRENT_ID;
-  renderProcessVersionComparison();
-  $("processVersionDialog").showModal();
-}
-
-async function saveCurrentProcessVersion() {
-  if (!activeReview || !activeProcessModel || !activeReviewSession) return;
-  const previous = [...(activeReview.processVersions || [])];
-  try {
-    const result = globalThis.T9ProcessVersionWorkflow.save(
-      activeProcessModel, previous, {
-        title: activeReviewSession.name,
-        createdAt: new Date().toISOString(),
-        status: activeReview.status === "completed" ? "approved" : "review"
-      }
-    );
-    if (!result.created) {
-      show(uiT("Processen är identisk med den senaste sparade versionen."));
-      return;
-    }
-    activeReview.processVersions = [...previous, result.version];
-    activeReview.updatedAt = result.version.createdAt;
-    await saveActiveReview({ announce: false, render: false });
-    try {
-      await updateDocumentLibraryRecord(activeReviewSession.id, {
-        processVersion: globalThis.T9ProcessVersioning.libraryMetadata(
-          activeReview.processVersions
-        )
-      }, { render: false });
-    } catch (metadataError) {
-      console.warn("Process version library metadata could not be updated.",
-        metadataError);
-    }
-    $("compareProcessVersions").disabled = false;
-    show(uiTf("process.versionSaved", { version: result.version.versionNumber }));
-  } catch (error) {
-    activeReview.processVersions = previous;
-    show(uiTf("process.versionSaveError", { detail: error.message }), true);
-  }
 }
 
 async function saveActiveReview(options = {}) {
@@ -9523,8 +8920,6 @@ async function openReview(session) {
   reviewStepFilter = "all";
   reviewStepLayout = "focus";
   activeReviewEdit = null;
-  activeProcessMapLevel = "businessCentral";
-  processMapIncludeReferences = false;
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
@@ -9672,11 +9067,6 @@ async function closeReview() {
   activeReview = null;
   activeReviewModel = null;
   reviewOpenRequestId = "";
-  activeProcessModel = null;
-  activeProcessAnalysis = null;
-  processAnalysisRequest = null;
-  activeProcessMapLevel = "businessCentral";
-  processMapIncludeReferences = false;
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
@@ -9761,7 +9151,7 @@ $("reviewStepFilter").addEventListener("change", event => {
     ? Math.min(1, visible.length) : visible.length));
   const activeId = activeReviewSelection.activeId || activeReviewSelection.selectedIds[0];
   if (visible.length && !visible.some(task => task.taskId === activeId)) {
-    activateProcessOverviewTask(visible[0].taskId, false);
+    activateReviewTask(visible[0].taskId, false);
   }
 });
 $("reviewStepNavigation").addEventListener("keydown", event => {
@@ -9782,7 +9172,7 @@ $("reviewStepNavigation").addEventListener("keydown", event => {
       additive: event.ctrlKey || event.metaKey
     });
   } else {
-    activateProcessOverviewTask(next.dataset.stepId, false);
+    activateReviewTask(next.dataset.stepId, false);
   }
   next.focus();
 });
@@ -9804,298 +9194,6 @@ $("reviewStepLayoutToggle").addEventListener("click", event => {
 });
 $("documentWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("document");
-});
-$("processOverview").addEventListener("click", event => {
-  const minimapNode = event.target.closest?.("[data-process-minimap-node]");
-  if (minimapNode) {
-    const nodeId = minimapNode.dataset.processMinimapNode;
-    globalThis.T9ProcessOverviewView.selectNode($("processOverview"), nodeId);
-    const target = [...$("processOverview").querySelectorAll("[data-process-node-action]")]
-      .find(action => action.dataset.processNodeAction === nodeId);
-    target?.scrollIntoView?.({ block: "nearest", inline: "center" });
-    target?.focus?.();
-    return;
-  }
-  const action = event.target.closest?.("[data-process-node-action]");
-  if (!action) return;
-  selectedProcessMapNodeId = action.dataset.processNodeAction;
-  $("editProcessMapNode").disabled = activeProcessMapLevel === "procedure";
-  $("editProcessMapRelationship").disabled = activeProcessMapLevel === "procedure";
-  if (action.dataset.processTaskId) {
-    activateProcessOverviewTask(action.dataset.processTaskId);
-  } else {
-    globalThis.T9ProcessOverviewView.selectNode(
-      $("processOverview"), action.dataset.processNodeAction
-    );
-  }
-});
-$('editProcessMapNode').addEventListener("click", () => {
-  const node = activeProcessModel?.nodes?.find(item => item.nodeId === selectedProcessMapNodeId);
-  if (!node) return;
-  $("processMapNodeName").value = node.title || "";
-  $("processMapNodeType").value = node.nodeType || "processStep";
-  $("processMapNodeRole").value = node.metadata?.processRole?.id || "system";
-  processMapDraftOverrides = JSON.parse(JSON.stringify(activeReview.processMapOverrides || []));
-  $("processMapNodeDialog").showModal();
-});
-function moveSelectedProcessNode(direction) {
-  if (!activeProcessBaseModel || !selectedProcessMapNodeId) return;
-  processMapDraftOverrides = globalThis.T9ProcessMapOverrides.move(
-    processMapDraftOverrides, activeProcessBaseModel, selectedProcessMapNodeId, direction);
-}
-$("moveProcessNodeEarlier").addEventListener("click", () => moveSelectedProcessNode(-1));
-$("moveProcessNodeLater").addEventListener("click", () => moveSelectedProcessNode(1));
-$("saveProcessMapNode").addEventListener("click", () => {
-  if (!activeReview || !selectedProcessMapNodeId) return;
-  const roles = { purchasing: "Purchasing", warehouse: "Warehouse", sales: "Sales",
-    production: "Production", finance: "Finance", system: "System" };
-  const roleId = $("processMapNodeRole").value;
-  activeReview.processMapOverrides = globalThis.T9ProcessMapOverrides.upsert(
-    processMapDraftOverrides, { nodeId: selectedProcessMapNodeId,
-      title: $("processMapNodeName").value, nodeType: $("processMapNodeType").value,
-      processRole: { id: roleId, name: roles[roleId] } });
-  activeReview.updatedAt = new Date().toISOString();
-  reviewAutoSave.schedule();
-  $("processMapNodeDialog").close();
-  renderProcessOverview();
-});
-function processRelationshipId(edge, index) {
-  return edge.transitionId || edge.relationshipId || `relationship:${index}`;
-}
-function processMapEditorLabel(key, fallback) {
-  const locale = applicationSettings.uiLocale || "sv-SE";
-  return globalThis.T9UiI18n?.translate?.(`processMapEditor.${key}`, locale) || fallback;
-}
-function populateProcessRelationshipEditor(relationshipId = "") {
-  const outgoing = (activeProcessModel?.transitions || []).map((edge, index) => ({
-    ...edge, editorId: processRelationshipId(edge, index)
-  })).filter(edge => edge.fromNodeId === selectedProcessMapNodeId);
-  const existing = $("processMapRelationshipExisting");
-  existing.replaceChildren(...[{ editorId: "", label: processMapEditorLabel("newConnection", "Ny koppling") },
-    ...outgoing.map(edge => ({ editorId: edge.editorId, label: edge.label ||
-      `${edge.transitionType}: ${activeProcessModel.nodes.find(node =>
-        node.nodeId === edge.toNodeId)?.title || edge.toNodeId}` }))].map(item => {
-      const option = document.createElement("option"); option.value = item.editorId;
-      option.textContent = item.label; return option;
-    }));
-  existing.value = outgoing.some(edge => edge.editorId === relationshipId) ? relationshipId : "";
-  const selected = outgoing.find(edge => edge.editorId === existing.value);
-  const targets = (activeProcessModel?.nodes || []).filter(node =>
-    node.nodeId !== selectedProcessMapNodeId);
-  $("processMapRelationshipTarget").replaceChildren(...targets.map(node => {
-    const option = document.createElement("option"); option.value = node.nodeId;
-    option.textContent = node.title; return option;
-  }));
-  if (selected) $("processMapRelationshipTarget").value = selected.toNodeId;
-  $("processMapRelationshipType").value = selected?.transitionType || "sequence";
-  $("processMapRelationshipLabel").value = selected?.label || selected?.condition || "";
-  $("deleteProcessMapRelationship").disabled = !selected;
-}
-$("editProcessMapRelationship").addEventListener("click", () => {
-  if (!selectedProcessMapNodeId || activeProcessMapLevel === "procedure") return;
-  populateProcessRelationshipEditor();
-  $("processMapRelationshipDialog").showModal();
-});
-$("processMapRelationshipExisting").addEventListener("change", event =>
-  populateProcessRelationshipEditor(event.currentTarget.value));
-$("saveProcessMapRelationship").addEventListener("click", () => {
-  const targetId = $("processMapRelationshipTarget").value;
-  if (!activeReview || !selectedProcessMapNodeId || !targetId) return;
-  const existingId = $("processMapRelationshipExisting").value;
-  const id = existingId || globalThis.T9ProcessMapRelationshipOverrides.createId(
-    selectedProcessMapNodeId, targetId,
-    (activeReview.processMapRelationshipOverrides || []).length + 1);
-  activeReview.processMapRelationshipOverrides =
-    globalThis.T9ProcessMapRelationshipOverrides.upsert(
-      activeReview.processMapRelationshipOverrides || [], { relationshipId: id,
-        fromNodeId: selectedProcessMapNodeId, toNodeId: targetId,
-        transitionType: $("processMapRelationshipType").value,
-        label: $("processMapRelationshipLabel").value, deleted: false });
-  activeReview.updatedAt = new Date().toISOString(); reviewAutoSave.schedule();
-  $("processMapRelationshipDialog").close(); renderProcessOverview();
-});
-$("deleteProcessMapRelationship").addEventListener("click", () => {
-  const id = $("processMapRelationshipExisting").value;
-  const edge = (activeProcessModel?.transitions || []).find((item, index) =>
-    processRelationshipId(item, index) === id);
-  if (!activeReview || !edge) return;
-  activeReview.processMapRelationshipOverrides =
-    globalThis.T9ProcessMapRelationshipOverrides.upsert(
-      activeReview.processMapRelationshipOverrides || [], { relationshipId: id,
-        fromNodeId: edge.fromNodeId, toNodeId: edge.toNodeId,
-        transitionType: edge.transitionType, label: edge.label || "", deleted: true });
-  activeReview.updatedAt = new Date().toISOString(); reviewAutoSave.schedule();
-  $("processMapRelationshipDialog").close(); renderProcessOverview();
-});
-$("processMapLevels").addEventListener("click", async event => {
-  const button = event.target.closest("[data-process-map-level]");
-  if (!button || button.disabled) return;
-  if (button.dataset.processMapLevel !== "procedure" && !activeProcessAnalysis) {
-    try {
-      await loadProcessAnalysis();
-    } catch (error) {
-      $("processOverview").innerHTML = `<p class="muted">${escapeHtml(uiTf(
-        "process.overviewError", { detail: error.message }
-      ))}</p>`;
-      return;
-    }
-  }
-  activeProcessMapLevel = button.dataset.processMapLevel;
-  renderProcessOverview();
-  $("processOverview").querySelector("[data-process-node-action]")?.focus();
-});
-function changeProcessMapZoom(value) {
-  processMapZoom = globalThis.T9ProcessMapViewport.normalize(value);
-  try {
-    globalThis.localStorage?.setItem(PROCESS_MAP_ZOOM_STORAGE_KEY,
-      String(processMapZoom));
-  } catch {
-    // The selected zoom remains active for the current dashboard session.
-  }
-  renderProcessOverview();
-}
-$("processMapZoomOut").addEventListener("click", () => changeProcessMapZoom(
-  processMapZoom - globalThis.T9ProcessMapViewport.STEP
-));
-$("processMapZoomIn").addEventListener("click", () => changeProcessMapZoom(
-  processMapZoom + globalThis.T9ProcessMapViewport.STEP
-));
-$("processMapResetZoom").addEventListener("click", () => changeProcessMapZoom(100));
-$("processMapFit").addEventListener("click", () => changeProcessMapZoom(
-  globalThis.T9ProcessMapViewport.measureFit($("processOverview"), processMapZoom)
-));
-$("processMapDirection").addEventListener("change", event => {
-  processMapDirection = normalizedProcessMapDirection(event.currentTarget.value);
-  try {
-    globalThis.localStorage?.setItem(PROCESS_MAP_DIRECTION_STORAGE_KEY,
-      processMapDirection);
-  } catch {
-    // The selected direction remains active for the current dashboard session.
-  }
-  renderProcessOverview();
-});
-$("processMapTheme").addEventListener("change", event => {
-  processMapTheme = globalThis.T9ProcessMapTheme.normalize(event.currentTarget.value);
-  try {
-    globalThis.localStorage?.setItem(PROCESS_MAP_THEME_STORAGE_KEY, processMapTheme);
-  } catch {
-    // The selected theme remains active for the current dashboard session.
-  }
-  renderProcessOverview();
-});
-$("processMapDensity").addEventListener("change", event => {
-  processMapDensity = normalizedProcessMapDensity(event.currentTarget.value);
-  try {
-    globalThis.localStorage?.setItem(PROCESS_MAP_DENSITY_STORAGE_KEY, processMapDensity);
-  } catch {
-    // The selected density remains active for the current dashboard session.
-  }
-  renderProcessOverview();
-});
-$("processMapIncludeReferences").addEventListener("change", event => {
-  processMapIncludeReferences = event.currentTarget.checked;
-  renderProcessOverview();
-});
-$("processMapFocus").addEventListener("click", () => setProcessMapFocus(
-  !$("processOverviewDisclosure").classList.contains("process-map-focus")
-));
-function applyProcessMapSearch(advance) {
-  const actions = [...$("processOverview").querySelectorAll("[data-process-node-action]")];
-  const matches = globalThis.T9ProcessMapSearch.find(
-    actions.map(action => action.textContent), $("processMapSearch").value
-  );
-  const matchIndexes = new Set(matches.map(match => match.index));
-  if (advance) processMapSearchCursor = globalThis.T9ProcessMapSearch.next(
-    matches, processMapSearchCursor
-  );
-  if (!matchIndexes.has(processMapSearchCursor)) processMapSearchCursor = -1;
-  actions.forEach((action, index) => {
-    action.classList.toggle("process-map-search-match", matchIndexes.has(index));
-    action.classList.toggle("process-map-search-current", index === processMapSearchCursor);
-  });
-  const hasQuery = Boolean($("processMapSearch").value.trim());
-  const resultLabel = matches.length === 1
-    ? processMapEditorLabel("match", "träff")
-    : processMapEditorLabel("matches", "träffar");
-  $("processMapSearchResult").textContent = hasQuery
-    ? `${matches.length} ${resultLabel}` : "";
-  $("processMapSearchNext").disabled = !matches.length;
-  if (processMapSearchCursor >= 0) {
-    actions[processMapSearchCursor]?.scrollIntoView?.({ block: "nearest", inline: "center" });
-  }
-}
-$("processMapSearch").addEventListener("input", () => {
-  processMapSearchCursor = -1;
-  applyProcessMapSearch(false);
-});
-$("processMapSearch").addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    applyProcessMapSearch(true);
-  } else if (event.key === "Escape" && event.currentTarget.value) {
-    event.stopPropagation();
-    event.currentTarget.value = "";
-    processMapSearchCursor = -1;
-    applyProcessMapSearch(false);
-  }
-});
-$("processMapSearchNext").addEventListener("click", () => applyProcessMapSearch(true));
-document.addEventListener("keydown", event => {
-  if (event.key !== "Escape" ||
-      !$("processOverviewDisclosure").classList.contains("process-map-focus")) return;
-  event.preventDefault();
-  setProcessMapFocus(false);
-});
-function scheduleProcessMapLayout() {
-  if (!activeReview || !$('processOverviewDisclosure')?.open || processMapResizeFrame) return;
-  processMapResizeFrame = requestAnimationFrame(() => {
-    processMapResizeFrame = null;
-    renderProcessOverview();
-  });
-}
-window.addEventListener("resize", scheduleProcessMapLayout);
-$("processOverviewDisclosure").addEventListener("toggle", event => {
-  if (event.currentTarget.open) scheduleProcessMapLayout();
-});
-$("processMapLevels").addEventListener("keydown", event => {
-  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-  const buttons = [...event.currentTarget.querySelectorAll(
-    "[data-process-map-level]:not(:disabled)"
-  )];
-  const current = buttons.indexOf(event.target);
-  if (current < 0) return;
-  const index = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 :
-    (current + (event.key === "ArrowLeft" ? -1 : 1) + buttons.length) % buttons.length;
-  event.preventDefault();
-  buttons[index].focus();
-  buttons[index].click();
-});
-$("exportProcessModel").addEventListener("click", () =>
-  exportActiveProcess("model"));
-$("exportProcessDiagram").addEventListener("click", () =>
-  exportActiveProcess("diagram"));
-$("saveProcessVersion").addEventListener("click", saveCurrentProcessVersion);
-$("compareProcessVersions").addEventListener("click",
-  openProcessVersionComparison);
-$("processVersionFrom").addEventListener("change",
-  renderProcessVersionComparison);
-$("processVersionTo").addEventListener("change",
-  renderProcessVersionComparison);
-$("processOverview").addEventListener("keydown", event => {
-  const action = event.target.closest?.("[data-process-node-action]");
-  if (!action || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
-    "Home", "End"].includes(event.key)) {
-    return;
-  }
-  const actions = [...$("processOverview").querySelectorAll(
-    "[data-process-node-action]"
-  )];
-  const current = actions.indexOf(action);
-  const next = event.key === "Home" ? 0 : event.key === "End"
-    ? actions.length - 1 : Math.max(0, Math.min(actions.length - 1,
-      current + (["ArrowLeft", "ArrowUp"].includes(event.key) ? -1 : 1)));
-  event.preventDefault();
-  actions[next]?.focus();
 });
 $("workspaceTabs").addEventListener("keydown", event => {
   const workspace = globalThis.T9WorkspaceController.workspaceFromKey(
@@ -10642,36 +9740,6 @@ $("openReviewDocumentFields").addEventListener("click", () => {
     $("reviewDocumentLanguage").focus();
   });
 });
-$("openProcessAnalysis").addEventListener("click", openProcessAnalysisDialog);
-$("processAnalysisContent").addEventListener("change", event => {
-  if (event.target.matches('input[name="processAnalysisReference"], input[name="processAnalysisVariant"]')) {
-    $("useSelectedReference").disabled = false;
-  }
-});
-$("confirmProcessAnalysis").addEventListener("click", () => {
-  const model = globalThis.T9ProcessAnalysisView.normalize(
-    activeProcessAnalysis || {}, activeReview?.processAnalysis
-  );
-  const reference = globalThis.T9ProcessAnalysisView.selectedReference(
-    $("processAnalysisContent"), model
-  );
-  const variant = reference.id === model.referenceId
-    ? globalThis.T9ProcessAnalysisView.selectedVariant(
-      $("processAnalysisContent"), model)
-    : null;
-  persistProcessAnalysisDecision(reference, "confirmed", variant);
-});
-$("useSelectedReference").addEventListener("click", () => {
-  const model = globalThis.T9ProcessAnalysisView.normalize(
-    activeProcessAnalysis || {}, activeReview?.processAnalysis
-  );
-  const reference = globalThis.T9ProcessAnalysisView.selectedReference(
-    $("processAnalysisContent"), model
-  );
-  const variant = globalThis.T9ProcessAnalysisView.selectedVariant(
-    $("processAnalysisContent"), model);
-  persistProcessAnalysisDecision(reference, "selected", variant);
-});
 $("expectedResultEditor").addEventListener("input", event => {
   globalThis.T9Review.setDocumentField(
     activeReview,
@@ -10684,36 +9752,7 @@ $("expectedResultEditor").addEventListener("input", event => {
   invalidateDocumentWorkspace();
   applyReviewToolbarState();
 });
-$("reviewDocumentProfile").addEventListener("change", async event => {
-  const profile = documentProfiles().find(value => value.profileId === event.currentTarget.value);
-  if (!profile || !activeReviewSession || !activeReview) return;
-  const session = activeReviewSession;
-  const review = activeReview;
-  const select = event.currentTarget;
-  select.disabled = true;
-  $("reviewDocumentProfileStatus").textContent = uiT("review.profileSaving");
-  try {
-    await updateDocumentLibraryRecord(session.id, {
-      profile: { profileId: profile.profileId, displayName: profile.displayName },
-      theme: { themeId: profile.theme.themeId, displayName: profile.theme.themeId }
-    });
-    if (activeReview !== review || activeReviewSession !== session) return;
-    activeDocumentProfileId = profile.profileId;
-    invalidateDocumentWorkspace();
-    renderReviewContent();
-    await synchronizeDocumentWorkspace();
-    if (activeReview === review && activeReviewSession === session) {
-      $("reviewDocumentProfileStatus").textContent = uiT("review.profileSaved");
-    }
-  } catch (error) {
-    if (activeReview === review && activeReviewSession === session) {
-      renderDocumentProfileChoice();
-      $("reviewDocumentProfileStatus").textContent = error.message;
-    }
-  } finally {
-    select.disabled = false;
-  }
-});
+
 
 $("reviewDocumentLanguage").addEventListener("change", event => {
   const documentLanguage = globalThis.T9LanguageRegistry.normalize(
@@ -10959,21 +9998,6 @@ globalThis.T9ReviewSelection.bind($("reviewList"), {
   dispatch: dispatchReviewSelection,
   move: moveReviewTasksByOffset
 });
-globalThis.T9ProcessMapDrag.bind($("processOverview"), {
-  move({ draggedId, targetId, position }) {
-    if (!activeReview || !activeProcessBaseModel || activeProcessMapLevel === "procedure") return;
-    activeReview.processMapOverrides = globalThis.T9ProcessMapOverrides.moveTo(
-      activeReview.processMapOverrides || [], activeProcessBaseModel,
-      draggedId, targetId, position
-    );
-    activeReview.updatedAt = new Date().toISOString();
-    reviewAutoSave.schedule();
-    selectedProcessMapNodeId = draggedId;
-    renderProcessOverview();
-    globalThis.T9ProcessOverviewView.selectNode($("processOverview"), draggedId);
-  }
-});
-
 globalThis.T9ReviewMove.bind($("reviewList"), {
   move: moveReviewTasksTo
 });
@@ -11004,9 +10028,9 @@ $("settingsPanel").querySelector(".settings-nav").addEventListener("click", even
     $(item.getAttribute("aria-controls")).hidden = item !== button;
   }
 });
-for (const id of ["librarySearch", "libraryProfileFilter",
+for (const id of ["librarySearch",
   "libraryThemeFilter", "libraryLanguageFilter", "librarySort",
-  "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
+  "libraryFavouriteFilter", "libraryRecentFilter",
   "libraryCreatedFrom", "libraryCreatedTo", "libraryModifiedFrom",
   "libraryModifiedTo"]) {
   $(id)?.addEventListener(id === "librarySearch" ? "input" : "change",
@@ -11036,14 +10060,17 @@ $("libraryResults").addEventListener("click", async event => {
     "[data-library-project-id]"
   )].map(element => element.dataset.libraryProjectId);
   const selectionControl = event.target.closest?.('[data-library-action="select"]');
+  // A click on the checkbox label also reaches the checkbox itself, which does the selecting.
+  if (!selectionControl && event.target.closest?.(".library-select")) return;
   const cardAction = event.target.closest?.("[data-library-action], [data-library-menu]");
+  // In Select several a click anywhere on the row marks or unmarks it, like its checkbox.
   // Outside selection mode a click on the row only selects with Ctrl, Cmd or Shift.
   if (selectionControl || (!cardAction && (librarySelectMode ||
       event.shiftKey || event.ctrlKey || event.metaKey))) {
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.select(
       documentLibrarySelection, visibleIds, projectId, {
         shift: event.shiftKey,
-        toggle: Boolean(selectionControl || event.ctrlKey || event.metaKey)
+        toggle: Boolean(selectionControl || librarySelectMode || event.ctrlKey || event.metaKey)
       }
     );
     renderDocumentLibrarySelection();
@@ -11070,6 +10097,11 @@ $("libraryResults").addEventListener("click", async event => {
   if (menuAction) {
     menuAction.closest("details").open = false;
     await runLibraryMenuAction(menuAction.dataset.libraryAction, projectId, card);
+    return;
+  }
+  // A reviewed document offers Run test on the card itself.
+  if (event.target.closest?.('.library-card-footer [data-library-action="run-test"]')) {
+    await runLibraryMenuAction("run-test", projectId, card);
     return;
   }
   if (!event.target.closest?.('[data-library-action="open"]')) return;
@@ -11328,7 +10360,7 @@ $("libraryBatchFavourite").addEventListener("click", async () => {
   }
 });
 for (const [id, mode] of [["libraryBatchTags", "tags"],
-  ["libraryBatchProfile", "profile"], ["libraryBatchTheme", "theme"],
+  ["libraryBatchTheme", "theme"],
   ["libraryBatchMetadata", "metadata"]]) {
   $(id).addEventListener("click", () => openBatchMetadataDialog(mode));
 }
@@ -11457,5 +10489,27 @@ async function initializeDashboard() {
     }
   }
 }
+
+// The library heading stays under the app bar; their heights keep scrolled-to cards and keyboard
+// focus clear of both.
+(() => {
+  const appbar = document.querySelector(".home-appbar");
+  const head = $("libraryHead");
+  const batch = $("libraryBatchToolbar");
+  if (!appbar || !head || !batch || typeof ResizeObserver !== "function") return;
+  const update = () => {
+    const root = document.documentElement.style;
+    root.setProperty("--home-appbar-height", `${appbar.offsetHeight}px`);
+    root.setProperty("--library-head-height", `${head.offsetHeight}px`);
+    // How far the heading scrolls away in a small window before the batch actions stay.
+    root.setProperty("--library-batch-offset", batch.hidden ? "0px" : `${Math.max(0,
+      Math.round(batch.getBoundingClientRect().top - head.getBoundingClientRect().top) - 6)}px`);
+  };
+  const observer = new ResizeObserver(update);
+  observer.observe(appbar);
+  observer.observe(head);
+  observer.observe(batch);
+  update();
+})();
 
 initializeDashboard();

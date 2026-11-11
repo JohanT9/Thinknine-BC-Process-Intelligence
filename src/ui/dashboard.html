@@ -5,7 +5,7 @@
 <script src="appearance.js"></script>
 <link rel="stylesheet" href="theme.css">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BC Process Studio — BC Knowledge Base</title>
+<title>BC Process Studio</title>
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;max-width:1120px;margin:0 auto 40px;padding:0 20px;color:var(--c-fg-1f2933)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -33,8 +33,16 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-card[data-selected="true"]{outline:3px solid var(--c-bd-0f6cbd);outline-offset:1px}.library-card:focus-visible{outline:3px solid var(--c-bd-0f6cbd)}
 .library-card-heading{display:flex;gap:8px;align-items:start}.library-card h4{margin:0;flex:1}.library-language{background:var(--c-bg-006f73);color:var(--c-fg-ffffff);border-radius:3px;font-size:11px;font-weight:700;padding:3px 5px}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:var(--c-fg-7c5800)}
 .library-profile{color:var(--c-fg-0f4c81);font-weight:600}.library-tags{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.library-tags span{background:var(--c-bg-edf2f7);border-radius:99px;padding:3px 8px;font-size:12px}
-.library-empty{grid-column:1/-1;padding:28px;text-align:center;background:var(--c-bg-f8fafc);border-radius:8px}.library-status{min-height:20px}
-.library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:var(--c-bg-eef6ff);border:1px solid var(--c-bd-9bc4e2);border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
+.library-empty{grid-column:1/-1;padding:28px;text-align:center;background:var(--c-bg-f8fafc);border-radius:8px}.library-first-run{text-align:left;max-width:640px;margin:0 auto}.library-first-run h4{margin:0 0 10px;font-size:17px}.library-first-run ol{margin:0 0 12px;padding-left:22px;display:grid;gap:6px;line-height:1.5}.library-first-run p{margin:0;line-height:1.5}.library-empty-store .library-primary-controls,.library-empty-store .library-quick-row,.library-empty-store #libraryFolders,.library-empty-store #libraryExport,.library-empty-store #libraryStatus{display:none}.library-empty-store .library-transfer-pair button{flex:0 0 auto}.library-status{min-height:20px}
+.library-results[data-select-mode=true] .library-card{cursor:pointer;user-select:none}
+/* The heading, tools, folders and count stay under the app bar while the documents scroll beneath them.
+   A short or narrow window keeps them in the page so the list keeps its room; there only the batch
+   actions stay in view while several documents are selected. */
+.library-head{position:sticky;top:var(--home-appbar-height,0px);z-index:15;max-height:calc(100vh - var(--home-appbar-height,0px));overflow-y:auto;margin-inline:-6px;padding:0 6px 6px;background:var(--colorBackgroundCanvas);box-shadow:0 0 0 100vmax var(--colorBackgroundCanvas),0 1px 0 100vmax var(--colorBorderSubtle);clip-path:inset(0 -100vmax -1px)}
+.library-head .library-status{margin-bottom:0}
+html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + var(--library-head-height,0px) + 8px)}
+@media (max-height:600px),(max-width:640px){.library-head{position:static;max-height:none;overflow:visible;box-shadow:none;clip-path:none}html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + 8px)}.library-head:has(#libraryBatchToolbar:not([hidden])){position:sticky;top:calc(var(--home-appbar-height,0px) - var(--library-batch-offset,0px))}html:has(#documentsView:not([hidden])):has(#libraryBatchToolbar:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + var(--library-head-height,0px) - var(--library-batch-offset,0px) + 8px)}}
+.library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:var(--c-bg-eef6ff);border:1px solid var(--c-bd-9bc4e2);border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto max-content minmax(0,1fr);gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
 .library-batch-more{position:relative}.library-batch-more>summary{cursor:pointer;font-weight:600;padding:9px 13px;background:var(--c-bg-e5e7eb);border-radius:5px;color:var(--c-fg-374151)}.library-batch-more[open]{width:100%;padding-top:4px}.library-batch-more[open]>summary{width:max-content;margin-bottom:7px}.library-batch-more button{margin-right:6px}
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:hidden}
 .review-overlay.open{display:block}
@@ -69,12 +77,6 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-selection-count{display:inline-flex;align-items:center;gap:8px;margin-right:8px;font-size:13px;font-weight:600}
 .review-selection-count dd{margin:0;padding:2px 7px;border-radius:12px;background:var(--c-bg-007e87);color:var(--c-fg-ffffff)}
 .review-selection-actions button{margin:0}
-[data-feature][hidden]{display:none!important}.process-analysis-trigger{display:inline-flex;align-items:center;gap:7px}.process-analysis-trigger output{min-width:28px;padding:2px 6px;border-radius:999px;background:var(--c-bg-d9f3f2);color:var(--c-fg-075c5b);font-size:12px;font-weight:700}.process-analysis-dialog{width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 32px);border:0;border-radius:10px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:0}.process-analysis-dialog::backdrop{background:rgba(15,23,42,.45)}.process-analysis-dialog form{display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-height:calc(100vh - 32px)}.process-analysis-dialog header,.process-analysis-dialog footer{padding:18px 22px;background:var(--c-bg-ffffff)}.process-analysis-dialog header{border-bottom:1px solid var(--c-bd-d8dee5)}.process-analysis-dialog header h3{margin:0 0 4px}.process-analysis-dialog footer{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--c-bd-d8dee5)}.process-analysis-dialog footer #processAnalysisStatus{margin-right:auto}.process-analysis-content{padding:20px 22px;overflow:auto;background:var(--c-bg-f7f9fb)}.process-analysis-loading{padding:40px;text-align:center}.process-analysis-summary{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:18px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-ccd6df);border-radius:8px}.process-analysis-summary h4{font-size:20px;margin:4px 0}.process-analysis-summary p{margin:0;color:var(--c-fg-526273)}.process-analysis-eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--c-fg-087f7e)}.process-analysis-confidence{text-align:center}.process-analysis-confidence strong{display:block;font-size:26px;color:var(--c-fg-087f7e)}.process-analysis-confidence span{font-size:12px;color:var(--c-fg-526273)}.process-analysis-meter{height:7px;background:var(--c-bg-dfe5ea);border-radius:999px;overflow:hidden;margin:10px 0 14px}.process-analysis-meter span{display:block;height:100%;background:var(--c-bg-008c8c)}.process-analysis-confirmed{padding:9px 12px;background:var(--c-bg-e6f7ef);border-left:4px solid var(--c-bd-15803d)}.process-analysis-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.process-analysis-metric{padding:12px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5);border-radius:7px}.process-analysis-metric strong{display:block;font-size:20px}.process-analysis-metric span{color:var(--c-fg-526273)}.process-analysis-metric.matched strong{color:var(--c-fg-15803d)}.process-analysis-metric.missing strong{color:var(--c-fg-a16207)}.process-analysis-metric.conditional strong{color:var(--c-fg-6d28d9)}.process-analysis-metric.additional strong{color:var(--c-fg-0369a1)}.process-analysis-advisory{margin:12px 0;color:var(--c-fg-526273)}.process-analysis-columns{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.process-analysis-list{padding:14px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5);border-radius:7px}.process-analysis-list.conditional{border-style:dashed;border-color:var(--c-bd-7c3aed)}.process-analysis-list h4{display:flex;justify-content:space-between;margin:0 0 10px}.process-analysis-list h4 span{font-size:12px;border-radius:999px;background:var(--c-bg-edf1f5);padding:2px 7px}.process-analysis-list ul{margin:0;padding-left:20px}.process-analysis-list li{margin:5px 0}.process-analysis-list p{color:var(--c-fg-526273)}.process-analysis-alternatives{margin-top:16px;padding:12px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5)}.process-analysis-alternatives label{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px}.process-analysis-alternatives input{width:auto}.process-analysis-empty{padding:28px;text-align:center;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5);border-radius:8px}
-.process-analysis-assessment{display:flex;justify-content:space-between;gap:12px;margin:0 0 12px;padding:10px 12px;border-left:4px solid var(--c-bd-a16207);background:var(--c-bg-fff7df)}.process-analysis-assessment span{color:var(--c-fg-526273)}.process-analysis-assessment.auto-classifiable{border-color:var(--c-bd-15803d);background:var(--c-bg-e6f7ef)}.process-analysis-assessment.insufficient-evidence{border-color:var(--c-bd-b42318);background:var(--c-bg-fff0ee)}
-.process-analysis-variant{display:grid;grid-template-columns:minmax(180px,auto) 1fr;gap:8px 20px;align-items:center;margin:10px 0 0;padding:12px 16px;border:1px solid var(--c-bd-d8dee5);border-radius:8px;background:var(--c-bg-ffffff)}.process-analysis-variant span{font-size:12px;color:var(--c-fg-526273)}.process-analysis-variant h4{margin:2px 0 0}.process-analysis-variant p{margin:0;color:var(--c-fg-526273)}.process-analysis-variant details{grid-column:1/-1}.process-analysis-variant details ul{margin:7px 0 0}
-.process-analysis-variant-options{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}.process-analysis-variant-options label{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--c-bd-b9c4ce);border-radius:6px;background:var(--c-bg-ffffff)}.process-analysis-variant-options input{width:auto;margin:0}.process-analysis-variant-options small{padding:2px 6px;border-radius:999px;background:var(--c-bg-e6f7ef);color:var(--c-fg-166534)}
-.process-analysis-evidence{margin:12px 0;padding:10px 12px;border:1px solid var(--c-bd-d8dee5);border-radius:7px;background:var(--c-bg-ffffff)}.process-analysis-evidence summary{cursor:pointer;font-weight:700}.process-analysis-evidence dl{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0 0}.process-analysis-evidence dl div{min-width:0}.process-analysis-evidence dt{font-size:12px;color:var(--c-fg-526273)}.process-analysis-evidence dd{margin:3px 0 0;font-weight:600}
-.process-map-node-dialog{width:min(520px,calc(100vw - 32px));border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3)}.process-map-node-dialog::backdrop{background:rgba(15,23,42,.45)}.process-map-node-dialog form{display:grid;gap:8px}.process-map-node-dialog h3{margin:0 0 8px}.process-map-node-dialog input,.process-map-node-dialog select{margin:0 0 8px}.process-map-node-dialog form>div,.process-map-node-dialog footer{display:flex;flex-wrap:wrap;gap:8px}.process-map-node-dialog footer{justify-content:flex-end;margin-top:10px}
 .review-progress{height:10px;background:var(--c-bg-e5e7eb);border-radius:99px;overflow:hidden;margin-top:12px}
 .review-progress-bar{height:100%;background:var(--c-bg-0f6cbd);width:0}
 .review-status{display:flex;flex-wrap:wrap;gap:18px;margin:12px 0 0;padding:10px 12px;background:var(--c-bg-f3f6fa);border-radius:7px}
@@ -164,7 +166,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-technical-details{margin:8px 0;color:var(--c-fg-52606d);font-size:12px}.review-technical-details>summary{cursor:pointer;width:max-content}.review-meta{font-size:12px;color:var(--c-fg-52606d);margin:6px 0}
 .review-actions{display:flex;align-self:start;align-items:center;justify-content:flex-end;gap:8px;position:relative;min-height:32px;margin-top:9px}
 .review-actions button{margin:0}
-.review-approve-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;margin:0;white-space:nowrap}
+.review-card[data-active-step=true]:not([data-review-state=approved]) .review-approve-action{display:none}.review-approve-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;margin:0;white-space:nowrap}
 .review-step-actions-menu{position:relative}.review-step-actions-trigger{display:grid;place-items:center;box-sizing:border-box;width:36px;height:32px;min-height:32px;padding:0;border:1px solid var(--c-bd-b8c2cc);border-radius:4px;background:var(--c-bg-ffffff);color:var(--c-fg-172b4d);cursor:pointer;font-size:20px;line-height:1}.review-step-actions-trigger:hover,.review-step-actions-menu.is-open>.review-step-actions-trigger{background:var(--c-bg-f3f6fa)}.review-step-actions-trigger:focus-visible{outline:3px solid var(--c-bd-0f6cbd);outline-offset:2px}.review-step-actions-panel{position:absolute;z-index:6;top:calc(100% + 5px);right:0;display:grid;gap:5px;width:190px;max-height:min(65vh,440px);overflow:auto;padding:8px;border:1px solid var(--c-bd-c8d2dc);border-radius:7px;background:var(--c-bg-ffffff);box-shadow:0 10px 30px rgba(15,23,42,.2)}.review-step-actions-panel button{width:100%;text-align:left}.review-step-actions-panel button.danger{background:var(--c-bg-ffffff);color:var(--c-fg-a4262c)}
 .review-screenshot{margin-top:10px}
 .review-image-stage{position:relative;display:block;width:fit-content;max-width:100%;line-height:0}
@@ -185,32 +187,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-document-fields textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical}
 .review-document-fields-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
 .review-document-fields-actions p{margin:0}
-.process-overview-card{margin:16px 0;border:1px solid var(--c-bd-d8dee5);border-radius:7px;background:var(--c-bg-ffffff)}.process-overview-card>summary{cursor:pointer;padding:12px 14px;font-weight:600}.process-overview-help{margin:0;padding:0 14px 10px}.process-diagram-scroll{overflow-x:auto;padding:2px 14px 12px;scrollbar-gutter:stable}.process-diagram-scroll:focus-visible{outline:2px solid var(--c-bd-0f6cbd);outline-offset:-2px}.process-overview-list{list-style:none;margin:0;padding:4px 0 12px;display:flex;align-items:stretch;gap:42px;min-width:max-content}.process-overview-step{position:relative;display:flex;width:250px;scroll-snap-align:start}.process-overview-step:not(:last-child)::after{content:"→";position:absolute;right:-31px;top:50%;width:20px;color:var(--c-fg-52606d);font-size:22px;font-weight:700;text-align:center;transform:translateY(-50%)}.process-overview-step[data-process-decision="true"]::after{content:""}.process-overview-action{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;gap:10px;width:100%;min-height:112px;margin:0;padding:10px;border:1px solid var(--c-bd-b8c2cc);border-radius:6px;background:var(--c-bg-ffffff);color:inherit;text-align:left}.process-overview-action:hover{background:var(--c-bg-f3f6fa)}.process-overview-action[aria-pressed="true"]{border-color:var(--c-bd-0f6cbd);background:var(--c-bg-eef6fc);box-shadow:0 0 0 1px var(--c-ot-0f6cbd)}.process-overview-number{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--c-bd-8392a5);border-radius:50%;background:var(--c-bg-f3f6fa);font-weight:700}.process-overview-decision .process-overview-action{border-color:var(--c-bd-8a6d1d);background:var(--c-bg-fffaf0)}.process-overview-decision .process-overview-number{border-color:var(--c-bd-8a6d1d);border-radius:4px;background:var(--c-bg-fff3cd);transform:rotate(45deg)}.process-overview-decision .process-overview-number::first-letter{transform:rotate(-45deg)}.process-overview-content,.process-overview-state,.process-overview-change,.process-overview-phase,.process-overview-subtask,.process-overview-node-type{display:block}.process-overview-node-type{margin-bottom:3px;color:var(--c-fg-765b00);font-size:12px;font-weight:700;text-transform:uppercase}.process-overview-phase{margin-bottom:3px;color:var(--c-fg-52606d);font-size:12px;font-weight:700;text-transform:uppercase}.process-overview-subtask{margin-bottom:5px;color:var(--c-fg-52606d);font-size:12px}.process-overview-state{margin-top:8px;color:var(--c-fg-52606d);font-size:12px}.process-overview-change+.process-overview-change{margin-top:3px}.process-overview-routes{margin:5px 0 0;padding-left:18px}.process-overview-routes.compact{display:grid;gap:4px;padding:0}.process-overview-route{display:flex;align-items:baseline;gap:5px}.process-overview-routes.compact .process-overview-route{padding:4px 6px;border-left:3px solid var(--c-bd-8a6d1d);background:var(--c-bg-ffffff)}.process-overview-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin:0 14px 14px;padding:12px 14px;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-f7f9fb)}.process-overview-detail-label{display:block;margin-bottom:4px;color:var(--c-fg-52606d);font-size:12px}.process-overview-detail-context{display:flex;flex-wrap:wrap;align-items:start;gap:6px}.process-overview-detail-context span{padding:3px 8px;border-radius:999px;background:var(--c-bg-e5edf5)}.process-overview-detail ul{margin:0;padding-left:18px}.process-overview-detail p{margin:0}@media(max-width:760px){.process-overview-detail{grid-template-columns:1fr}.process-overview-step{width:220px}}
-.process-overview-decision .process-overview-number>span{transform:rotate(-45deg)}
-.process-overview-list{display:grid;grid-template-columns:repeat(var(--process-columns),minmax(0,190px));min-width:0;gap:30px}.process-overview-step{width:auto}.process-overview-row-end::after{content:"↓"!important;right:calc(50% - 10px)!important;top:auto!important;bottom:-29px;transform:none!important;border-radius:50%;background:var(--c-bg-eaf3f8)}.process-overview-row-end+*{grid-column-start:1}@media(max-width:620px){.process-overview-list{grid-template-columns:repeat(var(--process-columns),minmax(0,170px))}}
-.process-overview-detail .process-overview-route{display:grid;grid-template-columns:auto auto 1fr;gap:5px}.process-overview-route-meta{grid-column:1/-1;color:var(--c-fg-52606d);font-size:12px}
-.process-overview-detail-explanation p{line-height:1.5}.process-overview-detail-source{display:block;margin-top:7px;font-size:12px}
 .review-knowledge-explanation{margin:8px 0 12px;padding:9px 11px;border-left:3px solid var(--c-bd-087f7e);background:var(--c-bg-f0f8f7)}.review-knowledge-explanation strong{display:block;margin-bottom:4px}.review-knowledge-explanation p{margin:0;line-height:1.5}.review-knowledge-source{display:block;margin-top:5px;font-size:12px}.review-knowledge-export-choice{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;cursor:pointer}.review-knowledge-export-choice input{margin:0}.review-knowledge-explanation-actions,.review-knowledge-explanation-editor-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.review-knowledge-explanation-editor textarea{box-sizing:border-box;width:100%;min-height:90px;margin:4px 0 0;padding:8px;font:inherit;line-height:1.45;resize:vertical}
 .review-knowledge-basis{display:block;margin-top:4px;font-size:12px;color:var(--c-fg-4b5563)}
 .review-load-status{margin:8px 0;padding:6px 0;color:var(--c-fg-536477);font-size:13px}
-.process-overview-detail-explanation p{line-height:1.5}.process-overview-detail-source{display:block;margin-top:7px;font-size:12px}
-.process-map-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 14px 12px}.process-map-levels{display:inline-flex;border:1px solid var(--c-bd-aeb8c2);border-radius:6px;overflow:hidden}.process-map-levels button{margin:0;border:0;border-right:1px solid var(--c-bd-aeb8c2);border-radius:0;background:var(--c-bg-ffffff);min-height:34px}.process-map-levels button:last-child{border-right:0}.process-map-levels button[aria-pressed="true"]{background:var(--c-bg-087f7e);color:var(--c-fg-ffffff)}.process-map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-left:auto;font-size:12px;color:var(--c-fg-526273)}.process-map-legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:4px;border-radius:2px;vertical-align:-1px}.process-map-legend .observed::before{background:var(--c-bg-dff3e5);border:1px solid var(--c-bd-15803d)}.process-map-legend .suggested::before{background:var(--c-bg-fff8e1);border:1px dashed var(--c-bd-a16207)}.process-map-legend .conditional::before{background:var(--c-bg-f5f3ff);border:1px dashed var(--c-bd-7c3aed)}.process-map-legend .customerSpecific::before{background:var(--c-bg-e0f2fe);border:1px solid var(--c-bd-0369a1)}.process-overview-semantic-state{display:inline-flex;margin-top:7px;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:600}.process-overview-semantic-state.observed{background:var(--c-bg-dff3e5);color:var(--c-fg-166534)}.process-overview-semantic-state.suggested{background:var(--c-bg-fff8e1);color:var(--c-fg-854d0e)}.process-overview-semantic-state.conditional{background:var(--c-bg-f5f3ff);color:var(--c-fg-6d28d9)}.process-overview-semantic-state.customerSpecific{background:var(--c-bg-e0f2fe);color:var(--c-fg-075985)}.process-overview-semantic-state.reference{background:var(--c-bg-eef1f4);color:var(--c-fg-44546a)}.process-overview-semantic-suggested .process-overview-action{border-style:dashed;border-color:var(--c-bd-a16207);background:var(--c-bg-fffdf5)}.process-overview-semantic-conditional .process-overview-action{border-style:dashed;border-color:var(--c-bd-7c3aed);background:var(--c-bg-faf8ff)}.process-overview-semantic-customerSpecific .process-overview-action{border-color:var(--c-bd-0369a1);background:var(--c-bg-f0f9ff)}.process-overview-semantic-observed .process-overview-action{border-color:var(--c-bd-4d9f63);background:var(--c-bg-f7fcf8)}@media(max-width:760px){.process-map-legend{width:100%;margin-left:0}.process-map-levels{width:100%}.process-map-levels button{flex:1}}
-.process-map-viewport-controls{display:inline-flex;align-items:center;gap:4px;margin-left:auto}.process-map-viewport-controls button{min-width:34px;min-height:34px;margin:0;padding:5px 9px}.process-map-viewport-controls output{min-width:48px;text-align:center;font-variant-numeric:tabular-nums}.process-map-direction-label{margin:0 3px 0 0;font-size:12px;color:var(--c-fg-526273)}.process-map-viewport-controls select{width:auto;min-width:108px;min-height:34px;margin:0 7px 0 0;padding:5px 25px 5px 8px}@media(max-width:900px){.process-map-viewport-controls{margin-left:0}}
-.process-overview-list[data-process-direction="vertical"]{justify-content:start}.process-overview-list[data-process-direction="vertical"] .process-overview-step{width:190px}
-.process-map-theme-label{margin:0 3px 0 0;font-size:12px;color:var(--c-fg-526273)}.process-map-viewport-controls #processMapTheme{width:auto;min-width:124px}.process-diagram-scroll[data-process-theme="neutral"] .process-overview-action{filter:saturate(.25)}.process-diagram-scroll[data-process-theme="neutral"] .process-overview-lane{border-left-color:var(--c-bd-667785);background:var(--c-bg-f5f6f7)}.process-diagram-scroll[data-process-theme="monochrome"] .process-overview-action{border-color:var(--c-bd-333333)!important;background:var(--c-bg-ffffff)!important;box-shadow:none!important;color:var(--c-fg-111111)}.process-diagram-scroll[data-process-theme="monochrome"] .process-overview-lane{border-left-color:var(--c-bd-222222);background:var(--c-bg-f2f2f2);color:var(--c-fg-111111)}.process-diagram-scroll[data-process-theme="monochrome"] .process-overview-semantic-state{background:var(--c-bg-ffffff);color:var(--c-fg-111111);border:1px solid var(--c-bd-555555)}.process-diagram-scroll[data-process-theme="monochrome"] .process-connector{stroke:var(--c-ot-333333)}.process-diagram-scroll[data-process-theme="monochrome"] .process-connector-marker{fill:var(--c-ot-333333)}
-.process-map-layout-status{padding:3px 7px;border-radius:999px;background:var(--c-bg-edf1f5);color:var(--c-fg-44546a);font-size:11px;font-weight:600}
-.process-diagram-scroll[data-process-theme="neutral"]{background:var(--c-bg-fafafa)}.process-diagram-scroll[data-process-theme="neutral"] .process-overview-action{background:var(--c-bg-eef1f3)}.process-diagram-scroll[data-process-theme="monochrome"] .process-overview-action{border-width:2px!important;border-color:var(--c-bd-111111)!important;background:var(--c-bg-e2e2e2)!important}.process-diagram-scroll[data-process-theme="monochrome"] .process-overview-number{border-color:var(--c-bd-111111);background:var(--c-bg-ffffff)}.process-diagram-scroll[data-process-theme="monochrome"] .process-connector{stroke:var(--c-ot-111111);stroke-width:2.5}.process-diagram-scroll[data-process-theme="monochrome"] .process-connector-marker{fill:var(--c-ot-111111)}
-.process-grammar-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:2px 14px 12px;padding:8px 10px;border:1px solid var(--c-bd-d8dee5);border-radius:5px;background:var(--c-bg-f7f9fb);font-size:12px}.process-grammar-legend-title{font-weight:700}.process-grammar-legend-item{display:inline-flex;align-items:center;gap:5px}.process-grammar-node-symbol{display:inline-block;width:18px;height:12px;border:2px solid var(--c-bd-52606d);border-radius:2px;background:var(--c-bg-ffffff)}.process-grammar-node-symbol[data-kind="business-process"]{border-color:var(--c-bd-31566f);background:var(--c-bg-eaf3f8)}.process-grammar-node-symbol[data-kind="document"]{border-color:var(--c-bd-2878a5);background:var(--c-bg-eef8fd)}.process-grammar-node-symbol[data-kind="posted-document"]{border-color:var(--c-bd-347447);background:var(--c-bg-eef8f0)}.process-grammar-node-symbol[data-kind="posting"],.process-grammar-node-symbol[data-kind="decision"]{border-color:var(--c-bd-7a5b00);background:var(--c-bg-fff4ce)}.process-grammar-node-symbol[data-kind="system-action"]{border-color:var(--c-bd-66558f);border-style:dashed;background:var(--c-bg-f6f2ff)}.process-grammar-node-symbol[data-kind="manual-action"]{border-color:var(--c-bd-8a5a2b);background:var(--c-bg-fff8ef)}.process-grammar-node-symbol[data-kind="data-entity"]{border-color:var(--c-bd-2878a5);background:var(--c-bg-f2f9fc)}.process-grammar-node-symbol[data-kind="external-system"]{border:3px double var(--c-bd-52606d);background:var(--c-bg-f5f6f7)}.process-grammar-node-symbol[data-shape="diamond"]{width:12px;height:12px;transform:rotate(45deg)}.process-grammar-node-symbol[data-shape="terminal"],.process-grammar-node-symbol[data-shape="rounded"]{border-radius:999px}.process-grammar-node-symbol[data-shape="hexagon"]{clip-path:polygon(20% 0,80% 0,100% 50%,80% 100%,20% 100%,0 50%)}.process-grammar-route-symbol{display:inline-block;width:24px;border-top:2px solid var(--c-bd-52606d)}.process-grammar-route-symbol[data-line="dashed"]{border-top-style:dashed}.process-grammar-route-symbol[data-line="dotted"]{border-top-style:dotted}.process-grammar-route-symbol[data-line="double"]{border-top-style:double;border-top-width:4px}
-.process-map-density-label{margin:0 3px 0 0;font-size:12px;color:var(--c-fg-526273)}.process-map-viewport-controls #processMapDensity{width:auto;min-width:102px}.process-diagram-scroll[data-process-density="compact"] .process-overview-list{gap:22px}.process-diagram-scroll[data-process-density="compact"] .process-overview-action{grid-template-columns:26px minmax(0,1fr);min-height:78px;padding:7px;gap:7px;font-size:12px}.process-diagram-scroll[data-process-density="compact"] .process-overview-number{width:24px;height:24px;font-size:11px}.process-diagram-scroll[data-process-density="compact"] .process-overview-node-type,.process-diagram-scroll[data-process-density="compact"] .process-overview-phase,.process-diagram-scroll[data-process-density="compact"] .process-overview-subtask{font-size:10px}.process-diagram-scroll[data-process-density="compact"] .process-overview-semantic-state,.process-diagram-scroll[data-process-density="compact"] .process-overview-review-state{font-size:9px}.process-diagram-scroll[data-process-density="compact"] .process-overview-routes.compact{display:none}
-body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map-focus{position:fixed;inset:10px;z-index:1200;display:flex;flex-direction:column;margin:0;overflow:hidden;background:var(--c-bg-ffffff);box-shadow:0 16px 48px rgba(0,0,0,.28)}.process-overview-card.process-map-focus>summary{flex:0 0 auto}.process-overview-card.process-map-focus #processOverview{flex:1 1 auto;min-height:0;overflow:auto}.process-overview-card.process-map-focus .process-diagram-scroll{min-height:45vh}.process-overview-card.process-map-focus #processMapFocus{border-color:var(--c-bd-087f7e);background:var(--c-bg-e6f5f5)}
-.process-map-search{display:flex;align-items:center;gap:6px;margin:0 14px 10px}.process-map-search label{font-size:12px;font-weight:600}.process-map-search input{width:min(320px,45vw);margin:0}.process-map-search button{margin:0}.process-map-search output{min-width:70px;color:var(--c-fg-526273);font-size:12px}.process-overview-action.process-map-search-match{outline:3px solid var(--c-bd-d99b00);outline-offset:2px}.process-overview-action.process-map-search-current{outline:4px solid var(--c-bd-0f6cbd);outline-offset:2px}
-.process-map-minimap{display:flex;align-items:flex-start;gap:10px;margin:0 14px 10px;padding:8px 10px;border:1px solid var(--c-bd-d8dee5);border-radius:5px;background:var(--c-bg-f7f9fb)}.process-map-minimap>strong{flex:0 0 auto;font-size:12px}.process-map-minimap-grid{display:grid;grid-template-columns:repeat(var(--minimap-columns),18px);grid-template-rows:repeat(var(--minimap-rows),18px);gap:4px;max-height:128px;overflow:auto;padding:2px}.process-map-minimap button{grid-column:var(--minimap-column);grid-row:var(--minimap-row);display:grid;place-items:center;width:18px;min-width:18px;height:18px;min-height:18px;margin:0;padding:0;border:1px solid var(--c-bd-637487);border-radius:3px;background:var(--c-bg-ffffff);color:var(--c-fg-33485a);font-size:8px}.process-map-minimap button:hover,.process-map-minimap button:focus-visible{border-color:var(--c-bd-0f6cbd);background:var(--c-bg-dceefb);outline:2px solid var(--c-bd-0f6cbd);outline-offset:1px}.process-map-minimap button[aria-current="step"]{border-color:var(--c-bd-087f7e);background:var(--c-bg-087f7e);color:var(--c-fg-ffffff)}
-.process-overview-kind-business-process .process-overview-action{border:2px solid var(--c-bd-31566f);border-radius:18px;background:var(--c-bg-eaf3f8)}.process-overview-kind-document .process-overview-action{border-color:var(--c-bd-2878a5);border-radius:3px;background:var(--c-bg-eef8fd);box-shadow:inset 0 -5px 0 var(--c-ot-c9e8f7)}.process-overview-kind-posted-document .process-overview-action{border-color:var(--c-bd-347447);border-radius:3px;background:var(--c-bg-eef8f0);box-shadow:inset 0 -5px 0 var(--c-ot-c9e8cf)}.process-overview-kind-posting .process-overview-action{border:2px solid var(--c-bd-7a5b00);border-radius:12px 3px;background:var(--c-bg-fff4ce);padding-inline:17px}.process-overview-kind-system-action .process-overview-action{border:2px dashed var(--c-bd-66558f);border-radius:8px;background:var(--c-bg-f6f2ff)}.process-overview-kind-manual-action .process-overview-action{border-left:6px solid var(--c-bd-8a5a2b);border-radius:2px 9px 9px 2px;background:var(--c-bg-fff8ef)}.process-overview-kind-status .process-overview-action{border-radius:999px;background:var(--c-bg-f2f4f7)}.process-overview-kind-data-entity .process-overview-action{border-color:var(--c-bd-2878a5);border-radius:18px/8px;background:var(--c-bg-f2f9fc)}.process-overview-kind-external-system .process-overview-action{border:3px double var(--c-bd-52606d);background:var(--c-bg-f5f6f7)}.process-overview-kind-start .process-overview-action,.process-overview-kind-end .process-overview-action{min-height:64px;border:2px solid var(--c-bd-347447);border-radius:999px;background:var(--c-bg-eef8f0)}.process-overview-node-type{letter-spacing:.035em}
-.process-overview-routes.compact{margin-top:9px}.process-overview-routes.compact .process-overview-route{display:grid;grid-template-columns:auto 12px minmax(0,1fr);align-items:start;border-left-width:4px;border-left-style:solid;border-radius:3px;font-size:11px;line-height:1.3}.process-overview-routes.compact .process-overview-route-alternate,.process-overview-routes.compact .process-overview-route-loop,.process-overview-routes.compact .process-overview-route-return{border-left-style:dashed;border-left-color:var(--c-bd-765b00);background:var(--c-bg-fff8e1)}.process-overview-routes.compact .process-overview-route-conditional,.process-overview-routes.compact .process-overview-route-branch{border-left-color:var(--c-bd-8a6d1d);background:var(--c-bg-fff4ce)}.process-overview-routes.compact .process-overview-route-creates{border-left-style:dotted;border-left-color:var(--c-bd-2878a5);background:var(--c-bg-eef8fd)}.process-overview-routes.compact .process-overview-route-posts{border-left-style:double;border-left-color:var(--c-bd-347447);background:var(--c-bg-eef8f0)}.process-overview-routes.compact .process-overview-route>span:last-child{overflow-wrap:anywhere}.process-overview-step:has(.process-overview-routes.compact) .process-overview-action{min-height:112px}
-.process-overview-lane{grid-column:1/-1;display:flex;align-items:center;min-height:34px;margin:8px 0 0;padding:6px 12px;border-left:5px solid var(--c-bd-31566f);border-bottom:1px solid var(--c-bd-c8d5df);background:var(--c-bg-f4f8fb);color:var(--c-fg-213547);font-size:13px;font-weight:700;text-transform:none}.process-overview-lane:first-child{margin-top:0}.process-overview-lane+.process-overview-step{grid-column-start:1}.process-overview-lane~.process-overview-row-end::after{background:var(--c-bg-dceaf2)}
-.process-diagram-scroll{position:relative}.process-connector-layer{position:absolute;inset:0;z-index:0;overflow:visible;pointer-events:none}.process-overview-list{position:relative;z-index:1}.process-connector{fill:none;stroke:var(--c-ot-52606d);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.process-connector-marker{fill:var(--c-ot-52606d)}.process-connector-label{font:600 11px "Segoe UI",sans-serif;fill:var(--c-ot-5f4b16);paint-order:stroke;stroke:var(--c-ot-ffffff);stroke-width:4px;stroke-linejoin:round}.process-connector-label-creates{fill:var(--c-ot-145b82)}.process-connector-label-posts{fill:var(--c-ot-246437)}.process-connector-alternate,.process-connector-loop,.process-connector-return{stroke:var(--c-ot-8a6d1d);stroke-dasharray:7 5}.process-connector-conditional,.process-connector-branch{stroke:var(--c-ot-765b00);stroke-width:2.5}.process-connector-creates{stroke:var(--c-ot-2878a5);stroke-dasharray:2 5}.process-connector-posts{stroke:var(--c-ot-347447);stroke-width:3}.process-connectors-active .process-overview-step::after{display:none}.process-connectors-active .process-overview-row-end::after{display:none!important}@media(forced-colors:active){.process-connector{stroke:CanvasText}.process-connector-marker{fill:CanvasText}.process-connector-label{fill:CanvasText;stroke:Canvas}}
-.process-overview-kind-process-step .process-overview-action{border:2px solid var(--c-bd-087f7e);background:var(--c-bg-e6f5f5)}.process-grammar-node-symbol[data-kind="process-step"]{border-color:var(--c-bd-087f7e);background:var(--c-bg-e6f5f5)}
-.process-overview-action{position:relative}.process-map-drag-handle{position:absolute;top:5px;right:6px;display:grid;place-items:center;width:22px;height:22px;border-radius:4px;color:var(--c-fg-52606d);cursor:grab;font-size:17px;line-height:1}.process-map-drag-handle:hover{background:var(--c-bg-e5edf5);color:var(--c-fg-172b3a)}.process-map-drag-handle:active{cursor:grabbing}.process-map-drag-handle[draggable="false"]{display:none}.process-map-dragging{opacity:.55}.process-map-drop-before .process-overview-action{box-shadow:inset 5px 0 0 var(--c-ot-0f6cbd)}.process-map-drop-after .process-overview-action{box-shadow:inset -5px 0 0 var(--c-ot-0f6cbd)}@media(forced-colors:active){.process-map-drop-before .process-overview-action,.process-map-drop-after .process-overview-action{outline:3px solid Highlight}}
 .review-zoom-content{zoom:var(--review-zoom,1)}
 .review-shell>[role="tabpanel"][hidden]{display:none!important}
 .document-workspace-panel{--document-zoom:1;background:var(--c-bg-e8edf1);padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
@@ -290,11 +269,9 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .annotation-properties input{width:100%;box-sizing:border-box}
 .annotation-properties-actions{grid-column:1/-1}
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
-.process-analysis-metrics,.process-analysis-columns{grid-template-columns:repeat(3,1fr)}
-.process-analysis-reference-comparison{margin-top:14px;padding:12px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5);border-radius:7px}.process-analysis-reference-comparison>summary{cursor:pointer;font-weight:700}.process-analysis-reference-comparison>p{color:var(--c-fg-526273)}.process-analysis-reference-comparison .process-analysis-list{margin-top:10px}
-@media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls{grid-template-columns:1fr}.review-toolbar-more{margin-left:0}.review-toolbar-more-panel{position:fixed;left:24px;right:24px;bottom:24px;top:auto;width:auto;max-height:70vh;overflow:auto}.review-toolbar-group{padding-right:5px}.review-header{padding:14px}.review-list{padding:12px}.document-workspace-body{flex-direction:column}.process-analysis-metrics,.process-analysis-columns,.process-analysis-variant,.process-analysis-evidence dl{grid-template-columns:1fr}.process-analysis-dialog footer{flex-wrap:wrap}.process-analysis-dialog footer button{flex:1 1 auto}}
+@media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls{grid-template-columns:1fr}.review-toolbar-more{margin-left:0}.review-toolbar-more-panel{position:fixed;left:24px;right:24px;bottom:24px;top:auto;width:auto;max-height:70vh;overflow:auto}.review-toolbar-group{padding-right:5px}.review-header{padding:14px}.review-list{padding:12px}.document-workspace-body{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel,.process-analysis-summary,.process-analysis-list,.process-analysis-alternatives{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"],.annotation-focus button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}.annotation-focus-frame{outline-color:Highlight}.process-analysis-meter span{background:Highlight}}
+@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"],.annotation-focus button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}.annotation-focus-frame{outline-color:Highlight}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
 .filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -358,7 +335,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-knowledge-disclosure>summary::after{content:"＋";float:right;color:var(--c-fg-52606d)}
 .review-knowledge-disclosure[open]>summary::after{content:"−"}
 .review-toolbar-more-panel{max-height:min(70vh,640px);overflow:auto}
-@media(max-width:800px){.review-step-workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);min-height:0}.review-step-navigation{border-right:0;border-bottom:1px solid var(--c-bd-d8dee5);max-height:180px;padding:8px 10px}.review-step-navigation h3{margin:2px 6px 6px}.review-step-navigation-list{display:flex;overflow:auto;gap:5px;padding:0 2px 6px}.review-step-nav-item{flex:0 0 min(230px,70vw);grid-template-columns:25px minmax(0,1fr);padding:7px}.review-step-content{min-height:0}.review-step-workspace[data-layout="focus"] .review-list{padding:12px}.review-step-workspace[data-layout="focus"] .review-card{grid-template-columns:32px minmax(0,1fr)!important;padding:12px;gap:10px}.review-step-workspace[data-layout="focus"] .review-actions{grid-column:1/-1;flex-direction:row;align-items:center}.review-step-layout-toggle{order:6}}
+@media(max-width:800px){.review-step-workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);min-height:0}.review-step-navigation{border-right:0;border-bottom:1px solid var(--c-bd-d8dee5);max-height:180px;padding:8px 10px}.review-step-navigation h3{margin:2px 6px 6px}.review-step-navigation-list{display:flex;overflow:auto;gap:5px;padding:0 2px 6px}.review-step-nav-item{flex:0 0 min(230px,70vw);grid-template-columns:25px minmax(0,1fr);padding:7px}.review-step-navigation{overflow:hidden;max-height:none}.review-step-nav-item{flex-basis:min(190px,58vw)}.review-step-nav-state{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.review-step-content{min-height:0}.review-step-workspace[data-layout="focus"] .review-list{padding:12px}.review-step-workspace[data-layout="focus"] .review-card{grid-template-columns:32px minmax(0,1fr)!important;padding:12px;gap:10px}.review-step-workspace[data-layout="focus"] .review-actions{grid-column:1/-1;flex-direction:row;align-items:center}.review-step-layout-toggle{order:6}}
 </style>
 <link rel="stylesheet" href="design-system.css">
 </head>
@@ -374,19 +351,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <section id="documentsView" class="document-library" aria-labelledby="documentLibraryTitle">
-  <p class="home-module">BC Knowledge Base</p>
+  <!-- The heading, tools, folders and count stay in view while the documents scroll beneath them. -->
+  <div id="libraryHead" class="library-head">
   <h2 id="documentLibraryTitle" class="home-title">Dokument</h2>
   <p class="muted home-lead" data-i18n="Processdokumentation och felrapporter från dina inspelningar i Business Central.">Processdokumentation och felrapporter från dina inspelningar i Business Central.</p>
-
-  <section id="libraryContinue" class="library-continue" aria-labelledby="libraryContinueTitle" hidden>
-    <h3 id="libraryContinueTitle">Fortsätt där du slutade</h3>
-    <div id="libraryContinueList" class="library-continue-list"></div>
-  </section>
-
-  <section id="libraryTestSuites" class="library-continue" aria-labelledby="libraryTestSuitesTitle" hidden>
-    <h3 id="libraryTestSuitesTitle" data-i18n="suite.librarySection">Testsviter</h3>
-    <div id="libraryTestSuiteList" class="library-continue-list"></div>
-  </section>
 
   <!-- The heading, search and quick filter rows share columns, so the actions line up. -->
   <div class="library-toolbar">
@@ -414,14 +382,13 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   <div class="library-primary-controls" role="search">
     <label for="librarySearch"><span class="sr-only">Sök dokument</span>
       <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
-        aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde"
+        aria-describedby="libraryStatus" placeholder="Titel, tagg eller arbetsflöde"
         data-i18n-placeholder="library.searchPlaceholder">
     </label>
     <label for="librarySort"><span class="sr-only">Sortera</span>
       <select id="librarySort">
         <option value="modified">Senast ändrad</option><option value="created">Skapad</option>
         <option value="alphabetical">Alfabetiskt</option><option value="recent">Senast öppnad</option>
-        <option value="profile">Dokumentprofil</option>
       </select>
     </label>
     <button id="librarySelectMode" type="button" class="secondary" aria-pressed="false" aria-controls="libraryResults">Välj flera</button>
@@ -440,9 +407,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <span id="libraryFilterCount" class="library-filter-count" hidden></span>
       </summary>
       <div class="library-filter-panel" role="group" aria-label="Filter för Dokumentbibliotek">
-        <label for="libraryProfileFilter">Dokumentprofil
-          <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
-        </label>
         <label for="libraryLanguageFilter">
           <span data-i18n="library.documentLanguage">Dokumentspråk</span>
           <select id="libraryLanguageFilter" data-language-select="document"
@@ -461,7 +425,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div class="library-filter-options">
           <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
           <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
-          <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
         </div>
         <div class="library-filter-actions">
           <button id="libraryResetFilters" type="button" class="secondary"
@@ -488,8 +451,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <p id="libraryFolderStatus" class="sr-only" role="status" aria-live="polite"></p>
   </div>
   <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
-  <div id="libraryResults" class="library-results" role="list" data-select-mode="false"
-    aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
   <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"
     aria-label="Batchåtgärder" aria-describedby="libraryBatchStatus" hidden>
     <span id="libraryBatchCount" class="library-batch-count"></span>
@@ -503,7 +464,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       <summary>Fler åtgärder</summary>
       <div class="library-batch-more-panel">
         <button id="libraryBatchTags" class="secondary">Taggar</button>
-        <button id="libraryBatchProfile" class="secondary">Profil</button>
         <button id="libraryBatchTheme" class="secondary">Tema</button>
         <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
         <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
@@ -513,6 +473,20 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
       value="0" hidden aria-label="Batchförlopp"></progress>
   </div>
+  </div>
+
+  <section id="libraryContinue" class="library-continue" aria-labelledby="libraryContinueTitle" hidden>
+    <h3 id="libraryContinueTitle">Fortsätt där du slutade</h3>
+    <div id="libraryContinueList" class="library-continue-list"></div>
+  </section>
+
+  <section id="libraryTestSuites" class="library-continue" aria-labelledby="libraryTestSuitesTitle" hidden>
+    <h3 id="libraryTestSuitesTitle" data-i18n="suite.librarySection">Testsviter</h3>
+    <div id="libraryTestSuiteList" class="library-continue-list"></div>
+  </section>
+
+  <div id="libraryResults" class="library-results" role="list" data-select-mode="false"
+    aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
   <p id="libraryBatchStatus" class="sr-only" role="status" aria-live="polite"
     aria-atomic="true"></p>
 </section>
@@ -680,8 +654,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <div class="library-batch-fields">
       <label><input id="libraryBatchUseTags" type="checkbox"> Ändra taggar
         <input id="libraryBatchTagsValue" type="text" placeholder="Tagg 1, Tagg 2"></label>
-      <label><input id="libraryBatchUseProfile" type="checkbox"> Ändra profil
-        <select id="libraryBatchProfileValue"></select></label>
       <label><input id="libraryBatchUseTheme" type="checkbox"> Ändra tema
         <select id="libraryBatchThemeValue"></select></label>
       <label><input id="libraryBatchUseAuthor" type="checkbox"> Ändra författare
@@ -850,7 +822,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           data-i18n="review.flowShare">Dela</button>
       </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
-        <button id="saveReview" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+S Meta+S">Spara</button>
+        <button id="saveReview" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+S Meta+S" hidden>Spara</button>
         <button id="completeReview" class="primary" disabled data-review-toolbar-item>Slutför granskning</button>
         <button id="nextUnreviewedStep" data-review-toolbar-item
           class="secondary review-next-action" aria-keyshortcuts="Alt+N"
@@ -865,8 +837,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
-            <button id="openProcessAnalysis" data-review-toolbar-item data-feature="processIntelligence" hidden class="secondary process-analysis-trigger" aria-haspopup="dialog" aria-controls="processAnalysisDialog">Processanalys
-              <output id="processAnalysisBadge" aria-label="Matchningsgrad" hidden></output></button>
             <div class="review-toolbar-group review-zoom-toolbar" id="reviewZoomToolbar" role="toolbar"
               aria-label="Zooma granskning" aria-controls="reviewZoomContent">
               <button id="reviewResetZoom" class="secondary">100%</button>
@@ -912,64 +882,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
       <div id="reviewZoomContent" class="review-zoom-content">
-      <details id="processOverviewDisclosure" class="process-overview-card" data-feature="processIntelligence" hidden>
-        <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
-        <p id="processMapDescription" class="muted process-overview-help" data-i18n="process.overviewHelp">Välj en aktivitet för att gå direkt till motsvarande steg. Detaljer visas under kartan.</p>
-        <div class="process-map-toolbar">
-          <div id="processMapLevels" class="process-map-levels" role="group"
-            aria-label="Processkartans detaljnivå">
-            <button type="button" data-process-map-level="business" aria-pressed="false">Affärsprocess</button>
-            <button type="button" data-process-map-level="businessCentral" aria-pressed="true">BC-process</button>
-            <button type="button" data-process-map-level="procedure" aria-pressed="false">Användarprocedur</button>
-          </div>
-          <div id="processMapLegend" class="process-map-legend" aria-label="Förklaring">
-            <span class="observed">Observerat</span><span class="suggested">Referensförslag</span><span class="conditional">Villkorligt</span>
-            <span class="customerSpecific">Kundunikt</span>
-          </div>
-          <div id="processMapViewportControls" class="process-map-viewport-controls"
-            role="group" aria-label="Processkartans storlek">
-            <label class="process-map-direction-label" for="processMapDirection">Layout</label>
-            <select id="processMapDirection" title="Välj processkartans riktning">
-              <option value="adaptive">Automatisk</option>
-              <option value="vertical">Lodrät</option>
-            </select>
-            <output id="processMapLayoutStatus" class="process-map-layout-status"
-              aria-live="polite"></output>
-            <label class="process-map-theme-label" for="processMapTheme">Tema</label>
-            <select id="processMapTheme" title="Välj processkartans visuella tema"></select>
-            <label class="process-map-density-label" for="processMapDensity">Täthet</label>
-            <select id="processMapDensity" title="Välj processkartans täthet">
-              <option value="standard">Standard</option>
-              <option value="compact">Kompakt</option>
-            </select>
-            <label class="process-map-reference-toggle"><input id="processMapIncludeReferences"
-              type="checkbox"> Visa referensförslag</label>
-            <button id="processMapFocus" type="button" class="secondary"
-              aria-pressed="false" title="Visa processkartan i fokusläge">Fokusläge</button>
-            <button id="processMapFit" type="button" class="secondary" title="Anpassa hela processkartan till tillgänglig bredd">Anpassa</button>
-            <button id="processMapZoomOut" type="button" class="secondary" title="Zooma ut processkartan">−</button>
-            <output id="processMapZoomValue" aria-live="polite">100%</output>
-            <button id="processMapZoomIn" type="button" class="secondary" title="Zooma in processkartan">+</button>
-            <button id="processMapResetZoom" type="button" class="secondary" title="Återställ processkartan till 100 %">100%</button>
-          </div>
-        </div>
-        <div class="process-map-search" role="search">
-          <label for="processMapSearch">Sök i kartan</label>
-          <input id="processMapSearch" type="search" autocomplete="off"
-            placeholder="Steg, dokument eller åtgärd">
-          <button id="processMapSearchNext" type="button" class="secondary" disabled>Nästa träff</button>
-          <output id="processMapSearchResult" aria-live="polite"></output>
-        </div>
-        <div class="process-overview-export" role="group" aria-label="Exportera process">
-          <button id="saveProcessVersion" type="button" class="secondary" disabled>Spara version</button>
-          <button id="compareProcessVersions" type="button" class="secondary" disabled>Jämför versioner</button>
-          <button id="exportProcessModel" type="button" class="secondary" disabled>Exportera process</button>
-          <button id="exportProcessDiagram" type="button" class="secondary" disabled>Exportera diagram</button>
-          <button id="editProcessMapNode" type="button" class="secondary" disabled>Redigera vald nod</button>
-          <button id="editProcessMapRelationship" type="button" class="secondary" disabled>Redigera kopplingar</button>
-        </div>
-        <div id="processOverview" role="region" aria-labelledby="processOverviewTitle"></div>
-      </details>
       <div id="reviewStepWorkspace" class="review-step-workspace" data-layout="focus">
         <nav class="review-step-navigation" aria-label="Dokumentets steg">
           <h3>Steg</h3>
@@ -1059,14 +971,15 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div class="document-toolbar-group" role="group" aria-label="Anpassa storlek">
           <button id="documentFitWidth" class="secondary" aria-pressed="false">Anpassa bredd</button>
           <button id="documentFitPage" class="secondary" aria-pressed="false">Anpassa sida</button>
-          <button id="documentResetZoom" class="secondary" aria-keyshortcuts="Control+0">100%</button>
+          <button id="documentResetZoom" class="secondary" aria-keyshortcuts="Control+0" title="Återställ zoom till 100 %">100%</button>
           <button id="documentZoomOut" class="secondary" aria-label="Zooma ut" aria-keyshortcuts="Control+-">−</button>
-          <output id="documentZoomValue" aria-label="Aktuell zoom">100%</output>
+          <output id="documentZoomValue" class="sr-only" aria-label="Aktuell zoom">100%</output>
           <button id="documentZoomIn" class="secondary" aria-label="Zooma in" aria-keyshortcuts="Control++">+</button>
         </div>
         <div class="document-toolbar-group" role="group" aria-label="Visningsläge">
           <button id="documentContinuousMode" class="secondary" aria-pressed="true"><span class="document-toolbar-label">Kontinuerligt</span></button>
           <button id="documentPageMode" class="secondary" aria-pressed="false"><span class="document-toolbar-label">Sidläge</span></button>
+          <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
         </div>
         <div class="document-toolbar-group" role="group" aria-label="Sidnavigering">
           <button id="documentPreviousPage" class="secondary" aria-label="Föregående sida">Föregående</button>
@@ -1079,7 +992,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
             data-i18n="review.nextUnreviewed">Nästa ogranskade</button>
           <button id="documentExportWord" type="button" class="primary">Exportera Word</button>
         </div>
-        <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
       </div>
       <div class="document-workspace-body">
         <div id="documentWorkspaceViewport" class="document-workspace-viewport">
@@ -1113,83 +1025,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
 </dialog>
 
-<dialog id="processMapRelationshipDialog" class="process-map-node-dialog" aria-labelledby="processMapRelationshipTitle">
-  <form method="dialog">
-    <h3 id="processMapRelationshipTitle">Redigera koppling</h3>
-    <label for="processMapRelationshipExisting">Koppling</label>
-    <select id="processMapRelationshipExisting"></select>
-    <label for="processMapRelationshipTarget">Till nod</label>
-    <select id="processMapRelationshipTarget"></select>
-    <label for="processMapRelationshipType">Typ</label>
-    <select id="processMapRelationshipType"><option value="sequence">Nästa</option>
-      <option value="conditional">Villkor</option><option value="alternate">Alternativ</option>
-      <option value="loop">Upprepa</option><option value="return">Tillbaka</option>
-      <option value="documentCreation">Skapar dokument</option>
-      <option value="documentPosting">Bokför som</option></select>
-    <label for="processMapRelationshipLabel">Etikett (valfri)</label>
-    <input id="processMapRelationshipLabel">
-    <footer><button value="cancel" class="secondary">Avbryt</button>
-      <button id="deleteProcessMapRelationship" type="button" class="danger">Ta bort</button>
-      <button id="saveProcessMapRelationship" type="button" class="primary">Spara</button></footer>
-  </form>
-</dialog>
-
-<dialog id="processMapNodeDialog" class="process-map-node-dialog" aria-labelledby="processMapNodeTitle">
-  <form method="dialog">
-    <h3 id="processMapNodeTitle">Redigera processnod</h3>
-    <label for="processMapNodeName">Namn</label><input id="processMapNodeName" required>
-    <label for="processMapNodeType">Typ</label><select id="processMapNodeType">
-      <option value="activity">Åtgärd</option><option value="processStep">Processsteg</option><option value="document">Dokument</option>
-      <option value="posting">Bokföring</option><option value="decision">Beslut</option>
-      <option value="manualAction">Manuell åtgärd</option><option value="systemAction">Systemåtgärd</option>
-    </select>
-    <label for="processMapNodeRole">Swimlane</label><select id="processMapNodeRole">
-      <option value="purchasing">Inköp</option><option value="warehouse">Lager</option>
-      <option value="sales">Försäljning</option><option value="production">Produktion</option>
-      <option value="finance">Ekonomi</option><option value="system">System</option>
-    </select>
-    <div><button id="moveProcessNodeEarlier" type="button" class="secondary">Flytta bakåt</button>
-      <button id="moveProcessNodeLater" type="button" class="secondary">Flytta framåt</button></div>
-    <footer><button value="cancel" class="secondary">Avbryt</button>
-      <button id="saveProcessMapNode" type="button" class="primary">Spara</button></footer>
-  </form>
-</dialog>
-
-<dialog id="processAnalysisDialog" class="process-analysis-dialog"
-  aria-labelledby="processAnalysisTitle" aria-describedby="processAnalysisDescription">
-  <form method="dialog">
-    <header>
-      <h3 id="processAnalysisTitle">Processanalys</h3>
-      <p id="processAnalysisDescription" class="muted">Jämför den inspelade processen med verifierade Business Central-referenser.</p>
-    </header>
-    <div id="processAnalysisContent" class="process-analysis-content" aria-live="polite">
-      <p class="process-analysis-loading">Analyserar processen…</p>
-    </div>
-    <footer>
-      <span id="processAnalysisStatus" role="status" aria-live="polite"></span>
-      <button value="close" class="secondary">Stäng</button>
-      <button id="useSelectedReference" type="button" class="secondary">Använd val</button>
-      <button id="confirmProcessAnalysis" type="button" class="primary">Bekräfta klassificering</button>
-    </footer>
-  </form>
-</dialog>
-
-<dialog id="processVersionDialog" class="process-version-dialog"
-  aria-labelledby="processVersionDialogTitle">
-  <form method="dialog">
-    <header>
-      <h3 id="processVersionDialogTitle">Jämför processversioner</h3>
-      <p class="muted">Jämförelsen är skrivskyddad och visar endast semantiska processändringar.</p>
-    </header>
-    <div class="process-version-selectors">
-      <label>Från version<select id="processVersionFrom"></select></label>
-      <label>Till version<select id="processVersionTo"></select></label>
-    </div>
-    <div id="processVersionComparison" aria-live="polite"></div>
-    <footer><button value="close" class="primary">Stäng</button></footer>
-  </form>
-</dialog>
-
 <dialog id="regenerationPreviewDialog" class="regeneration-preview-dialog"
   aria-labelledby="regenerationPreviewTitle"
   aria-describedby="regenerationPreviewDescription">
@@ -1219,10 +1054,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   <form method="dialog">
     <section class="review-document-fields">
       <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
-      <label for="reviewDocumentProfile" data-i18n="review.profilePurpose">Vad ska dokumentet användas till?</label>
-      <select id="reviewDocumentProfile" aria-describedby="reviewDocumentProfileHelp"></select>
-      <p id="reviewDocumentProfileHelp" class="muted"></p>
-      <p id="reviewDocumentProfileStatus" role="status" aria-live="polite"></p>
       <label for="reviewDocumentLanguage"
         data-i18n="review.documentLanguage">Dokumentspråk</label>
       <select id="reviewDocumentLanguage" data-language-select="document">
@@ -1325,7 +1156,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="engine/knowledge-repository.js"></script>
 <script src="engine/knowledge-ai-fallback.js"></script>
 <script src="engine/knowledge-resolution.js"></script>
-<script src="engine/feature-flags.js"></script>
 <script src="engine/screenshot-asset-paths.js"></script>
 <script src="engine/screenshot-batch-loader.js"></script>
 <script src="engine/screenshot-selection-engine.js"></script>
@@ -1398,27 +1228,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document-workspace-view.js"></script>
 <script src="document-workspace-experience.js"></script>
 <script src="document-library-view.js"></script>
-<script src="document/process-graph-layout.js"></script>
-<script src="document/process-visual-grammar.js"></script>
-<script src="document/process-route-grammar.js"></script>
-<script src="document/process-lane-model.js"></script>
 <script src="document/process-task-context.js"></script>
-<script src="document/process-map-overrides.js"></script>
-<script src="document/process-map-relationship-overrides.js"></script>
-<script src="document/process-map-theme.js"></script>
-<script src="document/process-map-labels.js"></script>
-<script src="document/process-map-legend.js"></script>
-<script src="exporters/process-svg-export.js"></script>
-<script src="exporters/process-export.js"></script>
-<script src="process-connector-view.js"></script>
-<script src="process-map-viewport.js"></script>
-<script src="process-map-search.js"></script>
-<script src="process-map-minimap.js"></script>
-<script src="process-map-drag.js"></script>
-<script src="process-overview-view.js"></script>
-<script src="process-version-comparison-view.js"></script>
-<script src="process-analysis-view.js"></script>
-<script src="document/semantic-process-map.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
 <script src="dashboard.js"></script>

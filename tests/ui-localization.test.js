@@ -68,8 +68,8 @@ assert.match(popup, /T9_GET_SETTINGS/);
 assert.match(popupHtml, /id="languageSwitch"/);
 assert.match(popupHtml, /id="recordingDocumentLanguage"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
 assert.match(dashboardHtml, /id="libraryLanguageFilter"/);
-assert.match(dashboardHtml, /data-i18n="process\.overview"/);
-assert.match(dashboardHtml, /data-i18n="process\.overviewHelp"/);
+// The process map was removed in 4.7.249; its texts are no longer in the review.
+assert.doesNotMatch(dashboardHtml, /data-i18n="process\.overview/);
 assert.match(dashboardHtml,
   /<label for="libraryLanguageFilter">\s*<span data-i18n="library\.documentLanguage">[\s\S]*?<select id="libraryLanguageFilter"/);
 assert.doesNotMatch(dashboardHtml,

@@ -11,7 +11,9 @@ const toolbarEnd = html.indexOf('id="reviewProgress"');
 const toolbar = html.slice(toolbarStart, toolbarEnd);
 const moreStart = toolbar.indexOf('id="reviewMoreActions"');
 assert(toolbarStart >= 0 && toolbarEnd > toolbarStart && moreStart > 0);
-for (const id of ["undoReview", "redoReview", "saveReview",
+// Changes save automatically, so Save is not shown; Ctrl+S and the footer's retry remain.
+assert(toolbar.includes('<button id="saveReview" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+S Meta+S" hidden>'));
+for (const id of ["undoReview", "redoReview",
   "exportWordReview", "openReviewDocumentFields", "completeReview"]) {
   assert(toolbar.indexOf(`id="${id}"`) < moreStart,
     `${id} must remain immediately visible`);
@@ -99,7 +101,6 @@ assert(dashboard.includes("instructionPresentation.text"));
 assert(dashboard.includes("Instruction presentation fallback"));
 assert(dashboard.indexOf("list.appendChild(card);") <
   dashboard.indexOf("initializeReviewScreenshots(card, task, images);"));
-assert(dashboard.includes("Review hierarchy display fallback"));
 assert(dashboard.includes("function reviewTasksForDisplay(review)"));
 assert(dashboard.includes("Review visibility fallback"));
 assert(dashboard.includes("Review active-task resolution failed"));

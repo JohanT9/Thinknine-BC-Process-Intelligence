@@ -205,6 +205,15 @@
     { name: "expectedResult", label: "What did you expect?",
       value: workspaceState.report.expectedResult.text, multiline: true },
     ];
+    // Without a captured Business Central error the user describes what happened; a captured
+    // error already says it, so the field is shown then only if it holds text.
+    const capturedErrors = report.sections.find(item => item.kind === "actual-result")
+      ?.content?.capturedErrors || [];
+    const actualText = workspaceState.report.actualResult?.human?.text || "";
+    if (!capturedErrors.length || actualText.trim()) {
+      fields.push({ name: "actualResult", label: "What happened instead?",
+        value: actualText, multiline: true });
+    }
     const appendField = (parent, field) => {
       const id = `technical-report-${field.name}`;
       const label = element(doc, "label", ui(field.label, locale)); label.htmlFor = id;
@@ -227,6 +236,8 @@
     let technicalSectionCount = 0;
     for (const section of report.sections) {
       if (advancedKinds.has(section.kind) && !hasSectionContent(section)) continue;
+      // The description is edited above; the section only adds captured errors.
+      if (section.kind === "actual-result" && !section.content.capturedErrors.length) continue;
       const node = doc.createElement("section");
       node.className = `report-section report-section-${section.kind}`;
       node.dataset.technicalReportSection = section.id;
@@ -459,6 +470,8 @@
           }
           parent.appendChild(figure);
         };
+        if (!screenshots.length) node.appendChild(element(doc, "p", uiKey("technical.noScreenshots",
+          locale, "No screenshots were taken for this report."), "evidence-empty"));
         if (primary) appendScreenshot(node, primary, "primary-evidence");
         const supporting = screenshots.filter(item => item !== primary);
         if (supporting.length) {

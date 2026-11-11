@@ -58,7 +58,7 @@ function populate(selectedTenant = "") {
   select.replaceChildren();
   if (!licenses.length) {
     const option = document.createElement("option");
-    option.textContent = text("Ingen känd tenant", "No known tenant");
+    option.textContent = text("Ingen licens kontrollerad ännu", "No license checked yet");
     option.value = "";
     select.append(option);
     select.disabled = true;
@@ -95,7 +95,7 @@ async function load(force = false) {
     }
     await summary(selectedTenant);
     $("message").textContent = force ? text("Licensinformationen är uppdaterad.", "License information updated.") :
-      !licenses.length ? text("Öppna en Business Central-tenant och gör en licenskontroll första gången.", "Open a Business Central tenant and run the first license check.") :
+      !licenses.length ? text("Öppna Business Central för att kontrollera licensen första gången.", "Open Business Central to check the license for the first time.") :
         text("Visar senast kända licensinformation. En BC-flik behövs bara för en ny serverkontroll.", "Showing the latest known license information. A BC tab is only needed for a new server check.");
   } catch (error) {
     await summary().catch(() => {});
@@ -118,6 +118,8 @@ function renderAccountStatus() {
   $("tenantAccountHelp").textContent = text("Tenantlicensen är aktiv. Logga in med Microsoft för användarregistrering och statistik. Ingen konsultlicens behövs.", "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.");
   $("consultantSignIn").hidden = result.signedIn || !result.configured;
   $("consultantSignOut").hidden = !result.signedIn;
+  // Signed-in consultants and administrators see their section open.
+  if (result.signedIn) $("consultantSection").open = true;
   const licenseLabels = { active: text("Konsultlicensen är aktiv.", "The consultant license is active."),
     pending: text("Väntar på aktivering i licensadministrationen.", "Waiting for activation in license administration."),
     expired: text("Konsultlicensen har gått ut.", "The consultant license has expired."),

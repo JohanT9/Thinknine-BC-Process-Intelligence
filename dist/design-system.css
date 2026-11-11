@@ -505,6 +505,19 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-card-footer{display:flex;align-items:center;gap:var(--space6)}
 .library-card-footer button{margin:0}
 .library-card-menu{position:relative}
+/* All document rows share their columns, so status, star and buttons line up from row to row and
+   each status and button is as wide as the widest one in its column, whatever the language. */
+@media (min-width: 761px){
+  .library-results{grid-template-columns:minmax(0,1fr) repeat(5,auto);column-gap:var(--space6)}
+  .library-results>*{grid-column:1/-1}
+  .library-results>.library-card{grid-template-columns:subgrid;column-gap:var(--space6)}
+  .library-results>.library-card>.library-card-footer{display:contents}
+  .library-results>.library-card>.library-state{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center;margin-inline-end:var(--space8)}
+  .library-results .library-favourite{grid-column:3}
+  .library-results .library-card-footer [data-library-action="run-test"]{grid-column:4}
+  .library-results .library-card-footer [data-library-action="open"]{grid-column:5;justify-self:stretch}
+  .library-results .library-card-menu{grid-column:6}
+}
 .library-card-menu>summary{display:grid;place-items:center;min-width:36px;min-height:var(--controlHeight);border:1px solid transparent;border-radius:var(--radiusMedium);color:var(--colorTextSecondary);font-size:18px;line-height:1;list-style:none;cursor:pointer}
 .library-card-menu>summary::-webkit-details-marker{display:none}
 .library-card-menu>summary:hover,.library-card-menu[open]>summary{border-color:var(--colorBorderDefault);color:var(--colorTextPrimary)}
@@ -513,7 +526,8 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-card-menu-panel button:hover:not(:disabled){background:var(--colorBrandSubtle)}
 .library-card-menu-panel button.danger{border-color:transparent!important;background:transparent!important}
 .library-card-menu-panel hr{width:100%;margin:var(--space4) 0;border:0;border-top:1px solid var(--colorBorderSubtle)}
-.library-batch-toolbar{position:sticky;top:auto;bottom:12px;margin:var(--space12) 0 0;border-radius:var(--radiusLarge)!important;border:1px solid var(--colorBorderDefault);box-shadow:var(--shadow8)}
+/* Selecting several documents shows the batch actions in the library heading, above the list. */
+.library-batch-toolbar{position:static;margin:var(--space8) 0 var(--space4);border-radius:var(--radiusLarge)!important;border:1px solid var(--colorBorderDefault)}
 .library-batch-more-panel{display:flex;flex-wrap:wrap;gap:var(--space6)}
 .library-batch-more-panel button{margin:0!important}
 .settings-view-heading{margin:var(--space16) 0}

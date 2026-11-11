@@ -140,8 +140,9 @@ function renderLicenseCard(license, { tenantId = "", signedIn = false,
     ? signedIn ? "license.cardStartTrial" : "license.cardSignInTrial"
     : "license.cardSignIn";
   updateText($("licenseCardAction"), t(actionKey));
+  // Outside Business Central there is nothing to sign in to yet: the status says what to do.
+  $("licenseCardAction").hidden = !tenantId;
   $("licenseCardAction").disabled = !tenantId;
-  $("licenseCardAction").title = tenantId ? "" : t("license.cardOpenBc");
 }
 
 function formatCheckedAt(value) {

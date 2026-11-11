@@ -17,7 +17,6 @@ assert.deepStrictEqual(brand, {
     recorder: "BC Process Recorder",
     reviewStudio: "BC Review Studio",
     documentGenerator: "BC Document Generator",
-    processMaps: "BC Process Maps",
     knowledgeBase: "BC Knowledge Base",
     processAI: "BC Process AI"
   }
@@ -36,10 +35,15 @@ for (const obsolete of ["Thinknine BC Process Intelligence",
   assert(!primarySurfaces.includes(obsolete), `Obsolete visible brand: ${obsolete}`);
 }
 for (const expected of [brand.productName, brand.companyAttribution,
-  brand.modules.recorder, brand.modules.reviewStudio,
-  brand.modules.documentGenerator, brand.modules.knowledgeBase]) {
+  brand.modules.reviewStudio, brand.modules.documentGenerator]) {
   assert(primarySurfaces.includes(expected), `Missing current brand: ${expected}`);
 }
+// The user sees one product name: the popup and the library are BC Process Studio, not
+// separate module names.
+for (const module of [brand.modules.recorder, brand.modules.knowledgeBase]) {
+  assert(!primarySurfaces.includes(module), `Module name shown to users: ${module}`);
+}
+assert(read("src/ui/popup.html").includes('<h1>BC Process Studio <span class="version"'));
 assert(!primarySurfaces.includes("BC Process Maps"),
   "Future Process Maps must not appear as available navigation.");
 assert(!primarySurfaces.includes("BC Process AI"),

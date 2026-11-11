@@ -173,8 +173,30 @@ const moreFields = allElements(container).find(item =>
   item.className === "report-more-fields");
 assert(!allElements(coreFields).some(item =>
   item.id === "technical-report-summary"));
-assert(!allElements(coreFields).some(item =>
-  item.id === "technical-report-actualResult"));
+// A captured error describes what happened; text the user already wrote stays editable.
+assert.strictEqual(allElements(coreFields).find(item =>
+  item.id === "technical-report-actualResult").value, "Edited actual result");
+{
+  const withError = JSON.parse(JSON.stringify(controller.state()));
+  assert(withError.document.sections.find(section => section.kind === "actual-result")
+    .content.capturedErrors.length, "the fixture has a captured error");
+  withError.report.actualResult.human.text = "";
+  const errorView = new Element("main");
+  view.render(errorView, withError, {}, fakeDocument);
+  assert(!allElements(errorView).some(item => item.id === "technical-report-actualResult"),
+    "with a captured error and no text the field is not asked for");
+  const noError = JSON.parse(JSON.stringify(withError));
+  noError.document.sections.find(section => section.kind === "actual-result")
+    .content.capturedErrors = [];
+  const noErrorView = new Element("main");
+  view.render(noErrorView, noError, {}, fakeDocument);
+  const field = allElements(noErrorView).find(item => item.id === "technical-report-actualResult");
+  assert.strictEqual(field?.tagName, "textarea",
+    "without a captured error the user can describe what happened");
+  assert(!allElements(noErrorView).some(item =>
+    item.className === "report-section report-section-actual-result"),
+    "the empty actual-result section is not shown");
+}
 assert.strictEqual(moreFields, undefined);
 const severitySelect = allElements(container).find(item =>
   item.id === "technical-report-severity");
@@ -211,7 +233,7 @@ view.render(container, controller.state(), {
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.className === "reproduction-editor"));
 const actualEditor = allElements(container).find(item => item.id === "technical-report-actualResult");
-assert.strictEqual(actualEditor, undefined);
+assert.strictEqual(actualEditor.value, "Edited actual result");
 assert(allElements(container).some(item =>
   item.className === "report-section report-section-reproduction"));
 assert(allElements(container).some(item =>

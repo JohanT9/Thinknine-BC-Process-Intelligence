@@ -12,8 +12,10 @@ BC Process Studio  is Business Process Intelligence for Microsoft Dynamics 365 B
 - BC Review Studio — implemented review and editing workspace.
 - BC Document Generator — implemented documentation and Word output.
 - BC Knowledge Base — implemented local document library and reusable knowledge surface.
-- BC Process Maps — future area; no automatic map generation is claimed in 4.7.
+- BC Process Maps — discontinued in 4.7.249; the unreleased process map was removed from the code.
 - BC Process AI — future broader product area.
+
+The module names are internal vocabulary for documentation and planning. Since 4.7.249 the interface shows one product name, BC Process Studio: the toolbar popup, its tooltip and the diagnostics page no longer say BC Process Recorder, and the library is headed by its own translated name rather than BC Knowledge Base.
 
 ## Compatibility rename map
 

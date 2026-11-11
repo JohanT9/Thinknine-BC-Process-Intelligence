@@ -5,7 +5,7 @@
 <script src="appearance.js"></script>
 <link rel="stylesheet" href="theme.css">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BC Process Recorder — BC Process Studio</title>
+<title>BC Process Studio</title>
 <style>
 html{width:390px;min-width:390px}body{margin:0;width:100%;min-width:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif;background:var(--c-bg-f7f8fa);color:var(--c-fg-1f2933)}
 header{position:relative;background:var(--c-bg-111827);color:var(--c-fg-ffffff);padding:10px 16px 10px}
@@ -34,13 +34,12 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
 <body>
 <header>
 <div class="brand-row">
-<div class="brand">BC PROCESS STUDIO</div>
+<h1>BC Process Studio <span class="version" id="extensionVersion">v—</span></h1>
 <button id="languageSettingsButton" class="language-button" type="button" aria-haspopup="dialog" aria-controls="languageSettingsDialog" data-i18n-title="settings.languages" data-i18n-aria-label="settings.languages">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
   <span id="languageCode" aria-hidden="true">EN</span><span aria-hidden="true">⌄</span>
 </button>
 </div>
-<h1>BC Process Recorder <span class="version" id="extensionVersion">v—</span></h1>
 </header>
 <dialog id="languageSettingsDialog" class="language-panel" aria-labelledby="languageSettingsTitle">
   <h2 id="languageSettingsTitle" data-i18n="settings.languages">Language settings</h2>
@@ -74,7 +73,7 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
 <div class="mode-grid">
   <button id="startProcess" class="primary mode-card"><strong data-i18n="recorder.process">Dokumentera en process</strong>
     <span data-i18n="recorder.processHelp">Spela in och skapa steg-för-steg-dokumentation.</span></button>
-  <button id="startBug" class="primary mode-card"><strong data-i18n="recorder.bug">Rapportera ett fel</strong>
+  <button id="startBug" class="mode-card"><strong data-i18n="recorder.bug">Rapportera ett fel</strong>
     <span data-i18n="recorder.bugHelp">Återskapa felet och skapa en teknisk felrapport.</span></button>
   <button id="reportVisibleError" class="mode-card"><strong data-i18n="recorder.reportVisibleError">Report the error shown now</strong>
     <span data-i18n="recorder.reportVisibleErrorHelp">Create a bug report right away, without recording.</span></button>
@@ -85,7 +84,7 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
     <span class="license-symbol" aria-hidden="true">●</span>
     <span class="license-summary-copy">
       <span id="licenseCardTitle" class="license-summary-title" data-i18n="license.pageTitle">Licensinformation</span>
-      <strong id="licenseCardStatus" role="status" aria-live="polite" data-i18n="license.cardUnknown">Öppna Business Central för att kontrollera licensen.</strong>
+      <strong id="licenseCardStatus" role="status" aria-live="polite" data-i18n="license.cardUnknown">Öppna Business Central för att börja spela in och kontrollera licensen.</strong>
       <span id="licenseCardMeta" class="license-summary-meta" hidden><span data-i18n="license.type">Licenstyp</span>: <span id="licenseCardType">—</span> <span aria-hidden="true">·</span> <span data-i18n="license.validUntil">Giltig till</span>: <span id="licenseCardExpiry">—</span></span>
       <span id="licenseCardChecked" class="license-summary-meta" hidden></span>
     </span>

@@ -48,7 +48,7 @@ Current product areas:
   choice for generated headings and local text/Markdown export.
 - **BC Knowledge Base** stores and helps retrieve reusable process documentation.
 
-**BC Process Maps** and broader **BC Process AI** capabilities are future product areas. They are not presented as available production functionality in 4.7.
+Broader **BC Process AI** capabilities are a future product area. They are not presented as available production functionality in 4.7.
 
 ## Report a Business Central bug
 

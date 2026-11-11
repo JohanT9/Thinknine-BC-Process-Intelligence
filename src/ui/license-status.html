@@ -10,6 +10,7 @@
     :root{font-family:"Segoe UI",Arial,sans-serif;color:var(--c-fg-172b45);background:var(--c-bg-f5f8f9)}
     *{box-sizing:border-box}body{margin:0}header{background:var(--c-bg-05474f);color:var(--c-fg-ffffff);padding:22px max(24px,calc((100vw - 760px)/2))}
     header strong,header span{display:block}header span{margin-top:4px;opacity:.8}main{max-width:808px;margin:auto;padding:24px}
+    .consultant-section>summary{cursor:pointer;list-style-position:outside}.consultant-section>summary h2{display:inline;margin:0}.consultant-section[open]>summary{margin-bottom:12px}.consultant-section>summary:focus-visible{outline:2px solid currentColor;outline-offset:3px}
     section{background:var(--c-bg-ffffff);border:1px solid var(--c-bd-ccdee0);border-radius:7px;padding:24px}h1{font-size:25px;margin:0 0 20px}h2{font-size:19px;color:var(--c-fg-007a82);margin:0 0 18px}
     dl{display:grid;grid-template-columns:180px 1fr;gap:0;margin:0}dt,dd{padding:12px;border-bottom:1px solid var(--c-bd-e1eaeb);margin:0}dt{font-weight:650}dd{overflow-wrap:anywhere}
     .status{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700}.active{background:var(--c-bg-e5f4ea);color:var(--c-fg-176b38)}.inactive{background:var(--c-bg-fde7e9);color:var(--c-fg-a4262c)}.unknown{background:var(--c-bg-fff4ce);color:var(--c-fg-6d5700)}
@@ -18,12 +19,12 @@
   </style>
 </head>
 <body>
-  <header><strong>BC Process Studio</strong><span data-i18n="license.header">Tenantlicens</span></header>
+  <header><strong>BC Process Studio</strong><span data-i18n="license.header">Licens</span></header>
   <main>
     <h1 data-i18n="license.pageTitle">Licensinformation</h1>
     <section aria-labelledby="detailsTitle">
-      <h2 id="detailsTitle" data-i18n="license.knownTenant">Känd Business Central-tenant</h2>
-      <label for="tenantSelect" data-i18n="license.tenant">Tenant</label>
+      <h2 id="detailsTitle" data-i18n="license.knownTenant">Din Business Central-licens</h2>
+      <label for="tenantSelect" data-i18n="license.tenant">Business Central-miljö</label>
       <select id="tenantSelect"></select>
       <dl>
         <dt data-i18n="license.status">Status</dt><dd><span id="status" class="status unknown" data-i18n="license.checking">Kontrollerar…</span></dd>
@@ -32,11 +33,12 @@
         <dt data-i18n="license.tenantId">Tenant-ID</dt><dd id="tenantId">—</dd>
         <dt data-i18n="license.lastChecked">Senast kontrollerad</dt><dd id="checkedAt">—</dd>
       </dl>
-      <div class="toolbar"><button id="refresh" type="button" data-i18n="license.refresh">Kontrollera aktuell BC-flik igen</button></div>
+      <div class="toolbar"><button id="refresh" type="button" data-i18n="license.refresh">Kontrollera licensen igen</button></div>
       <p id="message" role="status" aria-live="polite"></p>
     </section>
     <section aria-labelledby="consultantTitle">
-      <h2 id="consultantTitle" data-i18n="license.consultant">Microsoft-konto och konsultlicens</h2>
+      <details id="consultantSection" class="consultant-section">
+      <summary><h2 id="consultantTitle" data-i18n="license.consultant">För konsulter och administratörer</h2></summary>
       <p data-i18n="license.adminRoleHelp">Applikationsadministratörer använder Microsoft-inloggningen för att öppna lokala kunskapsförslag. Licenstjänsten kontrollerar rollen License.Administrator. Förslag och granskningsdata skickas inte.</p>
       <p id="tenantAccountHelp" hidden></p>
       <p id="consultantStatus" data-i18n="license.checking">Kontrollerar…</p>
@@ -44,6 +46,7 @@
         <button id="consultantSignIn" type="button" data-i18n="license.signIn">Logga in med Microsoft</button>
         <button id="consultantSignOut" type="button" hidden data-i18n="license.signOut">Logga ut</button>
       </div>
+      </details>
     </section>
   </main>
   <script src="engine/locale-catalogs.js"></script>

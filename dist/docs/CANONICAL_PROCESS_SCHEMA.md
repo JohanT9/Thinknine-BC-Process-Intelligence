@@ -1,7 +1,7 @@
 # Canonical Process Schema — phase 1A
 
 The schema and reference validator define a derived process contract. They do not
-replace Canonical Recording, review state, Semantic Document or process-map models.
+replace Canonical Recording, review state or Semantic Document models.
 No capture, storage, interpretation or export consumer is switched in phase 1A.
 
 ## API
