@@ -76,13 +76,16 @@
     const recording = state.state === "recording";
     const language = languages.get(record.documentLanguage);
     const safeTitle = escape(record.title);
-    const visibleTags = record.tags.slice(0, 3);
-    const hiddenTagCount = Math.max(0, record.tags.length - visibleTags.length);
+    // A tag that only repeats the company already shown in the card's details is left out.
+    const company = String(record.metadata?.company || "").trim().toLocaleLowerCase();
+    const tags = record.tags.filter(tag => String(tag).trim().toLocaleLowerCase() !== company);
+    const visibleTags = tags.slice(0, 3);
+    const hiddenTagCount = Math.max(0, tags.length - visibleTags.length);
     const label = stateLabel(state, locale);
+    // The status chip says whether a document is reviewed, so its button always names what it opens.
+    // The language badge comes first in the details, so it lines up from row to row.
     const openLabel = bugReport ? localized("Open bug report", locale, "Öppna felrapport")
-      : state.state === "ready" || recording
-        ? localized("Open documentation", locale, "Öppna dokumentation")
-        : localized("Review", locale, "Granska");
+      : localized("Open documentation", locale, "Öppna dokumentation");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
       data-selected="${selected}" ${active ? 'aria-current="true"' : ""}
       data-kind="${bugReport ? "bug-report" : "documentation"}"
@@ -97,11 +100,11 @@
         <span class="library-kind" aria-hidden="true">${bugReport ? "!" : "≡"}</span>
         <div class="library-card-title"><h4 title="${safeTitle}">${safeTitle}</h4>
           <div class="library-card-meta">
+            <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
             <span>${escape(bugReport ? localized("Bug report", locale, "Felrapport")
               : localized("Documentation", locale, "Dokumentation"))}</span>
             ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
             ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
-            <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
             <span>${escape(localized("Changed {date}", locale,
               "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
             ${bugReport && deliveryLabel(delivery, locale) ? `<span class="library-delivery"
@@ -124,6 +127,8 @@
             record.favourite ? "Remove from favorites" : "Add to favorites",
             locale, record.favourite ? "Ta bort från favoriter" :
               "Lägg till i favoriter"))}">${record.favourite ? "★" : "☆"}</button>
+        ${!bugReport && state.state === "ready" ? `<button class="secondary" data-library-action="run-test">${escape(
+          localized("Run test", locale, "Kör test"))}</button>` : ""}
         <button class="secondary" data-library-action="open" ${recording ? "disabled" : ""}>${escape(openLabel)}</button>
         <details class="library-card-menu" data-library-menu>
           <summary aria-label="${escape(localized("More actions for {title}", locale,
@@ -131,8 +136,8 @@
           <div class="library-card-menu-panel" data-no-tooltip>
             ${bugReport || recording ? "" : `<button type="button" data-library-action="export-word">${escape(
               localized("Export Word", locale, "Exportera Word"))}</button>
-            <button type="button" data-library-action="run-test">${escape(
-              localized("Run test", locale, "Kör test"))}</button>`}
+            ${state.state === "ready" ? "" : `<button type="button" data-library-action="run-test">${escape(
+              localized("Run test", locale, "Kör test"))}</button>`}`}
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
             ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
@@ -190,9 +195,17 @@
       container.innerHTML = state.emptyMessage
         ? `<p class="library-empty">${escape(state.emptyMessage)}</p>`
         : state.storedCount === 0
-        ? `<p class="library-empty">${escape(localized(
-          "No documents yet. Open Business Central, select BC Process Studio in the browser toolbar and choose Document a process.",
-          locale, "Det finns inga dokument ännu. Öppna Business Central, välj BC Process Studio i webbläsarens verktygsfält och välj Dokumentera en process."))}</p>`
+        // First use: the steps to the first document, with no tools that need documents.
+        ? `<div class="library-empty library-first-run"><h4>${escape(localized("Get started",
+          locale, "Kom igång"))}</h4><ol>${[
+          ["Open Business Central in the browser.", "Öppna Business Central i webbläsaren."],
+          ["Select BC Process Studio in the browser toolbar.",
+            "Välj BC Process Studio i webbläsarens verktygsfält."],
+          ["Choose Document a process or Report an issue and do the work in Business Central.",
+            "Välj Dokumentera en process eller Rapportera ett fel och utför arbetet i Business Central."]
+        ].map(([english, swedish]) => `<li>${escape(localized(english, locale, swedish))}</li>`).join("")}</ol>
+          <p>${escape(localized("When you finish the recording, the document appears here. Documents from another computer can be brought in with Import or Sync.",
+          locale, "När du avslutar inspelningen hamnar dokumentet här. Dokument från en annan dator hämtar du med Importera eller Synka."))}</p></div>`
         : `<div class="library-empty"><p>${escape(localized(
           "No documents in the Document Library match the search and filters.",
           locale, "Det finns inga dokument i Dokumentbiblioteket som matchar sökningen och filtren."))}</p>

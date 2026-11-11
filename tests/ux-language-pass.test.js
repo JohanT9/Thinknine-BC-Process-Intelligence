@@ -165,8 +165,11 @@ assert.ok(issueText.includes("1. Enter **A\\*1** in *No.*."), issueText);
 const libraryView = require("../src/ui/document-library-view");
 const container = { innerHTML: "" };
 libraryView.renderList(container, [], { locale: "de-DE", storedCount: 0 });
-assert.ok(container.innerHTML.includes("Noch keine Dokumente") &&
-  !container.innerHTML.includes("clear-search-filters"));
+// An empty library gives the steps to the first document, in the interface language.
+assert.ok(container.innerHTML.includes("Erste Schritte") &&
+  container.innerHTML.includes("Öffnen Sie Business Central im Browser.") &&
+  container.innerHTML.includes("library-first-run") &&
+  !container.innerHTML.includes("clear-search-filters"), container.innerHTML);
 libraryView.renderList(container, [], { locale: "de-DE", storedCount: 4 });
 assert.ok(container.innerHTML.includes("entsprechen der Suche") &&
   container.innerHTML.includes('data-library-action="clear-search-filters"'));

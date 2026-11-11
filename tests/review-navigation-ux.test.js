@@ -24,7 +24,7 @@ assert(html.includes('id="nextUnreviewedStep"'));
 assert(html.includes('aria-keyshortcuts="Alt+N"'));
 assert(html.includes('src="review/review-navigation.js"'));
 assert(dashboard.includes("function activateNextUnreviewedStep()"));
-assert(dashboard.includes("activateProcessOverviewTask(\n    navigation.nextTaskId, true"),
+assert(dashboard.includes("activateReviewTask(\n    navigation.nextTaskId, true"),
   "next navigation must select, focus and reveal the target review card");
 assert(dashboard.includes('event.key.toLowerCase() === "n"'));
 assert(i18n.includes('"review.nextUnreviewed": "Next unreviewed"'));

@@ -47,6 +47,17 @@
     outcome.textContent = `${t("test.outcome")}: ${t("test.outcome." + total.outcome)}`;
     summary.replaceChildren(outcome, document.createTextNode(" "), element("span", "", t("test.counts", {
       passed: total.passed, failed: total.failed, skipped: total.skipped, notRun: total.notRun })));
+    const next = run().steps.find(step => step.status === "not-run");
+    if (next && total.notRun < run().steps.length) {
+      const go = element("button", "", t("test.nextNotRun"));
+      go.type = "button"; go.id = "nextNotRun";
+      go.addEventListener("click", () => {
+        const target = stepList.querySelector(`[data-step-id="${CSS.escape(next.stepId)}"]`);
+        target?.scrollIntoView({ block: "center" });
+        target?.querySelector("input[type=radio]:checked, input[type=radio]")?.focus();
+      });
+      summary.append(go);
+    }
     // Steps a recording of the test showed as done pass only when the tester approves them.
     const passes = script.suggestedPasses(run());
     if (passes.length) {
@@ -176,7 +187,7 @@
     if (focus) document.querySelector(focus)?.focus();
   }
 
-  function stepItem(step, previousHeading) {
+  function stepItem(step, previousHeading, options = {}) {
     const current = run();
     const item = element("li", "run-step");
     item.dataset.status = step.status;
@@ -253,7 +264,12 @@
     const comment = field("test.comment", step.comment, "comment",
       step.status === "failed" ? t("test.failureHelp") : "");
     grid.append(expected.wrapper, comment.wrapper);
-    item.append(grid);
+    // The result comes first; the expected result and comment open when they hold text, when
+    // the step failed or when the tester opens them, so a long test stays short to work in.
+    const notes = element("details", "run-step-notes");
+    notes.open = Boolean(step.expected.trim() || step.comment.trim() || step.status === "failed" ||
+      options.notesOpen);
+    notes.append(element("summary", "", t("test.notesSummary")), grid);
 
     const status = element("fieldset", "run-status");
     status.append(element("legend", "", t("test.resultFor", { n: step.number })));
@@ -271,7 +287,10 @@
       choices.append(label);
     }
     status.append(choices);
-    item.append(status);
+    // The result and the screenshot button share a row; the notes follow.
+    const row = element("div", "run-step-row");
+    row.append(status);
+    item.append(row, notes);
 
     item.append(screenshotStrip(step));
     const actions = element("div", "run-step-report");
@@ -330,7 +349,7 @@
       });
       actions.append(create);
     }
-    item.append(actions);
+    row.append(actions);
     return item;
   }
 
@@ -342,7 +361,8 @@
     const active = item.contains(document.activeElement) ? document.activeElement : null;
     const focus = active?.id ? { id: active.id, start: active.selectionStart,
       end: active.selectionEnd } : null;
-    const replacement = stepItem(step, item.dataset.previousHeading || "");
+    const replacement = stepItem(step, item.dataset.previousHeading || "",
+      { notesOpen: Boolean(item.querySelector(".run-step-notes")?.open) });
     item.replaceWith(replacement);
     const target = focusSelector ? replacement.querySelector(focusSelector) : null;
     if (target && !target.disabled) { target.focus(); return; }

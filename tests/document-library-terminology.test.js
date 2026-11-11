@@ -15,11 +15,10 @@ assert(!popupHtml.includes("Öppna Documentation Excellence"));
 assert(popupScript.includes('$("dashboard").addEventListener("click"') &&
   popupScript.includes("chrome.runtime.openOptionsPage()"),
 "renaming must preserve popup navigation");
-assert(dashboardHtml.includes(
-  "<title>BC Process Studio — BC Knowledge Base</title>"
-));
-assert(dashboardHtml.includes('<p class="home-module">BC Knowledge Base</p>') &&
-  dashboardHtml.includes('<h2 id="documentLibraryTitle" class="home-title">Dokument</h2>'));
+assert(dashboardHtml.includes("<title>BC Process Studio</title>"));
+assert(!dashboardHtml.includes('class="home-module"'),
+  "the library is headed by its own name, not an untranslated module name");
+assert(dashboardHtml.includes('<h2 id="documentLibraryTitle" class="home-title">Dokument</h2>'));
 assert(dashboardHtml.includes('aria-label="Filter för Dokumentbibliotek"'));
 assert(dashboardHtml.includes('aria-label="Dokument i Dokumentbiblioteket"'));
 assert(dashboardHtml.includes('id="libraryFilterDisclosure"'));

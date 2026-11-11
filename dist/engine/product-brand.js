@@ -14,7 +14,6 @@
       recorder: "BC Process Recorder",
       reviewStudio: "BC Review Studio",
       documentGenerator: "BC Document Generator",
-      processMaps: "BC Process Maps",
       knowledgeBase: "BC Knowledge Base",
       processAI: "BC Process AI"
     })

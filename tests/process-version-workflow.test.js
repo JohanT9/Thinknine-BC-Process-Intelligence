@@ -1,7 +1,6 @@
 const assert = require("assert");
 const fs = require("fs");
 const workflow = require("../src/document/process-version-workflow");
-const view = require("../src/ui/process-version-comparison-view");
 
 function model(nodes) {
   return {
@@ -60,31 +59,11 @@ assert.strictEqual(currentComparison.diff.summary.changed, false);
 assert.throws(() => workflow.compare(versions, "missing",
   workflow.CURRENT_ID, secondModel), /selected/);
 
-const container = { innerHTML: "" };
-assert.deepStrictEqual(view.render(container, comparison, { locale: "sv-SE" }), {
-  changed: true, nodeCount: 2
-});
-assert(container.innerHTML.includes("Tillagda"));
-assert(container.innerHTML.includes('class="process-version-node added"'));
-assert(container.innerHTML.includes("Release order"));
-const unsafe = { ...comparison, to: { ...comparison.to,
-  processSnapshot: { ...comparison.to.processSnapshot, nodes: [{
-    ...comparison.to.processSnapshot.nodes[0], title: "<script>unsafe</script>"
-  }] } } };
-view.render(container, unsafe, { locale: "en-US" });
-assert(!container.innerHTML.includes("<script>"));
-assert(container.innerHTML.includes("&lt;script&gt;"));
-
+// The model versions remain for regenerating a document from its recording; the process map
+// that showed and compared them is removed from the interface.
 const html = fs.readFileSync("src/ui/dashboard.html", "utf8");
-const dashboard = fs.readFileSync("src/ui/dashboard.js", "utf8");
-const build = fs.readFileSync("scripts/build.js", "utf8");
-assert(html.includes('id="saveProcessVersion"'));
-assert(html.includes('id="compareProcessVersions"'));
-assert(html.includes('id="processVersionDialog"'));
 assert(html.includes('src="document/process-version-workflow.js"'));
-assert(html.includes('src="process-version-comparison-view.js"'));
-assert(dashboard.includes("function saveCurrentProcessVersion()"));
-assert(dashboard.includes("function renderProcessVersionComparison()"));
-assert(dashboard.includes("T9ProcessVersioning.libraryMetadata"));
-assert(build.includes('"process-version-comparison-view.js"'));
+for (const id of ["saveProcessVersion", "compareProcessVersions", "processVersionDialog"]) {
+  assert(!html.includes(`id="${id}"`), `${id} is not shown`);
+}
 console.log("Process version workflow tests passed.");

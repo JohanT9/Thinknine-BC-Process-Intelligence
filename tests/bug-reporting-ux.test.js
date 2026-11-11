@@ -123,6 +123,9 @@ assert.doesNotMatch(reportView, /Complete the required human context below/);
 assert.match(reportView, /Captured Business Central error/);
 assert.match(reportView, /Copy Business Central error/);
 assert.doesNotMatch(reportView, /appendField\(node, \{ name: "actualResult"/);
+assert.match(reportView, /name: "actualResult", label: "What happened instead\?"/,
+  "the actual result is asked for in the problem description");
+assert.match(reportView, /technical\.noScreenshots/);
 assert.match(reportView, /Needs attention/);
 assert.doesNotMatch(reportView, /Ready to share/);
 assert.match(reportLogic, /technical-report-expectedResult/);

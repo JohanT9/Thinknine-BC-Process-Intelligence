@@ -968,45 +968,6 @@ reliable metadata. See
 
 ## Multi-level ProcessGraph boundary (4.7)
 
-ProcessGraph presentation passes through the immutable
-`document/process-graph-layout.js` contract. It assigns deterministic rows and
-columns and describes connector route intent without adding layout information
-to the taxonomy, semantic recording, or ProcessGraph source model. HTML and
-future SVG/BPMN/Visio adapters may consume this contract independently.
-The contract supports adaptive row flow and vertical top-to-bottom flow as
-presentation preferences without changing canonical process order.
-
-Node appearance is resolved separately by
-`document/process-visual-grammar.js`. The contract translates canonical node
-types into renderer-neutral kind, shape, tone, and localized-label intent.
-Renderers implement that intent; taxonomy and recording data never store CSS or
-library-specific drawing instructions.
-
-Relationship appearance is resolved by
-`document/process-route-grammar.js`. It translates canonical transition types
-into line, marker, tone, and localized-label intent. Explicit conditions remain
-semantic graph data; route styling remains a renderer concern.
-
-Process phase and role grouping is projected by
-`document/process-lane-model.js`. It consumes Process Model containers and
-semantic role metadata and returns immutable lane membership and segments.
-The projector does not reorder nodes and does not create business semantics.
-
-`ui/process-connector-view.js` is the HTML/SVG adapter for graph relationships.
-It consumes final DOM bounds plus route grammar intent and draws a noninteractive
-connector layer. It does not infer transitions, alter layout, or expose SVG
-details to the semantic model.
-
-`ui/process-map-viewport.js` owns renderer viewport calculations only. It
-normalizes bounded zoom values and computes fit-to-width scale without mutating
-ProcessGraph or layout. Dashboard persists the user preference and requests a
-fresh render so connectors are measured after scaling.
-
-`exporters/process-svg-export.js` is the standalone SVG adapter. It consumes the
-same visual grammar, route grammar, and lane projection as Review Studio but
-owns deterministic export geometry independent of DOM measurements, viewport
-zoom, or screen size. `process-export.js` validates and delegates to it.
-
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User
@@ -1017,35 +978,11 @@ adapters consume ProcessGraph and may not reconstruct semantics from raw Review
 or introduce process branches. See
 [MULTI_LEVEL_PROCESS_GRAPH.md](MULTI_LEVEL_PROCESS_GRAPH.md).
 
-Process-map theme selection remains outside `ProcessGraph`.
-`document/process-map-theme.js` supplies immutable named palettes to the Review
-and SVG renderers, ensuring that a presentation preference never alters process
-semantics, evidence, or stored recordings. See
-[PROCESS_MAP_THEMES.md](PROCESS_MAP_THEMES.md).
-
-`document/process-map-legend.js` projects the node and route grammars used by a
-ProcessGraph into a renderer-neutral legend. Review and SVG adapters consume the
-same projection, ensuring standalone exports explain their notation without
-duplicating semantic inference. See [PROCESS_MAP_LEGEND.md](PROCESS_MAP_LEGEND.md).
-
-Map density is an ephemeral renderer preference shared by Review and SVG
-adapters. Standard and Compact modes adjust geometry and secondary presentation
-only; density is intentionally excluded from `ProcessGraph`. See
-[PROCESS_MAP_DENSITY.md](PROCESS_MAP_DENSITY.md).
-
-Process-map focus mode is UI orchestration only. It expands the existing Review
-renderer and preserves its active ProcessGraph, selection, viewport settings,
-and connector layer. See [PROCESS_MAP_FOCUS_MODE.md](PROCESS_MAP_FOCUS_MODE.md).
-
-`ui/process-map-search.js` provides pure normalization, matching, and cyclic
-navigation helpers. Dashboard applies results to the current rendered map;
-search never changes or filters ProcessGraph. See
-[PROCESS_MAP_SEARCH.md](PROCESS_MAP_SEARCH.md).
-
-`ui/process-map-minimap.js` projects the existing layout coordinates into a
-compact navigation model. It references the same stable node IDs and introduces
-no alternate graph or layout ownership. See
-[PROCESS_MAP_MINIMAP.md](PROCESS_MAP_MINIMAP.md).
+The process map that rendered ProcessGraph in Review Studio (layout, visual and
+route grammar, lanes, connectors, viewport, themes, legend, density, focus mode,
+search, minimap, node and relationship editing, SVG/JSON export and version
+comparison) was never enabled for users and was removed in 4.7.249. ProcessGraph,
+the Process Model and Process Versioning remain for recognition and regeneration.
 
 ## Business Central Document Lifecycle boundary (4.7)
 
@@ -1069,15 +1006,8 @@ Pipeline stages and extension/query contracts are documented in
 `REFERENCE_DIAGRAM_DATASET_PIPELINE.md`. No renderer or AI provider owns domain
 meaning, and source images are never assumed redistributable.
 
-Review Studio exposes this semantic layer through the Process Analysis adapter.
-The extension background owns matching; `process-analysis-view.js` only renders
-the immutable result. Manual confirmation is stored as Review metadata and does
-not copy or mutate the reference dataset. See `PROCESS_ANALYSIS_UX.md`.
-
-The Semantic Process Map projector combines the observed and reference
-ProcessGraphs into Business, BC Process and User Procedure views. It projects to
-the existing Process Model-compatible view contract, so Process Overview remains
-the single renderer and does not infer semantics. See `SEMANTIC_PROCESS_MAP_UX.md`.
+The Process Analysis dialog and the Semantic Process Map that showed this
+layer in Review Studio were removed in 4.7.249 together with the process map.
 
 ## Reference Process Library boundary (4.7)
 
