@@ -110,4 +110,46 @@ assert.ok(fallback.screenshot);
   assert.deepStrictEqual(itemTask.screenshotHighlight, { screenshotRef: "screenshots/list-open.png",
     sourceEventNo: 2, x: 0.1265, y: 0.766, width: 0.21, height: 0.0218 });
 }
+// New on a list and a search in Tell me show the moment of the click, outlined, as in a Swedish
+// purchase order recording: the list with New, and the search window with the result chosen,
+// not the page each click opened.
+{
+  const { replay } = require("../scripts/capture-quality/replay");
+  const frame = { sourceFrameId: "inner", frameDepth: 1, recordingId: "click-moment" };
+  const second = value => `2026-11-10T11:02:${String(value).padStart(2, "0")}.000Z`;
+  const ny = { x: 0.3217, y: 0.0944, width: 0.0258, height: 0.0326 };
+  const row = { x: 0.3662, y: 0.1793, width: 0.2678, height: 0.0292 };
+  const events = [
+    { ...frame, type: "click", category: "action", role: "button", controlType: "button",
+      label: "Sök", accessibleName: "Sök", pageCaption: "Rollcenter", pointerTarget: true,
+      interactionId: "top:search", preActionCaptureId: "top:search-capture", timestamp: second(1),
+      topViewportBounds: { x: 0.9, y: 0, width: 0.02, height: 0.04 } },
+    { ...frame, type: "field-change", category: "field", role: "textbox", controlType: "input",
+      inputType: "text", fieldName: "Berätta vad du vill göra.", label: "Berätta vad du vill göra.",
+      accessibleName: "Berätta vad du vill göra.", inputSource: "change", value: "ink ord",
+      pageCaption: "Aktiviteter", interactionId: "inner:tellme", timestamp: second(3) },
+    { ...frame, type: "click", category: "action", role: "gridcell", controlType: "td",
+      label: "Inköpsorder Listor \uEDFF", accessibleName: "Inköpsorder Listor \uEDFF",
+      selectedCaption: "Inköpsorder Listor \uEDFF", pageCaption: "Aktiviteter", pointerTarget: true,
+      interactionId: "inner:result", preActionCaptureId: "inner:result-capture", timestamp: second(5),
+      topViewportBounds: row },
+    { ...frame, type: "page-state", pageCaption: "Inköpsorder", pageId: "9307", timestamp: second(6) },
+    { ...frame, type: "dialog-close", category: "dialog", role: "dialog", pageCaption: "Inköpsorder",
+      interactionId: "inner:result", timestamp: second(7) },
+    { ...frame, type: "click", category: "action", role: "menuitem", controlType: "button",
+      label: "Ny", accessibleName: "Ny", pageCaption: "Inköpsorder", pageId: "9307", pointerTarget: true,
+      interactionId: "inner:new", preActionCaptureId: "inner:new-capture", timestamp: second(9),
+      topViewportBounds: ny },
+    { ...frame, type: "page-state", pageCaption: "Ny - Inköpsorder", pageId: "50", timestamp: second(10) }
+  ].map((event, index) => ({ ...event, sourceEventId: `moment:${index + 1}`, sourceSequence: index + 1 }));
+  const images = { 1: "shot-1.png", 3: "shot-3.png", 5: "shot-5.png", 6: "shot-6.png", 7: "shot-7.png" };
+  const tasks = replay(events, { documentLanguage: "sv-SE", imagePaths: images }).tasks;
+  const search = tasks.find(task => task.taskType === "SearchAndOpenPage");
+  const create = tasks.find(task => /\*\*Ny\*\*/u.test(task.instruction));
+  assert.ok(search && create, JSON.stringify(tasks.map(task => task.instruction)));
+  assert.strictEqual(search.screenshot, "shot-3.png", "the search shows the result being chosen");
+  assert.deepStrictEqual({ ...search.screenshotHighlight }, { screenshotRef: "shot-3.png", sourceEventNo: 3, ...row });
+  assert.strictEqual(create.screenshot, "shot-6.png", "New shows the list as it was clicked");
+  assert.deepStrictEqual({ ...create.screenshotHighlight }, { screenshotRef: "shot-6.png", sourceEventNo: 6, ...ny });
+}
 console.log("Selection screenshot tests passed.");

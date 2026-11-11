@@ -337,6 +337,7 @@
       targetField: properties.targetField || "",
       ...(properties.searchFieldCaption
         ? { searchFieldCaption: properties.searchFieldCaption } : {}),
+      ...(properties.typedValue ? { typedValue: properties.typedValue } : {}),
       captureGuidance,
       ...(capturePackets.length ? { capturePackets: clone(capturePackets) } : {}),
       ...(capturePackets.length === 1
@@ -435,11 +436,24 @@
           values.map(selectedRecordValue).find(Boolean) ||
           meaningfulValue({ selectedCaption: explicitSelection?.selectedCaption }) ||
           ownFieldValue || [...values].reverse().map(meaningfulValue).find(Boolean) || "";
+        // Text typed to find the row, such as part of a name, is said with the row chosen when
+        // it is not the start of the value chosen (iberic, then vendor 11976).
+        // A step described again keeps what was typed from its first description.
+        const carriedTyped = text(values[0]?.typedValue || values[0]?.semanticActionModel?.typedValue);
+        const typedFirst = carriedTyped || (["EnterFieldValue", "ChangeField"].includes(
+          values[0]?.taskType) ? meaningfulValue(values[0]) : "");
+        const typedOther = observedField && selectedValue && typedFirst &&
+          (carriedTyped || values.some(value => selectedRecordValue(value) === selectedValue)) &&
+          !selectedValue.toLocaleLowerCase().startsWith(typedFirst.toLocaleLowerCase())
+          ? typedFirst : "";
         return {
           consumed: values.length,
           action: action(rule, values, {
             actionType: config.actionType,
-            displayText: observedField && selectedValue
+            ...(typedOther ? { typedValue: typedOther } : {}),
+            displayText: typedOther
+              ? `Ange __${typedOther}__ i **${observedField}** och välj **${selectedValue}**.`
+              : observedField && selectedValue
               ? `Välj **${selectedValue}** i **${observedField}**.`
               : selectedValue
               ? `${config.verb} **${selectedValue}**.` : `${config.verb}.`,
@@ -668,11 +682,18 @@
         const observedField = text(first.fieldCaption || first.targetControl?.caption ||
           first.actionCaption || "Nr");
         const searchField = itemRow && sortingNumber(first) ? "Artikelnr." : observedField;
+        // What was typed is said when it is not the start of the record chosen, such as a word
+        // of the item's description; otherwise the record is simply entered.
+        const typed = meaningfulValue(first);
+        const typedOther = itemRow && typed && !selectedValue.toLocaleLowerCase()
+          .startsWith(typed.toLocaleLowerCase()) ? typed : "";
         return { consumed: values.length, action: action(rule, values, {
           actionType: itemRow ? "SearchAndSelectRecord" : "EnterFieldValue",
-          displayText: itemRow
-            ? `Sök efter __${selectedValue}__ i **${searchField}** och välj den filtrerade posten.`
-            : `Ange __${selectedValue}__ i **Nr**.`,
+          displayText: typedOther
+            ? `Ange __${typedOther}__ i **${searchField}** och välj **${selectedValue}**.`
+            : `Ange __${selectedValue}__ i **${itemRow ? searchField : "Nr"}**` +
+              (itemRow && /\.$/u.test(searchField) ? "" : "."),
+          ...(typedOther ? { typedValue: typedOther } : {}),
           selectedValue, targetField: itemRow ? "Artikel Nr" : "Nr",
           ...(itemRow ? { searchFieldCaption: observedField } : {}),
           ...(itemRow ? { selectedEntity: "Item",
@@ -815,6 +836,11 @@
         a[count].toLocaleLowerCase() === b[count].toLocaleLowerCase()) count += 1;
       return a.slice(0, count).join(" ");
     };
+    const onDialogSurface = value => {
+      const control = value?.targetControl || {};
+      return ["RunAction", "ClickAction"].includes(value?.taskType) &&
+        control.role === "dialog" && control.type === "interactiveSurface";
+    };
     // Tell me opened by its shortcut starts the same sequence as a click on its button.
     const opensSearch = (current, next) => current?.taskType === "SearchAndOpenPage" ||
       (current?.taskType === "PressShortcut" &&
@@ -827,13 +853,20 @@
           isSearchField(searchField(context.interactions[inputEnd + 1]))) {
         inputEnd += 1;
       }
-      const candidateResult = context.interactions[inputEnd + 1];
+      // A click on the search dialog itself, beside its controls, chooses nothing; the result
+      // chosen after it still belongs to the search.
+      let resultIndex = inputEnd + 1;
+      while (resultIndex + 1 < context.interactions.length &&
+          onDialogSurface(context.interactions[resultIndex])) {
+        resultIndex += 1;
+      }
+      const candidateResult = context.interactions[resultIndex];
       const resultCaption = clean(resultCaptionOf(candidateResult));
       const category = CATEGORY.test(resultCaption);
       const opened = openedPage(candidateResult);
       const result = category ? resultCaption.replace(CATEGORY, "")
         : opened && sharedWords(resultCaption, opened) || "";
-      return { inputEnd, candidateResult, result, category };
+      return { inputEnd, resultIndex, candidateResult, result, category };
     };
     const rule = {
       ruleId: "search-and-open-with-redundant-field",
@@ -858,10 +891,10 @@
           isSearchField(currentField) && isSearchField(nextField));
       },
       consolidate(context) {
-        const { inputEnd, result: recordedResult, category } = sequence(context);
+        const { inputEnd, resultIndex, result: recordedResult, category } = sequence(context);
         const hasRecordedResult = Boolean(recordedResult);
         const values = context.interactions.slice(context.index,
-          hasRecordedResult ? inputEnd + 2 : inputEnd + 1);
+          hasRecordedResult ? resultIndex + 1 : inputEnd + 1);
         const current = values[0];
         const selectedValue = meaningfulValue(current) || meaningfulValue(values[1]);
         const search = text(current.searchCaption || current.actionCaption || "Sök");

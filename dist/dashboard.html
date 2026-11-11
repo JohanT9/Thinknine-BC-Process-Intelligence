@@ -47,7 +47,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:hidden}
 .review-overlay.open{display:block}
 .review-shell{width:100%;max-width:none;height:calc(100vh - 48px);height:calc(100dvh - 48px);margin:0 auto;background:var(--c-bg-ffffff);border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:clip;display:flex;flex-direction:column}
-.review-header{position:sticky;top:0;background:var(--c-bg-ffffff);border-bottom:1px solid var(--c-bd-d8dee5);padding:18px;z-index:2}
+.review-header{position:sticky;top:0;background:var(--c-bg-ffffff);border-bottom:1px solid var(--c-bd-d8dee5);padding:18px;z-index:5}
 .review-header>.review-title-row,.review-header>.workspace-tabs,.review-header>.review-zoom-toolbar,.review-header>.review-toolbar,.review-header>.review-progress,.review-header>#reviewStatus{width:100%;max-width:1364px;margin-inline:auto;box-sizing:border-box}
 .review-title-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
 .workspace-tabs{display:flex;gap:6px;margin-top:12px;border-bottom:1px solid var(--c-bd-d8dee5)}
@@ -704,6 +704,9 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <h3 id="libraryMoveTitle"></h3>
     <label class="library-folder-field" for="libraryMoveDestination"><span data-i18n="folder.destination">Mapp</span>
       <select id="libraryMoveDestination" aria-describedby="libraryMoveError"></select></label>
+    <label id="libraryMoveNewField" class="library-folder-field" for="libraryMoveNewName" hidden><span data-i18n="folder.nameLabel">Mappnamn</span>
+      <input id="libraryMoveNewName" type="text" maxlength="80" autocomplete="off"
+        aria-describedby="libraryMoveError"></label>
     <p id="libraryMoveError" class="library-folder-error" role="alert"></p>
     <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
       <button type="submit" class="primary" data-i18n="folder.move">Flytta</button></footer>
