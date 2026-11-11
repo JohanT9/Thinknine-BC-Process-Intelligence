@@ -4,9 +4,9 @@ This handbook supplements the repository-wide [AGENTS.md](../AGENTS.md). Operati
 
 ## Product purpose
 
-Help users turn observed Business Central work into clear, trustworthy process documents and actionable bug reports with minimal manual effort. Prefer changes that save time, improve document quality, reduce uncertainty or make the workflow easier to understand. Technical work may enable that value without adding a visible feature.
+Help users turn observed Business Central work into clear, trustworthy process documents, actionable bug reports and repeatable tests (test scripts, test runs, suites and signable protocols) with minimal manual effort. User-friendliness is the overriding priority (see "User-friendliness comes first" in the root guide): every proposal and change is judged first by how easy it makes the product to understand and use. Prefer changes that save time, improve document quality, reduce uncertainty or make the workflow easier to understand. Technical work may enable that value without adding a visible feature.
 
-Keep related activities coherent: recording, review, documentation, reporting and export should feel like one application. Use progressive disclosure for advanced tools. Avoid adding a new abstraction, dialog or feature without a concrete need in the current task.
+Keep related activities coherent: recording, review, documentation, testing, reporting and export should feel like one application. Use progressive disclosure for advanced tools. Avoid adding a new abstraction, dialog or feature without a concrete need in the current task.
 
 ## Evidence and document quality
 
@@ -29,7 +29,7 @@ The process-document path is owned by the existing review projector, semantic mo
 
 Quality diagnostics evaluate the relevant model without mutating it or inventing repairs. Advisory quality concerns should inform the user without being confused with structural validation errors. Invalid plans, missing required assets or failed output generation must produce an actionable failure rather than a corrupt or falsely successful export.
 
-Bug reporting has its own report/evidence models, projection and issue-package contracts under `src/bug-report/`; its PDF, Markdown and email paths already exist. Preserve their ownership and consent boundaries. Do not force bug reports or licensing into the process-document Semantic Document pipeline merely to satisfy a generic diagram.
+Bug reporting has its own report/evidence models, projection and issue-package contracts under `src/bug-report/`; its PDF, Markdown and email paths already exist. Preserve their ownership and consent boundaries. Test runs and suites are likewise their own records under `src/document/test-script.js` and `test-suite.js`: a run refers to its document and records the tester's results, a suite refers to its runs and only derives progress from them. Neither ever sets a result the tester did not record. Do not force bug reports, tests or licensing into the process-document Semantic Document pipeline merely to satisfy a generic diagram.
 
 ## Architecture principles
 

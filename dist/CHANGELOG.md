@@ -1,3 +1,7 @@
+## 4.7.248
+- Project instructions: Ease of use is now the first rule for every proposal and change. The instructions also cover the test features, the knowledge catalog, the release procedure and that merging a license service change deploys it.
+- Four knowledge tests (HR context, search presentation, service context and subscription billing) now run in CI, so a regression in them is caught automatically.
+
 ## 4.7.247
 - Test suites: Test protocol on a suite's page gives one protocol for the whole suite to print or save as PDF, for example to sign off an upgrade: the result, environment and version, an overview of every test, each test's steps and results on its own page, and lines for the signatures.
 - Test protocol: When printed with background graphics, the page margins are white in the dark theme too.
