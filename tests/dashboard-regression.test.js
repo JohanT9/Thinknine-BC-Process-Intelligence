@@ -118,11 +118,26 @@ assert.ok(
   "Dashboard must merge stored settings with defaults."
 );
 assert.ok(
-  dashboard.includes("const expectedResult = configuredExpectedResult()") &&
+  (dashboard.match(/const expectedResult = templateExpectedResult\(template\)/gu) || []).length === 2 &&
     dashboard.includes("expectedResult,") &&
-    dashboard.includes("expectedResult: configuredExpectedResult(exportSettings)"),
+    dashboard.includes("expectedResult: templateExpectedResult(template, exportSettings)"),
   "Configured expected-result defaults must reach active and library exports."
 );
+// The template's text comes before the settings' text, which comes before the built-in one.
+{
+  const vm = require("vm");
+  const start = dashboard.indexOf("function configuredExpectedResult(");
+  const helper = dashboard.slice(start, dashboard.indexOf("function activeDocumentLanguage()"));
+  const context = { applicationSettings: { defaultExpectedResult: "Inställningens text." },
+    globalThis: { T9ReviewDocumentProjector: { DEFAULT_EXPECTED_RESULT: "Inbyggd text." } } };
+  vm.createContext(context);
+  vm.runInContext(helper, context);
+  assert.strictEqual(vm.runInContext("templateExpectedResult({ expectedResultText: ' Mallens text. ' })", context),
+    "Mallens text.");
+  assert.strictEqual(vm.runInContext("templateExpectedResult({ expectedResultText: '' })", context),
+    "Inställningens text.");
+  assert.strictEqual(vm.runInContext("templateExpectedResult(null, {})", context), "Inbyggd text.");
+}
 assert.ok(
   dashboard.includes("session.settings?.businessCentralCompany") &&
     dashboard.includes("company: companyName"),

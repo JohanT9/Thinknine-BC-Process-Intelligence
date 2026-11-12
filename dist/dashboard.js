@@ -2704,7 +2704,8 @@ async function autoSaveSettings() {
 function scheduleSettingsSave(event) {
   // The interface language and the appearance save through their own handlers.
   if (!event.target.matches?.("input, select, textarea") ||
-      event.target.id === "uiLocale" || event.target.name === "appearance") return;
+      event.target.id === "uiLocale" || event.target.name === "appearance" ||
+      event.target.closest("#documentTemplates")) return;
   clearTimeout(settingsSaveTimer);
   if (event.type === "change") autoSaveSettings();
   else settingsSaveTimer = setTimeout(autoSaveSettings, 700);
@@ -3310,7 +3311,8 @@ function createActiveDocumentPipeline() {
   if (!activeReviewModel || !activeReview) {
     throw new Error(uiT("Dokumentet är inte tillgängligt ännu."));
   }
-  const expectedResult = configuredExpectedResult();
+  const template = activeDocumentTemplate();
+  const expectedResult = templateExpectedResult(template);
   const documentLanguage = activeDocumentLanguage();
   const preparedPresentation = createActiveDocumentPresentation();
   const reviewWithKnowledgeExplanations = reviewForKnowledgeExport(activeReview);
@@ -3319,7 +3321,7 @@ function createActiveDocumentPipeline() {
     activeReview,
     workspaceState.revision,
     activeDocumentProfileId,
-    activeDocumentThemeId(),
+    templateCacheKey(template),
     expectedResult,
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.create({
@@ -3330,7 +3332,8 @@ function createActiveDocumentPipeline() {
       preparedPresentation,
       screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
       profileId: activeDocumentProfileId,
-      themeId: activeDocumentThemeId()
+      template,
+      purpose: template.purposeText
     }));
 }
 
@@ -3338,13 +3341,15 @@ function createActiveDocumentPresentation() {
   if (!activeReviewModel || !activeReview) {
     throw new Error(uiT("Dokumentet är inte tillgängligt ännu."));
   }
-  const expectedResult = configuredExpectedResult();
+  const template = activeDocumentTemplate();
+  const expectedResult = templateExpectedResult(template);
   const documentLanguage = activeDocumentLanguage();
   return activeDocumentPresentationCache.get([
     activeReviewModel,
     activeReview,
     workspaceState.revision,
     activeDocumentProfileId,
+    templateCacheKey(template),
     expectedResult,
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.createPresentation({
@@ -3352,7 +3357,8 @@ function createActiveDocumentPresentation() {
       review: reviewForKnowledgeExport(activeReview),
       expectedResult,
       documentLanguage,
-      profileId: activeDocumentProfileId
+      profileId: activeDocumentProfileId,
+      purpose: template.purposeText
     }));
 }
 
@@ -3373,6 +3379,12 @@ function configuredExpectedResult(settings = applicationSettings) {
     globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
 }
 
+// A document's expected result when it has no text of its own: its template's text, else
+// the standard text from the settings.
+function templateExpectedResult(template, settings = applicationSettings) {
+  return String(template?.expectedResultText || "").trim() || configuredExpectedResult(settings);
+}
+
 function activeDocumentLanguage() {
   return globalThis.T9LanguageRegistry.normalize(
     activeReview?.documentFields?.documentLanguage, "document"
@@ -3383,7 +3395,7 @@ function displayedExpectedResult() {
   const stored = String(activeReview?.documentFields?.expectedResult || "").trim();
   if (stored) return stored;
   return globalThis.T9DocumentLanguage.systemText(
-    configuredExpectedResult(),
+    templateExpectedResult(activeDocumentTemplate()),
     activeDocumentLanguage()
   );
 }
@@ -3437,10 +3449,16 @@ async function composeDocumentMediaForTarget(
       // Documents show the part of each screenshot around its marks, readable at page width.
       focus: applicationSettings?.focusScreenshots !== false
     });
-  return Object.fromEntries(screenshotAssets.map(asset => [
+  // The template's logo, in the header and on the cover.
+  const logoId = globalThis.T9DocumentTemplate.LOGO_ASSET_ID;
+  const logo = requiredAssetIds.has(logoId)
+    ? globalThis.T9DocumentTemplate.logoMedia(pipeline.template) : null;
+  return Object.fromEntries([...screenshotAssets.map(asset => [
     asset.assetId,
     composedScreenshots[asset.sourceRef.screenshotRef]
-  ]));
+  ]), ...(logo ? [[logoId, convertOriginal === dataUrlToImageData
+    ? { bytes: logo.bytes, mimeType: logo.mimeType }
+    : logo.source]] : [])]);
 }
 
 async function prepareDocumentMedia(pipeline) {
@@ -3470,17 +3488,15 @@ async function exportLibraryDocument(record, exportSettings) {
     })
     : globalThis.T9Review.createReview(session, model.businessTasks);
   await loadReviewScreenshots(model, review);
-  const themeId = globalThis.T9DocumentThemeRegistry.get(
-    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
-    record.theme.themeId
-  ) ? record.theme.themeId : "thinknine";
+  const template = documentTemplateFor(record.theme.themeId);
   const pipeline = globalThis.T9WordExportPipeline.create({
     session: model.response.session,
     review,
-    expectedResult: configuredExpectedResult(exportSettings),
+    expectedResult: templateExpectedResult(template, exportSettings),
     screenshotCandidates: screenshotCandidatesFor(model, review),
     profileId: record.profile.profileId,
-    themeId
+    template,
+    purpose: template.purposeText
   });
   const mediaAssets = await composeDocumentMedia(
     pipeline, review, model.screenshotData
@@ -3664,6 +3680,11 @@ let documentProfileVariants = new Map();
 let documentWorkspaceMediaSources = {};
 let documentProfileSource = null;
 let documentLibraryRecords = [];
+// The user's own document templates and the template new documents get
+// (document/document-template.js).
+let documentTemplates = [];
+let defaultDocumentTemplateId = "thinknine";
+let unreadableDocumentTemplates = [];
 let documentLibraryIndex = [];
 let documentLibrarySessions = new Map();
 let documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection();
@@ -3914,7 +3935,9 @@ function renderLibraryBatchToolbar(message = "") {
 function refreshLibraryFilters() {
   const themes = new Map();
   documentLibraryRecords.forEach(record => {
-    themes.set(record.theme.themeId, record.theme.displayName);
+    const known = globalThis.T9DocumentTemplate.builtIn(record.theme.themeId) ||
+      documentTemplates.find(template => template.templateId === record.theme.themeId);
+    themes.set(record.theme.themeId, known ? documentTemplateName(known) : record.theme.displayName);
   });
   fillLibraryFilter("libraryThemeFilter", [...themes],
     $("libraryThemeFilter")?.value || "");
@@ -4692,9 +4715,15 @@ $("libraryTestSuiteList").addEventListener("click", event => {
 });
 // Progress changes on the test pages; the list follows, a little later.
 let libraryTestSuiteTimer = null;
+let documentTemplateChangeTimer = null;
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
   const storageKeys = globalThis.T9StorageKeys;
+  if (Object.keys(changes).some(key => key.startsWith(storageKeys.DOCUMENT_TEMPLATE_PREFIX) ||
+      key === storageKeys.DEFAULT_DOCUMENT_TEMPLATE_KEY)) {
+    clearTimeout(documentTemplateChangeTimer);
+    documentTemplateChangeTimer = setTimeout(() => { void documentTemplatesChanged(); }, 150);
+  }
   if (!Object.keys(changes).some(key => key.startsWith(storageKeys.TEST_SUITE_PREFIX) ||
       key.startsWith(storageKeys.TEST_RUN_PREFIX))) return;
   clearTimeout(libraryTestSuiteTimer);
@@ -4816,6 +4845,7 @@ async function runLibraryExport(scope) {
   const lines = libraryTransfer.exportLines({ storage: chrome.storage.local,
     keys: globalThis.T9StorageKeys, appVersion: APP_VERSION,
     items: records.map(record => ({ id: record.projectId, record })), folders,
+    templates: documentTemplates,
     scope: { kind: scope, ...(scope === "folder" ? { folderName: scopes.folder.name } : {}) },
     onProgress: ({ done, total }) => {
       progress.value = done;
@@ -4926,12 +4956,19 @@ function libraryImportWriteCount() {
   return planned.counts.new + (replace ? planned.counts.different : 0);
 }
 
+// Templates the import adds or updates, also when no document is written.
+function libraryImportTemplateCount() {
+  return libraryImportRun?.planned?.templates?.writes.length || 0;
+}
+
 function updateLibraryImportSubmit() {
   const count = libraryImportWriteCount();
+  const templates = libraryImportTemplateCount();
   const submit = $("libraryImportSubmit");
-  submit.hidden = !libraryImportRun?.planned || !count;
-  submit.textContent = uiTf("transfer.importSubmit", { count });
-  $("libraryImportCancel").textContent = uiT(libraryImportRun?.planned && !count ? "transfer.close" : "folder.cancel");
+  submit.hidden = !libraryImportRun?.planned || !(count || templates);
+  submit.textContent = count ? uiTf("transfer.importSubmit", { count }) : uiT("transfer.importTemplatesSubmit");
+  $("libraryImportCancel").textContent = uiT(libraryImportRun?.planned && !(count || templates)
+    ? "transfer.close" : "folder.cancel");
 }
 
 function renderLibraryImportPlan(planned) {
@@ -4939,13 +4976,19 @@ function renderLibraryImportPlan(planned) {
   $("libraryImportSource").textContent = uiTf("transfer.source", {
     file: libraryImportRun.file.name, date: libraryTransferDate(header.exportedAt),
     version: header.appVersion || "?" });
-  $("libraryImportStatus").textContent = counts.new || counts.different ? "" : uiT("transfer.nothingNew");
+  const templatesNew = planned.templates.writes.filter(item => item.status === "new").length;
+  $("libraryImportStatus").textContent = counts.new || counts.different || planned.templates.writes.length
+    ? "" : uiT("transfer.nothingNew");
   $("libraryImportCounts").hidden = false;
   $("libraryImportCounts").innerHTML = [
     uiTf("transfer.countNew", { count: counts.new }),
     uiTf("transfer.countSame", { count: counts.same }),
     uiTf("transfer.countDifferent", { count: counts.different }),
-    ...(counts.busy ? [uiTf("transfer.countBusy", { count: counts.busy })] : [])
+    ...(counts.busy ? [uiTf("transfer.countBusy", { count: counts.busy })] : []),
+    ...(templatesNew ? [uiTf("transfer.countTemplatesNew", { count: templatesNew })] : []),
+    // An updated template changes how the documents that follow it look, so it is named.
+    ...planned.templates.writes.filter(item => item.status === "newer").map(item =>
+      uiTf("transfer.templateNewer", { name: item.template.name }))
   ].map(line => `<li>${escapeHtml(line)}</li>`).join("");
   const different = planned.items.filter(item => item.status === "different");
   $("libraryImportConflicts").hidden = !different.length;
@@ -4999,8 +5042,9 @@ async function openLibraryImport(file) {
     if (libraryImportRun?.file !== file) return;
     const local = await libraryTransfer.localDigests(chrome.storage.local, globalThis.T9StorageKeys,
       inspection.items.map(item => item.id));
+    await loadDocumentTemplates();
     const planned = libraryTransfer.plan({ inspection, local, records: documentLibraryRecords,
-      tree: documentFolders, activeId: await libraryActiveRecordingId() });
+      tree: documentFolders, activeId: await libraryActiveRecordingId(), templates: documentTemplates });
     if (libraryImportRun?.file !== file) return;
     libraryImportRun.planned = planned;
     setLibraryImportBusy(false);
@@ -5030,7 +5074,7 @@ $("libraryImportForm").addEventListener("submit", async event => {
   const replace = $("libraryImportForm").querySelector("[name=libraryImportConflict]:checked")?.value === "replace";
   const change = libraryTransfer.changes(run.planned, { replace, records: documentLibraryRecords,
     tree: documentFolders, normalize: globalThis.T9DocumentLibrary.normalize });
-  if (!change.written.length) return;
+  if (!change.written.length && !change.templates.length) return;
   run.writing = true;
   $("libraryImportError").textContent = "";
   const progress = $("libraryImportProgress");
@@ -5051,9 +5095,13 @@ $("libraryImportForm").addEventListener("submit", async event => {
     libraryImportRun = null;
     $("libraryImportDialog").close();
     await loadSessions();
+    if (change.templates.length) await documentTemplatesChanged();
     await renderLibraryImportNotice();
-    const message = uiTf("transfer.imported", { added: change.newIds.length,
-      replaced: change.replacedIds.length });
+    const message = [
+      ...(change.written.length ? [uiTf("transfer.imported", { added: change.newIds.length,
+        replaced: change.replacedIds.length })] : []),
+      ...(change.templates.length ? [uiTf("transfer.importedTemplates", { count: change.templates.length })] : [])
+    ].join(" ");
     announceLibraryFolders(message);
     show(message);
   } catch (error) {
@@ -5064,6 +5112,7 @@ $("libraryImportForm").addEventListener("submit", async event => {
       error?.code === "rollbackFailed" ? "" : uiT("transfer.rolledBack")}`.trim();
     await releaseLibraryDocuments(change.replacedIds);
     await loadSessions().catch(() => {});
+    await documentTemplatesChanged().catch(() => {});
     await renderLibraryImportNotice();
     updateLibraryImportSubmit();
   }
@@ -5137,6 +5186,7 @@ async function undoLibraryImport() {
   await releaseLibraryDocuments([...(meta?.newIds || []), ...(meta?.replacedIds || []),
     ...(meta?.removedIds || [])]);
   await loadSessions();
+  if (meta?.templates?.written?.length) await documentTemplatesChanged();
   await renderLibraryImportNotice();
   return result;
 }
@@ -5165,9 +5215,11 @@ $("libraryImportUndo").addEventListener("click", async () => {
     return;
   }
   const synced = meta.kind === "sync";
-  $("libraryImportUndoBody").textContent = uiTf(synced ? "sync.undoBody" : "transfer.undoBody", {
+  const templateCount = (meta.templates?.written || []).length;
+  $("libraryImportUndoBody").textContent = [uiTf(synced ? "sync.undoBody" : "transfer.undoBody", {
     added: (meta.newIds || []).length, replaced: (meta.replacedIds || []).length,
-    removed: (meta.removedIds || []).length });
+    removed: (meta.removedIds || []).length }),
+  ...(templateCount ? [uiTf("transfer.undoTemplates", { count: templateCount })] : [])].join(" ");
   for (const [id, key] of [["libraryImportUndoTitle", "undoTitle"], ["libraryImportUndoSubmit", "undo"]]) {
     $(id).dataset.i18n = `${synced ? "sync" : "transfer"}.${key}`;
     $(id).textContent = uiT($(id).dataset.i18n);
@@ -5325,6 +5377,7 @@ function librarySyncSummary(result) {
   const lines = [
     [result.pushed, "sync.resultPushed"], [result.pulled, "sync.resultPulled"],
     [result.removedHere, "sync.resultRemoved"], [result.removedThere, "sync.resultRemovedThere"],
+    [result.templatesPulled, "sync.resultTemplates"],
     [result.conflictsLeft, "sync.resultConflicts"], [result.deletionsLeft, "sync.resultDeletions"],
     [result.waiting, "sync.resultWaiting"], [result.changedDuring, "sync.resultChanged"],
     [result.unreadable, "sync.resultUnreadable"]
@@ -5435,12 +5488,15 @@ async function runLibrarySync({ interactive, decisions = null }) {
     // The library is read again first: another tab may have changed it, and a document
     // missing from an out-of-date list would look deleted here.
     await loadSessions();
+    await loadDocumentTemplates();
+    // A template with changes not yet saved here is saved first, so it is compared as it is.
+    if (templateEditor?.pending) await flushTemplateSave();
     // Compared afresh also after the user decided, so that changes made while the decisions
     // were shown are not overwritten. The document being recorded and the one open for
     // review are left as they are.
     const prepared = await librarySync.prepare({ ...context, records: documentLibraryRecords,
       tree: documentFolders, activeId: await libraryActiveRecordingId(),
-      activeIds: activeReviewSession ? [activeReviewSession.id] : [] });
+      activeIds: activeReviewSession ? [activeReviewSession.id] : [], templates: documentTemplates });
     const shown = decisions ? librarySyncPrepared : null;
     if (interactive && prepared.needsDecision &&
       (!shown || librarySyncDecisionKey(shown) !== librarySyncDecisionKey(prepared))) {
@@ -5466,6 +5522,7 @@ async function runLibrarySync({ interactive, decisions = null }) {
           { done, total });
       } });
     await releaseLibraryDocuments([...result.replacedIds, ...result.removedIds]);
+    if (result.templatesPulled) await documentTemplatesChanged();
     await renderLibraryImportNotice();
     return { result };
   });
@@ -5607,6 +5664,10 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
     const sessionRecord = librarySessionRecord(session);
+    // A new document gets the default template; a stored one keeps the template it has.
+    if (!stored.has(session.id) && !sessionRecord.theme) {
+      sessionRecord.theme = documentTemplateAssignment(null);
+    }
     const report = bugReports.get(session.id);
     const reportTitle = report?.summary?.title;
     return globalThis.T9DocumentLibrary.merge(storedRecord, {
@@ -5687,14 +5748,21 @@ async function commitLibraryBatch(result, confirmation) {
   return result.affected;
 }
 
+// The templates a document can be given: the built-in ones, then the user's own.
+function allDocumentTemplates() {
+  return [...globalThis.T9DocumentTemplate.BUILT_IN.map(item =>
+    globalThis.T9DocumentTemplate.builtIn(item.templateId)), ...documentTemplates];
+}
+
 function populateBatchMetadataOptions() {
-  const themes = globalThis.T9DocumentThemeRegistry.list(
-    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
-  ).filter(theme => theme.themeId !== "base");
-  $("libraryBatchThemeValue").innerHTML = themes.map(theme =>
-    `<option value="${escapeHtml(theme.themeId)}">` +
-      `${escapeHtml(theme.displayName)}</option>`
+  const select = $("libraryBatchThemeValue");
+  const selected = select.value || defaultDocumentTemplateId;
+  select.innerHTML = allDocumentTemplates().map(template =>
+    `<option value="${escapeHtml(template.templateId)}">` +
+      `${escapeHtml(documentTemplateName(template))}</option>`
   ).join("");
+  select.value = allDocumentTemplates().some(template => template.templateId === selected)
+    ? selected : defaultDocumentTemplateId;
 }
 
 function openBatchMetadataDialog(mode = "metadata") {
@@ -5734,14 +5802,691 @@ function batchMetadataOperation() {
   };
 }
 
-function activeDocumentThemeId() {
-  const assigned = documentLibraryRecords.find(record =>
-    record.projectId === activeReviewSession?.id)?.theme?.themeId;
-  const themes = globalThis.T9DocumentThemeRegistry.list(
-    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY);
-  return themes.some(theme => theme.themeId === assigned) ? assigned
-    : documentProfiles().find(profile => profile.profileId === activeDocumentProfileId)
-      ?.theme.themeId || "thinknine";
+// The template a document follows (document/document-template.js): the one its library
+// record names (record.theme.themeId), else the default template. A template that is not
+// here, for example not yet synchronized, is shown as the default one; the record keeps
+// naming it.
+function documentTemplateFor(templateId) {
+  return globalThis.T9DocumentTemplate.resolve(documentTemplates,
+    templateId || defaultDocumentTemplateId, defaultDocumentTemplateId);
+}
+
+// Built-in templates are named in the interface language; the user's own keep their name.
+function documentTemplateName(template) {
+  return template?.builtIn ? uiT(`template.builtIn.${template.templateId}`) : template?.name || "";
+}
+
+async function loadDocumentTemplates() {
+  const model = globalThis.T9DocumentTemplate;
+  const keys = globalThis.T9StorageKeys;
+  try {
+    const { templates, unreadable } = await model.list(chrome.storage.local, keys);
+    documentTemplates = templates;
+    unreadableDocumentTemplates = unreadable;
+    defaultDocumentTemplateId = await model.defaultTemplateId(chrome.storage.local, keys, templates);
+  } catch (error) {
+    console.error("BC Process Studio document templates could not be read", error);
+  }
+}
+
+// After a template changes here or in another window: the open document and the library show it.
+async function documentTemplatesChanged() {
+  await loadDocumentTemplates();
+  renderDocumentTemplateSettings();
+  populateBatchMetadataOptions();
+  refreshLibraryFilters();
+  renderDocumentLibrary();
+  if (activeReview) {
+    if (document.activeElement !== $("expectedResultEditor")) {
+      $("expectedResultEditor").value = displayedExpectedResult();
+    }
+    invalidateDocumentWorkspace();
+    if (workspaceState.active === "document") void synchronizeDocumentWorkspace();
+  }
+}
+
+function documentTemplateAssignment(assigned) {
+  const template = documentTemplateFor(assigned?.themeId);
+  if (assigned?.themeId && template.templateId !== assigned.themeId) {
+    return { themeId: assigned.themeId, displayName: assigned.displayName || assigned.themeId };
+  }
+  return { themeId: template.templateId, displayName: documentTemplateName(template) };
+}
+
+function activeDocumentTemplate() {
+  return documentTemplateFor(documentLibraryRecords.find(record =>
+    record.projectId === activeReviewSession?.id)?.theme?.themeId);
+}
+
+// Settings → Documents → Document templates. The list shows the built-in templates and the
+// user's own; a template of the user's own is edited in place and saved as it is changed.
+const TEMPLATE_COLORS = ["#007a82", "#0f6cbd", "#17365d", "#5b2a86", "#a4262c", "#c35a00",
+  "#107c10", "#111827"];
+const TEMPLATE_LOGO_MAX_BYTES = 2 * 1024 * 1024;
+let templateEditor = null;
+let templateRemoveTarget = null;
+
+function templateListItem(template) {
+  const isDefault = template.templateId === defaultDocumentTemplateId;
+  const item = document.createElement("li");
+  item.className = "document-template-item";
+  item.dataset.templateId = template.templateId;
+  const swatch = document.createElement("span");
+  swatch.className = "document-template-item-swatch";
+  swatch.style.background = template.color;
+  swatch.setAttribute("aria-hidden", "true");
+  const name = document.createElement("span");
+  name.className = "document-template-item-name";
+  name.textContent = documentTemplateName(template);
+  const label = document.createElement("span");
+  label.className = "document-template-item-label";
+  label.append(swatch, name);
+  if (isDefault) {
+    const badge = document.createElement("span");
+    badge.className = "document-template-badge";
+    badge.textContent = uiT("template.default");
+    label.append(badge);
+  }
+  const actions = document.createElement("span");
+  actions.className = "document-template-item-actions";
+  const button = (action, text) => {
+    const element = document.createElement("button");
+    element.type = "button";
+    element.className = action === "remove" ? "danger" : "secondary";
+    element.dataset.templateAction = action;
+    element.textContent = text;
+    element.setAttribute("aria-label", `${text}: ${documentTemplateName(template)}`);
+    return element;
+  };
+  actions.append(button("edit", uiT(template.builtIn ? "template.view" : "template.edit")),
+    button("copy", uiT("template.copy")));
+  if (!isDefault) actions.append(button("default", uiT("template.makeDefault")));
+  if (!template.builtIn) actions.append(button("remove", uiT("template.remove")));
+  item.append(label, actions);
+  return item;
+}
+
+function renderDocumentTemplateSettings() {
+  const list = $("documentTemplateList");
+  if (!list) return;
+  list.replaceChildren(...allDocumentTemplates().map(templateListItem));
+  $("documentTemplateUnreadable").hidden = unreadableDocumentTemplates.length === 0;
+  $("documentTemplateUnreadable").textContent = uiTf("template.unreadable",
+    { count: unreadableDocumentTemplates.length });
+  $("documentTemplateFooterHelp").textContent = uiT("template.footerHelp");
+  if (!templateEditor) return;
+  const stored = allDocumentTemplates().find(template =>
+    template.templateId === templateEditor.template.templateId);
+  if (!stored) {
+    closeTemplateEditor();
+    return;
+  }
+  // A change saved in another window is shown, unless this window has changes of its own.
+  if (!templateEditor.pending && !templateEditor.saving &&
+      stored.updatedAt !== templateEditor.template.updatedAt) {
+    templateEditor.template = stored;
+    fillTemplateEditor();
+  } else {
+    renderTemplateEditorChrome();
+  }
+}
+
+function renderTemplateEditorChrome() {
+  const { template } = templateEditor;
+  $("documentTemplateEditorTitle").textContent = documentTemplateName(template);
+  $("documentTemplateBuiltInNote").hidden = !template.builtIn;
+  $("documentTemplateDelete").hidden = template.builtIn;
+  $("documentTemplateShare").hidden = template.builtIn;
+  $("documentTemplateFooterHelp").textContent = uiT("template.footerHelp");
+  renderTemplateSwatches();
+  renderTemplateSample();
+}
+
+function fillTemplateEditor() {
+  const { template } = templateEditor;
+  const readOnly = template.builtIn;
+  $("documentTemplateName").value = documentTemplateName(template);
+  $("documentTemplateCompany").value = template.company || "";
+  $("documentTemplateColor").value = template.color;
+  $("documentTemplateFooter").value = template.footer || "";
+  $("documentTemplatePurpose").value = template.purposeText || "";
+  $("documentTemplateExpected").value = template.expectedResultText || "";
+  for (const box of document.querySelectorAll("[data-template-section]")) {
+    box.checked = template.sections?.[box.dataset.templateSection] !== false;
+  }
+  renderTemplateTextPlaceholders();
+  const font = $("documentTemplateFont");
+  font.replaceChildren(...globalThis.T9DocumentTemplate.FONTS.map(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    option.style.fontFamily = value;
+    return option;
+  }));
+  font.value = template.font;
+  for (const id of ["documentTemplateName", "documentTemplateCompany", "documentTemplateColor",
+    "documentTemplateFont", "documentTemplateFooter", "documentTemplateLogoChoose",
+    "documentTemplateLogoRemove"]) {
+    $(id).disabled = readOnly;
+  }
+  // A built-in template is shown, not edited: its sample and the way to copy it.
+  $("documentTemplateFields").hidden = readOnly;
+  $("documentTemplateFields").parentElement.classList.toggle("is-built-in", readOnly);
+  $("documentTemplateLogoChoose").hidden = readOnly;
+  $("documentTemplateLogoError").hidden = true;
+  fillTemplateLogo();
+  renderTemplateEditorChrome();
+}
+
+// The empty default texts show the text a document gets instead, in the interface language.
+function renderTemplateTextPlaceholders() {
+  const language = globalThis.T9LanguageRegistry.normalize(applicationSettings.uiLocale, "document");
+  const system = value => globalThis.T9DocumentLanguage.systemText(value, language);
+  $("documentTemplatePurpose").placeholder =
+    system(globalThis.T9ReviewDocumentProjector.DEFAULT_PURPOSE);
+  $("documentTemplateExpected").placeholder = system(configuredExpectedResult());
+}
+
+function fillTemplateLogo() {
+  const { logo, builtIn } = templateEditor.template;
+  $("documentTemplateLogoImage").hidden = !logo;
+  if (logo) $("documentTemplateLogoImage").src = logo.dataUrl;
+  else $("documentTemplateLogoImage").removeAttribute("src");
+  $("documentTemplateLogoRemove").hidden = !logo || builtIn;
+}
+
+function renderTemplateSwatches() {
+  const { template } = templateEditor;
+  const container = $("documentTemplateSwatches");
+  container.replaceChildren(...TEMPLATE_COLORS.map(color => {
+    const swatch = document.createElement("button");
+    swatch.type = "button";
+    swatch.className = "document-template-swatch";
+    swatch.style.background = color;
+    swatch.dataset.color = color;
+    swatch.disabled = template.builtIn;
+    swatch.setAttribute("aria-pressed", String(template.color === color));
+    swatch.setAttribute("aria-label", uiTf("template.colorOption", { color }));
+    return swatch;
+  }));
+  const model = globalThis.T9DocumentTemplate;
+  $("documentTemplateColorHelp").hidden = model.readableColor(template.color) === template.color;
+}
+
+// The first page as Word shows it: the header, footer and cover come from the document plan
+// the template gives, so the sample shows what the template really does.
+function renderTemplateSample() {
+  const model = globalThis.T9DocumentTemplate;
+  const { template } = templateEditor;
+  const sample = $("documentTemplateSample");
+  const title = uiT("template.sampleTitle");
+  const locale = applicationSettings.uiLocale || "en-US";
+  const plan = globalThis.T9WordExportPipeline.create({
+    session: { id: "template-sample", name: title },
+    review: { sessionId: "template-sample", sessionName: title, tasks: [] },
+    documentLanguage: globalThis.T9LanguageRegistry.normalize(locale, "document"),
+    template
+  }).plan;
+  const find = (components, kind) => {
+    for (const component of components || []) {
+      if (component.kind === kind && component.visibility !== "hidden") return component;
+      const found = find(component.components, kind);
+      if (found) return found;
+    }
+    return null;
+  };
+  const header = find(plan.components, "header");
+  const footer = find(plan.components, "footer");
+  const cover = find(plan.components, "cover") ||
+    (plan.sections || []).map(section => find(section.components, "cover")).find(Boolean);
+  const branding = header?.appearance?.branding || {};
+  const own = Boolean(branding.templateId);
+  const banded = !own && Boolean(header?.appearance?.fillColor);
+  sample.style.setProperty("--sample-color", model.readableColor(template.color));
+  sample.style.fontFamily = `"${template.font}", Arial, sans-serif`;
+  const headerBand = sample.querySelector(".document-workspace-page-sample-header");
+  headerBand.hidden = !header;
+  headerBand.classList.toggle("is-banded", banded);
+  headerBand.classList.toggle("is-plain", !own && !banded);
+  const fill = String(header?.appearance?.fillColor || "").replace(/^#?/u, "#");
+  headerBand.style.setProperty("--sample-fill", banded ? fill : "transparent");
+  const ink = String(header?.appearance?.textColor || "").replace(/^#?/u, "#");
+  headerBand.style.setProperty("--sample-ink", banded && ink.length > 1 ? ink : "#1f2937");
+  const logo = own && template.logo ? template.logo.dataUrl : "";
+  for (const id of ["documentTemplateSampleLogo", "documentTemplateSampleCoverLogo"]) {
+    $(id).hidden = !logo;
+    if (logo) $(id).src = logo;
+    else $(id).removeAttribute("src");
+  }
+  $("documentTemplateSampleCompany").textContent = own ? branding.organizationName || "" : "";
+  $("documentTemplateSampleHeaderTitle").textContent = banded
+    ? `BC Process Studio  |  Business Central  |  ${header.content.text}` : header?.content?.text || "";
+  $("documentTemplateSampleCoverCompany").textContent = cover?.appearance?.brandText || "";
+  $("documentTemplateSampleTitle").textContent = title;
+  for (const id of ["documentTemplateSampleCoverCompany", "documentTemplateSampleTitle"]) {
+    $(id).hidden = !cover;
+  }
+  sample.querySelector(".document-workspace-page-sample-rule").hidden = !cover;
+  sample.querySelector(".document-workspace-page-sample-cover").classList.toggle("is-coverless", !cover);
+  if (!cover) $("documentTemplateSampleCoverLogo").hidden = true;
+  const firstSection = (plan.sections || []).find(section => section.kind !== "cover");
+  const firstHeading = firstSection?.kind === "toc"
+    ? find(firstSection.components, "toc")?.appearance?.title
+    : find(firstSection?.components, "heading")?.content?.text;
+  $("documentTemplateSampleHeading").textContent = firstHeading || uiT("template.sampleHeading");
+  const footerText = String(footer?.content?.text || "");
+  $("documentTemplateSampleFooter").hidden = !footer;
+  $("documentTemplateSampleFooter").textContent = footerText.includes("{page}")
+    ? footerText.split("{page}").join("1") : `${footerText} | ${footer?.content?.pageLabel || ""} 1`;
+}
+
+function openTemplateEditor(template) {
+  templateEditor = { template, pending: null, timer: null, saving: false };
+  $("documentTemplateListView").hidden = true;
+  $("documentTemplateEditor").hidden = false;
+  setTemplateSaveStatus("");
+  $("documentTemplateRetry").hidden = true;
+  $("documentTemplateShareStatus").textContent = "";
+  fillTemplateEditor();
+  $("documentTemplateEditorTitle").focus();
+}
+
+function closeTemplateEditor() {
+  const templateId = templateEditor?.template.templateId;
+  if (templateEditor?.pending) void flushTemplateSave();
+  templateEditor = null;
+  $("documentTemplateEditor").hidden = true;
+  $("documentTemplateListView").hidden = false;
+  renderDocumentTemplateSettings();
+  const row = [...$("documentTemplateList").children].find(item =>
+    item.dataset.templateId === templateId);
+  (row?.querySelector("button") || $("documentTemplateNew")).focus();
+}
+
+function setTemplateSaveStatus(key, saved = false) {
+  $("documentTemplateSaveStatus").textContent = key ? uiT(key) : "";
+  $("documentTemplateSaveStatus").classList.toggle("saved", saved);
+}
+
+function changeTemplate(patch) {
+  if (!templateEditor || templateEditor.template.builtIn) return;
+  templateEditor.template = globalThis.T9DocumentTemplate.update(templateEditor.template, patch);
+  templateEditor.pending = templateEditor.template;
+  renderTemplateEditorChrome();
+  setTemplateSaveStatus("template.saving");
+  $("documentTemplateRetry").hidden = true;
+  clearTimeout(templateEditor.timer);
+  templateEditor.timer = setTimeout(() => { void flushTemplateSave(); }, 500);
+}
+
+async function flushTemplateSave(editor = templateEditor) {
+  if (!editor?.pending || editor.saving) return;
+  clearTimeout(editor.timer);
+  const value = editor.pending;
+  editor.pending = null;
+  editor.saving = true;
+  try {
+    await globalThis.T9DocumentTemplate.save(chrome.storage.local, globalThis.T9StorageKeys, value);
+    editor.saving = false;
+    documentTemplates = documentTemplates.map(item =>
+      item.templateId === value.templateId ? value : item);
+    if (editor.pending) {
+      void flushTemplateSave(editor);
+      return;
+    }
+    if (templateEditor === editor) {
+      setTemplateSaveStatus("template.saved", true);
+      $("documentTemplateRetry").hidden = true;
+    }
+  } catch (error) {
+    console.error("BC Process Studio document template could not be saved", error);
+    editor.saving = false;
+    // The edits stay in the editor and are saved with the next change or the retry.
+    editor.pending = editor.pending || value;
+    if (templateEditor === editor) {
+      setTemplateSaveStatus("template.saveFailed");
+      $("documentTemplateRetry").hidden = false;
+    } else {
+      $("documentTemplateListStatus").textContent = uiT("template.saveFailed");
+    }
+  }
+}
+
+async function addDocumentTemplate(from, name) {
+  const model = globalThis.T9DocumentTemplate;
+  const template = model.create(from, { templateId: `template-${crypto.randomUUID()}`, name });
+  try {
+    await model.save(chrome.storage.local, globalThis.T9StorageKeys, template);
+  } catch (error) {
+    console.error("BC Process Studio document template could not be created", error);
+    $("documentTemplateListStatus").textContent = uiT("template.actionFailed");
+    return;
+  }
+  documentTemplates = [...documentTemplates, template];
+  populateBatchMetadataOptions();
+  openTemplateEditor(template);
+}
+
+function copyTemplateName(template) {
+  return uiTf("template.copyName", { name: documentTemplateName(template) })
+    .slice(0, globalThis.T9DocumentTemplate.MAX_NAME);
+}
+
+async function makeDefaultDocumentTemplate(template) {
+  try {
+    await globalThis.T9DocumentTemplate.setDefault(chrome.storage.local, globalThis.T9StorageKeys,
+      template.templateId);
+    defaultDocumentTemplateId = template.templateId;
+    renderDocumentTemplateSettings();
+    $("documentTemplateListStatus").textContent = uiTf("template.defaultChanged",
+      { name: documentTemplateName(template) });
+    const row = [...$("documentTemplateList").children].find(item =>
+      item.dataset.templateId === template.templateId);
+    row?.querySelector("button")?.focus();
+  } catch (error) {
+    console.error("BC Process Studio default document template could not be saved", error);
+    $("documentTemplateListStatus").textContent = uiT("template.actionFailed");
+  }
+}
+
+function askRemoveDocumentTemplate(template) {
+  templateRemoveTarget = template;
+  const count = documentLibraryRecords.filter(record =>
+    record.theme?.themeId === template.templateId).length;
+  const fallbackId = template.templateId === defaultDocumentTemplateId
+    ? globalThis.T9DocumentTemplate.DEFAULT_TEMPLATE_ID : defaultDocumentTemplateId;
+  $("documentTemplateRemoveTitle").textContent = uiTf("template.removeTitle",
+    { name: documentTemplateName(template) });
+  $("documentTemplateRemoveText").textContent = uiTf(count
+    ? "template.removeInUse" : "template.removeUnused",
+    { count, name: documentTemplateName(documentTemplateFor(fallbackId)) });
+  $("documentTemplateRemoveDialog").returnValue = "";
+  $("documentTemplateRemoveDialog").showModal();
+}
+
+// A removed template's documents get the default template; their content is not changed.
+async function removeDocumentTemplate(template) {
+  const model = globalThis.T9DocumentTemplate;
+  const keys = globalThis.T9StorageKeys;
+  try {
+    if (templateEditor?.template.templateId === template.templateId) {
+      clearTimeout(templateEditor.timer);
+      templateEditor.pending = null;
+    }
+    if (template.templateId === defaultDocumentTemplateId) {
+      await model.setDefault(chrome.storage.local, keys, model.DEFAULT_TEMPLATE_ID);
+      defaultDocumentTemplateId = model.DEFAULT_TEMPLATE_ID;
+    }
+    await model.remove(chrome.storage.local, keys, template.templateId);
+    documentTemplates = documentTemplates.filter(item => item.templateId !== template.templateId);
+    const fallback = documentTemplateAssignment(null);
+    let moved = false;
+    documentLibraryRecords = documentLibraryRecords.map(record => {
+      if (record.theme?.themeId !== template.templateId) return record;
+      moved = true;
+      return globalThis.T9DocumentLibrary.merge(record, { theme: fallback });
+    });
+    if (moved) {
+      rebuildDocumentLibraryIndex();
+      await persistDocumentLibrary();
+    }
+    if (templateEditor?.template.templateId === template.templateId) {
+      templateEditor = null;
+      $("documentTemplateEditor").hidden = true;
+      $("documentTemplateListView").hidden = false;
+    }
+    await documentTemplatesChanged();
+    $("documentTemplateListStatus").textContent = uiTf("template.removed",
+      { name: documentTemplateName(template) });
+    $("documentTemplateNew").focus();
+  } catch (error) {
+    console.error("BC Process Studio document template could not be removed", error);
+    $("documentTemplateListStatus").textContent = uiT("template.actionFailed");
+  }
+}
+
+// A chosen logo is drawn as a PNG of at most 800 × 300 pixels, so Word and the preview show
+// the same image whatever format it was chosen in.
+function readTemplateLogo(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      const width = image.naturalWidth || 800;
+      const height = image.naturalHeight || 300;
+      const scale = Math.min(1, 800 / width, 300 / height);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve({ dataUrl: canvas.toDataURL("image/png"), width: canvas.width, height: canvas.height });
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("unreadable"));
+    };
+    image.src = url;
+  });
+}
+
+function showTemplateLogoError(key) {
+  $("documentTemplateLogoError").textContent = uiT(key);
+  $("documentTemplateLogoError").hidden = false;
+}
+
+$("documentTemplateList").addEventListener("click", event => {
+  const button = event.target.closest("[data-template-action]");
+  if (!button) return;
+  const template = allDocumentTemplates().find(item =>
+    item.templateId === button.closest("[data-template-id]")?.dataset.templateId);
+  if (!template) return;
+  $("documentTemplateListStatus").textContent = "";
+  const action = button.dataset.templateAction;
+  if (action === "edit") openTemplateEditor(template);
+  else if (action === "copy") void addDocumentTemplate(template, copyTemplateName(template));
+  else if (action === "default") void makeDefaultDocumentTemplate(template);
+  else if (action === "remove") askRemoveDocumentTemplate(template);
+});
+$("documentTemplateNew").addEventListener("click", () => {
+  $("documentTemplateListStatus").textContent = "";
+  void addDocumentTemplate(documentTemplateFor(defaultDocumentTemplateId), uiT("template.newName"));
+});
+$("documentTemplateBack").addEventListener("click", closeTemplateEditor);
+$("documentTemplateCopyEdit").addEventListener("click", () => {
+  if (templateEditor) void addDocumentTemplate(templateEditor.template,
+    copyTemplateName(templateEditor.template));
+});
+$("documentTemplateRetry").addEventListener("click", () => {
+  if (!templateEditor) return;
+  setTemplateSaveStatus("template.saving");
+  void flushTemplateSave();
+});
+$("documentTemplateDelete").addEventListener("click", () => {
+  if (templateEditor) askRemoveDocumentTemplate(templateEditor.template);
+});
+$("documentTemplateRemoveDialog").addEventListener("close", () => {
+  const template = templateRemoveTarget;
+  templateRemoveTarget = null;
+  if ($("documentTemplateRemoveDialog").returnValue === "remove" && template) {
+    void removeDocumentTemplate(template);
+  }
+});
+$("documentTemplateName").addEventListener("input", event => {
+  if (event.target.value.trim()) changeTemplate({ name: event.target.value });
+});
+$("documentTemplateName").addEventListener("change", event => {
+  // An empty name is not saved; the template keeps the name it had.
+  if (!event.target.value.trim() && templateEditor) {
+    event.target.value = documentTemplateName(templateEditor.template);
+  }
+});
+$("documentTemplateCompany").addEventListener("input", event =>
+  changeTemplate({ company: event.target.value }));
+$("documentTemplatePurpose").addEventListener("input", event =>
+  changeTemplate({ purposeText: event.target.value }));
+$("documentTemplateExpected").addEventListener("input", event =>
+  changeTemplate({ expectedResultText: event.target.value }));
+for (const box of document.querySelectorAll("[data-template-section]")) {
+  box.addEventListener("change", () =>
+    changeTemplate({ sections: { [box.dataset.templateSection]: box.checked } }));
+}
+$("documentTemplateFooter").addEventListener("input", event =>
+  changeTemplate({ footer: event.target.value }));
+$("documentTemplateFont").addEventListener("change", event =>
+  changeTemplate({ font: event.target.value }));
+$("documentTemplateColor").addEventListener("input", event =>
+  changeTemplate({ color: event.target.value }));
+$("documentTemplateSwatches").addEventListener("click", event => {
+  const swatch = event.target.closest("[data-color]");
+  if (!swatch) return;
+  $("documentTemplateColor").value = swatch.dataset.color;
+  changeTemplate({ color: swatch.dataset.color });
+  $("documentTemplateSwatches").querySelector(`[data-color="${swatch.dataset.color}"]`)?.focus();
+});
+$("documentTemplateLogoChoose").addEventListener("click", () => $("documentTemplateLogoFile").click());
+$("documentTemplateLogoFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file || !templateEditor) return;
+  $("documentTemplateLogoError").hidden = true;
+  if (file.size > TEMPLATE_LOGO_MAX_BYTES) {
+    showTemplateLogoError("template.logoTooLarge");
+    return;
+  }
+  try {
+    const logo = await readTemplateLogo(file);
+    // A logo the template cannot keep is not saved, and the logo it had stays.
+    if (!globalThis.T9DocumentTemplate.update(templateEditor.template, { logo }).logo) {
+      throw new Error("unreadable");
+    }
+    changeTemplate({ logo });
+    fillTemplateLogo();
+  } catch {
+    showTemplateLogoError("template.logoUnreadable");
+  }
+});
+$("documentTemplateLogoRemove").addEventListener("click", () => {
+  changeTemplate({ logo: null });
+  fillTemplateLogo();
+  $("documentTemplateLogoChoose").focus();
+});
+
+// A template as a file of its own, for a colleague. It is reported as saved only when the
+// browser has written the file.
+$("documentTemplateShare").addEventListener("click", async () => {
+  if (!templateEditor || templateEditor.template.builtIn) return;
+  const model = globalThis.T9DocumentTemplate;
+  const button = $("documentTemplateShare");
+  const status = $("documentTemplateShareStatus");
+  button.disabled = true;
+  try {
+    if (templateEditor.pending) await flushTemplateSave();
+    const template = templateEditor.template;
+    const filename = model.fileName(template);
+    // A blob without a type is saved as text and Edge would change the file's extension.
+    const blob = new Blob([model.fileText(template, { appVersion: APP_VERSION })],
+      { type: "application/octet-stream" });
+    status.textContent = uiT("transfer.waitingForDownload");
+    await libraryDownloadCompleted(await downloadBlob(blob, filename));
+    status.textContent = uiTf("template.fileSaved", { file: filename });
+  } catch (error) {
+    status.textContent = error?.code === "downloadNotSaved" ? uiT("transfer.downloadNotSaved")
+      : uiTf("template.fileFailed", { error: error?.message || String(error) });
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// A template file from a colleague. A template that is here already in another version is
+// replaced or kept beside it as the user chooses; nothing is replaced without asking.
+const TEMPLATE_FILE_MAX_BYTES = 4 * 1024 * 1024;
+let templateImportPending = null;
+
+async function saveImportedTemplate(template, key) {
+  const status = $("documentTemplateListStatus");
+  try {
+    await globalThis.T9DocumentTemplate.save(chrome.storage.local, globalThis.T9StorageKeys, template);
+  } catch (error) {
+    console.error("BC Process Studio document template could not be imported", error);
+    status.textContent = uiT("template.actionFailed");
+    return;
+  }
+  await documentTemplatesChanged();
+  status.textContent = uiTf(key, { name: template.name });
+  const row = [...$("documentTemplateList").children].find(item =>
+    item.dataset.templateId === template.templateId);
+  (row?.querySelector("button") || $("documentTemplateImport")).focus();
+}
+
+$("documentTemplateImport").addEventListener("click", () => {
+  $("documentTemplateImportFile").value = "";
+  $("documentTemplateImportFile").click();
+});
+$("documentTemplateImportFile").addEventListener("change", async () => {
+  const file = $("documentTemplateImportFile").files?.[0];
+  if (!file) return;
+  const model = globalThis.T9DocumentTemplate;
+  const status = $("documentTemplateListStatus");
+  status.textContent = "";
+  let read;
+  try {
+    if (file.size > TEMPLATE_FILE_MAX_BYTES) throw Object.assign(new Error("too large"), { code: "notTemplate" });
+    read = model.readFile(await file.text());
+  } catch (error) {
+    status.textContent = uiT(error?.code === "newerVersion" ? "template.fileNewer" : "template.fileUnreadable");
+    return;
+  }
+  await loadDocumentTemplates();
+  const [item] = model.incoming([read.template], documentTemplates).items;
+  if (item.status === "new") {
+    await saveImportedTemplate(item.template, "template.imported");
+    return;
+  }
+  if (item.status === "same") {
+    status.textContent = uiTf("template.importSame", { name: item.previous.name });
+    return;
+  }
+  templateImportPending = item;
+  $("documentTemplateImportTitle").textContent = uiTf("template.importConflictTitle",
+    { name: item.previous.name });
+  $("documentTemplateImportText").textContent = uiTf(item.status === "newer"
+    ? "template.importNewer" : "template.importOlder", {
+    mine: libraryTransferDate(item.previous.updatedAt), theirs: libraryTransferDate(item.template.updatedAt) });
+  $("documentTemplateImportDialog").returnValue = "";
+  $("documentTemplateImportDialog").showModal();
+});
+$("documentTemplateImportDialog").addEventListener("close", () => {
+  const item = templateImportPending;
+  templateImportPending = null;
+  const choice = $("documentTemplateImportDialog").returnValue;
+  const model = globalThis.T9DocumentTemplate;
+  if (!item || !["replace", "both"].includes(choice)) {
+    $("documentTemplateImport").focus();
+    return;
+  }
+  // A replaced template counts as changed now, so the synchronized folder does not bring the
+  // version it replaced back.
+  void saveImportedTemplate(choice === "replace" ? model.update(item.template, {})
+    : model.create(item.template, { templateId: `template-${crypto.randomUUID()}`,
+      name: uiTf("template.importedName", { name: item.template.name }).slice(0, model.MAX_NAME) }),
+  choice === "replace" ? "template.importReplaced" : "template.imported");
+});
+
+// The language setting is updated right after the event, so the texts are redrawn after it.
+document.addEventListener("t9:locale-changed", () => setTimeout(() => {
+  if (!$("documentTemplateList")) return;
+  $("documentTemplateListStatus").textContent = "";
+  if (templateEditor && !templateEditor.pending && !templateEditor.saving) setTemplateSaveStatus("");
+  if (templateEditor) renderTemplateTextPlaceholders();
+  renderDocumentTemplateSettings();
+  populateBatchMetadataOptions();
+  refreshLibraryFilters();
+}, 0));
+
+// What a template looks like, for caches: it changes when the template is saved.
+function templateCacheKey(template) {
+  return `${template.templateId}:${template.updatedAt || ""}`;
 }
 
 function documentProfiles() {
@@ -5751,25 +6496,10 @@ function documentProfiles() {
 }
 
 function buildDocumentProfileVariants(pipeline) {
-  const availableThemeIds = new Set(globalThis.T9DocumentThemeRegistry.list(
-    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
-  ).map(theme => theme.themeId));
   return new Map(documentProfiles().filter(profile =>
     profile.profileId === activeDocumentProfileId).map(profile => {
-    const assignedThemeId = profile.profileId === activeDocumentProfileId
-      ? documentLibraryRecords.find(record =>
-        record.projectId === activeReviewSession?.id
-      )?.theme.themeId
-      : null;
-    const themeId = availableThemeIds.has(assignedThemeId)
-      ? assignedThemeId : profile.theme.themeId;
-    const theme = themeId === pipeline.theme.themeId
-      ? pipeline.theme
-      : globalThis.T9DocumentThemeRegistry.resolve(
-        globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
-        themeId,
-        profile.theme.overrides || {}
-      );
+    // The pipeline was made with the document's template.
+    const theme = pipeline.theme;
     const matchesPipeline =
       profile.profileId === pipeline.languageProfile.profileId &&
       theme === pipeline.theme;
@@ -5792,7 +6522,8 @@ function buildDocumentProfileVariants(pipeline) {
       );
       semanticDocument = screenshotResult.document;
       screenshotSelections = screenshotResult.selections;
-      plan = globalThis.T9DocumentPlanner.plan(semanticDocument, theme);
+      plan = globalThis.T9DocumentPlanner.plan(
+        globalThis.T9DocumentTemplate.arrangeSections(semanticDocument, pipeline.template), theme);
     }
     return [profile.profileId, {
       profile,
@@ -5867,11 +6598,10 @@ function indexActiveDocumentVariant(variant, semanticDocument) {
       profileId: variant.profile.profileId,
       displayName: variant.profile.displayName
     },
-    theme: {
-      themeId: variant.theme.themeId,
-      displayName: variant.theme.name || variant.theme.displayName ||
-        variant.theme.themeId
-    },
+    // The record names the document's template. One that is not here (not yet
+    // synchronized) stays named, so the document gets it when it arrives.
+    theme: documentTemplateAssignment(documentLibraryRecords.find(record =>
+      record.projectId === activeReviewSession.id)?.theme),
     summary: semanticDocument.purpose || semanticDocument.metadata?.purpose ||
       paragraphTexts[0] || "",
     workflowName: activeReviewSession.name,
@@ -10602,6 +11332,7 @@ async function initializeDashboard() {
   // The library is requested while the settings load; it is shown once both are there.
   const libraryRequest = send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
   libraryRequest.catch(() => {});
+  const templatesLoaded = loadDocumentTemplates();
   try {
     await loadSettings();
   } catch (error) {
@@ -10633,6 +11364,9 @@ async function initializeDashboard() {
   }
 
   let sessionsLoaded = false;
+  await templatesLoaded;
+  renderDocumentTemplateSettings();
+  populateBatchMetadataOptions();
   try {
     await loadSessions(libraryRequest);
     sessionsLoaded = true;

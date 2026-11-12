@@ -432,7 +432,11 @@
     ) ? section.kind : "generic";
     const children = section.blocks.map(block =>
       planBlock(block, section.kind, theme,
-        document.metadata?.documentLanguage));
+        document.metadata?.documentLanguage)).map(component =>
+      // The table of contents is titled in the document's language.
+      component.kind === "toc" && localizedLanguage
+        ? { ...component, appearance: { ...component.appearance, title: label("Contents", "Innehåll") } }
+        : component);
     if (section.kind === "cover") {
       children.push({
         ...componentContract("metadata", {

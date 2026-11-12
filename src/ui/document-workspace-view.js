@@ -22,6 +22,13 @@
     if (appearance.borderColor) {
       element.style.borderColor = appearance.borderColor;
     }
+    // A heading's line has the colour Word gives it.
+    if (item.kind === "heading" && appearance.dividerColor) {
+      element.style.borderBottomColor = appearance.dividerColor;
+    }
+    if (item.kind === "stepTitle" && appearance.headingBorderColor) {
+      element.style.borderLeftColor = appearance.headingBorderColor;
+    }
   }
 
   function appendRuns(element, runs, documentValue) {
@@ -69,6 +76,31 @@
           textElement(documentValue, "dd", row.value, "")
         );
       }
+    } else if (item.kind === "toc") {
+      element = documentValue.createElement("nav");
+      element.className = "document-workspace-page-toc";
+      element.setAttribute("aria-label", item.content.title);
+      const list = documentValue.createElement("ol");
+      for (const entry of item.content.entries || []) {
+        list.appendChild(textElement(documentValue, "li", entry.text,
+          entry.level > 1 ? "document-workspace-page-toc-sub" : ""));
+      }
+      element.append(textElement(documentValue, "h2", item.content.title,
+        "document-workspace-heading"), list);
+    } else if (item.kind === "brand") {
+      element = documentValue.createElement("div");
+      element.className = "document-workspace-page-cover-brand";
+      const media = item.content.logoAssetId ? mediaAssets[item.content.logoAssetId] : null;
+      if (media?.source) {
+        const image = documentValue.createElement("img");
+        image.className = "document-workspace-page-cover-logo";
+        image.src = media.source;
+        image.alt = "";
+        element.appendChild(image);
+      }
+      if (item.content.text) {
+        element.appendChild(textElement(documentValue, "span", item.content.text, ""));
+      }
     } else if (item.kind === "image") {
       const media = mediaAssets[item.content.assetId];
       element = documentValue.createElement("figure");
@@ -111,9 +143,10 @@
   }
 
   function sectionFingerprint(section, mediaAssets) {
-    const media = section.items.filter(item => item.kind === "image").map(item => {
-      const value = mediaAssets[item.content.assetId];
-      return [item.content.assetId, value?.revision || ""];
+    const media = section.items.filter(item => ["image", "brand"].includes(item.kind)).map(item => {
+      const assetId = item.content.assetId || item.content.logoAssetId;
+      const value = mediaAssets[assetId];
+      return [assetId, value?.revision || "", value?.source ? 1 : 0];
     });
     return JSON.stringify([section, media]);
   }
@@ -141,18 +174,55 @@
     return element;
   }
 
+  // The template's header (logo, company and the document's name) and footer, above and
+  // below the document as on a Word page. They are not part of the document's content.
+  function createPageBand(band, mediaAssets, documentValue) {
+    const element = documentValue.createElement(band.kind === "pageHeader" ? "header" : "footer");
+    element.className = `document-workspace-page-band ${band.kind}`;
+    element.dataset.documentWorkspaceSectionId = band.workspaceSectionId;
+    if (band.value.borderColor) element.style.borderColor = band.value.borderColor;
+    if (band.kind === "pageHeader") {
+      const media = band.value.logoAssetId ? mediaAssets[band.value.logoAssetId] : null;
+      if (media?.source) {
+        const image = documentValue.createElement("img");
+        image.src = media.source;
+        image.alt = band.value.company ? `${band.value.company} logo` : "Logo";
+        image.className = "document-workspace-page-logo";
+        element.appendChild(image);
+      }
+      if (band.value.company) {
+        element.appendChild(textElement(documentValue, "strong", band.value.company,
+          "document-workspace-page-company"));
+      }
+      element.appendChild(textElement(documentValue, "span", band.value.title,
+        "document-workspace-page-title"));
+    } else {
+      element.appendChild(textElement(documentValue, "span", band.value.text, ""));
+    }
+    element.dataset.renderFingerprint = JSON.stringify([band, band.value.logoAssetId
+      ? mediaAssets[band.value.logoAssetId]?.source || "" : ""]);
+    return element;
+  }
+
   function render(container, model, mediaAssets = {}, documentValue = document) {
     const existing = new Map([...container.children].map(element => [
       element.dataset.documentWorkspaceSectionId,
       element
     ]));
     let changedSections = 0;
-    for (const section of model.sections) {
+    const band = (kind, value) => value
+      ? [{ band: true, kind, value, workspaceSectionId: `workspace:${kind}` }] : [];
+    for (const section of [...band("pageHeader", model.pageHeader), ...model.sections,
+      ...band("pageFooter", model.pageFooter)]) {
       const current = existing.get(section.workspaceSectionId);
-      const fingerprint = sectionFingerprint(section, mediaAssets);
+      const fingerprint = section.band
+        ? JSON.stringify([section, section.value.logoAssetId
+          ? mediaAssets[section.value.logoAssetId]?.source || "" : ""])
+        : sectionFingerprint(section, mediaAssets);
       const next = current?.dataset.renderFingerprint === fingerprint
         ? current
-        : createSection(section, mediaAssets, documentValue);
+        : section.band ? createPageBand(section, mediaAssets, documentValue)
+          : createSection(section, mediaAssets, documentValue);
       if (next !== current) changedSections += 1;
       container.appendChild(next);
       existing.delete(section.workspaceSectionId);

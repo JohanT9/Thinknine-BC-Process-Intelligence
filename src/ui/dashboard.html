@@ -209,6 +209,58 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .document-workspace-panel[data-view-mode="page"] .document-workspace-section[hidden]{display:none}
 .document-workspace-panel[data-view-mode="page"] .document-workspace-section{min-height:790px;margin:0}
 .document-workspace-section{margin-bottom:30px}
+.document-workspace-page-band{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12px;color:#4b5563;border:0 solid #b8c2cc}
+.document-workspace-page-band.pageHeader{border-bottom-width:2px;padding-bottom:8px;margin-bottom:24px}
+.document-workspace-page-band.pageFooter{border-top-width:1px;padding-top:8px;margin-top:24px;justify-content:center;text-align:center}
+.document-workspace-page-logo{display:block;max-height:36px;max-width:160px;object-fit:contain}
+.document-workspace-page-toc ol{margin:0;padding:0;list-style:none;display:grid;gap:4px}.document-workspace-page-toc li{color:#1f2937}.document-workspace-page-toc li.document-workspace-page-toc-sub{padding-left:20px;color:#4b5563}
+.document-workspace-page-cover-brand{display:grid;justify-items:start;gap:8px;margin-bottom:14px;font-size:13px;color:#4b5563}.document-workspace-page-cover-logo{display:block;max-height:90px;max-width:260px;object-fit:contain}
+.document-workspace-page-company{color:#1f2937}
+.document-workspace-page-title{margin-left:auto;text-align:right;overflow-wrap:anywhere}
+.document-templates{margin:22px 0 18px;padding-top:16px;border-top:1px solid var(--c-bd-d8dee5)}
+.document-templates h4{margin:0 0 4px;font-size:16px}.document-templates h5{margin:12px 0 8px;font-size:15px;overflow-wrap:anywhere}
+.document-template-list{display:grid;gap:8px;margin:12px 0;padding:0;list-style:none}
+.document-template-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:10px 12px;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-ffffff)}
+.document-template-item-label{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 180px}
+.document-template-item-name{font-weight:600;overflow-wrap:anywhere;min-width:0}
+.document-template-item-swatch{flex:none;width:14px;height:14px;border-radius:3px;border:1px solid var(--c-bd-cbd5df)}
+.document-template-badge{flex:none;padding:2px 8px;border-radius:10px;background:var(--c-bg-e4f5f5);color:var(--c-fg-064f52);font-size:12px;font-weight:600}
+.document-template-item-actions{display:flex;flex-wrap:wrap;gap:6px}.document-template-item-actions button{margin:0}
+.document-template-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px;padding:10px 12px;border-radius:6px;background:var(--c-bg-f3f6fa)}.document-template-note p{margin:0;flex:1 1 220px}
+.document-template-editor-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:16px 24px;align-items:start}
+.document-template-editor-body.is-built-in{grid-template-columns:minmax(0,300px)}
+@media (max-width:720px){.document-template-editor-body{grid-template-columns:minmax(0,1fr)}}
+.document-template-fields{display:grid;gap:4px;min-width:0}.document-template-fields label,.document-template-label{margin-top:8px;font-weight:600}
+.document-template-fields input[type=text],.document-template-fields select{width:100%;max-width:420px;box-sizing:border-box}
+.document-template-fields p{margin:2px 0 0}
+.document-template-logo,.document-template-colors{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.document-template-logo button{margin:0}
+.document-template-logo img{max-width:160px;max-height:48px;object-fit:contain;padding:4px;border:1px solid var(--c-bd-d8dee5);border-radius:4px;background:var(--c-bg-ffffff)}
+.document-template-swatches{display:flex;flex-wrap:wrap;gap:6px}
+.document-template-swatch{width:28px;height:28px;min-height:28px;margin:0;padding:0;border:2px solid var(--c-bg-ffffff);border-radius:50%;box-shadow:0 0 0 1px var(--c-bd-cbd5df);cursor:pointer}
+#documentTemplateSwatches .document-template-swatch{display:grid;place-items:center;color:var(--c-fg-ffffff);font-size:15px;font-weight:700;line-height:1}#documentTemplateSwatches .document-template-swatch[aria-pressed=true]{box-shadow:0 0 0 2px var(--c-bg-ffffff),0 0 0 4px var(--c-fg-1f2933)}#documentTemplateSwatches .document-template-swatch[aria-pressed=true]::after{content:"\2713"}
+.document-template-colors input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--c-bd-cbd5df);border-radius:4px;background:var(--c-bg-ffffff);cursor:pointer}
+.document-template-error{color:var(--c-fg-991b1b)}
+.document-template-sections{display:grid;gap:6px;margin:14px 0 4px;padding:10px 12px;border:1px solid var(--c-bd-d8dee5);border-radius:6px;min-width:0}.document-template-sections legend{padding:0 4px;font-weight:600}.document-template-sections label{display:flex;align-items:flex-start;gap:8px;margin:0;font-weight:400}.document-template-sections p{margin:0}.document-template-indent{padding-left:26px}
+.document-template-fields textarea{width:100%;max-width:420px;box-sizing:border-box}
+.document-template-preview{margin:0;min-width:0}.document-template-preview figcaption{display:grid;gap:2px;margin-bottom:8px;font-weight:600}.document-template-preview figcaption .muted{font-weight:400;font-size:13px}
+#documentTemplateSaveStatus{margin-top:12px}#documentTemplateRetry,#documentTemplateShare,#documentTemplateDelete{margin:8px 8px 0 0}
+.document-template-list-actions{display:flex;flex-wrap:wrap;gap:8px}
+/* The page sample is document paper: it keeps the paper's own colours in both themes. */
+.document-workspace-page-sample{--sample-color:#007a82;display:grid;grid-template-rows:auto 1fr auto;gap:10px;aspect-ratio:210/297;max-width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid #d8dee5;border-radius:2px;background:#ffffff;color:#1f2937;box-shadow:0 4px 14px rgba(15,23,42,.12);font-size:9px;overflow:hidden}
+.document-workspace-page-sample-header{display:flex;align-items:center;gap:6px;padding-bottom:5px;border-bottom:2px solid var(--sample-color);color:#4b5563;min-width:0}
+.document-workspace-page-sample-header img{max-height:16px;max-width:70px;object-fit:contain}
+.document-workspace-page-sample-header strong{color:#1f2937;overflow-wrap:anywhere}
+.document-workspace-page-sample-header.is-banded{padding:5px 6px;background:var(--sample-fill);font-weight:700;color:var(--sample-ink,#1f2937)}.document-workspace-page-sample-header.is-banded span{margin-left:0;text-align:left}
+.document-workspace-page-sample-header span{margin-left:auto;text-align:right;overflow-wrap:anywhere}
+.document-workspace-page-sample-cover{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.document-workspace-page-sample-cover img{align-self:flex-start;max-height:40px;max-width:130px;object-fit:contain}
+.document-workspace-page-sample-cover > span{overflow-wrap:anywhere}.document-workspace-page-sample-cover.is-coverless{justify-content:flex-start}
+.document-workspace-page-sample-title{font-size:17px;font-weight:700;line-height:1.2;color:#111827}
+.document-workspace-page-sample-rule{display:block;width:40%;height:3px;background:var(--sample-color)}
+.document-workspace-page-sample-heading{margin-top:14px;font-size:12px;font-weight:700;color:var(--sample-color)}
+.document-workspace-page-sample-line{display:block;height:5px;border-radius:2px;background:#e5e7eb}.document-workspace-page-sample-line.short{width:65%}
+.document-workspace-page-sample-footer{padding-top:5px;border-top:1px solid color-mix(in srgb,var(--sample-color) 28%,#ffffff);color:#4b5563;text-align:center;overflow-wrap:anywhere}
 .document-workspace-section.cover{padding-top:50px;padding-bottom:35px}
 .document-workspace-heading{color:#0f4c81;border-bottom:2px solid #38a3d1;padding-bottom:7px}
 .document-workspace-section.cover .document-workspace-heading{font-size:32px;border:0;padding:0;margin-bottom:24px}
@@ -416,8 +468,8 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
             <option value="en-US">English</option>
           </select>
         </label>
-        <label for="libraryThemeFilter">Tema
-          <select id="libraryThemeFilter"><option value="">Alla teman</option></select></label>
+        <label for="libraryThemeFilter"><span data-i18n="template.label">Mall</span>
+          <select id="libraryThemeFilter"><option value="" data-i18n="template.all">Alla mallar</option></select></label>
         <label for="libraryCreatedFrom">Skapad från<input id="libraryCreatedFrom" type="date"></label>
         <label for="libraryCreatedTo">Skapad till<input id="libraryCreatedTo" type="date"></label>
         <label for="libraryModifiedFrom">Ändrad från<input id="libraryModifiedFrom" type="date"></label>
@@ -464,7 +516,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <summary>Fler åtgärder</summary>
       <div class="library-batch-more-panel">
         <button id="libraryBatchTags" class="secondary">Taggar</button>
-        <button id="libraryBatchTheme" class="secondary">Tema</button>
+        <button id="libraryBatchTheme" class="secondary" data-i18n="template.label">Mall</button>
         <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
         <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
       </div>
@@ -549,13 +601,14 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <label for="environmentName">Miljönamn</label>
 <input id="environmentName" type="text">
 
-<label for="companyName">Företag</label>
-<input id="companyName" type="text">
+<label for="companyName" data-i18n="settings.bcCompany">Business Central-företag</label>
+<input id="companyName" type="text" aria-describedby="companyNameHelp">
+<p id="companyNameHelp" class="muted" data-i18n="settings.bcCompanyHelp">Visas i biblioteket och kan ingå i filnamnet med {company}. Företagsnamnet i dokumentet anges i dokumentmallen.</p>
 
 <label for="defaultExpectedResult">Standardtext för förväntat resultat</label>
 <textarea id="defaultExpectedResult" rows="3"
   aria-describedby="defaultExpectedResultHelp"></textarea>
-<p id="defaultExpectedResultHelp" class="muted" data-i18n="Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.">Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.</p>
+<p id="defaultExpectedResultHelp" class="muted" data-i18n="settings.expectedResultHelp">Används i dokument som inte har en egen text och vars mall inte har någon standardtext.</p>
 
 <label for="exportFileNamePattern">Filnamnsmall</label>
 <input
@@ -610,6 +663,110 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   <label><input id="maskLocationCode" type="checkbox"> Lagerplatskoder</label>
   <label><input id="maskLotBatchNo" type="checkbox"> Lot-/Batchnummer</label>
 </div>
+<section id="documentTemplates" class="document-templates" aria-labelledby="documentTemplatesTitle">
+<h4 id="documentTemplatesTitle" data-i18n="template.title">Dokumentmallar</h4>
+<p class="muted" data-i18n="template.intro">Mallen bestämmer hur dokumenten ser ut och vilka avsnitt de har: logotyp, färg, typsnitt, sidfot, avsnitt och standardtexter. Det du har skrivit i ett dokument ändras inte.</p>
+<div id="documentTemplateListView">
+  <ul id="documentTemplateList" class="document-template-list"></ul>
+  <p id="documentTemplateUnreadable" class="muted" hidden></p>
+  <div class="document-template-list-actions">
+    <button id="documentTemplateNew" class="secondary" type="button" data-i18n="template.new">Ny mall</button>
+    <button id="documentTemplateImport" class="secondary" type="button" data-i18n="template.import" aria-describedby="documentTemplateShareHelp">Importera mall…</button>
+    <input id="documentTemplateImportFile" type="file" accept=".bcpt,application/json" hidden>
+  </div>
+  <p id="documentTemplateShareHelp" class="muted" data-i18n="template.shareHelp">Mallarna följer med när du exporterar eller synkroniserar dokument. Vill du ge en mall till en kollega öppnar du mallen och sparar den som fil.</p>
+  <p id="documentTemplateListStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+</div>
+<div id="documentTemplateEditor" class="document-template-editor" hidden>
+  <button id="documentTemplateBack" class="secondary" type="button" data-i18n="template.back">← Alla mallar</button>
+  <h5 id="documentTemplateEditorTitle" tabindex="-1"></h5>
+  <div id="documentTemplateBuiltInNote" class="document-template-note" hidden>
+    <p data-i18n="template.builtInNote">Inbyggda mallar kan inte ändras. Kopiera mallen för att göra en egen.</p>
+    <button id="documentTemplateCopyEdit" class="primary" type="button" data-i18n="template.copyAndEdit">Kopiera och redigera</button>
+  </div>
+  <div class="document-template-editor-body">
+    <div id="documentTemplateFields" class="document-template-fields">
+      <label for="documentTemplateName" data-i18n="template.name">Mallens namn</label>
+      <input id="documentTemplateName" type="text" maxlength="80" autocomplete="off">
+
+      <span class="document-template-label" id="documentTemplateLogoLabel" data-i18n="template.logo">Logotyp</span>
+      <div class="document-template-logo" role="group" aria-labelledby="documentTemplateLogoLabel" aria-describedby="documentTemplateLogoHelp">
+        <img id="documentTemplateLogoImage" alt="" hidden>
+        <input id="documentTemplateLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+        <button id="documentTemplateLogoChoose" class="secondary" type="button" data-i18n="template.chooseLogo">Välj logotyp…</button>
+        <button id="documentTemplateLogoRemove" class="secondary" type="button" data-i18n="template.removeLogo" hidden>Ta bort logotyp</button>
+      </div>
+      <p id="documentTemplateLogoHelp" class="muted" data-i18n="template.logoHelp">PNG, JPG, SVG eller WebP, högst 2 MB. Visas i sidhuvudet på varje sida och större på första sidan.</p>
+      <p id="documentTemplateLogoError" class="document-template-error" role="alert" hidden></p>
+
+      <label for="documentTemplateCompany" data-i18n="template.company">Företagsnamn i dokumentet</label>
+      <input id="documentTemplateCompany" type="text" maxlength="120" autocomplete="organization" aria-describedby="documentTemplateCompanyHelp">
+      <p id="documentTemplateCompanyHelp" class="muted" data-i18n="template.companyHelp">Visas i sidhuvudet på varje sida och på första sidan.</p>
+
+      <span class="document-template-label" id="documentTemplateColorLabel" data-i18n="template.color">Färg</span>
+      <div class="document-template-colors" role="group" aria-labelledby="documentTemplateColorLabel">
+        <div id="documentTemplateSwatches" class="document-template-swatches"></div>
+        <input id="documentTemplateColor" type="color" data-i18n-aria-label="template.customColor" aria-label="Egen färg">
+      </div>
+      <p id="documentTemplateColorHelp" class="muted" hidden data-i18n="template.colorAdjusted">Färgen görs mörkare i dokumentet så att texten går att läsa.</p>
+
+      <label for="documentTemplateFont" data-i18n="template.font">Typsnitt</label>
+      <select id="documentTemplateFont"></select>
+
+      <label for="documentTemplateFooter" data-i18n="template.footer">Sidfot</label>
+      <input id="documentTemplateFooter" type="text" maxlength="200" autocomplete="off" aria-describedby="documentTemplateFooterHelp">
+      <p id="documentTemplateFooterHelp" class="muted"></p>
+
+      <fieldset class="document-template-sections" aria-describedby="documentTemplateSectionsHelp">
+        <legend data-i18n="template.sections">Avsnitt i dokumentet</legend>
+        <p id="documentTemplateSectionsHelp" class="muted" data-i18n="template.sectionsHelp">Avsnitt som inte är markerade visas inte. Deras innehåll finns kvar och visas igen om du markerar dem.</p>
+        <label><input type="checkbox" data-template-section="cover"> <span data-i18n="template.section.cover">Försättsblad</span></label>
+        <label><input type="checkbox" data-template-section="toc" aria-describedby="documentTemplateTocHelp"> <span data-i18n="template.section.toc">Innehållsförteckning</span></label>
+        <p id="documentTemplateTocHelp" class="muted document-template-indent" data-i18n="template.tocHelp">Word frågar om fälten ska uppdateras när dokumentet öppnas. Svara Ja så fylls förteckningen i.</p>
+        <label><input type="checkbox" data-template-section="purpose"> <span data-i18n="template.section.purpose">Syfte</span></label>
+        <label><input type="checkbox" data-template-section="prerequisites"> <span data-i18n="template.section.prerequisites">Förutsättningar</span></label>
+        <label><input type="checkbox" checked disabled> <span data-i18n="template.section.workflow">Arbetsgång (alltid med)</span></label>
+        <label><input type="checkbox" data-template-section="expectedResult"> <span data-i18n="template.section.expectedResult">Förväntat resultat</span></label>
+        <label><input type="checkbox" data-template-section="revisionHistory"> <span data-i18n="template.section.revisionHistory">Versionshistorik</span></label>
+      </fieldset>
+
+      <label for="documentTemplatePurpose" data-i18n="template.purposeText">Standardtext för Syfte</label>
+      <textarea id="documentTemplatePurpose" rows="3" maxlength="2000" aria-describedby="documentTemplateTextsHelp"></textarea>
+      <label for="documentTemplateExpected" data-i18n="template.expectedText">Standardtext för Förväntat resultat</label>
+      <textarea id="documentTemplateExpected" rows="3" maxlength="2000" aria-describedby="documentTemplateTextsHelp"></textarea>
+      <p id="documentTemplateTextsHelp" class="muted" data-i18n="template.textsHelp">Används i dokument som inte har en egen text. Lämna tomt för att använda standardtexten.</p>
+    </div>
+    <figure class="document-template-preview" aria-labelledby="documentTemplatePreviewTitle">
+      <figcaption>
+        <span id="documentTemplatePreviewTitle" data-i18n="template.preview">Förhandsvisning</span>
+        <span class="muted" data-i18n="template.previewHelp">Så här ser första sidan ut i Word och i förhandsvisningen.</span>
+      </figcaption>
+      <div id="documentTemplateSample" class="document-workspace-page-sample" aria-hidden="true">
+        <div class="document-workspace-page-sample-header">
+          <img id="documentTemplateSampleLogo" alt="" hidden>
+          <strong id="documentTemplateSampleCompany"></strong>
+          <span id="documentTemplateSampleHeaderTitle"></span>
+        </div>
+        <div class="document-workspace-page-sample-cover">
+          <img id="documentTemplateSampleCoverLogo" alt="" hidden>
+          <span id="documentTemplateSampleCoverCompany"></span>
+          <span id="documentTemplateSampleTitle" class="document-workspace-page-sample-title"></span>
+          <span class="document-workspace-page-sample-rule"></span>
+          <span id="documentTemplateSampleHeading" class="document-workspace-page-sample-heading"></span>
+          <span class="document-workspace-page-sample-line"></span>
+          <span class="document-workspace-page-sample-line short"></span>
+        </div>
+        <div id="documentTemplateSampleFooter" class="document-workspace-page-sample-footer"></div>
+      </div>
+    </figure>
+  </div>
+  <p id="documentTemplateSaveStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+  <button id="documentTemplateRetry" class="secondary" type="button" data-i18n="template.retry" hidden>Försök igen</button>
+  <button id="documentTemplateShare" class="secondary" type="button" data-i18n="template.saveFile" hidden>Spara som fil</button>
+  <button id="documentTemplateDelete" class="danger" type="button" data-i18n="template.removeTemplate" hidden>Ta bort mallen</button>
+  <p id="documentTemplateShareStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+</div>
+</section>
 </section>
 
 <section id="settingsRecording" class="settings-section" aria-labelledby="settingsRecordingTitle" hidden>
@@ -654,7 +811,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <div class="library-batch-fields">
       <label><input id="libraryBatchUseTags" type="checkbox"> Ändra taggar
         <input id="libraryBatchTagsValue" type="text" placeholder="Tagg 1, Tagg 2"></label>
-      <label><input id="libraryBatchUseTheme" type="checkbox"> Ändra tema
+      <label><input id="libraryBatchUseTheme" type="checkbox"> <span data-i18n="template.change">Ändra mall</span>
         <select id="libraryBatchThemeValue"></select></label>
       <label><input id="libraryBatchUseAuthor" type="checkbox"> Ändra författare
         <input id="libraryBatchAuthorValue" type="text"></label>
@@ -788,6 +945,23 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <p id="libraryImportUndoError" class="library-folder-error" role="alert"></p>
     <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
       <button id="libraryImportUndoSubmit" type="submit" class="danger" data-i18n="transfer.undo">Ångra import</button></footer>
+  </form>
+</dialog>
+<dialog id="documentTemplateRemoveDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="documentTemplateRemoveTitle" aria-describedby="documentTemplateRemoveText">
+  <form method="dialog">
+    <h3 id="documentTemplateRemoveTitle"></h3>
+    <p id="documentTemplateRemoveText"></p>
+    <footer><button type="submit" value="cancel" class="secondary" data-i18n="template.cancel">Avbryt</button>
+      <button type="submit" value="remove" class="danger" data-i18n="template.removeTemplate">Ta bort mallen</button></footer>
+  </form>
+</dialog>
+<dialog id="documentTemplateImportDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="documentTemplateImportTitle" aria-describedby="documentTemplateImportText">
+  <form method="dialog">
+    <h3 id="documentTemplateImportTitle"></h3>
+    <p id="documentTemplateImportText"></p>
+    <footer><button type="submit" value="cancel" class="secondary" data-i18n="template.cancel">Avbryt</button>
+      <button type="submit" value="both" class="secondary" data-i18n="template.keepBoth">Behåll båda</button>
+      <button type="submit" value="replace" class="primary" data-i18n="template.replace">Ersätt min mall</button></footer>
   </form>
 </dialog>
 <dialog id="libraryDeleteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryDeleteTitle" aria-describedby="libraryDeleteBody">
@@ -1204,6 +1378,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/document-theme.js"></script>
 <script src="document/document-theme-validation.js"></script>
 <script src="document/document-theme-registry.js"></script>
+<script src="document/document-template.js"></script>
 <script src="document/document-components.js"></script>
 <script src="document/document-component-registry.js"></script>
 <script src="document/document-component-validation.js"></script>
