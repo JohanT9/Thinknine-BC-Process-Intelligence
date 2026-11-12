@@ -12245,6 +12245,12 @@
     },
     children: overlap ? [createOverlapElement(overlap)] : void 0
   });
+  var TableLayoutType = {
+    /** Auto-fit layout - column widths are adjusted based on content */
+    AUTOFIT: "autofit",
+    /** Fixed layout - column widths are fixed as specified */
+    FIXED: "fixed"
+  };
   var createTableLayout = (type) => new BuilderElement({
     name: "w:tblLayout",
     attributes: { type: {
@@ -19790,12 +19796,24 @@
       ]
     });
   }
-  function screenshotBlock(component, mediaAssets) {
+  var TWIPS_PER_PIXEL = 15;
+  var TWIPS_PER_POINT = 20;
+  function screenshotBlock(component, mediaAssets, context = {}) {
     const media = mediaAssets[component.content.assetId];
     const bytes = imageBytes(media);
     if (!bytes) {
       throw new Error(`Word export is missing media asset: ${component.content.assetId}.`);
     }
+    const framed = component.appearance.presentationStyle === "framed";
+    const frameWidth = Number(context.contentWidth) > 0 ? Math.round(context.contentWidth) : 0;
+    const frameInside = framed ? frameWidth - 2 * TWIPS_PER_POINT * (Number(component.appearance.cellPadding) || 0) - 2 * TWIPS_PER_POINT * ((Number(component.appearance.borderSize) || 4) / 8) : frameWidth;
+    const limits = frameWidth > 0 ? {
+      ...component.appearance,
+      maxWidth: Math.min(
+        Number(component.appearance.maxWidth) || 590,
+        Math.floor(frameInside / TWIPS_PER_PIXEL)
+      )
+    } : component.appearance;
     const image = new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: component.appearance.presentationStyle === "framed" ? componentSpacing(component, { before: 6, after: 10 }) : { before: 120, after: 200 },
@@ -19803,7 +19821,7 @@
       children: [new ImageRun({
         data: bytes,
         type: imageType(media, bytes),
-        transformation: fittedImageSize(bytes, component.appearance),
+        transformation: fittedImageSize(bytes, limits),
         altText: {
           title: component.accessibility.label,
           description: component.accessibility.description,
@@ -19814,7 +19832,11 @@
     if (component.appearance.presentationStyle !== "framed") return image;
     const border = color(component.appearance.borderColor, "C8D5DF");
     return new Table({
-      width: { size: 100, type: WidthType.PERCENTAGE },
+      ...frameWidth > 0 ? {
+        width: { size: frameWidth, type: WidthType.DXA },
+        columnWidths: [frameWidth],
+        layout: TableLayoutType.FIXED
+      } : { width: { size: 100, type: WidthType.PERCENTAGE } },
       alignment: AlignmentType.CENTER,
       borders: {
         top: {
@@ -19856,7 +19878,8 @@
       cantSplit: component.presentationIntent.rowIntegrity !== false,
       children: rowGroup.components.map((cellGroup) => new TableCell({
         margins: cellMargins(component.appearance.cellPadding),
-        children: cellGroup.components.flatMap((child) => renderComponent(child, mediaAssets, context))
+        // A column is narrower than the page: its width is Word's to work out.
+        children: cellGroup.components.flatMap((child) => renderComponent(child, mediaAssets, { ...context, contentWidth: 0 }))
       }))
     }));
     return new Table({
@@ -19895,7 +19918,7 @@
       })];
     }
     if (component.kind === "screenshot") {
-      return [screenshotBlock(component, mediaAssets)];
+      return [screenshotBlock(component, mediaAssets, context)];
     }
     if (component.kind === "callout") {
       if (component.appearance.presentationStyle === "inline") {
@@ -19909,7 +19932,7 @@
       const supportingComponents = component.components.filter((child, index) => index !== instructionIndex);
       return [
         stepLeadBlock(component, instruction),
-        ...supportingComponents.flatMap((child) => renderComponent(child, mediaAssets, { step: true }))
+        ...supportingComponents.flatMap((child) => renderComponent(child, mediaAssets, { ...context, step: true }))
       ];
     }
     if (component.kind === "list") {
@@ -20066,9 +20089,11 @@
     const planBefore = JSON.stringify(plan);
     const headerComponent = plan.components.find((component) => component.kind === "header" && component.visibility !== "hidden");
     const footerComponent = plan.components.find((component) => component.kind === "footer" && component.visibility !== "hidden");
-    const children = plan.sections.flatMap((section) => section.components.flatMap((component) => renderComponent(component, mediaAssets)));
     const appearance = plan.content.documentAppearance || {};
     const margins = appearance.margins || {};
+    const A4_WIDTH = 11906;
+    const contentWidth = A4_WIDTH - millimeters(margins.left, 20) - millimeters(margins.right, 20);
+    const children = plan.sections.flatMap((section) => section.components.flatMap((component) => renderComponent(component, mediaAssets, { contentWidth })));
     const document2 = new File({
       creator: plan.content.creator,
       title: plan.content.title,
