@@ -8,7 +8,17 @@
   "expectedSteps": [
     {
       "target": "Ctrl+Delete",
-      "note": "One step; Yes and OK belong to it. Business Central refused: the order is released."
+      "note": "One step; Yes and OK belong to it. Business Central refused: the order is released.",
+      "texts": {
+        "sv-SE": "Tryck på Ctrl+Delete.",
+        "en-US": "Press Ctrl+Delete.",
+        "fr-FR": "Appuyez sur Ctrl+Delete.",
+        "de-DE": "Drücken Sie Ctrl+Delete.",
+        "es-ES": "Pulse Ctrl+Delete.",
+        "da-DK": "Tryk på Ctrl+Delete.",
+        "fi-FI": "Paina Ctrl+Delete.",
+        "nb-NO": "Trykk på Ctrl+Delete."
+      }
     }
   ],
   "events": [

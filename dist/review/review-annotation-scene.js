@@ -8,6 +8,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   annotations
 ) {
+  const LEGACY_RECTANGLE_STROKE_WIDTH = 0.006;
   function positiveDimension(value, name) {
     if (!Number.isFinite(value) || value <= 0) {
       throw new RangeError(`${name} must be greater than zero.`);
@@ -48,8 +49,10 @@
         style.stroke,
         annotations.DEFAULT_STYLES[annotations.TYPES.RECTANGLE].stroke
       ),
+      // Frames saved with the earlier standard width (no one could choose another) are drawn
+      // with today's; the saved annotation is not changed.
       strokeWidth: finiteStyle(
-        style.strokeWidth,
+        style.strokeWidth === LEGACY_RECTANGLE_STROKE_WIDTH ? undefined : style.strokeWidth,
         annotations.DEFAULT_STYLES[annotations.TYPES.RECTANGLE].strokeWidth
       ) * Math.min(width, height),
       opacity: finiteStyle(

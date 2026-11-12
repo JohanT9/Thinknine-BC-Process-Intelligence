@@ -377,6 +377,7 @@
   }
 
   function syncRecordingIndicator() {
+    syncCaptureActivity();
     if (!recording) clearClickHighlight();
     if (recording) showRecordingIndicator();
     else removeRecordingIndicator();
@@ -411,6 +412,8 @@
       recording = Boolean(response?.state?.recording && response.isRecordingTab);
       sessionId = recording ? response?.state?.sessionId || null : null;
       errorEvidence = recording && capturesErrors(response?.state);
+      // A frame that loads during a recording reports the page it opened on.
+      captureStartedWithFrame = true;
       syncRecordingIndicator();
     });
   } catch {
@@ -440,8 +443,33 @@
     }
   }
 
+  // Outside a recording the frame does no work of its own: it watches neither the page nor its
+  // address and does not keep the extension awake. It reports once that it is here, and a
+  // recording that starts reaches it through the stored state below.
+  let pingTimer = null;
+  let urlTimer = null;
+  let observing = false;
+  let captureStartedWithFrame = false;
+  function syncCaptureActivity() {
+    if (recording && !observing) {
+      observing = true;
+      startObserver(!captureStartedWithFrame);
+      lastUrl = location.href;
+      urlTimer = setInterval(checkUrl, 400);
+      pingTimer = setInterval(sendPing, 5000);
+    } else if (!recording && observing) {
+      observing = false;
+      observer.disconnect();
+      // Dialogs are seen afresh by the next recording.
+      observedDialogs.clear();
+      clearInterval(urlTimer);
+      clearInterval(pingTimer);
+      urlTimer = pingTimer = null;
+    }
+    captureStartedWithFrame = false;
+  }
+
   sendPing();
-  setInterval(sendPing, 5000);
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "T9_STATE_CHANGED") {
@@ -459,6 +487,7 @@
       recording = true;
       sessionId = message.sessionId || null;
       errorEvidence = true;
+      syncCaptureActivity();
       captureVisibleBugErrors().then(captured => sendResponse({ ok: true, captured }),
         () => sendResponse({ ok: true, captured: 0 }));
       return true;
@@ -470,7 +499,7 @@
         recording,
         sessionId,
         diagnosticsEnabled,
-        observedContext: context(),
+        observedContext: context({ versions: true }),
         frameUrl: location.href,
         version: "2.1.0"
       });
@@ -643,9 +672,11 @@
     return "";
   }
 
-  function context() {
+  // The Business Central versions are read from the page text only when the background asks
+  // the frame for its context, not for every recorded event.
+  function context({ versions = false } = {}) {
     let businessCentralVersions = {};
-    try {
+    if (versions) try {
       businessCentralVersions = globalThis.T9BusinessCentralVersionCapture
         ?.extract(document.body?.innerText || document.body?.textContent || "") || {};
     } catch { /* Version details are optional and must never block capture. */ }
@@ -1301,8 +1332,15 @@
   window.addEventListener("click", event => {
     if (isRecorderUiEvent(event)) return;
     const observedTarget = eventElement(event);
-    const target = interactiveTarget(observedTarget, event) ||
+    const interactive = interactiveTarget(observedTarget, event);
+    const target = interactive ||
       (observedTarget instanceof Element ? observedTarget : null);
+    // A click that hit no control but landed on an element holding controls, such as the empty
+    // part of a toolbar, activated nothing. It is recorded as such, so it does not become a step.
+    let pointerContainer = false;
+    try {
+      pointerContainer = !interactive && Boolean(target?.querySelector?.(NATIVE_INTERACTIVE_SELECTOR));
+    } catch {}
     diagnostic("native-event-observed", { eventType: "click",
       targetTag: eventElement(event)?.tagName?.toLowerCase?.() || "",
       role: eventElement(event)?.getAttribute?.("role") || "",
@@ -1336,6 +1374,7 @@
       clientX: event.clientX,
       clientY: event.clientY,
       pointerTarget: true,
+      ...(pointerContainer ? { pointerContainer: true } : {}),
       interactionId,
       ...(keyboard ? { inputSource: "keyboard", key: keyboard.key } : {}),
       ...(preActionCaptureId ? { preActionCaptureId } : {}),
@@ -1376,7 +1415,9 @@
   // emptied, was rejected and is left to the error evidence. Lines are re-rendered after a
   // commit, so a replaced editor is found again by its caption, row and grid. Typing in the
   // field again, or in the editor that replaced it, ends the wait: that is a new edit.
-  const SETTLE_DELAYS_MS = [300, 1200];
+  // A choice that makes the client save and reload the record can take several seconds to show
+  // in the field, such as a vendor's name after the vendor was chosen.
+  const SETTLE_DELAYS_MS = [300, 1200, 3000, 6000];
   const settling = new Set();
 
   function fieldLocator(element) {
@@ -1727,10 +1768,17 @@
     }
   });
 
-  function startObserver() {
+  // When a recording starts on a page that is already open, what the page shows at that moment
+  // is its starting point, not something the recording caused.
+  function startObserver(fromCurrentPage) {
     if (!document.documentElement) {
-      requestAnimationFrame(startObserver);
+      requestAnimationFrame(() => { if (observing) startObserver(fromCurrentPage); });
       return;
+    }
+    if (fromCurrentPage) {
+      lastPageSignature = `${getPageId()}|${getPageCaption()}|${location.href}`;
+      document.querySelectorAll('[role="dialog"],[aria-modal="true"]')
+        .forEach(dialog => observedDialogs.add(dialog));
     }
 
     document.querySelectorAll(
@@ -1743,9 +1791,7 @@
     });
   }
 
-  startObserver();
-
-  setInterval(() => {
+  function checkUrl() {
     if (location.href === lastUrl) return;
 
     const from = lastUrl;
@@ -1760,5 +1806,5 @@
       from,
       to: location.href
     });
-  }, 400);
+  }
 })();

@@ -6,6 +6,7 @@ const { createService } = require("../services/licensing/server.js");
 const tenant = "20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb";
 const unknown = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 const otherInstallation = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff";
+let signedInTenant = unknown;
 async function main() {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "t9-license-service-"));
   const registry = path.join(directory, "tenants.json");
@@ -19,7 +20,9 @@ async function main() {
       if (authorization !== "Bearer signed-in") {
         const error = new Error("unauthorized"); error.status = 401; throw error;
       }
-      return { tid: unknown, oid: otherInstallation,
+      // The user's organization: the tenant a trial is requested for, unless a test signs in
+      // from another organization.
+      return { tid: signedInTenant, oid: otherInstallation,
         name: "Tenant User", preferredUsername: "user@example.com" };
     } });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
@@ -98,6 +101,14 @@ async function main() {
       headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
       body: JSON.stringify(trialRequest) })).status, 409);
     const noEmailTenant = "cccccccc-dddd-eeee-ffff-000000000000";
+    // A user of another organization cannot start this tenant's one trial.
+    const foreignTrial = await fetch(trialEndpoint, { method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
+      body: JSON.stringify({ ...value, tenantId: noEmailTenant }) });
+    assert.equal(foreignTrial.status, 403);
+    assert.equal((await foreignTrial.json()).error, "trial-other-organization");
+    assert.equal((await (await post({ ...value, tenantId: noEmailTenant })).json()).trialAvailable, true);
+    signedInTenant = noEmailTenant;
     const noEmailTrial = await fetch(trialEndpoint, { method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
       body: JSON.stringify({ ...value, tenantId: noEmailTenant }) });
@@ -110,6 +121,7 @@ async function main() {
     const afterDelete = await (await post({ ...value, tenantId: unknown })).json();
     assert.equal(afterDelete.allowed, false);
     assert.equal(afterDelete.trialAvailable, false);
+    signedInTenant = unknown;
     assert.equal((await fetch(trialEndpoint, { method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
       body: JSON.stringify(trialRequest) })).status, 409);

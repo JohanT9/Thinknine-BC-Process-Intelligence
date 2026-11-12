@@ -232,6 +232,8 @@ with these resource keys:
 | `display` | `ShowMoreFields`, `ShowLess`, `CommandBar_ShowWrappedItemsInContextMenu_Tooltip`, `CommandBar_ShowMore_Tooltip`, `CommandBar_ShowLess_Tooltip` |
 | `history` | `Back_Title`, `HelpPaneBackButton`, `HelpPaneForwardButton` |
 | `tellMe` | `ProductMenuBar_PageSearch` (its first sentence) |
+| `create` | `CreateActionCaption` |
+| `confirmYes` | `ConfirmYes` |
 | `fieldHint` | `HasMandatoryField`, `MandatoryIcon_Tooltip`, `Autofill_AnnouncementSupportedField` |
 | announcements (`isAnnouncement`) | `SavingState_Saving`, `SavingState_Saved`, `Sorting_AriaSortText`, `Table_TotalNumberOfRowsChanged`, `Table_TotalNumberOfRowsChangedOneItem`, `Search_TotalNumberOfRowsChanged`, `Search_TotalNumberOfRowsChangedOneItem`, `FilterAsYouTypeResults_None`, `FilterAsYouTypeResults_One`, `FilterAsYouTypeResults_MoreThanOne` |
 
@@ -246,6 +248,31 @@ deliberately left out except in English: Afvis, Hylkää, Verwerfen, Descartar, 
 Ignorer are also the captions of Business Central business actions such as Reject, which must
 stay steps. When the client changes a caption, read the same keys from a newer platform
 artifact; `tests/bc-client-captions.test.js` checks coverage for every registered language.
+
+Known gaps, kept visible rather than filled with unverified captions:
+
+- The answer "No" of a confirmation (`ConfirmNo`) is recognised from the action identity and
+  from the observed captions No and Nej only. Its French, German, Finnish and Norwegian
+  captions have not been read from the client resources.
+- Menu groups (Actions, Related, Functions, Line), the Tell Me category "Lists" and the
+  "Sort by" prefix of a column header are matched by caption in Swedish and English only.
+  Menu paths are otherwise read from the control hierarchy and a search result from the page it
+  opened, which do not depend on language.
+
+## Clicks beside controls
+
+A click that hits no control but lands on an element holding controls, such as the empty part
+of a toolbar, activated nothing. The recorder marks it (`pointerContainer`), the control is
+identified as `container` and the event is kept as supporting evidence, never as a step. In
+recordings made before the mark existed, such a click is recognised by its shape: an element
+without a role, named only by the text inside it, at least 300 px wide and eight times wider
+than high.
+
+A value the client shows in a field several seconds after the edit, such as a vendor's name
+after the vendor was chosen, is recorded as a `validated` value for up to six seconds. Older
+recordings carry it only on the next focus of the field in the same interaction; normalization
+reads it from there. A validated value that arrives after the step that edited the field is
+evidence for that step, not a step of its own.
 
 ## Keyboard use and validated values
 

@@ -45,7 +45,7 @@ for (const locale of locales) {
   assert.equal(context.T9UiI18n.format("review.imageNumber", { number: 17 }, locale).includes("17"), true);
   assert.equal(languages.normalize(locale.split("-")[0]), locale);
   assert.equal(languages.normalize(locale.split("-")[0] + "-CA"), locale);
-  assert.equal(documentLanguage.translateInstruction("Välj Förs.order.", locale), `${expected[locale].choose} Förs.order.`);
+  assert.equal(documentLanguage.translateInstruction("Välj Förs.order.", locale), `${expected[locale].choose} Förs.order${locale === "de-DE" ? " aus" : ""}.`);
   const source = { schemaVersion: 1, documentId: "localized", metadata: { title: "Customer title" }, assets: [],
     sections: [{ sectionId: "workflow", kind: "workflow", title: "Arbetsgång", blocks: [
       { blockId: "manual", kind: "paragraph", text: "Välj min egen text.", preserveUserText: true, provenance: "manual" },

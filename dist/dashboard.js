@@ -4207,31 +4207,99 @@ $("libraryFolderForm").addEventListener("submit", async event => {
     `[data-library-folder="${CSS.escape(created.folderId)}"]`) : $("libraryFolderRename"))?.focus();
 });
 
-// Removing a folder moves its documents and subfolders to the folder above.
+// Removing an empty folder only asks once. A folder with content offers a choice: keep the
+// content, which moves to the folder above (chosen beforehand), or delete the folder with its
+// subfolders and documents for good.
+let libraryFolderDeleting = false;
+function libraryFolderDeleteMode() {
+  return $("libraryFolderDeleteChoice").hidden ? "keep"
+    : $("libraryFolderDeleteForm").elements.libraryFolderDeleteMode.value;
+}
+function updateLibraryFolderDeleteSubmit() {
+  $("libraryFolderDeleteSubmit").textContent = uiT(libraryFolderDeleteMode() === "all"
+    ? "folder.deleteAllConfirm" : "folder.deleteConfirm");
+}
 function openLibraryFolderDelete() {
   const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
   if (!folder) return;
-  const effect = globalThis.T9DocumentFolders.removal(documentFolders, folder.folderId,
+  const content = globalThis.T9DocumentFolders.contents(documentFolders, folder.folderId,
     documentLibraryRecords);
   $("libraryFolderDeleteTitle").textContent = uiTf("folder.deleteTitle", { name: folder.name });
-  $("libraryFolderDeleteBody").textContent = folder.parentId
+  $("libraryFolderDeleteBody").textContent = uiT(content.empty ? "folder.deleteEmpty"
+    : "folder.deleteContains");
+  $("libraryFolderDeleteCounts").innerHTML = content.empty ? "" : [
+    uiTf("folder.deleteContentDocuments", { count: content.projectIds.length }),
+    ...(content.archived ? [uiTf("folder.deleteContentArchived", { count: content.archived })] : []),
+    uiTf("folder.deleteContentSubfolders", { count: content.subfolders })
+  ].map(line => `<li>${escapeHtml(line)}</li>`).join("");
+  $("libraryFolderDeleteKeepHint").textContent = folder.parentId
     ? uiTf("folder.deleteBody", { parent: libraryFolderPathText(folder.parentId) })
     : uiT("folder.deleteBodyTop");
-  $("libraryFolderDeleteCounts").innerHTML = [
-    uiTf("folder.deleteDocuments", { count: effect.documents }),
-    uiTf("folder.deleteSubfolders", { count: effect.subfolders })
-  ].map(line => `<li>${escapeHtml(line)}</li>`).join("");
+  $("libraryFolderDeleteChoice").hidden = content.empty;
+  $("libraryFolderDeleteForm").elements.libraryFolderDeleteMode.value = "keep";
+  updateLibraryFolderDeleteSubmit();
+  $("libraryFolderDeleteProgress").textContent = "";
   $("libraryFolderDeleteError").textContent = "";
   $("libraryFolderDeleteDialog").showModal();
+}
+$("libraryFolderDeleteChoice").addEventListener("change", updateLibraryFolderDeleteSubmit);
+// While documents are being deleted the dialog stays open, so the progress stays in view.
+$("libraryFolderDeleteDialog").addEventListener("cancel", event => {
+  if (libraryFolderDeleting) event.preventDefault();
+});
+
+// Deletes the documents one at a time, then the folders. If a document cannot be deleted the
+// folders stay, with the documents not yet deleted still in them.
+async function deleteLibraryFolderWithContents(folder) {
+  const content = globalThis.T9DocumentFolders.contents(documentFolders, folder.folderId,
+    documentLibraryRecords);
+  const form = $("libraryFolderDeleteForm");
+  const controls = [...form.querySelectorAll("button, input")];
+  let deleted = 0;
+  libraryFolderDeleting = true;
+  controls.forEach(control => { control.disabled = true; });
+  $("libraryFolderDeleteError").textContent = "";
+  try {
+    for (const projectId of content.projectIds) {
+      $("libraryFolderDeleteProgress").textContent = uiTf("folder.deleteProgress",
+        { done: deleted, total: content.projectIds.length });
+      const response = await send({ type: "T9_DELETE_SESSION", sessionId: projectId });
+      if (!response?.ok) throw new Error(response?.error || uiT("library.deleteFailed"));
+      deleted += 1;
+    }
+    const tree = globalThis.T9DocumentFolders.removeWithContents(documentFolders, folder.folderId);
+    await saveLibraryFolders(tree);
+    documentFolders = tree;
+  } catch (error) {
+    $("libraryFolderDeleteProgress").textContent = "";
+    $("libraryFolderDeleteError").textContent = `${error?.code ? folderErrorText(error)
+      : error.message} ${uiTf("folder.deleteAllFailed", { count: deleted })}`;
+    if (deleted) await loadSessions().catch(() => {});
+    return;
+  } finally {
+    libraryFolderDeleting = false;
+    controls.forEach(control => { control.disabled = false; });
+  }
+  if (deleted) await loadSessions().catch(() => {});
+  $("libraryFolderDeleteDialog").close();
+  openLibraryFolder(folder.parentId);
+  announceLibraryFolders(uiTf("folder.deletedAll", { name: folder.name, count: deleted }));
 }
 
 $("libraryFolderDeleteForm").addEventListener("submit", async event => {
   event.preventDefault();
+  if (libraryFolderDeleting) return;
   const folder = globalThis.T9DocumentFolders.find(documentFolders, libraryFolder);
   if (!folder) {
     $("libraryFolderDeleteDialog").close();
     return;
   }
+  if (libraryFolderDeleteMode() === "all") {
+    await deleteLibraryFolderWithContents(folder);
+    return;
+  }
+  const empty = globalThis.T9DocumentFolders.contents(documentFolders, folder.folderId,
+    documentLibraryRecords).empty;
   const result = globalThis.T9DocumentFolders.remove(documentFolders, folder.folderId,
     documentLibraryRecords, applicationSettings.uiLocale || "en-US");
   const records = result.records.map(record => globalThis.T9DocumentLibrary.normalize(record));
@@ -4252,8 +4320,8 @@ $("libraryFolderDeleteForm").addEventListener("submit", async event => {
   }
   $("libraryFolderDeleteDialog").close();
   openLibraryFolder(folder.parentId);
-  announceLibraryFolders(folder.parentId
-    ? uiTf("folder.deleted", { name: folder.name, parent: libraryFolderPathText(folder.parentId),
+  announceLibraryFolders(empty ? uiTf("folder.deletedEmpty", { name: folder.name })
+    : folder.parentId ? uiTf("folder.deleted", { name: folder.name, parent: libraryFolderPathText(folder.parentId),
       count: result.moved.length })
     : uiTf("folder.deletedTop", { name: folder.name, count: result.moved.length }));
 });

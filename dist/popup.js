@@ -243,6 +243,9 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
     return { source: "tenant", license: tenantResult.license, tenantId: tenantResult.tenantId, account };
   }
 
+  // A trial belongs to the organization that owns the environment. A consultant signed in from
+  // another organization cannot start it, and continues with the consultant license instead.
+  let otherOrganization = null;
   if (tenantResult?.license?.trialAvailable || checkError) {
     try {
       let trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 45000);
@@ -258,7 +261,7 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
           ? t("license.trialServiceTimeout")
           : trial.code === "trial-service-unreachable"
             ? t("license.trialServiceUnavailable") : trial.error || t("license.trialFailed");
-        throw Object.assign(new Error(message), { status: trial?.status });
+        throw Object.assign(new Error(message), { status: trial?.status, code: trial?.code });
       }
       return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
     } catch (error) {
@@ -271,7 +274,8 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
           return { source: "tenant", license: current.license, tenantId: current.tenantId, account };
         }
       }
-      throw error;
+      if (error.code !== "trial-other-organization") throw error;
+      otherOrganization = error;
     }
   }
 
@@ -280,7 +284,7 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
   if (consultant?.license?.allowed) {
     return { source: "consultant", license: consultant.license, tenantId: tenantResult?.tenantId, account };
   }
-  throw new Error(t("license.noEligibleTrial"));
+  throw new Error(t(otherOrganization ? "license.trialOtherOrganization" : "license.noEligibleTrial"));
 }
 
 function displayLatestAction(action) {
@@ -466,7 +470,7 @@ $("licenseCardAction").addEventListener("click", async () => {
     renderLicenseCard(result.license, { tenantId: result.tenantId, signedIn: true });
     setLicenseFeedback(t(result.license.licenseType === "trial" ? "license.trialActivated" : "license.signInComplete"));
   } catch (error) {
-    setLicenseFeedback(error.message || t("license.trialFailed"), true);
+    setLicenseFeedback(error.message ? t(error.message) : t("license.trialFailed"), true);
     await updateLicenseCard();
   } finally {
     card.setAttribute("aria-busy", "false");

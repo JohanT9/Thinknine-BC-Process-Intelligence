@@ -61,6 +61,17 @@ const localizedTitle = service.createBugReportFromRecording(bugSource, [{
     errorEvidenceId: "error-title", recordingId: bugSource.id, capturedAt: NOW,
     precedingActionEventId: bugSource.events[0].id }] });
 assert.strictEqual(localizedTitle.summary.title, "Fel vid \u201dBokf\u00f6r\u201d");
+// The suggested title is written in every document language, not only Swedish and English.
+const titlesByLanguage = { "en-US": "Error when selecting \u201cBokf\u00f6r\u201d",
+  "fr-FR": "Erreur lors de la s\u00e9lection de \u00ab Bokf\u00f6r \u00bb", "de-DE": "Fehler bei \u201eBokf\u00f6r\u201c",
+  "es-ES": "Error al seleccionar \u00abBokf\u00f6r\u00bb", "da-DK": "Fejl ved \u201dBokf\u00f6r\u201d",
+  "fi-FI": "Virhe toiminnossa \u201dBokf\u00f6r\u201d", "nb-NO": "Feil ved \u00abBokf\u00f6r\u00bb" };
+for (const [documentLanguage, expectedTitle] of Object.entries(titlesByLanguage)) {
+  assert.strictEqual(service.createBugReportFromRecording(bugSource, [{
+    ...steps[0], actionCaption: "Bokf\u00f6r" }], { now: NOW, documentLanguage, errorEvidence: [{
+    errorEvidenceId: "error-title", recordingId: bugSource.id, capturedAt: NOW,
+    precedingActionEventId: bugSource.events[0].id }] }).summary.title, expectedTitle, documentLanguage);
+}
 const capturedActionTitle = service.createBugReportFromRecording(bugSource, steps, {
   now: NOW, documentLanguage: "sv-SE", errorEvidence: [{
     errorEvidenceId: "error-raw-action", recordingId: bugSource.id, capturedAt: NOW,

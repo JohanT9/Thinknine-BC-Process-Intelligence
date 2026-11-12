@@ -100,76 +100,28 @@
     const actionType = action?.actionType || action?.taskType;
     const value = String(action?.selectedValue ?? action?.instructionValue ??
       action?.value ?? "").trim();
-    const rawField = cleanLookupFieldCaption(
-      action?.targetField ?? action?.fieldCaption ?? "");
-    const rowTypeContext = action?.rowTypeContext ||
-      action?.semanticActionModel?.rowTypeContext;
-    const itemRow = rowTypeContext?.source === "same-row-type" &&
-      rowTypeContext.schemaVersion === 1 &&
-      /^(?:artikel|item|article|artículo|tuote|vare)$/iu.test(
-        String(rowTypeContext.value || "").trim());
-    const itemNumberLabels = {
-      "sv-SE": "Artikelnr.", "en-US": "Item No.", "fr-FR": "N° d’article",
-      "de-DE": "Artikelnr.", "es-ES": "N.º de artículo", "da-DK": "Varenr.",
-      "fi-FI": "Nimikenro", "nb-NO": "Varenr."
-    };
-    const rowTypeAliases = {
-      Item: /^(?:artikel|item|article|artículo|tuote|vare|produkt)$/iu,
-      Resource: /^(?:resurs|resource|ressource|recurso|resurssi|ressurs)$/iu,
-      GLAccount: /^(?:g\/?l(?:\s|-)?account|ledger account|redovisningskonto|g\/?l-konto|sachkonto|compte général|cuenta contable|finanskonto|finanskonti|finanskonton|pääkirjatili)$/iu,
-      FixedAsset: /^(?:fixed asset|anläggningstillgång|anlaegningstilgang|anlægsaktiv|anlage|immobilisation|activo fijo|käyttöomaisuus|anleggsmiddel|driftsmiddel)$/iu,
-      ItemCharge: /^(?:charge\s*\(\s*item\s*\)|item charge|artikelavgift|varegebyr|artikelzuschlag|frais article|cargo\s*\(\s*producto\s*\)|cargo de producto|nimikeveloitus|tuoteveloitus)$/iu
-    };
-    const rowEntity = action?.selectedEntity || Object.entries(rowTypeAliases).find(([, pattern]) =>
-      pattern.test(String(rowTypeContext?.value || "").trim()))?.[0] || "";
-    const numberFields = {
-      Item: itemNumberLabels,
-      Resource: { "sv-SE": "Resursnr.", "en-US": "Resource No.", "fr-FR": "N° de ressource",
-        "de-DE": "Ressourcennr.", "es-ES": "N.º de recurso", "da-DK": "Ressourcenr.",
-        "fi-FI": "Resurssinro", "nb-NO": "Ressursnr." },
-      GLAccount: { "sv-SE": "Redovisningskontonr.", "en-US": "G/L Account No.",
-        "fr-FR": "N° de compte général", "de-DE": "Sachkontonr.",
-        "es-ES": "N.º de cuenta contable", "da-DK": "Finanskontonr.",
-        "fi-FI": "Pääkirjatilinro", "nb-NO": "Finanskontonr." },
-      FixedAsset: { "sv-SE": "Anläggningstillgångsnr.", "en-US": "Fixed Asset No.",
-        "fr-FR": "N° d’immobilisation", "de-DE": "Anlagennr.",
-        "es-ES": "N.º de activo fijo", "da-DK": "Anlægsnr.",
-        "fi-FI": "Käyttöomaisuusnro", "nb-NO": "Anleggsnr." },
-      ItemCharge: { "sv-SE": "Artikelavgiftsnr.", "en-US": "Item Charge No.",
-        "fr-FR": "N° de frais article", "de-DE": "Artikelzuschlagsnr.",
-        "es-ES": "N.º de cargo de producto", "da-DK": "Varegebyrnr.",
-        "fi-FI": "Nimikeveloitusnro", "nb-NO": "Varegebyrnr." }
-    };
-    const isNumberField = /^(?:nr\.?|no\.?|number|nummer|n°|nº|n\.?[º°]|num(?:ero|éro)?|nro\.?|n:o)$/iu
-      .test(rawField);
-    const contextualNumberField = rowTypeContext?.source === "same-row-type" &&
-      rowTypeContext.schemaVersion === 1 && isNumberField && rowEntity
-      ? numberFields[rowEntity]?.[locale] : "";
-    // "Artikelnummer" is the item rule's own label, not a captured caption, so it is translated.
-    const generatedItemField = actionType === "SelectItem" && rawField === "Artikelnummer";
-    const field = (actionType === "EnterItemNumber" && itemRow) || generatedItemField
-      ? itemNumberLabels[locale] : contextualNumberField || rawField;
+    // The field is named as Business Central showed it. A column is announced by its sort button
+    // ("Sortera efter Nr"); the column's own name is what the reader sees.
+    const shownField = caption => String(caption ?? "").trim()
+      .replace(/^(?:sortera efter|sort by|trier par|sortieren nach|ordenar por|sort[eé]r? efter|sorter etter)\s+/iu, "")
+      .replace(/^lajittele\s+(.+?)(?::n)?\s+mukaan$/iu, "$1").trim();
+    const field = shownField(cleanLookupFieldCaption(
+      action?.targetField ?? action?.fieldCaption ?? ""));
+    const german = locale === "de-DE";
+    // Ends a sentence after a caption: German closes with its verb prefix, and a caption that
+    // ends with its own period ("Nr.") ends the sentence.
+    const afterCaption = (caption, prefix) => run(german && prefix ? ` ${prefix}.`
+      : /\.$/u.test(String(caption)) ? "" : ".");
     // Text typed to find a record, then the record chosen.
     const enterAndChoose = (typed, caption) => sentence(run(words.enter, "action"),
       run(typed, "value"), run(words.in), quoted(caption),
-      run(locale === "de-DE" ? " ein und wählen Sie " : words.andChoose), quoted(value),
-      run(locale === "de-DE" ? " aus." : "."));
+      run(german ? " ein und wählen Sie " : words.andChoose), quoted(value),
+      run(german ? " aus." : "."));
     if (actionType === "SearchAndSelectRecord" && value) {
       // The record is entered in the field; text typed to find it, such as a word of the item's
       // description, is said with the record chosen.
       const typed = String(action?.typedValue || "").trim();
-      const german = locale === "de-DE";
-      const observedSearchField = String(action?.searchFieldCaption || rawField || "").trim();
-      const sortByNumberCaptions = {
-        "sv-SE": "Sortera efter Nr", "en-US": "Sort by No.",
-        "fr-FR": "Trier par n°", "de-DE": "Sortieren nach Nr.",
-        "es-ES": "Ordenar por N.º", "da-DK": "Sortér efter nr.",
-        "fi-FI": "Lajittele nro:n mukaan", "nb-NO": "Sorter etter nr."
-      };
-      const isSortByNumber = /^(?:sortera efter\s+nr\.?|sort by\s+(?:no\.?|nr\.?)|trier par\s+n[°º.]|sortieren nach\s+nr\.?|ordenar por\s+n\.?[º°]|sort[eé]r? efter\s+nr\.?|lajittele\s+nro(?::n)?\s+mukaan|sorter etter\s+nr\.?)$/iu
-        .test(observedSearchField);
-      const searchField = isSortByNumber
-        ? (itemRow ? itemNumberLabels[locale] : sortByNumberCaptions[locale]) : observedSearchField || {
+      const searchField = shownField(action?.searchFieldCaption || field) || {
         "sv-SE": "nummerfältet", "en-US": "the number field",
         "fr-FR": "le champ du numéro", "de-DE": "das Nummernfeld",
         "es-ES": "el campo de número", "da-DK": "nummerfeltet",
@@ -178,9 +130,14 @@
       return typed
         ? enterAndChoose(typed, searchField)
         : sentence(run(words.enter, "action"), run(value, "value"), run(words.in),
-          // A caption such as "Artikelnr." ends the sentence with its own period.
-          quoted(searchField), run(german ? " ein." : /\.$/u.test(searchField) ? "" : "."));
+          quoted(searchField), afterCaption(searchField, "ein"));
     }
+    // The label of the item selection rule when no field caption was captured.
+    const itemNumberLabels = {
+      "sv-SE": "Artikelnr.", "en-US": "Item No.", "fr-FR": "N° d’article",
+      "de-DE": "Artikelnr.", "es-ES": "N.º de artículo", "da-DK": "Varenr.",
+      "fi-FI": "Nimikenro", "nb-NO": "Varenr."
+    };
     const selectLabels = {
       SelectCustomer: { "sv-SE": "Kund", "en-US": "Customer", "fr-FR": "Client",
         "de-DE": "Debitor", "es-ES": "Cliente", "da-DK": "Kunde",
@@ -196,27 +153,37 @@
         "de-DE": "Dimension", "es-ES": "Dimensión", "da-DK": "Dimension",
         "fi-FI": "Dimensio", "nb-NO": "Dimensjon" }[locale]
     };
+    // A search already described by what was searched for and what was opened keeps that text.
+    if (actionType === "SearchAndOpenPage" &&
+        /^Sök efter /u.test(String(action?.displayText || ""))) {
+      return sentence(legacyRuns(fallbackText));
+    }
     if (actionType === "SearchAndOpenPage") {
       const search = String(action?.searchCaption || {
         "sv-SE": "Sök", "en-US": "Search", "fr-FR": "Rechercher",
         "de-DE": "Suchen", "es-ES": "Buscar", "da-DK": "Søg",
         "fi-FI": "Hae", "nb-NO": "Søk"
       }[locale]).trim();
+      // The search box's caption in the client's own words (bc-client-captions, tellMe); its
+      // closing punctuation would end the sentence in the middle.
       const searchField = String(action?.searchFieldCaption || field || {
-        "sv-SE": "Berätta vad du vill göra.", "en-US": "Tell me what you want to do.",
-        "fr-FR": "Dites-moi ce que vous voulez faire.",
-        "de-DE": "Sagen Sie mir, was Sie tun möchten.",
-        "es-ES": "Dígame qué desea hacer.", "da-DK": "Fortæl mig, hvad du vil gøre.",
-        "fi-FI": "Kerro, mitä haluat tehdä.", "nb-NO": "Fortell meg hva du vil gjøre."
-      }[locale]).trim();
+        "sv-SE": "Berätta vad du vill göra", "en-US": "Tell me what you want to do",
+        "fr-FR": "Dites-moi ce que vous voulez faire", "de-DE": "Was möchten Sie tun",
+        "es-ES": "Indique qué desea hacer", "da-DK": "Fortæl mig, hvad du vil foretage dig",
+        "fi-FI": "Kerro, mitä haluat tehdä", "nb-NO": "Fortell hva du vil gjøre"
+      }[locale]).trim().replace(/[.?]$/u, "");
       const result = String(action?.resultCaption || action?.selectedCaption ||
         action?.pageCaption || "").trim();
       if (result) {
-        return sentence(run(words.choose, "action"), quoted(search),
-          run(`, ${words.enter.trim().toLocaleLowerCase(locale)} `),
-          value ? run(value, "value") : run(words.searchText),
-          run(words.in), quoted(searchField), run(words.andChoose),
-          quoted(result), run("."));
+        const query = value ? run(value, "value") : run(words.searchText);
+        return german
+          ? sentence(run(words.choose, "action"), quoted(search), run(" aus, geben Sie "), query,
+            run(words.in), quoted(searchField), run(" ein und wählen Sie "), quoted(result),
+            run(" aus."))
+          : sentence(run(words.choose, "action"), quoted(search),
+            run(`, ${words.enter.trim().toLocaleLowerCase(locale)} `), query,
+            run(words.in), quoted(searchField), run(words.andChoose),
+            quoted(result), run("."));
       }
     }
     if (selectLabels[actionType] && value && String(action?.typedValue || "").trim()) {
@@ -225,28 +192,24 @@
     if (selectLabels[actionType] && value) {
       // The captured Business Central field caption wins over the generic label.
       return sentence(run(words.choose, "action"), quoted(field || selectLabels[actionType]),
-        run(" "), run(value, "value"), run("."));
+        run(" "), run(value, "value"), run(german ? " aus." : "."));
     }
     if (["EnterQuantity", "EnterItemNumber", "SelectDate", "EnterFieldValue"].includes(
       actionType) && value && field) {
       return sentence(run(words.enter, "action"), run(value, "value"),
-        run(words.in), quoted(field), run("."));
-    }
-    if (actionType === "SelectLookupValue" && value && contextualNumberField) {
-      return sentence(run(words.enter, "action"), run(value, "value"),
-        run(words.in), quoted(contextualNumberField), run("."));
+        run(words.in), quoted(field), afterCaption(field, "ein"));
     }
     if (["SelectOption", "SelectLookupValue"].includes(actionType) &&
         value) {
       return field
         ? sentence(run(words.choose, "action"), run(value, "value"),
-          run(words.forField), quoted(field), run("."))
-        : sentence(run(words.choose, "action"), run(value, "value"), run("."));
+          run(words.forField), quoted(field), afterCaption(field, "aus"))
+        : sentence(run(words.choose, "action"), run(value, "value"), run(german ? " aus." : "."));
     }
     if (["EnableCheckbox", "DisableCheckbox"].includes(actionType) &&
         field) {
       return sentence(run(actionType === "EnableCheckbox"
-        ? words.enable : words.disable, "action"), quoted(field), run("."));
+        ? words.enable : words.disable, "action"), quoted(field), afterCaption(field, ""));
     }
     if (actionType === "RunActionPath" && Array.isArray(action?.actionPath) &&
         action.actionPath.length && action.actionPath.every(item =>
@@ -256,7 +219,7 @@
         if (index) pathRuns.push(run(" → "));
         pathRuns.push(quoted(caption.trim()));
       });
-      return sentence(run(words.choose, "action"), pathRuns, run("."));
+      return sentence(run(words.choose, "action"), pathRuns, run(german ? " aus." : "."));
     }
     const runs = legacyRuns(fallbackText);
     return sentence(runs);

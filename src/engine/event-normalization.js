@@ -328,6 +328,12 @@
       ? cache.get(recording) : null;
     if (cached && cached.revision === revision) return cached.result;
     const events = []; let pending = null; let focusedFieldContext = null;
+    // The last committed field value. When the field is focused again in the same interaction
+    // and then shows another value, the client validated the entry into it (a vendor's name
+    // after the vendor was chosen). Recordings made before the recorder waited long enough for
+    // that value carry it only on this focus.
+    let lastCommit = null;
+    const VALIDATED_ON_FOCUS_MS = 10000;
     const flush = () => { if (!pending) return; const owner = pending.sources.at(-1); events.push(create(owner, pending.kind, pending.reason, pending.sources, options)); pending = null; };
     for (const event of recording?.events || []) {
       const raw = rawOf(event);
@@ -335,6 +341,23 @@
       if (!kind) {
         if (raw.type === "focus") {
           flush();
+          const committed = lastCommit ? rawOf(lastCommit) : null;
+          const age = committed ? Date.parse(event.timestamp || raw.timestamp || "") -
+            Date.parse(lastCommit.timestamp || committed.timestamp || "") : NaN;
+          if (committed && typeof raw.value === "string" && raw.value.trim() &&
+              raw.value !== committed.value && raw.value !== committed.previousValue &&
+              raw.value !== "[maskerat]" && raw.interactionId &&
+              raw.interactionId === committed.interactionId &&
+              controlKey(lastCommit) === controlKey(event) && age >= 0 &&
+              age <= VALIDATED_ON_FOCUS_MS) {
+            const validated = { ...event, raw: { ...raw, type: "field-change", category: "field",
+              fieldName: committed.fieldName || raw.fieldName || raw.accessibleName || raw.label,
+              inputSource: "validated", enteredValue: committed.value,
+              previousValue: committed.previousValue } };
+            events.push(create(validated, "value-change", "focused-field-shows-validated-value",
+              [validated], options));
+            lastCommit = null;
+          }
           const caption = String(raw.accessibleName || raw.fieldName || raw.label || "").trim();
           const tellMe = captions.matches("tellMe", caption);
           focusedFieldContext = caption && !tellMe ? {
@@ -357,6 +380,7 @@
         } else focusedFieldContext = null;
       }
       if (kind === "value-change") {
+        lastCommit = ["change", "validated"].includes(raw.inputSource) ? event : lastCommit;
         if (canCoalesce(pending, candidate, kind)) pending.sources.push(candidate);
         else { flush(); pending = { kind, reason, sources: [candidate] }; }
       } else { flush(); events.push(create(candidate, kind, reason, [candidate], options)); }

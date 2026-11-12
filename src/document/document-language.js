@@ -268,7 +268,7 @@
         "en-US": () => `Choose the record ${record}${page ? ` on the ${page} page` : ""}.`,
         "fr-FR": () => `Sélectionnez l’enregistrement ${record}${page ? ` sur la page ${page}` : ""}.`,
         "de-DE": () => `Wählen Sie den Datensatz ${record}${page ? ` auf der Seite ${page}` : ""} aus.`,
-        "es-ES": () => `Selecciona el registro ${record}${page ? ` en la página ${page}` : ""}.`,
+        "es-ES": () => `Seleccione el registro ${record}${page ? ` en la página ${page}` : ""}.`,
         "da-DK": () => `Vælg posten ${record}${page ? ` på siden ${page}` : ""}.`,
         "fi-FI": () => `Valitse tietue ${record}${page ? ` sivulla ${page}` : ""}.`,
         "nb-NO": () => `Velg posten ${record}${page ? ` på siden ${page}` : ""}.`
@@ -280,9 +280,39 @@
       const list = openList[1];
       const templates = {
         "en-US": `Open the ${list} list.`, "fr-FR": `Ouvrez la liste ${list}.`,
-        "de-DE": `Öffnen Sie die Liste ${list}.`, "es-ES": `Abre la lista ${list}.`,
+        "de-DE": `Öffnen Sie die Liste ${list}.`, "es-ES": `Abra la lista ${list}.`,
         "da-DK": `Åbn listen ${list}.`, "fi-FI": `Avaa luettelo ${list}.`,
         "nb-NO": `Åpne listen ${list}.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
+    // A shortcut and the page the client opened in response.
+    const shortcutOpens = source.match(/^Tryck på ([\s\S]+?) för att öppna ([\s\S]+?)\.$/u);
+    if (shortcutOpens) {
+      const [, keys, opened] = shortcutOpens;
+      const templates = {
+        "en-US": `Press ${keys} to open ${opened}.`,
+        "fr-FR": `Appuyez sur ${keys} pour ouvrir ${opened}.`,
+        "de-DE": `Drücken Sie ${keys}, um ${opened} zu öffnen.`,
+        "es-ES": `Pulse ${keys} para abrir ${opened}.`,
+        "da-DK": `Tryk på ${keys} for at åbne ${opened}.`,
+        "fi-FI": `Avaa ${opened} painamalla ${keys}.`,
+        "nb-NO": `Trykk på ${keys} for å åpne ${opened}.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
+    // A button chosen in a dialog.
+    const dialogChoice = source.match(/^Välj ([\s\S]+?) i dialogrutan\.$/u);
+    if (dialogChoice) {
+      const button = dialogChoice[1];
+      const templates = {
+        "en-US": `Choose ${button} in the dialog.`,
+        "fr-FR": `Sélectionnez ${button} dans la boîte de dialogue.`,
+        "de-DE": `Wählen Sie im Dialog ${button} aus.`,
+        "es-ES": `Seleccione ${button} en el cuadro de diálogo.`,
+        "da-DK": `Vælg ${button} i dialogboksen.`,
+        "fi-FI": `Valitse valintaikkunassa ${button}.`,
+        "nb-NO": `Velg ${button} i dialogboksen.`
       };
       if (templates[locale]) return templates[locale];
     }
@@ -292,7 +322,7 @@
       const keys = shortcut[1];
       const templates = {
         "en-US": `Press ${keys}.`, "fr-FR": `Appuyez sur ${keys}.`,
-        "de-DE": `Drücken Sie ${keys}.`, "es-ES": `Pulsa ${keys}.`,
+        "de-DE": `Drücken Sie ${keys}.`, "es-ES": `Pulse ${keys}.`,
         "da-DK": `Tryk på ${keys}.`, "fi-FI": `Paina ${keys}.`, "nb-NO": `Trykk på ${keys}.`
       };
       if (templates[locale]) return templates[locale];
@@ -319,7 +349,7 @@
         "en-US": `Search for ${query} and open ${isList ? `the ${result} list` : result}.`,
         "fr-FR": `Recherchez ${query} et ouvrez ${isList ? "la liste " : ""}${result}.`,
         "de-DE": `Suchen Sie nach ${query} und öffnen Sie ${isList ? "die Liste " : ""}${result}.`,
-        "es-ES": `Busca ${query} y abre ${isList ? "la lista " : ""}${result}.`,
+        "es-ES": `Busque ${query} y abra ${isList ? "la lista " : ""}${result}.`,
         "da-DK": `Søg efter ${query} og åbn ${isList ? "listen " : ""}${result}.`,
         "fi-FI": `Hae ${query} ja avaa ${isList ? "luettelo " : ""}${result}.`,
         "nb-NO": `Søk etter ${query} og åpne ${isList ? "listen " : ""}${result}.`
@@ -347,14 +377,15 @@
         "en-US": (action, page) => `Choose ${action} on the ${page} page.`,
         "fr-FR": (action, page) => `Sélectionnez ${action} sur la page ${page}.`,
         "de-DE": (action, page) => `Wählen Sie ${action} auf der Seite ${page} aus.`,
-        "es-ES": (action, page) => `Selecciona ${action} en la página ${page}.`,
+        "es-ES": (action, page) => `Seleccione ${action} en la página ${page}.`,
         "da-DK": (action, page) => `Vælg ${action} på siden ${page}.`,
         "fi-FI": (action, page) => `Valitse ${action} sivulla ${page}.`,
         "nb-NO": (action, page) => `Velg ${action} på siden ${page}.`
       };
       if (templates[locale]) return templates[locale](actionOnPage[1], actionOnPage[2]);
     }
-    const confirmation = source.match(/^(Ange [\s\S]+\.) (Välj \*\*OK\*\*\.)$/u);
+    // An entry confirmed with a button, whatever the button is called (OK, Ja, Yes).
+    const confirmation = source.match(/^(Ange [\s\S]+?\.) (Välj \*\*[^*]+\*\*\.)$/u);
     if (confirmation) return translateInstruction(confirmation[1], language) + ' ' +
       translateInstruction(confirmation[2], language);
     const exact = systemText(source, language);
@@ -447,10 +478,15 @@
   const MASKED_VALUE = Object.freeze({ "sv-SE": "[maskerat]", "en-US": "[masked]",
     "fr-FR": "[masqué]", "de-DE": "[maskiert]", "es-ES": "[enmascarado]",
     "da-DK": "[maskeret]", "fi-FI": "[peitetty]", "nb-NO": "[maskert]" });
+  // A field whose caption the recorder could not read is stored with the marker "Okänt fält".
+  const UNKNOWN_FIELD = Object.freeze({ "sv-SE": "Okänt fält", "en-US": "Unknown field",
+    "fr-FR": "Champ inconnu", "de-DE": "Unbekanntes Feld", "es-ES": "Campo desconocido",
+    "da-DK": "Ukendt felt", "fi-FI": "Tuntematon kenttä", "nb-NO": "Ukjent felt" });
   function localizedInstruction(value, language) {
     const translated = translateInstruction(value, language);
     const marker = MASKED_VALUE[normalize(language)] || MASKED_VALUE["en-US"];
-    return translated.replaceAll("[maskerat]", marker);
+    return translated.replaceAll("[maskerat]", marker)
+      .replaceAll("**Okänt fält**", `**${UNKNOWN_FIELD[normalize(language)] || UNKNOWN_FIELD["en-US"]}**`);
   }
 
   return { VERSION, DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, normalize,

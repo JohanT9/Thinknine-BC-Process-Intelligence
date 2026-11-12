@@ -12,9 +12,10 @@
     TEXT_LABEL: "text-label"
   });
   const DEFAULT_STYLES = Object.freeze({
+    // A frame is half as thick as it first was (0.006), so it outlines without covering.
     [TYPES.RECTANGLE]: Object.freeze({
       stroke: "#dc2626",
-      strokeWidth: 0.006,
+      strokeWidth: 0.003,
       opacity: 1
     }),
     [TYPES.ARROW]: Object.freeze({

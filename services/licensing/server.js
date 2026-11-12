@@ -491,6 +491,11 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         if (!validTrialRequest(value)) return reply(400, { error: "invalid-request" });
         try {
           const identity = await validateEntra(request.headers.authorization || "");
+          // The one trial of a Business Central tenant is started by a user of the organization
+          // that owns it (the tenant is its Entra tenant), not by anyone who can sign in.
+          if (identity.tid !== value.tenantId) {
+            return reply(403, { error: "trial-other-organization" });
+          }
           const license = await requestTrial({ ...value, email: email(identity.preferredUsername) }, identity);
           return reply(200, { tenantId: value.tenantId, allowed: true,
             licenseType: "trial", licenseStatus: "active", expiresAt: license.expiresAt });

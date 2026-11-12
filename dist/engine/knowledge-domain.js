@@ -5,11 +5,13 @@
     ? require("./knowledge-explanation-catalog") : root.T9KnowledgeExplanationCatalog;
   const pageIdentification = typeof module === "object" && module.exports
     ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
-  const api = factory(consolidation, explanationCatalog, pageIdentification);
+  const clientCaptions = typeof module === "object" && module.exports
+    ? require("./bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(consolidation, explanationCatalog, pageIdentification, clientCaptions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9KnowledgeDomain = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (consolidation, explanationCatalog, pageIdentification) {
+function (consolidation, explanationCatalog, pageIdentification, clientCaptions) {
   "use strict";
   const VERSION = "2.3.0";
   const text = value => String(value || "");
@@ -254,21 +256,21 @@ function (consolidation, explanationCatalog, pageIdentification) {
   const createInstructionTemplates = {
     "sv-SE": (entity, action, page) => `Börja skapa en ny **${entity}** genom att välja **${action}** på sidan **${page}**.`,
     "en-US": (entity, action, page) => `Start creating a new **${entity}** by selecting **${action}** on the **${page}** page.`,
-    "fr-FR": (entity, action, page) => `Commencez à créer **${entity}** en sélectionnant **${action}** sur la page **${page}**.`,
-    "de-DE": (entity, action, page) => `Beginnen Sie mit der Erstellung von **${entity}**, indem Sie auf der Seite **${page}** **${action}** wählen.`,
-    "es-ES": (entity, action, page) => `Empieza a crear **${entity}** seleccionando **${action}** en la página **${page}**.`,
+    "fr-FR": (entity, action, page) => `Sélectionnez **${action}** sur la page **${page}** pour créer un nouvel enregistrement (**${entity}**).`,
+    "de-DE": (entity, action, page) => `Wählen Sie auf der Seite **${page}** **${action}** aus, um einen neuen Datensatz (**${entity}**) zu erstellen.`,
+    "es-ES": (entity, action, page) => `Seleccione **${action}** en la página **${page}** para crear un nuevo registro (**${entity}**).`,
     "da-DK": (entity, action, page) => `Begynd at oprette en ny **${entity}** ved at vælge **${action}** på siden **${page}**.`,
-    "fi-FI": (entity, action, page) => `Aloita uuden **${entity}** luominen valitsemalla **${action}** sivulla **${page}**.`,
+    "fi-FI": (entity, action, page) => `Luo uusi tietue (**${entity}**) valitsemalla **${action}** sivulla **${page}**.`,
     "nb-NO": (entity, action, page) => `Begynn å opprette en ny **${entity}** ved å velge **${action}** på siden **${page}**.`
   };
   const genericCreateInstructionTemplates = {
     "sv-SE": (action, page) => `Börja skapa en ny post genom att välja **${action}** på sidan **${page}**.`,
     "en-US": (action, page) => `Start creating a new record by selecting **${action}** on the **${page}** page.`,
-    "fr-FR": (action, page) => `Commencez à créer un enregistrement en sélectionnant **${action}** sur la page **${page}**.`,
-    "de-DE": (action, page) => `Beginnen Sie mit der Erstellung eines neuen Datensatzes, indem Sie auf der Seite **${page}** **${action}** wählen.`,
-    "es-ES": (action, page) => `Empieza a crear un registro seleccionando **${action}** en la página **${page}**.`,
+    "fr-FR": (action, page) => `Sélectionnez **${action}** sur la page **${page}** pour créer un nouvel enregistrement.`,
+    "de-DE": (action, page) => `Wählen Sie auf der Seite **${page}** **${action}** aus, um einen neuen Datensatz zu erstellen.`,
+    "es-ES": (action, page) => `Seleccione **${action}** en la página **${page}** para crear un nuevo registro.`,
     "da-DK": (action, page) => `Begynd at oprette en ny post ved at vælge **${action}** på siden **${page}**.`,
-    "fi-FI": (action, page) => `Aloita tietueen luominen valitsemalla **${action}** sivulla **${page}**.`,
+    "fi-FI": (action, page) => `Luo uusi tietue valitsemalla **${action}** sivulla **${page}**.`,
     "nb-NO": (action, page) => `Begynn å opprette en ny post ved å velge **${action}** på siden **${page}**.`
   };
   function isNewActionCaption(value) {
@@ -285,8 +287,9 @@ function (consolidation, explanationCatalog, pageIdentification) {
     const language = text(task.language || task.locale || task.context?.language || "sv-SE");
     const locale = genericCreateInstructionTemplates[language] ? language :
       genericCreateInstructionTemplates[language.split("-")[0]] ? language.split("-")[0] : "sv-SE";
-    const page = text(task.knowledgePageCaption || task.pageCaption ||
-      task.context?.currentPageCaption || task.context?.previousPageCaption);
+    // The page is named without the record or the product title after it.
+    const page = clientCaptions.pageName(text(task.knowledgePageCaption || task.pageCaption ||
+      task.context?.currentPageCaption || task.context?.previousPageCaption));
     const action = text(task.actionCaption);
     if (!page || !isNewActionCaption(action)) return "";
     if (!names) return genericCreateInstructionTemplates[locale](action, page);

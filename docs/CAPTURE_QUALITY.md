@@ -13,6 +13,13 @@ normalization, step grouping, session interpretation), and every produced step i
 | extra | A step that matches no expected step (noise) |
 | missing | An expected step with no produced step |
 
+An entry can also state the sentence the finished document shows for each step
+(`expectedSteps[].texts`, by locale). The recording is then interpreted in each stated
+language and taken through the same chain as the document preview and the Word export; a
+sentence that differs counts as a text mismatch and is printed with the expected and the actual
+sentence. This is what the reader gets, so wording, word order and untranslated system text are
+caught here and not only whether the right steps were found.
+
 Precision is correct steps divided by produced steps; recall is correct steps divided by
 expected steps. Steps are aligned in order, so a step in the wrong place does not count.
 

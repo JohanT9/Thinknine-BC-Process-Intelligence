@@ -189,6 +189,17 @@
         evidence("observed-action-caption", caption)].filter(Boolean)
     };
   }
+  function isLegacyPointerContainer(raw, role, tag) {
+    if (raw.pointerContainer !== undefined || raw.pointerTarget !== true || raw.type !== "click" ||
+        raw.accessibleNameSource !== "pointer-path-text" ||
+        !["div", "span", "section", "td", "li", "ul"].includes(tag) || (role && role !== tag) ||
+        raw.controlId || raw.fieldId || raw.automationId || raw.dataControlId || raw.elementId ||
+        raw.ariaHasPopup) return false;
+    const bounds = raw.localBounds || {};
+    const words = text(raw.accessibleName || raw.label).split(/\s+/u).filter(Boolean).length;
+    return words >= 2 && Number(bounds.width) >= 300 && Number(bounds.height) > 0 &&
+      Number(bounds.width) / Number(bounds.height) >= 8;
+  }
   function controlType(raw) {
     const explicit = text(raw.controlKind);
     if (explicit) return { value: explicit, quality: "exact", source: "explicit-control-kind" };
@@ -206,6 +217,14 @@
     if (role === "gridcell") return { value: "repeaterCell", quality: "strong", source: "role" };
     if (raw.reactInteractive === true) return { value: "interactiveSurface",
       quality: "strong", source: "observed-react-interactive-surface" };
+    // A click that hit no control, on an element that holds controls: the empty part of a toolbar
+    // or a group. Recordings made before the recorder reported this are recognised by the shape
+    // of such a strip: an element without a role, named only by the text inside it, much wider
+    // than it is high.
+    if (raw.pointerContainer === true || isLegacyPointerContainer(raw, role, tag)) {
+      return { value: "container", quality: raw.pointerContainer === true ? "strong" : "partial",
+        source: "observed-pointer-container" };
+    }
     if (raw.pointerTarget === true && text(raw.accessibleName || raw.label)) {
       return { value: "interactiveSurface", quality: "partial",
         source: "observed-named-pointer-target" };
