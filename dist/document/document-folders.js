@@ -197,6 +197,27 @@
     return { tree: freeze({ ...tree, folders }), records: nextRecords, moved };
   }
 
+  // Everything in a folder and the folders below it: the documents, how many of them are
+  // archived, and the subfolders. A folder with neither is empty.
+  function contents(tree, folderId, records = []) {
+    const folderIds = descendantIds(tree, folderId);
+    const documents = records.filter(record => folderIds.has(folderOf(tree, record)));
+    return {
+      projectIds: documents.map(record => record.projectId),
+      archived: documents.filter(record => record.archived).length,
+      subfolders: folderIds.size - 1,
+      empty: !documents.length && folderIds.size === 1
+    };
+  }
+
+  // Removes a folder and every folder below it. The documents in them are deleted separately
+  // first; a document whose folder no longer exists would show at the top level.
+  function removeWithContents(tree, folderId) {
+    if (!find(tree, folderId)) throw folderError("missing");
+    const folderIds = descendantIds(tree, folderId);
+    return freeze({ ...tree, folders: tree.folders.filter(folder => !folderIds.has(folder.folderId)) });
+  }
+
   // Every folder in tree order, with its depth and full path, for a folder picker.
   function outline(tree, locale = "en-US") {
     const result = [];
@@ -214,6 +235,6 @@
   }
 
   return Object.freeze({ MAX_DEPTH, MAX_NAME_LENGTH, SCHEMA_VERSION,
-    children, create, descendantIds, empty, find, folderOf, move, outline, path, read,
-    removal, remove, rename, serialize, validateName });
+    children, contents, create, descendantIds, empty, find, folderOf, move, outline, path, read,
+    removal, remove, removeWithContents, rename, serialize, validateName });
 });

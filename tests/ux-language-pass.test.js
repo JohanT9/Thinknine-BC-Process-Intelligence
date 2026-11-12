@@ -115,7 +115,7 @@ const createInstruction = documentLanguage => {
     imagePaths: {}, knowledgePacks: packs }).businessTasks[0].instruction;
 };
 assert.match(createInstruction("sv-SE"), /^Börja skapa en ny \*\*försäljningsorder\*\*/u);
-assert.match(createInstruction("de-DE"), /^Beginnen Sie mit der Erstellung/u);
+assert.match(createInstruction("de-DE"), /^Wählen Sie auf der Seite .+ aus, um einen neuen Datensatz \(\*\*Verkaufsauftrag\*\*\) zu erstellen\.$/u);
 
 // Masked capture values keep their stored marker and read naturally in each document language.
 const documentText = require("../src/document/document-language");

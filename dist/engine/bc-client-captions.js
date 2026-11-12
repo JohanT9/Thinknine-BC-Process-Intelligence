@@ -94,6 +94,16 @@
       "fi-FI": [leading("Kerro, mitä haluat tehdä")],
       "nb-NO": [leading("Fortell hva du vil gjøre")]
     },
+    // CreateActionCaption: the action that starts a new record.
+    create: {
+      "sv-SE": exact("Ny"), "en-US": exact("New"), "fr-FR": exact("Créer"), "de-DE": exact("Neu"),
+      "es-ES": exact("Nuevo"), "da-DK": exact("Ny"), "fi-FI": exact("Uusi"), "nb-NO": exact("Ny")
+    },
+    // ConfirmYes: the button that confirms a question the client asks.
+    confirmYes: {
+      "sv-SE": exact("Ja"), "en-US": exact("Yes"), "fr-FR": exact("Oui"), "de-DE": exact("Ja"),
+      "es-ES": exact("Sí"), "da-DK": exact("Ja"), "fi-FI": exact("Kyllä"), "nb-NO": exact("Ja")
+    },
     // HasMandatoryField, MandatoryIcon_Tooltip, Autofill_AnnouncementSupportedField, plus the
     // Swedish and English wordings observed in older recordings.
     fieldHint: {
@@ -232,11 +242,25 @@
       .some(patterns => patterns.some(pattern => pattern.test(text)));
   }
 
+  // A page's name as a reader knows it, without the record shown on it or the company: the
+  // client captions a saved document "Inköpsorder - 2600074 ∙ Greenfood Iberica", a new one
+  // "Ny - Inköpsorder" and a list "Inköpsorder (RDG)". A name that itself contains " - " is kept
+  // unless what follows names a record (a number or "∙").
+  function pageName(caption) {
+    const value = String(caption || "").replace(/\s+/gu, " ").trim();
+    const parts = value.split(/\s+[-–]\s+/u);
+    let name = value;
+    if (parts.length > 1 && matches("create", parts[0])) name = pageName(parts.slice(1).join(" - "));
+    else if (parts.length > 1 && /[∙·•]|\d/u.test(parts.slice(1).join(" "))) name = parts[0];
+    return name.split(/\s*[∙·•]/u)[0].replace(/\s*\([^()]*\)\s*$/u, "").trim() || value;
+  }
+
   // Category and language pairs without captions.
   function gaps(locales = []) {
     return Object.entries(CAPTIONS).flatMap(([category, byLocale]) =>
       locales.filter(locale => !byLocale[locale]).map(locale => ({ category, locale })));
   }
 
-  return { ANNOUNCEMENTS, CAPTIONS, PAGE_ERRORS, gaps, isAnnouncement, isPageError, matches };
+  return { ANNOUNCEMENTS, CAPTIONS, PAGE_ERRORS, gaps, isAnnouncement, isPageError, matches,
+    pageName };
 });

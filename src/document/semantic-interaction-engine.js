@@ -217,7 +217,9 @@
 
   function checkboxEnabled(value, selectedValue) {
     if (typeof value?.value === "boolean") return value.value;
-    return /true|ja|yes|1/iu.test(selectedValue);
+    // A whole answer, not a value that merely contains one ("10", "Januari").
+    return /^(?:true|ja|yes|1)$/iu.test(text(selectedValue)) ||
+      captions.matches("confirmYes", text(selectedValue));
   }
 
   function stableId(ruleId, values) {
@@ -313,7 +315,9 @@
         : (value.stepGroups || []).map(group => group.capturePacket).filter(Boolean));
     const packetInteractionIds = unique(capturePackets.flatMap(packet =>
       packet.interactionIds || [packet.interactionId]));
-    const pageCaption = text(page.pageCaption || page.caption || page.name);
+    // The page is named without the record shown on it ("Inköpsorder", not "Inköpsorder -
+    // 2600074 ∙ Greenfood Iberica"): the next reader works with another record.
+    const pageCaption = captions.pageName(text(page.pageCaption || page.caption || page.name));
     let displayText = properties.displayText;
     if (["RunAction", "RunActionPath", "SelectRecord"].includes(
         properties.actionType) && pageCaption && displayText &&
@@ -432,7 +436,13 @@
         const ownFieldValue = observedField ? [...values].reverse().filter(value =>
           text(controlCaption(value) || value.fieldCaption) === observedField)
           .map(meaningfulValue).find(Boolean) : "";
-        const selectedValue = values.map(groupedSelectionValue).find(Boolean) ||
+        // What the client then showed in that field is what the choice put there: choosing vendor
+        // 11976 in a list fills Leverantörsnamn with the vendor's name.
+        const validatedOwn = observedField ? [...values].reverse().filter(value =>
+          (value.inputSources || []).includes("validated") &&
+          text(controlCaption(value) || value.fieldCaption) === observedField)
+          .map(meaningfulValue).find(Boolean) || "" : "";
+        const selectedValue = validatedOwn || values.map(groupedSelectionValue).find(Boolean) ||
           values.map(selectedRecordValue).find(Boolean) ||
           meaningfulValue({ selectedCaption: explicitSelection?.selectedCaption }) ||
           ownFieldValue || [...values].reverse().map(meaningfulValue).find(Boolean) || "";
@@ -443,7 +453,8 @@
         const typedFirst = carriedTyped || (["EnterFieldValue", "ChangeField"].includes(
           values[0]?.taskType) ? meaningfulValue(values[0]) : "");
         const typedOther = observedField && selectedValue && typedFirst &&
-          (carriedTyped || values.some(value => selectedRecordValue(value) === selectedValue)) &&
+          (carriedTyped || validatedOwn ||
+            values.some(value => selectedRecordValue(value) === selectedValue)) &&
           !selectedValue.toLocaleLowerCase().startsWith(typedFirst.toLocaleLowerCase())
           ? typedFirst : "";
         return {
@@ -602,8 +613,7 @@
         const selectedEntity = entityForRowType(rowType);
         const isItemRow = selectedEntity === "Item";
         const isKnownTypedRow = Boolean(selectedEntity);
-        const resolvedField = isItemRow && /^(?:nr\.?|no\.?|number)$/iu
-          .test(targetField) ? (rowType + " " + targetField) : targetField;
+        const resolvedField = targetField;
         return { consumed: values.length, action: action(rule, values, {
           actionType: isItemRow ? "EnterItemNumber" : "SelectLookupValue",
           displayText: selectedValue
@@ -639,6 +649,32 @@
           targetField: text(value.fieldCaption),
           hidden: true
         }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  // The value the client showed in a field after the step that edited it, when other events came
+  // between: the number of the item chosen two clicks earlier. The earlier step already says
+  // what was entered or chosen, so this is evidence for it and not another step.
+  function validatedValueOfEarlierStepRule() {
+    const field = value => text(value?.fieldCaption || controlCaption(value));
+    const rule = {
+      ruleId: "validated-value-of-earlier-step",
+      priority: 118,
+      match(context) {
+        const value = context.interactions[context.index];
+        const sources = value?.inputSources || [];
+        if (sources.length !== 1 || sources[0] !== "validated" || !field(value)) return false;
+        return context.interactions.slice(Math.max(0, context.index - 3), context.index)
+          .some(earlier => ["ChangeField", "EnterFieldValue"].includes(earlier?.taskType) &&
+            field(earlier) === field(value) && !crossesNonModalPage([earlier], value));
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "ValidatedFieldValue", displayText: "", targetField: field(value),
+          selectedValue: meaningfulValue(value), hidden: true }) };
       }
     };
     return deepFreeze(rule);
@@ -681,7 +717,8 @@
         // item line the field is the item number.
         const observedField = text(first.fieldCaption || first.targetControl?.caption ||
           first.actionCaption || "Nr");
-        const searchField = itemRow && sortingNumber(first) ? "Artikelnr." : observedField;
+        // The field is named as the client showed it: the column "Nr", not a generated name.
+        const searchField = businessField(observedField);
         // What was typed is said when it is not the start of the record chosen, such as a word
         // of the item's description; otherwise the record is simply entered.
         const typed = meaningfulValue(first);
@@ -691,10 +728,12 @@
           actionType: itemRow ? "SearchAndSelectRecord" : "EnterFieldValue",
           displayText: typedOther
             ? `Ange __${typedOther}__ i **${searchField}** och välj **${selectedValue}**.`
-            : `Ange __${selectedValue}__ i **${itemRow ? searchField : "Nr"}**` +
-              (itemRow && /\.$/u.test(searchField) ? "" : "."),
+            : `Ange __${selectedValue}__ i **${searchField}**` +
+              (/\.$/u.test(searchField) ? "" : "."),
           ...(typedOther ? { typedValue: typedOther } : {}),
-          selectedValue, targetField: itemRow ? "Artikel Nr" : "Nr",
+          // The step's kind is still recognised by this internal field name; the text and
+          // the document show the caption the client displayed (searchFieldCaption).
+          selectedValue, targetField: itemRow ? "Artikel Nr" : searchField,
           ...(itemRow ? { searchFieldCaption: observedField } : {}),
           ...(itemRow ? { selectedEntity: "Item",
             rowTypeContext: clone(first.rowTypeContext) } : {})
@@ -1412,6 +1451,7 @@
 
   const SEARCH_AND_OPEN_RULE = searchAndOpenWithRedundantFieldRule();
   const BUILT_IN_RULES = deepFreeze([
+    validatedValueOfEarlierStepRule(),
     successAcknowledgementRule(),
     fieldDialogConfirmationRule(),
     sortedRecordSelectionRule(),
@@ -1494,11 +1534,11 @@
       display: value => `Välj **${text(value.actionCaption)}**.` }),
     singleRule({ ruleId: "create-new-record-with-page-context", priority: 54,
       match: value => value?.taskType === "RunAction" &&
-        /^(?:ny|new)$/iu.test(text(value.actionCaption)),
+        captions.matches("create", text(value.actionCaption)),
       actionType: () => "CreateNewRecord",
       display: value => {
-        const page = text(value.pageCaption || value.pageContext?.pageCaption ||
-          value.pageContext?.caption).replace(/\s*\([^)]*\)\s*$/u, "");
+        const page = captions.pageName(text(value.pageCaption || value.pageContext?.pageCaption ||
+          value.pageContext?.caption));
         const names = {
           purchase: /^(?:inköpsord(?:er|rar|erlista)|purchase orders?(?: list)?|commandes? achat|bestellungen?|pedidos? de compra|indkøbsordrer?|ostotilaukset|bestillinger?)$/iu,
           sales: /^(?:försäljningsord(?:er|rar|erlista)|sales orders?(?: list)?|commandes? vente|verkaufsaufträge?|pedidos? de venta|salgsordrer?|myyntitilaukset)$/iu,
@@ -1613,7 +1653,16 @@
       match: (value, context) => value?.taskType === "PressShortcut" &&
         Boolean(text(value?.shortcut)) && !SEARCH_AND_OPEN_RULE.match(context),
       actionType: () => "PressShortcut",
-      display: value => `Tryck på **${text(value.shortcut)}**.` }),
+      // What the client opened in response says what the shortcut is for.
+      display: value => {
+        const verification = value.resultVerification || value.capturePacket?.resultVerification;
+        const opened = verification?.primaryOutcome === "navigation"
+          ? text([...(verification.outcomes || [])].reverse()
+            .find(outcome => outcome.kind === "navigation")?.pageCaption)
+            .replace(/[-]/gu, "").replace(/\s*\([^()]*\)\s*$/u, "").trim() : "";
+        return opened ? `Tryck på **${text(value.shortcut)}** för att öppna **${opened}**.`
+          : `Tryck på **${text(value.shortcut)}**.`;
+      } }),
     singleRule({ ruleId: "generic-captioned-action", priority: 5,
       match: value => value?.taskType === "RunAction" &&
         Boolean(text(value?.actionCaption)),

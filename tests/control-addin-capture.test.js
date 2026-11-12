@@ -15,7 +15,7 @@ const popup = fs.readFileSync("src/ui/popup.js", "utf8");
 const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 
 assert(content.includes("function getCompanyName()"));
-assert(content.includes("observedContext: context()"));
+assert(content.includes("observedContext: context({ versions: true })"));
 assert(background.includes("const environmentChanged ="));
 assert(background.includes('environmentChanged ? ""'));
 

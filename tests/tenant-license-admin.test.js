@@ -7,6 +7,8 @@ const { createService } = require("../services/licensing/server.js");
 const tenant = "20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb";
 const second = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 const trialTenant = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff";
+// The organization the signed-in user belongs to.
+let signedInTenant = tenant;
 async function main() {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "t9-license-admin-"));
   const file = path.join(directory, "tenants.json");
@@ -21,7 +23,7 @@ async function main() {
       if (authorization !== "Bearer signed-in") {
         const error = new Error("unauthorized"); error.status = 401; throw error;
       }
-      return { tid: tenant, oid: second, name: "Trial User", preferredUsername: "trial@example.com" };
+      return { tid: signedInTenant, oid: second, name: "Trial User", preferredUsername: "trial@example.com" };
     } });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -88,6 +90,7 @@ async function main() {
     state = await (await get("/admin/api/state")).json();
     assert.equal(state.registrations.length, 1);
     assert.equal(state.installationCount, 1);
+    signedInTenant = trialTenant;
     const trialResponse = await fetch(base + "/v1/license/trial", { method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
       body: JSON.stringify({ tenantId: trialTenant, installationId: second, version: "4.7.0" }) });

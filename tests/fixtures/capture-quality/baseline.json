@@ -9,7 +9,8 @@
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,
-      "missing": 0
+      "missing": 0,
+      "textMismatches": 0
     },
     {
       "id": "bc-purchase-order-ctrl-delete",
@@ -19,7 +20,19 @@
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,
-      "missing": 0
+      "missing": 0,
+      "textMismatches": 0
+    },
+    {
+      "id": "bc-purchase-order-vendor-item-release",
+      "expected": 6,
+      "produced": 6,
+      "correct": 6,
+      "wrong": 0,
+      "duplicates": 0,
+      "extras": 0,
+      "missing": 0,
+      "textMismatches": 0
     },
     {
       "id": "lab-keyboard-navigation",
@@ -29,7 +42,8 @@
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,
-      "missing": 0
+      "missing": 0,
+      "textMismatches": 0
     },
     {
       "id": "lab-sales-order-typeahead",
@@ -39,7 +53,8 @@
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,
-      "missing": 0
+      "missing": 0,
+      "textMismatches": 0
     }
   ]
 }

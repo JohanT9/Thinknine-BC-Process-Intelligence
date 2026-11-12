@@ -54,6 +54,9 @@
     if (/^(?:Tryck på|Press)\s+(?:Enter|Escape|Esc|Tab|Backspace|Delete|Home|End|Page Up|Page Down|F\d{1,2})(?:\b|\.)/iu.test(result)) {
       return result;
     }
+    // A key combination is pressed, never chosen ("Tryck på **Alt+N**").
+    if (/^(?:Tryck på|Press)\s+(?:\*\*|`)(?:(?:Ctrl|Alt|Shift|Meta|Cmd|Win|Skift|Strg)\+)*[^\s*`+]+(?:\*\*|`)/iu
+      .test(result)) return result;
     const rules = [...COMMON_RULES, ...(PROFILE_RULES[toneFor(profile)] || [])];
     for (const [pattern, replacement] of rules) {
       if (pattern.test(result)) {

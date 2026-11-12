@@ -795,9 +795,19 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <h3 id="libraryFolderDeleteTitle"></h3>
     <p id="libraryFolderDeleteBody"></p>
     <ul id="libraryFolderDeleteCounts" class="library-folder-counts"></ul>
+    <fieldset id="libraryFolderDeleteChoice" class="library-folder-delete-choice" hidden>
+      <legend data-i18n="folder.deleteChoice">Vad ska hända med innehållet?</legend>
+      <label><input type="radio" name="libraryFolderDeleteMode" value="keep" checked>
+        <span><strong data-i18n="folder.deleteKeep">Behåll innehållet</strong>
+          <span id="libraryFolderDeleteKeepHint"></span></span></label>
+      <label><input type="radio" name="libraryFolderDeleteMode" value="all">
+        <span><strong data-i18n="folder.deleteAll">Ta bort allt innehåll</strong>
+          <span data-i18n="folder.deleteAllHint">Dokumenten tas bort för alltid, med inspelningar, skärmbilder och testkörningar. Det går inte att ångra.</span></span></label>
+    </fieldset>
+    <p id="libraryFolderDeleteProgress" class="library-folder-progress" role="status"></p>
     <p id="libraryFolderDeleteError" class="library-folder-error" role="alert"></p>
     <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
-      <button type="submit" class="danger" data-i18n="folder.deleteConfirm">Ta bort mapp</button></footer>
+      <button id="libraryFolderDeleteSubmit" type="submit" class="danger" data-i18n="folder.deleteConfirm">Ta bort mapp</button></footer>
   </form>
 </dialog>
 

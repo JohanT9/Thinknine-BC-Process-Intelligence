@@ -91,16 +91,16 @@ assert.strictEqual(prepared.grouped.groups.length, fixture.userActions.length,
   "one step group per user action");
 const steps = interpret(prepared, "sv-SE");
 assert.deepStrictEqual(steps, [
-  "Börja skapa en ny post genom att välja **New** på sidan **Sales Orders - Dynamics 365 Business Central**.",
+  "Börja skapa en ny post genom att välja **New** på sidan **Sales Orders**.",
   "Välj **Adatum Corporation** i **Customer Name**.",
   "Ange __PO-1001__ i **External Document No.**.",
   "Ange __27.10.2026__ i **Posting Date**.",
   "Välj artikel **1896-S**.",
   "Ange __5__ i **Quantity**.",
   "Ange __6__ i **Quantity**.",
-  "Välj **Release** på sidan **Sales Order - Dynamics 365 Business Central**.",
-  "Välj **Statistics** på sidan **Sales Order - Dynamics 365 Business Central**.",
-  "Välj **Post...** på sidan **Sales Order - Dynamics 365 Business Central**."
+  "Välj **Release** på sidan **Sales Order**.",
+  "Välj **Statistics** på sidan **Sales Order**.",
+  "Välj **Post...** på sidan **Sales Order**."
 ]);
 assert(!steps.some(step => /Ada\b|Aktivera/u.test(step)),
   "no typed fragment and no checkbox step for a text field");
@@ -167,14 +167,14 @@ const keyboardPrepared = prepare(keys);
 const keyboardSteps = interpret(keyboardPrepared, "sv-SE");
 assert.deepStrictEqual(keyboardSteps, [
   "Sök efter __sales ord__ och öppna listan **Sales Orders**.",
-  "Välj posten **101003** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
+  "Välj posten **101003** på sidan **Sales Order 101003**.",
   "Ange __28.10.2026__ i **Order Date**.",
   "Ange __1,200.00__ i **Unit Price Excl. VAT**.",
   "Välj artikel **1928-S**.",
-  "Välj **Balance (LCY)** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
-  "Välj **Delete Line** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
+  "Välj **Balance (LCY)** på sidan **Sales Order 101003**.",
+  "Välj **Delete Line** på sidan **Sales Order 101003**.",
   "Tryck på **Shift+F7**.",
-  "Välj **Post...** på sidan **Sales Order 101003 - Dynamics 365 Business Central**."
+  "Välj **Post...** på sidan **Sales Order 101003**."
 ]);
 assertLocalized(keyboardPrepared, keyboardSteps);
 // A refusal is the result of the shortcut that caused it, and a completion of Post.

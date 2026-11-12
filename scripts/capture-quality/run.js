@@ -4,16 +4,17 @@
 //   npm run quality:capture -- --verbose list every step with its outcome
 const fs = require("fs");
 const path = require("path");
-const { replay, enabledKnowledgePacks } = require("./replay");
+const { documentTexts, replay, enabledKnowledgePacks } = require("./replay");
 const { score } = require("./score");
 const { translateInstruction } = require("../../src/document/document-language");
 
 const root = path.resolve(__dirname, "../..");
 const corpusDir = path.join(root, "tests/fixtures/capture-quality/recordings");
 const baselinePath = path.join(root, "tests/fixtures/capture-quality/baseline.json");
-const COUNTS = ["expected", "produced", "correct", "wrong", "duplicates", "extras", "missing"];
+const COUNTS = ["expected", "produced", "correct", "wrong", "duplicates", "extras", "missing",
+  "textMismatches"];
 // A higher value is worse for these counts; fewer correct steps is worse too.
-const WORSE_WHEN_HIGHER = ["wrong", "duplicates", "extras", "missing"];
+const WORSE_WHEN_HIGHER = ["wrong", "duplicates", "extras", "missing", "textMismatches"];
 
 function validate(entry, file) {
   const problems = [];
@@ -37,6 +38,28 @@ function loadCorpus(dir = corpusDir) {
   });
 }
 
+// What the reader gets: the sentence of each step in the finished document, in every language
+// the entry states (expectedSteps[].texts, by locale). A step count that differs from the
+// expected one makes every stated sentence a mismatch, since the sentences no longer line up.
+function textCheck(entry, knowledgePacks) {
+  const locales = [...new Set(entry.expectedSteps.flatMap(step => Object.keys(step.texts || {})))];
+  const problems = [];
+  for (const locale of locales) {
+    const { tasks } = replay(entry.events, { id: entry.id, documentLanguage: locale, knowledgePacks });
+    const shown = documentTexts(tasks, locale);
+    const aligned = shown.length === entry.expectedSteps.length;
+    entry.expectedSteps.forEach((step, index) => {
+      const expected = step.texts?.[locale];
+      if (expected === undefined) return;
+      const actual = aligned ? shown[index] : "";
+      if (actual !== expected) problems.push({ locale, step: index + 1, expected, actual });
+    });
+  }
+  return { textMismatches: problems.length, textProblems: problems,
+    textsChecked: entry.expectedSteps.reduce((sum, step) =>
+      sum + Object.keys(step.texts || {}).length, 0) };
+}
+
 function evaluate(corpus = loadCorpus(), knowledgePacks = enabledKnowledgePacks()) {
   const recordings = corpus.map(entry => {
     const documentLanguage = entry.documentLanguage || "en-US";
@@ -45,7 +68,8 @@ function evaluate(corpus = loadCorpus(), knowledgePacks = enabledKnowledgePacks(
     const shown = tasks.map(task => ({ ...task,
       instruction: translateInstruction(task.instruction, documentLanguage) }));
     return { id: entry.id, reviewed: entry.reviewed === true,
-      ...score(entry.expectedSteps, shown) };
+      ...score(entry.expectedSteps, shown),
+      ...textCheck(entry, knowledgePacks) };
   });
   const totals = Object.fromEntries(COUNTS.map(key =>
     [key, recordings.reduce((sum, item) => sum + item[key], 0)]));
@@ -105,6 +129,13 @@ function report(result, { verbose = false } = {}) {
         `  ${String(index + 1).padStart(2)} ${step.outcome.padEnd(9)} ${step.instruction}`));
       item.missingSteps.forEach(step => lines.push(
         `     missing   ${step.target}${step.value ? ` = ${step.value}` : ""}`));
+    }
+  }
+  // A sentence that differs from the expected one is always shown: it is what the reader gets.
+  for (const item of result.recordings) {
+    for (const problem of item.textProblems || []) {
+      lines.push("", `${item.id}, ${problem.locale}, step ${problem.step}: document text differs`,
+        `  expected  ${problem.expected}`, `  actual    ${problem.actual || "(steps do not line up)"}`);
     }
   }
   return lines.join("\n");

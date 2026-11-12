@@ -27,7 +27,7 @@ assert.ok(Math.abs(rectangle.geometry.width - 0.4) < Number.EPSILON);
 assert.ok(Math.abs(rectangle.geometry.height - 0.3) < Number.EPSILON);
 assert.deepStrictEqual(rectangle.style, {
   stroke: "#dc2626",
-  strokeWidth: 0.006,
+  strokeWidth: 0.003,
   opacity: 1
 });
 assert.strictEqual(annotations.validation(rectangle).valid, true);

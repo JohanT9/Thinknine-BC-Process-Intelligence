@@ -366,6 +366,11 @@
     if (event.rawEventType === "click" && event.kind === "activation" &&
         ["main", "form"].includes(event.controlIdentification?.role) &&
         !event.controlIdentification?.fieldId && !event.value?.normalized) return true;
+    // A click beside the controls of a toolbar or group activated nothing. Its name is the text
+    // of every control inside it, which would read as an action nobody chose.
+    if (event.rawEventType === "click" && event.kind === "activation" &&
+        event.controlIdentification?.controlType === "container" &&
+        !event.controlIdentification?.fieldId && !event.value?.normalized && !event.selection) return true;
     const caption = String(event.actionIdentification?.caption ||
       event.controlIdentification?.caption || event.rawEvent?.label || "")
       .trim().split(/\s*(?:→|->)\s*/).at(-1);
@@ -495,7 +500,9 @@
     if (origin?.kind !== "activation" || event.kind !== "dialog-action") return false;
     const action = event.actionIdentification || {};
     const identity = String(action.actionType || action.caption || "").trim();
-    return /^(ConfirmYes|ConfirmNo|Yes|No|Ja|Nej)$/i.test(identity) &&
+    // The answer in every registered language; "No" is known only as observed (No, Nej).
+    return (/^(ConfirmYes|ConfirmNo|Yes|No|Ja|Nej)$/i.test(identity) ||
+      captions.matches("confirmYes", identity)) &&
       (event.pageIdentification?.modal === true || events.some(item =>
         item.kind === "dialog-open")) && elapsed(origin, event) <= 15000;
   }

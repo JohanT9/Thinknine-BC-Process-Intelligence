@@ -88,7 +88,7 @@ for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-
 const altShortcuts = quality.loadCorpus().find(item => item.id === "bc-purchase-order-alt-shortcuts");
 const searched = replay(altShortcuts.events, { documentLanguage: "sv-SE" }).tasks;
 assert.deepStrictEqual(searched.map(task => task.instruction), [
-  "Sök efter __ink ord__ och öppna listan **Inköpsorder**.", "Tryck på **Alt+N**."]);
+  "Sök efter __ink ord__ och öppna listan **Inköpsorder**.", "Tryck på **Alt+N** för att öppna **Ny - Inköpsorder**."]);
 assert.deepStrictEqual(searched.map(task => task.resultVerification.summary), [
   "Sidan Inköpsorder (RDG) visas nu.", "Sidan Ny - Inköpsorder (RDG) visas nu."]);
 assert(!searched.some(task => /Rhloqw/u.test(task.instruction + task.resultVerification.summary)),

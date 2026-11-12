@@ -9,11 +9,31 @@
     {
       "target": "Alt+Q",
       "value": "ink ord",
-      "note": "Tell me opened with Alt+Q, search typed and the Purchase Orders list chosen with the mouse: one step."
+      "note": "Tell me opened with Alt+Q, search typed and the Purchase Orders list chosen with the mouse: one step.",
+      "texts": {
+        "sv-SE": "Sök efter ink ord och öppna listan Inköpsorder.",
+        "en-US": "Search for ink ord and open the Inköpsorder list.",
+        "fr-FR": "Recherchez ink ord et ouvrez la liste Inköpsorder.",
+        "de-DE": "Suchen Sie nach ink ord und öffnen Sie die Liste Inköpsorder.",
+        "es-ES": "Busque ink ord y abra la lista Inköpsorder.",
+        "da-DK": "Søg efter ink ord og åbn listen Inköpsorder.",
+        "fi-FI": "Hae ink ord ja avaa luettelo Inköpsorder.",
+        "nb-NO": "Søk etter ink ord og åpne listen Inköpsorder."
+      }
     },
     {
       "target": "Alt+N",
-      "note": "New purchase order created with Alt+N; the result is the page it opened."
+      "note": "New purchase order created with Alt+N; the result is the page it opened.",
+      "texts": {
+        "sv-SE": "Tryck på Alt+N för att öppna Ny - Inköpsorder.",
+        "en-US": "Press Alt+N to open Ny - Inköpsorder.",
+        "fr-FR": "Appuyez sur Alt+N pour ouvrir Ny - Inköpsorder.",
+        "de-DE": "Drücken Sie Alt+N, um Ny - Inköpsorder zu öffnen.",
+        "es-ES": "Pulse Alt+N para abrir Ny - Inköpsorder.",
+        "da-DK": "Tryk på Alt+N for at åbne Ny - Inköpsorder.",
+        "fi-FI": "Avaa Ny - Inköpsorder painamalla Alt+N.",
+        "nb-NO": "Trykk på Alt+N for å åpne Ny - Inköpsorder."
+      }
     }
   ],
   "events": [

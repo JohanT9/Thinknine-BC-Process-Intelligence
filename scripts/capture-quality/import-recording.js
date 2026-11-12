@@ -100,7 +100,10 @@ function collectDataWords(events) {
     TITLE_FIELDS.forEach(field => values.push(String(event[field] || "").split("∙").slice(1).join(" ")));
     if (event.type === "click" && DATA_ROLES.has(event.role)) values.push(event.label, event.accessibleName);
   }
-  const captionWords = new Set(events.filter(event => !DATA_ROLES.has(event.role))
+  // A status message repeats what was typed or chosen ("Det finns ett förslag för iberic",
+  // "2600074 ∙ Greenfood Iberica"), so its words do not make a value a caption.
+  const captionWords = new Set(events.filter(event => !DATA_ROLES.has(event.role) &&
+    event.type !== "status-message")
     .flatMap(event => [event.fieldName, event.label, event.accessibleName])
     .filter(text => !values.includes(text)).flatMap(wordsOf).map(word => word.toLowerCase()));
   const words = new Set(values.flatMap(wordsOf).map(word => word.toLowerCase())
@@ -146,7 +149,8 @@ function sanitizeEvents(events, { keepValues = false } = {}) {
     }
     return result;
   };
-  const sanitizeString = (text, key) => {
+  // echo: the text of a status message, which repeats typed fragments as values do.
+  const sanitizeString = (text, key, echo) => {
     if (COMPANY_FIELDS.includes(key)) return "";
     const result = sanitizeUrl(text)
       .replace(/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.\p{L}{2,}/gu, "user@example.invalid")
@@ -157,18 +161,19 @@ function sanitizeEvents(events, { keepValues = false } = {}) {
         return guids.get(key);
       });
     return words.length ? result.replace(TOKEN, token =>
-      pseudonymizeToken(token, DATA_FIELDS.includes(key))) : result;
+      pseudonymizeToken(token, echo || DATA_FIELDS.includes(key))) : result;
   };
-  const walk = (value, key) => {
-    if (typeof value === "string") return sanitizeString(value, key);
-    if (Array.isArray(value)) return value.map(item => walk(item, key));
+  const walk = (value, key, echo) => {
+    if (typeof value === "string") return sanitizeString(value, key, echo);
+    if (Array.isArray(value)) return value.map(item => walk(item, key, echo));
     if (value && typeof value === "object") {
       return Object.fromEntries(Object.entries(value).map(([field, item]) =>
-        [field, walk(item, field)]));
+        [field, walk(item, field, echo)]));
     }
     return value;
   };
-  return { events: events.map(event => walk(rawEvent(event))), pseudonymized: replaced.size };
+  return { events: events.map(event => walk(rawEvent(event), undefined,
+    event.type === "status-message")), pseudonymized: replaced.size };
 }
 
 function draftExpectedSteps(tasks) {

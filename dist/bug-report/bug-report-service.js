@@ -84,18 +84,41 @@
     return result;
   }
 
-  function actionFromInstruction(value, language) {
+  // The action a generated instruction names, in any document language: the instruction's
+  // verb, and the closing verb prefix of a German sentence, are left out.
+  function actionFromInstruction(value) {
     const text = String(value || "").replace(/\*\*/gu, "").trim();
-    const swedish = /^sv(?:-|$)/i.test(String(language || ""));
-    const match = text.match(swedish
-      ? /^(?:välj|klicka på|tryck på)\s+(.+?)[.!]?$/iu
-      : /^(?:select|choose|click on|click|press)\s+(.+?)[.!]?$/iu);
-    return String(match?.[1] || "").replace(/^[”“"']|[”“"']$/gu, "").trim();
+    const match = text.match(
+      /^(?:välj|klicka på|tryck på|select|choose|click on|click|press|sélectionnez|choisissez|appuyez sur|wählen sie|drücken sie|seleccione|pulse|vælg|tryk på|valitse|paina|velg|trykk på)\s+(.+?)(?:\s+aus)?[.!]?$/iu);
+    return String(match?.[1] || "").replace(/^[”“"'«„»]|[”“"'»«]$/gu, "").trim();
+  }
+
+  // Suggested titles in every document language; the captured caption keeps its own language.
+  const TITLE_TEMPLATES = {
+    action: { "sv-SE": v => `Fel vid ”${v}”`, "en-US": v => `Error when selecting “${v}”`,
+      "fr-FR": v => `Erreur lors de la sélection de « ${v} »`, "de-DE": v => `Fehler bei „${v}“`,
+      "es-ES": v => `Error al seleccionar «${v}»`, "da-DK": v => `Fejl ved ”${v}”`,
+      "fi-FI": v => `Virhe toiminnossa ”${v}”`, "nb-NO": v => `Feil ved «${v}»` },
+    field: { "sv-SE": v => `Valideringsfel i ”${v}”`, "en-US": v => `Validation error in “${v}”`,
+      "fr-FR": v => `Erreur de validation dans « ${v} »`, "de-DE": v => `Validierungsfehler in „${v}“`,
+      "es-ES": v => `Error de validación en «${v}»`, "da-DK": v => `Valideringsfejl i ”${v}”`,
+      "fi-FI": v => `Tarkistusvirhe kentässä ”${v}”`, "nb-NO": v => `Valideringsfeil i «${v}»` },
+    page: { "sv-SE": v => `Business Central-fel i ”${v}”`,
+      "en-US": v => `Business Central error in “${v}”`,
+      "fr-FR": v => `Erreur Business Central dans « ${v} »`,
+      "de-DE": v => `Business Central-Fehler in „${v}“`,
+      "es-ES": v => `Error de Business Central en «${v}»`,
+      "da-DK": v => `Business Central-fejl i ”${v}”`,
+      "fi-FI": v => `Business Central -virhe sivulla ”${v}”`,
+      "nb-NO": v => `Business Central-feil i «${v}»` }
+  };
+  function titleFor(kind, value, language) {
+    const locale = languages.normalize(language, "document");
+    return (TITLE_TEMPLATES[kind][locale] || TITLE_TEMPLATES[kind]["en-US"])(value);
   }
 
   function draftTitle(recording, derivedSteps, reproductionSteps, errorEvidence,
     language) {
-    const swedish = /^sv(?:-|$)/i.test(String(language || ""));
     const evidenceEventIds = new Set(errorEvidence.flatMap(item =>
       [item.precedingActionEventId, item.canonicalEventId]).filter(Boolean));
     const failed = reproductionSteps.find(step => step.failurePoint) ||
@@ -113,12 +136,9 @@
       actionFromInstruction(failed?.instruction, language) || "").trim();
     const field = String(source?.fieldCaption || "").trim();
     const page = String(source?.pageCaption || "").trim();
-    if (errorEvidence.length && action) return swedish
-      ? `Fel vid \u201d${action}\u201d` : `Error when selecting \u201c${action}\u201d`;
-    if (errorEvidence.length && field) return swedish
-      ? `Valideringsfel i \u201d${field}\u201d` : `Validation error in \u201c${field}\u201d`;
-    if (errorEvidence.length && page) return swedish
-      ? `Business Central-fel i \u201d${page}\u201d` : `Business Central error in \u201c${page}\u201d`;
+    if (errorEvidence.length && action) return titleFor("action", action, language);
+    if (errorEvidence.length && field) return titleFor("field", field, language);
+    if (errorEvidence.length && page) return titleFor("page", page, language);
     // A report made from an error already on screen has no recorded process to refer to.
     if (errorEvidence.length && !reproductionSteps.length) {
       return languages.translate("Business Central error", language, "Business Central-fel");

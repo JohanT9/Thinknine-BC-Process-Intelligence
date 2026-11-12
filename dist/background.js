@@ -1538,7 +1538,7 @@ async function stopSession(finalName = "", documentLanguage = "") {
       failures: [...rawStoreIntegrity.failures, ...storeIntegrity.failures].map(item => ({
         operationType: item.operationType, message: item.message
       })) } });
-    throw new Error("Recording remains incomplete because evidence writes did not settle.");
+    throw new Error("recorder.stopIncomplete");
   }
 
   const session = await getSession(state.sessionId);
@@ -1572,7 +1572,7 @@ async function stopSession(finalName = "", documentLanguage = "") {
         code: "canonical-integrity-validation-failed",
         diagnostics: integrityDiagnostics
       } });
-      throw new Error("Recording remains incomplete because evidence integrity validation failed.");
+      throw new Error("recorder.stopIncomplete");
     }
     session.status = "completed";
     session.completedAt = new Date().toISOString();
@@ -2270,8 +2270,33 @@ async function deleteSession(id) {
   );
 }
 
+// Discarding must always work. When the recording cannot be completed, for example because
+// its evidence could not be written, it is abandoned as it is and removed, so the user is
+// never left with a recording that can be neither stopped nor discarded.
 async function cancelActiveSession() {
-  const session = await stopSession();
+  const state = await getState();
+  let session;
+  try {
+    session = await stopSession();
+  } catch (error) {
+    const id = state.sessionId;
+    if (!id) throw error;
+    session = await getSession(id) || { id };
+    screenshotQueue = [];
+    preActionCaptures.clear();
+    writeQueue = Promise.resolve();
+    errorEvidenceWrites = Promise.resolve();
+    await setState({ recording: false, sessionId: null, tabId: state.tabId,
+      startedAt: null, recordingPurpose: null });
+    await setDebug({ activeSessionId: null, lastError: null });
+    rawEventStore.release(id);
+    canonicalStore.release(id);
+    rawEventLogStorage.release(id);
+    canonicalEventLogStorage.release(id);
+    stoppingSessionId = null;
+    recordingLicenseGuard.clear(id);
+    tenantLicenseFailureNotifications.delete(String(id));
+  }
   if (!session) return null;
   await deleteSession(session.id);
   return session;

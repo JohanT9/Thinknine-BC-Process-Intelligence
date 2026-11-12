@@ -44,7 +44,16 @@ const invalidStyleAnnotation = {
 const invalidStyleSnapshot = JSON.stringify(invalidStyleAnnotation);
 const safePrimitive = scene.create([invalidStyleAnnotation], 1000, 500)[0];
 assert.strictEqual(safePrimitive.stroke, annotations.DEFAULT_STYLES.rectangle.stroke);
-assert.strictEqual(safePrimitive.strokeWidth, 3);
+assert.strictEqual(safePrimitive.strokeWidth, 1.5);
+// A frame saved with the earlier standard width is drawn half as thick, as new frames are; one
+// with another saved width keeps it, and the saved annotation is left as it was.
+const savedFrame = { annotationId: "ann_saved", type: "rectangle",
+  geometry: { x: 0.1, y: 0.1, width: 0.2, height: 0.2 },
+  style: { stroke: "#dc2626", strokeWidth: 0.006, opacity: 1 } };
+assert.strictEqual(scene.create([savedFrame], 1000, 500)[0].strokeWidth, 1.5);
+assert.strictEqual(savedFrame.style.strokeWidth, 0.006);
+assert.strictEqual(scene.create([{ ...savedFrame, style: { ...savedFrame.style, strokeWidth: 0.01 } }],
+  1000, 500)[0].strokeWidth, 5);
 assert.strictEqual(safePrimitive.opacity, 1);
 assert.strictEqual(JSON.stringify(invalidStyleAnnotation), invalidStyleSnapshot);
 

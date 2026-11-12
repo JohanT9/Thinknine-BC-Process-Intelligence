@@ -48,7 +48,7 @@
           code: response.searchParams.get("code"), redirect_uri: redirectUri,
           code_verifier: verifier, scope: `openid profile offline_access ${config.scope}` }) });
       } catch {
-        const error = new Error("Microsoft sign-in could not be completed because the token service was unreachable.");
+        const error = new Error("license.signInUnreachable");
         error.code = "entra-signin-unreachable";
         throw error;
       }
@@ -56,7 +56,7 @@
       const tokens = await tokenResponse.json();
       if (!tokens?.access_token || !Number.isFinite(Number(tokens.expires_in)) ||
           Number(tokens.expires_in) <= 0) throw Object.assign(
-        new Error("Microsoft sign-in response did not include a valid access token."),
+        new Error("license.signInNoToken"),
         { code: "entra-token-invalid" });
       const value = { accessToken: tokens.access_token, refreshToken: tokens.refresh_token,
         expiresAt: now() + Number(tokens.expires_in || 0) * 1000,
@@ -156,6 +156,12 @@
       let detail = "";
       let result = null;
       try { result = await response.json(); detail = String(result?.error || ""); } catch { /* Keep status. */ }
+      if (!response.ok && response.status === 403 && detail === "trial-other-organization") {
+        const error = new Error("license.trialOtherOrganization");
+        error.status = 403;
+        error.code = "trial-other-organization";
+        throw error;
+      }
       if (!response.ok) {
         const error = new Error(response.status === 409
           ? "Denna tenant har redan använt eller fått en testlicens."
