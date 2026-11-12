@@ -3,11 +3,14 @@
     ? require("../engine/source-reference") : root.T9SourceReference;
   const captions = typeof module === "object" && module.exports
     ? require("../engine/bc-client-captions") : root.T9BCClientCaptions;
-  const api = factory(sourceReference, captions);
+  const stepText = typeof module === "object" && module.exports
+    ? require("../engine/step-text") : root.T9StepText;
+  const api = factory(sourceReference, captions, stepText);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference, captions) {
-  const ENGINE_VERSION = "1.5.0";
+})(typeof globalThis !== "undefined" ? globalThis : this,
+function (sourceReference, captions, stepText) {
+  const ENGINE_VERSION = "1.6.0";
   const documentCache = new WeakMap();
 
   // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
@@ -326,11 +329,15 @@
       displayText = `${String(displayText).replace(/[.!?]+$/u, "")} ` +
         `på sidan **${pageCaption}**.`;
     }
+    // What the sentence says, without its words: the document writes it in its own language.
+    const described = stepText?.parse(displayText) || null;
+    delete futureMetadata.stepText;
     return deepFreeze({
       ...futureMetadata,
       actionId: stableId(rule.ruleId, values),
       actionType: properties.actionType,
       displayText,
+      ...(described ? { stepText: described } : {}),
       ...(properties.rowTypeContext ? {rowTypeContext: clone(properties.rowTypeContext), selectedEntity: properties.selectedEntity} : {}),
       ...(Array.isArray(properties.actionPath)
         ? { actionPath: clone(properties.actionPath) } : {}),

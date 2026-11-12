@@ -2,11 +2,13 @@
   const semantic = typeof module === "object" && module.exports
     ? require("./semantic-document")
     : root.T9DocumentModel;
-  const api = factory(semantic);
+  const stepText = typeof module === "object" && module.exports
+    ? require("../engine/step-text") : root.T9StepText;
+  const api = factory(semantic, stepText);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9PresentationGrammar = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic) {
-  const GRAMMAR_VERSION = "1.3.0";
+})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic, stepText) {
+  const GRAMMAR_VERSION = "1.4.0";
   const cache = new WeakMap();
   const DOCUMENT_LANGUAGES = new Set([
     "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
@@ -68,7 +70,9 @@
       "").trim();
   }
 
-  function presentationFor(action, fallbackText, documentLanguage = "sv-SE") {
+  // The sentence of a step whose kind has its own wording in every language; null when the
+  // step is written from its recorded text.
+  function structuredPresentation(action, documentLanguage = "sv-SE") {
     const locale = DOCUMENT_LANGUAGES.has(documentLanguage)
       ? documentLanguage : "sv-SE";
     const words = {
@@ -156,7 +160,7 @@
     // A search already described by what was searched for and what was opened keeps that text.
     if (actionType === "SearchAndOpenPage" &&
         /^Sök efter /u.test(String(action?.displayText || ""))) {
-      return sentence(legacyRuns(fallbackText));
+      return null;
     }
     if (actionType === "SearchAndOpenPage") {
       const search = String(action?.searchCaption || {
@@ -221,22 +225,52 @@
       });
       return sentence(run(words.choose, "action"), pathRuns, run(german ? " aus." : "."));
     }
-    const runs = legacyRuns(fallbackText);
-    return sentence(runs);
+    return null;
   }
 
-  function processBlock(block, action, documentLanguage) {
+  function presentationFor(action, fallbackText, documentLanguage = "sv-SE") {
+    return structuredPresentation(action, documentLanguage) ||
+      sentence(legacyRuns(fallbackText));
+  }
+
+  // The sentence of a described step in the document's language. The description is used only
+  // while the step's instruction is still the sentence it describes, in any language: a step
+  // that was merged or whose text was changed keeps its own text.
+  function describedSentence(step, documentLanguage) {
+    const action = step.semanticAction || step.interaction?.semanticActionModel;
+    if (!stepText || !action) return null;
+    // A step saved before steps were described is read from its sentence.
+    const descriptor = action.stepText || stepText.LOCALES.map(locale =>
+      stepText.parse(action.displayText, locale)).find(Boolean);
+    if (!descriptor) return null;
+    const instruction = String(step.interaction?.instruction ?? action.displayText ?? "").trim()
+      .replace(/\.\*\*\.$/u, ".**");
+    if (!instruction || !stepText.LOCALES.some(locale =>
+      stepText.markdown(descriptor, locale) === instruction)) return null;
+    const rendered = stepText.render(descriptor, documentLanguage);
+    if (!rendered) return null;
+    return sentence(rendered.runs.map(item => item.role === "interface"
+      ? quoted(item.text) : run(item.text, item.role)));
+  }
+
+  function processBlock(block, action, documentLanguage, described = null) {
     const result = clone(block);
     const blockAction = result.kind === "step"
       // A step kept as recorded is described from its semantic action model, as in Review.
       ? result.semanticAction || result.interaction?.semanticActionModel || result.interaction || action
       : action;
+    const stepSentence = result.kind === "step"
+      ? describedSentence(result, documentLanguage) : null;
     if (result.kind === "paragraph" && typeof result.text === "string") {
       if (result.preserveUserText || result.provenance === "user-edited") {
         // Preserve literal authored text even when no rich-text runs were stored.
         if (!Array.isArray(result.presentationRuns)) {
           result.presentationRuns = [run(result.text)];
         }
+      } else if (described && String(result.blockId || "").startsWith("block:instruction:") &&
+          !structuredPresentation(blockAction, documentLanguage)) {
+        result.text = described.text;
+        result.presentationRuns = clone(described.runs);
       } else {
         const presentation = presentationFor(blockAction, result.text,
           documentLanguage);
@@ -250,7 +284,8 @@
         result.kind === "step" && child.kind === "paragraph"
           ? child.preserveUserText ? null : blockAction
           : action,
-        documentLanguage
+        documentLanguage,
+        result.kind === "step" ? stepSentence : null
       ));
     }
     if (Array.isArray(result.items)) {

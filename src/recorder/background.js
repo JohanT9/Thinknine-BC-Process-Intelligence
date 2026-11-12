@@ -31,6 +31,7 @@ importScripts("engine/raw-event-persistence.js");
 importScripts("engine/event-log-storage.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/bc-client-captions.js");
+importScripts("engine/step-text.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/capture-packet-integrity.js");
 importScripts("engine/observed-state.js");

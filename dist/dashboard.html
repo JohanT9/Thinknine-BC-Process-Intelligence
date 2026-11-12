@@ -833,7 +833,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           aria-label="Stäng granskning" data-i18n-aria-label="Stäng granskning">Stäng</button>
       </div>
       <div id="reviewInterpretationNotice" class="review-interpretation-notice" role="status" hidden>
-        <p data-i18n="review.improvedInterpretation">Det finns en förbättrad tolkning av inspelningen. Du ser vad som ändras innan något ändras.</p>
+        <p id="reviewInterpretationText">Det finns en förbättrad tolkning av inspelningen. Du ser vad som ändras innan något ändras.</p>
         <div class="review-interpretation-actions"><button id="reviewInterpretationShow" type="button" data-i18n="review.improvedInterpretationShow">Visa förbättringar</button>
           <button id="reviewInterpretationLater" type="button" class="secondary" data-i18n="review.improvedInterpretationLater">Inte nu</button></div>
       </div>
@@ -1160,6 +1160,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="engine/bc-ui-identification.js"></script>
 <script src="engine/source-reference.js"></script>
 <script src="engine/bc-client-captions.js"></script>
+<script src="engine/step-text.js"></script>
 <script src="engine/capture-sequence.js"></script>
 <script src="engine/noise-filter.js"></script>
 <script src="engine/entity-memory.js"></script>

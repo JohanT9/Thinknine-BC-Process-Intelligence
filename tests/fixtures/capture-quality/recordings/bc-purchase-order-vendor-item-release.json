@@ -26,13 +26,13 @@
       "note": "Börja skapa en ny **inköpsorder** genom att välja **Ny** på sidan **Inköpsorder**.",
       "texts": {
         "sv-SE": "Börja skapa en ny inköpsorder genom att välja Ny på sidan Inköpsorder.",
-        "en-US": "Start creating a new purchase order by selecting Ny on the Purchase Order List page.",
-        "fr-FR": "Sélectionnez Ny sur la page Commande achat pour créer un nouvel enregistrement (commande achat).",
-        "de-DE": "Wählen Sie auf der Seite Einkaufsbestellung Ny aus, um einen neuen Datensatz (Einkaufsbestellung) zu erstellen.",
-        "es-ES": "Seleccione Ny en la página Pedido de compra para crear un nuevo registro (pedido de compra).",
-        "da-DK": "Begynd at oprette en ny købsordre ved at vælge Ny på siden Købsordre.",
-        "fi-FI": "Luo uusi tietue (ostotilaus) valitsemalla Ny sivulla Ostotilaus.",
-        "nb-NO": "Begynn å opprette en ny innkjøpsordre ved å velge Ny på siden Innkjøpsordre."
+        "en-US": "Start creating a new purchase order by selecting Ny on the Inköpsorder page.",
+        "fr-FR": "Sélectionnez Ny sur la page Inköpsorder pour créer un nouvel enregistrement (commande achat).",
+        "de-DE": "Wählen Sie auf der Seite Inköpsorder Ny aus, um einen neuen Datensatz (Einkaufsbestellung) zu erstellen.",
+        "es-ES": "Seleccione Ny en la página Inköpsorder para crear un nuevo registro (pedido de compra).",
+        "da-DK": "Begynd at oprette en ny købsordre ved at vælge Ny på siden Inköpsorder.",
+        "fi-FI": "Luo uusi tietue (ostotilaus) valitsemalla Ny sivulla Inköpsorder.",
+        "nb-NO": "Begynn å opprette en ny innkjøpsordre ved å velge Ny på siden Inköpsorder."
       }
     },
     {

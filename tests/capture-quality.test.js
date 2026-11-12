@@ -184,5 +184,25 @@ assert.deepStrictEqual(sanitized.map(item => item.taskType), original.map(item =
 assert.strictEqual(entry.expectedSteps.length, original.length);
 assert.strictEqual(entry.expectedSteps[1].value, chosen);
 
+// Changing the document language rewrites every step: a recording interpreted in Swedish or in
+// English reads the same in each document language, and no step keeps the recording's words.
+const { documentTexts } = require("../scripts/capture-quality/replay");
+const recordingsDirectory = path.join(__dirname, "fixtures/capture-quality/recordings");
+let switchedTexts = 0;
+for (const file of fs.readdirSync(recordingsDirectory)) {
+  const recorded = JSON.parse(fs.readFileSync(path.join(recordingsDirectory, file), "utf8"));
+  if (!recorded.events || !recorded.expectedSteps?.some(step => step.texts)) continue;
+  for (const interpretedIn of ["sv-SE", "en-US"]) {
+    const { tasks } = replay(recorded.events, { id: recorded.id, documentLanguage: interpretedIn });
+    for (const documentLanguage of Object.keys(recorded.expectedSteps[0].texts)) {
+      assert.deepStrictEqual(documentTexts(tasks, documentLanguage),
+        recorded.expectedSteps.map(step => step.texts[documentLanguage]),
+        `${file}: interpreted in ${interpretedIn}, shown in ${documentLanguage}`);
+      switchedTexts += recorded.expectedSteps.length;
+    }
+  }
+}
+assert(switchedTexts > 100, `only ${switchedTexts} step texts were compared`);
+
 console.log(`Capture quality tests passed (${result.recordings.length} corpus recordings, ` +
   `precision ${Math.round(result.totals.precision * 100)}%, recall ${Math.round(result.totals.recall * 100)}%).`);

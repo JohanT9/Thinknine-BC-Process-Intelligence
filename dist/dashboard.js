@@ -9978,9 +9978,10 @@ function showRegenerationPreview(preview) {
 }
 
 // A document made by an earlier version keeps its steps until the user looks at what today's
-// interpretation of the same recording would change. The review offers that when it differs,
-// and only when the existing preview could apply it safely. "Not now" hides the offer on this
-// device until the interpretation changes again.
+// interpretation of the same recording would change. The review offers that when it differs.
+// When the review holds work the preview cannot carry over (approvals, edited steps, notes,
+// own markings), the offer says so; the preview then shows the differences and the reason.
+// "Not now" hides the offer on this device until the interpretation changes again.
 const INTERPRETATION_NOTICE_PREFIX = "bcps.interpretationNotice.";
 function interpretationFingerprint(preview) {
   const source = JSON.stringify((preview.freshReview?.generatedTasks || []).map(task =>
@@ -10004,13 +10005,19 @@ function updateInterpretationNotice() {
   try {
     preview = globalThis.T9ReviewRegeneration.preview(activeReview, activeReviewSession,
       activeReviewModel.businessTasks);
-  } catch { return; }
+  } catch (error) {
+    // The offer is optional; the review works without it.
+    console.warn("BC Process Studio: the improved interpretation could not be checked.", error);
+    return;
+  }
   const differences = preview.addedStepCount + preview.removedStepCount +
     preview.changedStepCount + preview.mergeStepCount + preview.splitStepCount;
-  if (preview.blocked || !differences) return;
+  if (!differences) return;
   const fingerprint = interpretationFingerprint(preview);
   if (interpretationNoticeDismissed(activeReviewSession.id, fingerprint)) return;
   notice.dataset.fingerprint = fingerprint;
+  $("reviewInterpretationText").textContent = uiT(preview.blocked
+    ? "review.improvedInterpretationBlocked" : "review.improvedInterpretation");
   notice.hidden = false;
 }
 $("reviewInterpretationShow").addEventListener("click", async () => {
