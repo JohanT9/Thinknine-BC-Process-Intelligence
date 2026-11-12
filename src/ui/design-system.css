@@ -368,6 +368,10 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 
 #reviewExportStatus { margin: 4px 0; overflow-wrap: anywhere; }
 #reviewExportStatus.export-error { color: var(--colorStatusDanger, var(--c-fg-b42318)); }
+/* An improved interpretation of the recording is offered, never applied without the preview. */
+.review-interpretation-notice{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:6px 0;padding:8px 12px;border:1px solid color-mix(in srgb,var(--colorStatusInformation) 45%,transparent);border-radius:var(--radiusLarge);background:color-mix(in srgb,var(--colorStatusInformation) 10%,transparent)}
+.review-interpretation-notice p{flex:1 1 260px;min-width:0;margin:0;overflow-wrap:anywhere}
+.review-interpretation-actions{display:flex;flex-wrap:wrap;gap:8px}
 
 /* Start page: an app bar with Documents and Settings, documents as a status-first list
    and settings grouped in sections that save automatically. */

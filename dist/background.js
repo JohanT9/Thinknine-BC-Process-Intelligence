@@ -202,7 +202,7 @@ const DEFAULT_SETTINGS = {
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
-  environmentName: "ApteanAdvance",
+  environmentName: "",
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
@@ -3090,13 +3090,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               canonicalSourceEventId: canonicalEvent.id || "",
               canonicalScreenshotAssetId:
                 canonicalEvent.screenshotAssetId || "",
-              normalizedInteraction: mechanicsBySource.get(
-                canonicalEvent.id
-              ) || null,
-              stepGroup: groupsByNormalizedEvent.get(
+              // Each event names its interaction and step group; both are sent once below
+              // and linked again by the receiver, instead of a copy per event.
+              normalizedInteractionRef: mechanicsBySource.get(
+                canonicalEvent.id)?.normalizedEventId || "",
+              stepGroupRef: groupsByNormalizedEvent.get(
                 mechanicsBySource.get(canonicalEvent.id)
                   ?.normalizedEventId
-              ) || null
+              )?.stepGroupId || ""
             }))
           : [];
         const recordingHeader = recording
