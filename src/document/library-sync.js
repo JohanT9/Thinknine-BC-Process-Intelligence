@@ -15,13 +15,19 @@
 // changed only elsewhere is fetched, and one changed in both places is a conflict the user
 // decides. Fetched and removed documents are written with the library import (with undo and
 // rollback); deletions and conflicts are never applied without the user.
+//
+// The manifest also lists the computer's document templates (document/document-template.js).
+// A template changed later on another computer replaces the one here; a template removed here
+// is not fetched again unless it is changed elsewhere afterwards. Removing a template is not
+// carried to the other computers: their documents keep the template they follow.
 (function (root, factory) {
   const node = typeof module === "object" && module.exports;
   const api = factory(node ? require("./library-transfer") : root.T9LibraryTransfer,
-    node ? require("./document-folders") : root.T9DocumentFolders);
+    node ? require("./document-folders") : root.T9DocumentFolders,
+    node ? require("./document-template") : root.T9DocumentTemplate);
   if (node) module.exports = api;
   root.T9LibrarySync = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (transfer, folderModel) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (transfer, folderModel, templateModel) {
   const FORMAT = "bc-process-studio-sync";
   const FORMAT_VERSION = 1;
   const STATE_SCHEMA_VERSION = 1;
@@ -112,7 +118,8 @@
         throw syncError("newerVersion");
       }
       manifests.push({ ...value, documents: plain(value.documents), deleted: plain(value.deleted),
-        folders: Array.isArray(value.folders) ? value.folders : null });
+        folders: Array.isArray(value.folders) ? value.folders : null,
+        templates: Array.isArray(value.templates) ? value.templates : [] });
     }
     return { manifests, unreadable };
   }
@@ -221,7 +228,9 @@
   //   busy          being recorded now; left as it is
   //   waiting       its file has not arrived in the folder yet
   // activeIds: documents being recorded or edited now; they are left as they are.
-  async function prepare({ dir, storage, keys, records, state, tree, activeId = "", activeIds = [] }) {
+  // templates: the user's own document templates here.
+  async function prepare({ dir, storage, keys, records, state, tree, activeId = "", activeIds = [],
+    templates = [] }) {
     const active = new Set([activeId, ...activeIds].filter(Boolean));
     const { manifests, unreadable } = await readManifests(dir);
     const others = manifests.filter(manifest => manifest.deviceId !== state.deviceId);
@@ -284,7 +293,31 @@
     const counts = Object.fromEntries(["same", "adopt", "push", "pull", "deleteThere", "deleteHere",
       "conflict", "busy", "waiting"].map(action => [action, count(action)]));
     return { manifests, others, items, files, folders, counts, unreadable,
+      templates: prepareTemplates(others, templates, state),
       needsDecision: counts.conflict > 0 || counts.deleteHere > 0 };
+  }
+
+  // The templates to fetch: the newest version on the other computers of each template, when
+  // it is not here or was changed later than the one here. A template removed here (known at
+  // the last synchronization, gone now) comes back only when it was changed elsewhere since.
+  function prepareTemplates(others, local, state) {
+    if (!templateModel) return { pulls: [], local: [] };
+    const known = plain(state.templates);
+    const newest = new Map();
+    for (const manifest of others) {
+      for (const value of manifest.templates || []) {
+        let template;
+        try { template = templateModel.normalize(value); } catch { continue; }
+        const current = newest.get(template.templateId);
+        if (!current || String(template.updatedAt) > String(current.updatedAt)) newest.set(template.templateId, template);
+      }
+    }
+    const here = (local || []).map(value => templateModel.normalize(value));
+    const removedHere = id => Object.hasOwn(known, id) && !here.some(item => item.templateId === id);
+    const candidates = [...newest.values()].filter(template => !removedHere(template.templateId) ||
+      String(template.updatedAt) > String(known[template.templateId]));
+    const pulls = templateModel.incoming(candidates, here).writes;
+    return { pulls, local: here };
   }
 
   // A fresh reading of the fetched files as one import file.
@@ -430,6 +463,16 @@
     }
     if (fetched.length || removeHere.length) await saveState(next);
 
+    // Templates changed on another computer replace the ones here.
+    const templatePulls = prepared.templates?.pulls || [];
+    if (templatePulls.length && keys.DOCUMENT_TEMPLATE_PREFIX) {
+      await storage.set(Object.fromEntries(templatePulls.map(({ template }) =>
+        [keys.DOCUMENT_TEMPLATE_PREFIX + template.templateId, template])));
+    }
+    const pulledTemplates = new Map(templatePulls.map(({ template }) => [template.templateId, template]));
+    const templates = [...(prepared.templates?.local || []).filter(item => !pulledTemplates.has(item.templateId)),
+      ...pulledTemplates.values()].sort((a, b) => a.templateId.localeCompare(b.templateId));
+
     // 4. This computer's manifest.
     for (const { item, path } of pushed) {
       const previous = next.published[item.id];
@@ -460,7 +503,7 @@
     const foldersChangedAt = transfer.canonical(folders) !== transfer.canonical(state.publishedFolders || null)
       ? now : state.foldersChangedAt || now;
     const manifest = { format: FORMAT, formatVersion: FORMAT_VERSION, deviceId: state.deviceId,
-      appVersion, updatedAt: now, foldersChangedAt, folders,
+      appVersion, updatedAt: now, foldersChangedAt, folders, templates,
       documents: next.published,
       deleted: Object.fromEntries(Object.entries(next.deleted).map(([id, deletedAt]) => [id, { deletedAt }])) };
     await dir.writeText(`${DEVICES}/${state.deviceId}.json`, JSON.stringify(manifest));
@@ -472,6 +515,9 @@
       if (item.local) next.base[item.id] = { local: item.local.version, remote: item.remote.version };
       else delete next.base[item.id];
     }
+    // Templates removed here stay listed, so that they are not fetched again next time.
+    next.templates = { ...plain(state.templates),
+      ...Object.fromEntries(templates.map(item => [item.templateId, String(item.updatedAt || "")])) };
     next.folders = folders;
     next.publishedFolders = folders;
     next.foldersChangedAt = foldersChangedAt;
@@ -483,7 +529,7 @@
       removedThere: removeThere.length, conflictsLeft: left.conflict, deletionsLeft: left.deleteHere,
       deferred: left.deferred,
       waiting: prepared.counts.waiting, busy: prepared.counts.busy, changedDuring,
-      unreadable: prepared.unreadable, foldersChanged,
+      unreadable: prepared.unreadable, foldersChanged, templatesPulled: templatePulls.length,
       newIds: fetched.filter(item => item.status === "new").map(item => item.id),
       replacedIds: fetched.filter(item => item.status === "different").map(item => item.id),
       removedIds: [...removedIds] };

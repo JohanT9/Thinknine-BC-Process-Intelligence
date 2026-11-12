@@ -6,7 +6,9 @@
 // regenerated or reinterpreted when it is imported. It is gzip-compressed text with one JSON
 // object per line, so that a large library is written and read a line at a time:
 //
-//   {"type":"header", format, formatVersion, exportedAt, appVersion, scope, folders, itemCount}
+//   {"type":"header", format, formatVersion, exportedAt, appVersion, scope, folders, templates,
+//    itemCount}                             templates: the document templates the documents
+//                                           name (document/document-template.js)
 //   {"type":"item", id, record}             the library record of one document
 //   {"type":"entry", id, key, value}        one stored entry of that document
 //   {"type":"itemEnd", id, entryCount, digest}
@@ -15,16 +17,19 @@
 // An import accepts an entry only when its key belongs to the document it is listed under,
 // so a file cannot write settings, licenses or another document's data. Entries that are
 // replaced are kept first, so the import can be undone; an import that stops halfway is
-// rolled back.
+// rolled back. A template from the file is added when it is not here and replaces the one
+// here when it was changed later; the template it replaces is kept for undo as well.
 (function (root, factory) {
   const folders = typeof module === "object" && module.exports
     ? require("./document-folders") : root.T9DocumentFolders;
   const reviewFormat = typeof module === "object" && module.exports
     ? require("../engine/review-storage-format") : root.T9ReviewStorageFormat;
-  const api = factory(folders, reviewFormat);
+  const templates = typeof module === "object" && module.exports
+    ? require("./document-template") : root.T9DocumentTemplate;
+  const api = factory(folders, reviewFormat, templates);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9LibraryTransfer = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (folderModel, reviewFormat) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (folderModel, reviewFormat, templateModel) {
   const FORMAT = "bc-process-studio-library";
   const FORMAT_VERSION = 1;
   const FILE_EXTENSION = ".bcps";
@@ -197,13 +202,16 @@
   }
 
   // The export as lines of text. items: [{ id, record }].
-  async function* exportLines({ storage, keys, items, folders = [], scope = {},
+  // templates: the user's own templates; the ones the documents name go with them.
+  async function* exportLines({ storage, keys, items, folders = [], scope = {}, templates = [],
     exportedAt = new Date().toISOString(), appVersion = "", onProgress = () => {} }) {
     const ids = items.map(item => item.id);
     if (!ids.every(validId)) throw transferError("documentMissing");
     const owned = await inventory(storage, keys, ids);
+    const used = templateModel ? templateModel.usedBy(templates, items.map(item => item.record)) : [];
     yield JSON.stringify({ type: "header", format: FORMAT, formatVersion: FORMAT_VERSION,
-      exportedAt, appVersion, scope, folders, itemCount: items.length });
+      exportedAt, appVersion, scope, folders, ...(used.length ? { templates: used } : {}),
+      itemCount: items.length });
     let entryTotal = 0;
     let done = 0;
     for (const { id, record } of items) {
@@ -362,8 +370,12 @@
   //   same       here already, unchanged
   //   different  here already, with other content
   //   busy       being recorded now; never changed
-  function plan({ inspection, local, records, tree, activeId = "" }) {
+  // templates: the user's own templates here.
+  function plan({ inspection, local, records, tree, activeId = "", templates = [] }) {
     const folders = mapFolders(tree, inspection.header.folders);
+    const incomingTemplates = templateModel
+      ? templateModel.incoming(inspection.header.templates, templates)
+      : { items: [], writes: [], unreadable: 0 };
     const recordById = new Map(records.map(record => [record.projectId || record.sessionId, record]));
     const items = inspection.items.map(item => {
       const folderId = folders.map.get(String(item.record.folderId || "")) ?? "";
@@ -380,7 +392,7 @@
         localRecord: recordById.get(item.id) || null };
     });
     const count = status => items.filter(item => item.status === status).length;
-    return { header: inspection.header, items, folders,
+    return { header: inspection.header, items, folders, templates: incomingTemplates,
       counts: { new: count("new"), same: count("same"), different: count("different"),
         busy: count("busy") } };
   }
@@ -413,8 +425,29 @@
       written,
       newIds: written.filter(item => item.status === "new").map(item => item.id),
       replacedIds: written.filter(item => item.status === "different").map(item => item.id),
-      tree: nextTree, records: nextRecords, createdFolderIds
+      tree: nextTree, records: nextRecords, createdFolderIds,
+      templates: (planned.templates?.writes || []).map(({ template, previous }) => ({ template, previous }))
     };
+  }
+
+  // Templates are written after the documents and put back with them.
+  async function writeTemplates(storage, keys, list) {
+    if (!list.length) return;
+    await storage.set(Object.fromEntries(list.map(({ template }) =>
+      [keys.DOCUMENT_TEMPLATE_PREFIX + template.templateId, template])));
+  }
+  // A template changed again after the import is left as it is now.
+  async function restoreTemplates(storage, keys, meta) {
+    const written = meta.templates?.written || [];
+    if (!written.length || !keys.DOCUMENT_TEMPLATE_PREFIX) return;
+    const previous = new Map((meta.templates.previous || []).map(item => [item.templateId, item]));
+    const stored = await storage.get(written.map(item => keys.DOCUMENT_TEMPLATE_PREFIX + item.templateId)) || {};
+    for (const { templateId, updatedAt } of written) {
+      const key = keys.DOCUMENT_TEMPLATE_PREFIX + templateId;
+      if (!Object.hasOwn(stored, key) || String(stored[key]?.updatedAt || "") !== updatedAt) continue;
+      if (previous.has(templateId)) await storage.set({ [key]: previous.get(templateId) });
+      else await storage.remove(key);
+    }
   }
 
   function undoKeys(keys) {
@@ -460,6 +493,10 @@
       oldRecords: Object.fromEntries([...change.written, ...removed]
         .filter(item => item.localRecord).map(item => [item.id, item.localRecord])),
       createdFolderIds: change.createdFolderIds || [], keptEntries: 0,
+      ...(change.templates?.length ? { templates: {
+        written: change.templates.map(({ template }) =>
+          ({ templateId: template.templateId, updatedAt: String(template.updatedAt || "") })),
+        previous: change.templates.map(item => item.previous).filter(Boolean) } } : {}),
       ...(oldFolders ? { oldFolders, newFolders: folderModel.serialize(change.tree) } : {}) };
     await clearUndo(storage, keys);
     await storage.set({ [metaKey]: meta });
@@ -506,6 +543,7 @@
           if (!item || item.digest !== expected.get(id)) throw transferError("changedFile");
         }
       }
+      await writeTemplates(storage, keys, change.templates || []);
       await saveLibrary(change.tree, change.records);
       meta.state = "complete";
       meta.completedAt = new Date().toISOString();
@@ -539,6 +577,7 @@
     await readBatches(storage, keptKeys, async (_key, kept) => {
       if (kept && typeof kept.key === "string") await storage.set({ [kept.key]: kept.value });
     });
+    await restoreTemplates(storage, keys, meta);
   }
 
   // The library records and folders after undoing an import.

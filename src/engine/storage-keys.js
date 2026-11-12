@@ -38,6 +38,12 @@
   const ACTIVE_TEST_RUN_KEY = "t9_active_test_run";
   // Session storage: the Business Central tabs the toolbar button has been used on.
   const TEST_ACCESS_TABS_KEY = "t9_test_access_tabs";
+  // One entry per document template the user made (document/document-template.js), keyed
+  // by its own id; documents name their template in the library. Built-in templates are
+  // not stored.
+  const DOCUMENT_TEMPLATE_PREFIX = "t9_document_template_";
+  // The template new documents get.
+  const DEFAULT_DOCUMENT_TEMPLATE_KEY = "t9_default_document_template";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -63,6 +69,8 @@
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     DOCUMENT_FOLDERS_KEY,
+    DOCUMENT_TEMPLATE_PREFIX,
+    DEFAULT_DOCUMENT_TEMPLATE_KEY,
     LIBRARY_IMPORT_UNDO_KEY,
     LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
     LIBRARY_SYNC_STATE_KEY,

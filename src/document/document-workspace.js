@@ -59,6 +59,18 @@
           stepNumber: component.content.stepNumber
         }));
         renderComponents(component.components, result);
+      } else if (component.kind === "toc") {
+        result.push(workspaceItem(component, "toc", "toc", {
+          title: String(component.appearance?.title || ""), entries: []
+        }));
+      } else if (component.kind === "cover") {
+        // The cover's logo and organisation, above the title, as Word shows them.
+        const logoAssetId = String(component.appearance?.brandLogo || "");
+        const text = String(component.appearance?.brandText || "");
+        if (logoAssetId || text) {
+          result.push(workspaceItem(component, "brand", "brand", { logoAssetId, text }));
+        }
+        renderComponents(component.components, result);
       } else if (component.kind === "paragraph") {
         const runs = component.content.runs ||
           textFormat.instructionSegments(component.content.text);
@@ -100,7 +112,34 @@
         items
       };
     });
+    // A table of contents lists the document's headings and steps, as Word fills it in;
+    // the preview has no pages, so it has no page numbers.
+    const entries = sections.filter(section => !["cover", "toc"].includes(section.kind))
+      .flatMap(section => section.items).flatMap(item =>
+        item.kind === "heading" ? [{ text: item.content.text, level: Math.min(2, item.content.level || 1) }]
+          : item.kind === "stepTitle" ? [{ text: item.content.text, level: 2 }] : []);
+    sections.forEach(section => section.items.forEach(item => {
+      if (item.kind === "toc") item.content.entries = entries.map(entry => ({ ...entry }));
+    }));
+    // A template of the user's own shows its logo and company above the document and its
+    // footer below it, as Word shows them on every page. The preview is one long page, so
+    // the page number reads 1.
+    const pageComponent = kind => (plan.components || []).find(component =>
+      component.kind === kind && component.visibility !== "hidden");
+    const header = pageComponent("header");
+    const footer = pageComponent("footer");
+    const branding = header?.appearance?.branding || footer?.appearance?.branding || {};
+    const footerText = String(footer?.content?.text || "");
     return planModel.deepFreeze({
+      pageHeader: branding.templateId && header ? {
+        company: String(branding.organizationName || ""), logoAssetId: String(branding.logo || ""),
+        title: String(header.content?.text || ""), borderColor: header.appearance?.borderColor || ""
+      } : null,
+      pageFooter: branding.templateId && footer ? {
+        text: footerText.includes("{page}") ? footerText.split("{page}").join("1")
+          : `${footerText} | ${footer.content?.pageLabel || ""} 1`,
+        borderColor: footer.appearance?.borderColor || ""
+      } : null,
       rendererVersion: RENDERER_VERSION,
       planId: plan.planId,
       documentId: plan.documentRef?.documentId || "",

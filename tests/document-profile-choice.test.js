@@ -18,19 +18,32 @@ assert(!source.includes("renderDocumentProfileChoice"));
 assert.match(source, /activeDocumentProfileId = documentProfiles\(\)\.some\(profile =>\s+profile\.profileId === assignedProfileId\s+\) \? assignedProfileId : "business-process";/u,
   "a saved profile is still used for the document; otherwise the standard profile");
 
-// The theme still follows a document's own theme, then its saved profile.
-const helper = source.slice(source.indexOf("function activeDocumentThemeId()"),
-  source.indexOf("function documentProfiles()"));
+// The look follows the document's own template (its saved theme), whatever its profile; a
+// template that is not here gives the default template, and the document keeps naming it.
+const helper = source.slice(source.indexOf("function documentTemplateFor("),
+  source.indexOf("// Settings → Documents → Document templates.")) +
+  source.slice(source.indexOf("// What a template looks like, for caches"),
+    source.indexOf("function documentProfiles()"));
 const context = {
   activeDocumentProfileId: "quick-reference", activeReviewSession: { id: "s" },
   documentLibraryRecords: [{ projectId: "s", theme: { themeId: "missing" } }],
-  T9DocumentThemeRegistry: { list: () => [{ themeId: "minimal" }, { themeId: "corporate" }] },
+  documentTemplates: [{ templateId: "acme", name: "Acme", builtIn: false, updatedAt: "1" }],
+  defaultDocumentTemplateId: "acme",
+  T9DocumentTemplate: require("../src/document/document-template"),
+  uiT: key => key,
   documentProfiles: () => profiles
 };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(helper, context);
-assert.strictEqual(vm.runInContext("activeDocumentThemeId()", context), "minimal");
+assert.strictEqual(vm.runInContext("activeDocumentTemplate().templateId", context), "acme");
+assert.deepStrictEqual({ ...vm.runInContext("documentTemplateAssignment({ themeId: 'missing', displayName: 'Old' })", context) },
+  { themeId: "missing", displayName: "Old" }, "a missing template stays named on the document");
 context.documentLibraryRecords[0].theme.themeId = "corporate";
-assert.strictEqual(vm.runInContext("activeDocumentThemeId()", context), "corporate");
+assert.strictEqual(vm.runInContext("activeDocumentTemplate().templateId", context), "corporate");
+assert.strictEqual(vm.runInContext("templateCacheKey(activeDocumentTemplate())", context), "corporate:");
+context.documentLibraryRecords[0].theme.themeId = "acme";
+assert.strictEqual(vm.runInContext("templateCacheKey(activeDocumentTemplate())", context), "acme:1");
+assert.deepStrictEqual({ ...vm.runInContext("documentTemplateAssignment(null)", context) },
+  { themeId: "acme", displayName: "Acme" }, "a new document gets the default template");
 console.log("Document profile choice tests passed.");

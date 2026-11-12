@@ -11404,6 +11404,10 @@
     /** Start-aligned tab stop (left-to-right equivalent) */
     START: "start"
   };
+  var TabStopPosition = {
+    /** Maximum tab stop position (right margin) */
+    MAX: 9026
+  };
   var createTabStopItem = ({ type, position, leader }) => new BuilderElement({
     name: "w:tab",
     attributes: {
@@ -19966,7 +19970,13 @@
       const metadata = component.components.find((child) => child.kind === "metadata");
       const accent = color(component.appearance.accentColor, "0F4C81");
       const muted = color(component.appearance.mutedColor, "5F6B76");
+      const logo = logoRun(component.appearance.brandLogo, mediaAssets, { maxWidth: 260, maxHeight: 90 });
       return [
+        ...logo ? [new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 160 },
+          children: [logo]
+        })] : [],
         bodyParagraph(component.appearance.brandText, {
           bold: true,
           color: accent,
@@ -20006,8 +20016,45 @@
     }
     return component.components.flatMap((child) => renderComponent(child, mediaAssets, context));
   }
-  function wordHeader(component) {
+  function logoRun(assetId, mediaAssets, limits) {
+    const media = assetId ? mediaAssets[assetId] : null;
+    const bytes = imageBytes(media);
+    if (!bytes) return null;
+    return new ImageRun({
+      data: bytes,
+      type: imageType(media, bytes),
+      transformation: fittedImageSize(bytes, limits),
+      altText: { title: "Logo", description: "Logo", name: "Logo" }
+    });
+  }
+  function wordHeader(component, mediaAssets = {}) {
     if (!component) return void 0;
+    const branding = component.appearance.branding || {};
+    if (branding.templateId) {
+      const size = halfPoints(component.appearance.fontSize, 9);
+      const textColor = color(component.appearance.textColor, "4B5563");
+      const logo = logoRun(branding.logo, mediaAssets, { maxWidth: 160, maxHeight: 36 });
+      const company = String(branding.organizationName || "").trim();
+      return new Header({ children: [new Paragraph({
+        tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+        spacing: { after: 160 },
+        border: { bottom: {
+          style: BorderStyle.SINGLE,
+          size: 6,
+          color: color(component.appearance.borderColor, "0F4C81")
+        } },
+        children: [
+          ...logo ? [logo] : [],
+          ...company ? [new TextRun({
+            text: `${logo ? "  " : ""}${company}`,
+            bold: true,
+            color: "1F2937",
+            size
+          })] : [],
+          new TextRun({ text: `	${component.content.text}`, color: textColor, size })
+        ]
+      })] });
+    }
     const branded = Boolean(component.appearance.fillColor);
     return new Header({ children: [new Paragraph({
       alignment: branded ? AlignmentType.LEFT : AlignmentType.RIGHT,
@@ -20032,6 +20079,21 @@
   function wordFooter(component) {
     if (!component) return void 0;
     const textColor = color(component.appearance.textColor, "5F6B76");
+    if (String(component.content.text || "").includes("{page}")) {
+      const size = halfPoints(component.appearance.fontSize, 9);
+      return new Footer({ children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        border: { top: {
+          style: BorderStyle.SINGLE,
+          size: 4,
+          color: color(component.appearance.borderColor, "B8C2CC")
+        } },
+        children: String(component.content.text).split("{page}").flatMap((part, index) => [
+          ...index ? [new TextRun({ children: [PageNumber.CURRENT], color: textColor, size })] : [],
+          ...part ? [new TextRun({ text: part, color: textColor, size })] : []
+        ])
+      })] });
+    }
     return new Footer({ children: [new Paragraph({
       alignment: AlignmentType.CENTER,
       border: { top: {
@@ -20094,7 +20156,11 @@
     const A4_WIDTH = 11906;
     const contentWidth = A4_WIDTH - millimeters(margins.left, 20) - millimeters(margins.right, 20);
     const children = plan.sections.flatMap((section) => section.components.flatMap((component) => renderComponent(component, mediaAssets, { contentWidth })));
+    const hasToc = plan.sections.some((section) => section.components.some(function visit(component) {
+      return component.visibility !== "hidden" && (component.kind === "toc" || (component.components || []).some(visit));
+    }));
     const document2 = new File({
+      ...hasToc ? { features: { updateFields: true } } : {},
       creator: plan.content.creator,
       title: plan.content.title,
       subject: plan.content.subject,
@@ -20110,7 +20176,7 @@
         } }
       } } },
       sections: [{
-        headers: headerComponent ? { default: wordHeader(headerComponent) } : {},
+        headers: headerComponent ? { default: wordHeader(headerComponent, mediaAssets) } : {},
         footers: footerComponent ? { default: wordFooter(footerComponent) } : {},
         properties: { page: { margin: {
           top: millimeters(margins.top, 20),

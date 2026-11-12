@@ -113,7 +113,8 @@
     const projection = projector.project(options.review, {
       session: options.session,
       prerequisites: options.prerequisites,
-      expectedResult: options.expectedResult
+      expectedResult: options.expectedResult,
+      purpose: options.purpose
     });
     const documentResult = semantic.validate(projection.document);
     if (!documentResult.valid) {
@@ -162,11 +163,7 @@
       profile
     });
     const presentationDocument = screenshotResult.document;
-    const resolvedTheme = registry.resolve(
-      registry.BUILT_IN_REGISTRY,
-      options.themeId || "thinknine",
-      options.themeOverrides || {}
-    );
+    const resolvedTheme = resolveTheme(options, presentationDocument.metadata || {});
     const themeResult = themeValidation.validate(resolvedTheme, {
       requireValues: true
     });
@@ -175,9 +172,13 @@
         `Document Theme validation failed: ${themeResult.issues[0].message}`
       );
     }
-    const plan = planner.plan(presentationDocument, resolvedTheme);
+    // The template decides which parts of the document are shown (document-template.js).
+    const model = options.template ? templateModel() : null;
+    const arranged = model ? model.arrangeSections(presentationDocument, options.template)
+      : presentationDocument;
+    const plan = planner.plan(arranged, resolvedTheme);
     const planResult = planValidation.validate(plan, {
-      document: presentationDocument,
+      document: arranged,
       theme: resolvedTheme,
       plannerVersion: planner.PLANNER_VERSION
     });
@@ -197,10 +198,44 @@
       screenshotCandidates,
       screenshotSelections: screenshotResult.selections,
       theme: resolvedTheme,
+      // The template the document is presented with, for its logo.
+      template: options.template || null,
       plan,
       diagnostics: prepared.diagnostics,
-      qualityDiagnostics: analyzeQuality(presentationDocument, plan)
+      // The quality check reads the whole document: a part the template leaves out is a
+      // choice, not something missing.
+      qualityDiagnostics: arranged === presentationDocument ||
+        arranged.sections.length === presentationDocument.sections.length &&
+        arranged.sections.every((section, index) => section === presentationDocument.sections[index])
+        ? analyzeQuality(presentationDocument, plan)
+        : analyzeQuality(presentationDocument, planner.plan(presentationDocument, resolvedTheme))
     });
+  }
+
+  // The theme a document is presented with: its template's (document/document-template.js)
+  // when it names one, else the theme it names. A template of the user's own is its built-in
+  // theme with the template's appearance laid over it; the footer is filled in with the
+  // document's name and the date in the document language.
+  function templateModel() {
+    return globalThis.T9DocumentTemplate ||
+      (typeof require === "function" ? require("../document/document-template") : null);
+  }
+  function resolveTheme(options = {}, metadata = {}) {
+    const template = options.template || null;
+    const model = template && !template.builtIn ? templateModel() : null;
+    if (!model) {
+      return registry.resolve(registry.BUILT_IN_REGISTRY,
+        template?.builtIn ? template.templateId : options.themeId || "thinknine",
+        options.themeOverrides || {});
+    }
+    const value = model.normalize(template);
+    const base = registry.resolve(registry.BUILT_IN_REGISTRY, value.baseThemeId);
+    const locale = metadata.documentLanguage || "en-US";
+    let date;
+    try { date = new Date(options.now || Date.now()).toLocaleDateString(locale); }
+    catch { date = new Date(options.now || Date.now()).toISOString().slice(0, 10); }
+    return registry.resolve(registry.BUILT_IN_REGISTRY, value.baseThemeId,
+      model.themeOverrides(value, { document: metadata.title || "", date }, base.capabilities));
   }
 
   function screenshotComponents(plan) {
@@ -219,10 +254,23 @@
     return result;
   }
 
+  // The template's logo, in the header and on the cover, is an image Word needs as well.
+  function templateLogoIds(plan) {
+    const found = [];
+    const visit = components => (components || []).forEach(component => {
+      const logo = component.appearance?.branding?.logo || component.appearance?.brandLogo;
+      if (logo && ["header", "cover"].includes(component.kind)) found.push(logo);
+      visit(component.components);
+    });
+    visit(plan?.components);
+    (plan?.sections || []).forEach(section => visit(section.components));
+    return found;
+  }
+
   function requiredMediaAssetIds(plan) {
-    return [...new Set(screenshotComponents(plan).map(component =>
+    return [...new Set([...screenshotComponents(plan).map(component =>
       component.content?.assetId || component.sourceRef?.assetId
-    ).filter(Boolean))];
+    ), ...templateLogoIds(plan)].filter(Boolean))];
   }
 
   function validateMedia(plan, mediaAssets = {}) {
@@ -242,6 +290,7 @@
     create,
     createPresentation,
     requiredMediaAssetIds,
+    resolveTheme,
     screenshotComponents,
     validateMedia
   };

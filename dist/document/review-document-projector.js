@@ -153,7 +153,7 @@
     });
   }
 
-  function projectMetadata(review, session) {
+  function projectMetadata(review, session, options = {}) {
     return {
       title: firstText(
         review.sessionName,
@@ -164,7 +164,8 @@
       status: text(review.status),
       reviewer: text(review.reviewer) || "Ej angiven",
       notes: text(review.notes),
-      purpose: text(session.purpose) || DEFAULT_PURPOSE,
+      // The recording's own purpose, else the document template's text, else the standard one.
+      purpose: text(session.purpose) || text(options.purpose) || DEFAULT_PURPOSE,
       environment: text(session.settings?.environmentName) || "Ej angiven",
       documentationProfile: text(session.settings?.documentationProfile) || "generic",
       documentLanguage: languages.normalize(firstText(
@@ -223,7 +224,7 @@
     }));
     const session = object(options.session);
     const diagnostics = [];
-    const metadata = projectMetadata(review, session);
+    const metadata = projectMetadata(review, session, options);
     const sessionId = metadata.sessionId;
 
     if (!firstText(review.sessionName, session.name)) {
@@ -761,6 +762,7 @@
 
   return {
     DEFAULT_EXPECTED_RESULT,
+    DEFAULT_PURPOSE,
     ORIGIN,
     PROJECTOR_VERSION,
     project

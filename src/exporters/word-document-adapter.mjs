@@ -16,6 +16,8 @@ import {
   TableLayoutType,
   TableOfContents,
   TableRow,
+  TabStopPosition,
+  TabStopType,
   TextRun,
   WidthType,
 } from "docx";
@@ -605,7 +607,10 @@ function renderComponent(component, mediaAssets, context = {}) {
     const metadata = component.components.find(child => child.kind === "metadata");
     const accent = color(component.appearance.accentColor, "0F4C81");
     const muted = color(component.appearance.mutedColor, "5F6B76");
+    const logo = logoRun(component.appearance.brandLogo, mediaAssets, { maxWidth: 260, maxHeight: 90 });
     return [
+      ...(logo ? [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 },
+        children: [logo] })] : []),
       bodyParagraph(component.appearance.brandText, {
         bold: true, color: accent,
         size: halfPoints(component.appearance.brandSize, 12),
@@ -645,8 +650,40 @@ function renderComponent(component, mediaAssets, context = {}) {
     renderComponent(child, mediaAssets, context));
 }
 
-function wordHeader(component) {
+// A template's logo as an image run of at most the given size, or nothing when the
+// template has none.
+function logoRun(assetId, mediaAssets, limits) {
+  const media = assetId ? mediaAssets[assetId] : null;
+  const bytes = imageBytes(media);
+  if (!bytes) return null;
+  return new ImageRun({ data: bytes, type: imageType(media, bytes),
+    transformation: fittedImageSize(bytes, limits),
+    altText: { title: "Logo", description: "Logo", name: "Logo" } });
+}
+
+function wordHeader(component, mediaAssets = {}) {
   if (!component) return undefined;
+  const branding = component.appearance.branding || {};
+  // A template of the user's own: its logo and company on the left, the document's name on
+  // the right.
+  if (branding.templateId) {
+    const size = halfPoints(component.appearance.fontSize, 9);
+    const textColor = color(component.appearance.textColor, "4B5563");
+    const logo = logoRun(branding.logo, mediaAssets, { maxWidth: 160, maxHeight: 36 });
+    const company = String(branding.organizationName || "").trim();
+    return new Header({ children: [new Paragraph({
+      tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+      spacing: { after: 160 },
+      border: { bottom: { style: BorderStyle.SINGLE, size: 6,
+        color: color(component.appearance.borderColor, "0F4C81") } },
+      children: [
+        ...(logo ? [logo] : []),
+        ...(company ? [new TextRun({ text: `${logo ? "  " : ""}${company}`, bold: true,
+          color: "1F2937", size })] : []),
+        new TextRun({ text: `	${component.content.text}`, color: textColor, size }),
+      ],
+    })] });
+  }
   const branded = Boolean(component.appearance.fillColor);
   return new Header({ children: [new Paragraph({
     alignment: branded ? AlignmentType.LEFT : AlignmentType.RIGHT,
@@ -670,6 +707,19 @@ function wordHeader(component) {
 function wordFooter(component) {
   if (!component) return undefined;
   const textColor = color(component.appearance.textColor, "5F6B76");
+  // A footer that says where the page number goes ({page}) gets it there and nothing else.
+  if (String(component.content.text || "").includes("{page}")) {
+    const size = halfPoints(component.appearance.fontSize, 9);
+    return new Footer({ children: [new Paragraph({
+      alignment: AlignmentType.CENTER,
+      border: { top: { style: BorderStyle.SINGLE, size: 4,
+        color: color(component.appearance.borderColor, "B8C2CC") } },
+      children: String(component.content.text).split("{page}").flatMap((part, index) => [
+        ...(index ? [new TextRun({ children: [PageNumber.CURRENT], color: textColor, size })] : []),
+        ...(part ? [new TextRun({ text: part, color: textColor, size })] : []),
+      ]),
+    })] });
+  }
   return new Footer({ children: [new Paragraph({
     alignment: AlignmentType.CENTER,
     border: { top: {
@@ -745,7 +795,14 @@ function buildDocument({ plan, mediaAssets = {} }) {
   const children = plan.sections.flatMap(section =>
     section.components.flatMap(component =>
       renderComponent(component, mediaAssets, { contentWidth })));
+  // A table of contents is filled in by Word when the document is opened: Word asks whether
+  // to update the document's fields.
+  const hasToc = plan.sections.some(section => section.components.some(function visit(component) {
+    return component.visibility !== "hidden" &&
+      (component.kind === "toc" || (component.components || []).some(visit));
+  }));
   const document = new Document({
+    ...(hasToc ? { features: { updateFields: true } } : {}),
     creator: plan.content.creator,
     title: plan.content.title,
     subject: plan.content.subject,
@@ -761,7 +818,7 @@ function buildDocument({ plan, mediaAssets = {} }) {
       } },
     } } },
     sections: [{
-      headers: headerComponent ? { default: wordHeader(headerComponent) } : {},
+      headers: headerComponent ? { default: wordHeader(headerComponent, mediaAssets) } : {},
       footers: footerComponent ? { default: wordFooter(footerComponent) } : {},
       properties: { page: { margin: {
         top: millimeters(margins.top, 20),
