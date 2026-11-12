@@ -209,7 +209,9 @@
     if (suggestion && current.recordingCheck?.checkedAt) {
       const note = element("p", "run-suggestion");
       note.dataset.state = suggestion.state;
-      note.append(element("strong", "", t({ done: "test.suggestionDone", failed: "test.suggestionFailed",
+      // A result the recording set says so; the tester can choose another.
+      note.append(element("strong", "", t(script.byRecording(step) ? script.statusKey(step) : {
+        done: "test.suggestionDone", failed: "test.suggestionFailed",
         "not-found": "test.suggestionNotFound", unknown: "test.suggestionUnknown" }[suggestion.state])));
       if (suggestion.state === "failed") {
         note.append(element("span", "run-suggestion-error", suggestion.error || t("test.errorNoMessage")));

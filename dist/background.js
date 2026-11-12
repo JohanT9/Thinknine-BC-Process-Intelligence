@@ -907,6 +907,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
     session.eventCount = canonical.events.length;
     session.updatedAt = event.timestamp;
     await saveSession(session);
+    if (session.testRunId) scheduleLiveTestCheck(recordingId);
 
     if (alreadyCanonical) return { recordingId, canonicalEvent, event };
 
@@ -1724,7 +1725,62 @@ async function testRecordingScreenshots(recordingId, recording, run, check, task
   return shots;
 }
 
+// The recording of a test as steps, interpreted as the library interprets a recording and
+// with secrets masked, compared with the test's steps.
+async function checkTestRecording(recordingId, run) {
+  const recording = await getCanonicalRecording(recordingId);
+  const settings = await getSettings();
+  const labels = privacyMaskLabels(run.documentLanguage);
+  const masked = { ...recording, events: (recording.events || []).map(event =>
+    globalThis.T9PrivacyMask.maskRecordedEvent(event,
+      { ...settings, maskValues: "secrets", labels })) };
+  const timeOf = new Map((recording.events || []).map(event => [event.id, event.timestamp]));
+  const errorOf = await testRecordingErrors(recordingId, masked);
+  const tasks = (await deriveBugReportTasks(masked,
+    await screenshotAssetStore.manifest(recordingId), { repository: true })).map(task => ({ ...task,
+    at: timeOf.get((task.sourceEventIds || [])[0]) || "", ...errorOf(task) }));
+  return { recording, tasks, check: globalThis.T9TestRecordingMatch.check(run.steps, tasks) };
+}
+
+// While a test is recorded, the recording is compared with the test shortly after the
+// tester acts, at most once in that time, so the panel beside Business Central follows the
+// test as it is done: steps done pass and an error fails its step. Screenshots go with the
+// steps when the recording stops.
+const LIVE_TEST_CHECK_DELAY_MS = 1200;
+const liveTestCheck = { timer: null, running: Promise.resolve() };
+function scheduleLiveTestCheck(recordingId) {
+  if (liveTestCheck.timer) return;
+  liveTestCheck.timer = setTimeout(() => {
+    liveTestCheck.timer = null;
+    liveTestCheck.running = liveTestCheck.running
+      .then(() => runLiveTestCheck(recordingId)).catch(() => {});
+  }, LIVE_TEST_CHECK_DELAY_MS);
+}
+async function settleLiveTestCheck() {
+  clearTimeout(liveTestCheck.timer);
+  liveTestCheck.timer = null;
+  await liveTestCheck.running;
+}
+async function runLiveTestCheck(recordingId) {
+  const session = await getSession(recordingId);
+  if (!session?.testRunId || session.status !== "recording") return;
+  const run = await loadTestRun(session.testRunId);
+  if (!run) return;
+  try {
+    const { check } = await checkTestRecording(recordingId, run);
+    // The recording may have stopped meanwhile; then the check made when it stopped counts.
+    if ((await getSession(recordingId))?.status !== "recording") return;
+    await withTestRun(run.testRunId, current => globalThis.T9TestScript.applyRecordingResults(
+      current, { ...check, live: true }, new Date().toISOString()));
+  } catch (error) {
+    console.warn("Test recording could not be compared while recording", error);
+    await withTestRun(run.testRunId, current => globalThis.T9TestScript.liveCheckFailed(
+      current, new Date().toISOString())).catch(() => {});
+  }
+}
+
 async function compareTestRecording(recordingId) {
+  await settleLiveTestCheck();
   const session = await getSession(recordingId);
   if (!session?.testRunId) throw new Error("test.noTestRecording");
   const run = await loadTestRun(session.testRunId);
@@ -1733,18 +1789,7 @@ async function compareTestRecording(recordingId) {
     throw new Error("test.runNotFound");
   }
   try {
-    const recording = await getCanonicalRecording(recordingId);
-    const settings = await getSettings();
-    const labels = privacyMaskLabels(run.documentLanguage);
-    const masked = { ...recording, events: (recording.events || []).map(event =>
-      globalThis.T9PrivacyMask.maskRecordedEvent(event,
-        { ...settings, maskValues: "secrets", labels })) };
-    const timeOf = new Map((recording.events || []).map(event => [event.id, event.timestamp]));
-    const errorOf = await testRecordingErrors(recordingId, masked);
-    const tasks = (await deriveBugReportTasks(masked,
-      await screenshotAssetStore.manifest(recordingId), { repository: true })).map(task => ({ ...task,
-      at: timeOf.get((task.sourceEventIds || [])[0]) || "", ...errorOf(task) }));
-    const check = globalThis.T9TestRecordingMatch.check(run.steps, tasks);
+    const { recording, tasks, check } = await checkTestRecording(recordingId, run);
     const now = new Date().toISOString();
     // The screenshot of each step found in the recording goes with the step, in place of the
     // ones an earlier recording gave it; the tester's own screenshots are kept.
@@ -1754,7 +1799,7 @@ async function compareTestRecording(recordingId) {
     let saved;
     try {
       saved = await withTestRun(run.testRunId, current => {
-        let result = globalThis.T9TestScript.applyRecordingCheck(current, check, now);
+        let result = globalThis.T9TestScript.applyRecordingResults(current, check, now);
         for (const item of replaced) {
           result = globalThis.T9TestScript.removeScreenshot(result, item.stepId, item.screenshotId, now);
         }

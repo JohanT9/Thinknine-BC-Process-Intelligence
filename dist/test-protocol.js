@@ -104,7 +104,7 @@
       instruction.append(document.createTextNode(step.instruction));
       tr.append(element("td", "", String(step.number)), instruction,
         element("td", "", script.resolveText(step.expected, run.testData)),
-        element("td", `result-${step.status}`, d("test.status." + step.status)),
+        element("td", `result-${step.status}`, d(script.statusKey(step))),
         element("td", "", step.comment));
       steps.append(tr);
     });

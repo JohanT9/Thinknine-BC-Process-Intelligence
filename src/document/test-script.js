@@ -82,12 +82,26 @@
       createdAt: now, updatedAt: now, tester: "", environment: "", steps });
   }
 
+  // A result the recording of the test set, rather than the tester: passed when the recording
+  // shows the step done, failed when Business Central showed an error after it. It says so
+  // wherever the result is shown, and the tester's own choice replaces it.
+  const RECORDED_RESULTS = Object.freeze(["passed", "failed"]);
+  const byRecording = step => step?.resultSource === "recording" && RECORDED_RESULTS.includes(step.status);
+  // The label of a step's result: "Passed according to the recording" for one the recording set.
+  const statusKey = step => byRecording(step) ? `test.statusByRecording.${step.status}`
+    : `test.status.${STATUSES.includes(step?.status) ? step.status : "not-run"}`;
+
   function normalizeStep(value = {}, index = 0) {
-    return { ...clone(value), stepId: String(value.stepId || `step-${index + 1}`),
+    const status = STATUSES.includes(value.status) ? value.status : "not-run";
+    const recorded = byRecording({ ...value, status });
+    const { resultSource, recordingError, ...rest } = clone(value) || {};
+    return { ...rest, stepId: String(value.stepId || `step-${index + 1}`),
       number: index + 1, heading: text(value.heading), instruction: text(value.instruction),
       expected: Array.isArray(value.expected) ? value.expected.map(text).filter(Boolean)
         .join("\n") : text(value.expected),
-      status: STATUSES.includes(value.status) ? value.status : "not-run",
+      status,
+      ...(recorded ? { resultSource: "recording" } : {}),
+      ...(recorded && status === "failed" && text(recordingError) ? { recordingError: text(recordingError) } : {}),
       comment: text(value.comment),
       bugReportId: value.bugReportId ? String(value.bugReportId) : null,
       screenshots: (Array.isArray(value.screenshots) ? value.screenshots : [])
@@ -135,7 +149,10 @@
     if (!step) throw new TypeError("Test step was not found.");
     if (patch.status !== undefined) {
       if (!STATUSES.includes(patch.status)) throw new TypeError("Unknown test step status.");
+      // A result the tester chooses is the tester's own, even the one the recording had set.
       step.status = patch.status;
+      delete step.resultSource;
+      delete step.recordingError;
     }
     if (typeof patch.comment === "string") step.comment = patch.comment;
     if (typeof patch.expected === "string") step.expected = patch.expected;
@@ -217,7 +234,7 @@
       updatedAt: now, environment: text(options.environment), recordingCheck: undefined,
       suiteId: options.suiteId ? String(options.suiteId) : undefined,
       steps: value.steps.map(step => ({ ...step, recordingSuggestion: undefined,
-        status: "not-run", comment: "", bugReportId: null, screenshots: [] })) });
+        resultSource: undefined, recordingError: undefined, status: "not-run", comment: "", bugReportId: null, screenshots: [] })) });
   }
 
   // What a recording made while the test was run shows for each step: done, not found, or
@@ -241,6 +258,8 @@
         ...(found.state === "failed" ? { error: text(found.error) } : {}) };
     });
     result.recordingCheck = { checkedAt: now || new Date().toISOString(),
+      // A check made while the test is still recorded; the last one is made when it stops.
+      ...(check.live ? { live: true } : {}),
       recordedSteps: Math.max(0, Number(check.recordedSteps) || 0),
       additional: (Array.isArray(check.additional) ? check.additional : []).map(text)
         .filter(Boolean).slice(0, MAX_ADDITIONAL),
@@ -249,6 +268,57 @@
           ...(item?.failed ? { failed: true, error: text(item.error) } : {}) }))
         .filter(item => item.instruction).slice(0, MAX_RECORDED) };
     result.updatedAt = now || result.updatedAt;
+    return normalize(result);
+  }
+
+  // The results a recording of the test sets, while it is recorded and when it stops: a
+  // step the recording shows done passes, a step Business Central showed an error after
+  // fails with the message in its comment. Only steps without a result of the tester's own
+  // are set. A result the recording set follows the latest check, so a step that a later
+  // check no longer finds is not tested again, and the message it added is taken out.
+  function withoutRecordingError(step) {
+    const message = text(step.recordingError);
+    if (message) {
+      const lines = step.comment.split("\n");
+      const at = lines.lastIndexOf(message);
+      if (at >= 0) lines.splice(at, 1);
+      step.comment = lines.join("\n").trim();
+    }
+    delete step.recordingError;
+  }
+  function applyRecordingResults(run, check = {}, now) {
+    const result = applyRecordingCheck(run, check, now);
+    result.steps.forEach(step => {
+      if (step.status !== "not-run" && !byRecording(step)) return;
+      const state = step.recordingSuggestion?.state;
+      if (state === "failed") {
+        const message = text(step.recordingSuggestion.error).trim();
+        if (step.status === "failed" && text(step.recordingError) === message) return;
+        withoutRecordingError(step);
+        const failure = failureFromSuggestion(step);
+        step.status = "failed";
+        step.comment = failure.comment;
+        step.resultSource = "recording";
+        if (message) step.recordingError = message;
+      } else if (state === "done") {
+        withoutRecordingError(step);
+        step.status = "passed";
+        step.resultSource = "recording";
+      } else if (byRecording(step)) {
+        withoutRecordingError(step);
+        step.status = "not-run";
+        delete step.resultSource;
+      }
+    });
+    return normalize(result);
+  }
+
+  // A check while the test was recorded that could not be made; the recording goes on and is
+  // compared when it stops.
+  function liveCheckFailed(run, now) {
+    const result = normalize(run);
+    result.recordingCheck = { ...(result.recordingCheck || {}), live: true, liveFailed: true,
+      liveFailedAt: now || new Date().toISOString() };
     return normalize(result);
   }
 
@@ -326,7 +396,7 @@
     const rows = [["#", label("test.section"), label("test.step"), label("test.expected"),
       label("test.result"), label("test.comment"), label("test.screenshots")]];
     value.steps.forEach(step => rows.push([step.number, step.heading, step.instruction,
-      resolveText(step.expected, value.testData), label("test.status." + step.status), step.comment,
+      resolveText(step.expected, value.testData), label(statusKey(step)), step.comment,
       step.screenshots.length]));
     return "\uFEFF" + rows.map(row => row.map(cell).join(separator)).join("\r\n") + "\r\n";
   }
@@ -357,12 +427,13 @@
     lines.push(`| # | ${label("test.step")} | ${label("test.expected")} | ${label("test.result")} | ${label("test.comment")} |`,
       "|---|---|---|---|---|");
     value.steps.forEach(step => lines.push(`| ${step.number} | ${cell(step.instruction)} | ${
-      cell(resolveText(step.expected, value.testData))} | ${label("test.status." + step.status)} | ${cell(step.comment)} |`));
+      cell(resolveText(step.expected, value.testData))} | ${label(statusKey(step))} | ${cell(step.comment)} |`));
     return lines.join("\n") + "\n";
   }
 
   return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot,
-    applyChanges, applyRecordingCheck, bugReportContent, failureFromSuggestion,
+    applyChanges, applyRecordingCheck, applyRecordingResults, bugReportContent, byRecording,
+    failureFromSuggestion, liveCheckFailed, statusKey,
     recordingCheckFailed, suggestedPasses, carryOver, countsText, create, csv, markdown, normalize,
     filledTestData, removeScreenshot, rerun, resolveText, screenshotIds, stepsFromDocument, summary, update,
     updateStep };
