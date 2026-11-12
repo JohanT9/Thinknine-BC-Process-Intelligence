@@ -790,6 +790,14 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <button id="libraryImportUndoSubmit" type="submit" class="danger" data-i18n="transfer.undo">Ångra import</button></footer>
   </form>
 </dialog>
+<dialog id="libraryDeleteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryDeleteTitle" aria-describedby="libraryDeleteBody">
+  <form id="libraryDeleteForm" method="dialog">
+    <h3 id="libraryDeleteTitle"></h3>
+    <p id="libraryDeleteBody"></p>
+    <footer><button type="button" class="secondary" data-folder-cancel data-i18n="folder.cancel">Avbryt</button>
+      <button id="libraryDeleteSubmit" type="submit" class="danger" data-i18n="library.deleteConfirm">Ta bort</button></footer>
+  </form>
+</dialog>
 <dialog id="libraryFolderDeleteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryFolderDeleteTitle" aria-describedby="libraryFolderDeleteBody">
   <form id="libraryFolderDeleteForm" method="dialog">
     <h3 id="libraryFolderDeleteTitle"></h3>
@@ -823,6 +831,11 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
         <button id="reviewDocumentBeside" type="button" class="secondary review-document-beside" aria-pressed="false" aria-controls="documentWorkspacePanel">Visa dokument</button>
         <button id="closeReview" class="debug"
           aria-label="Stäng granskning" data-i18n-aria-label="Stäng granskning">Stäng</button>
+      </div>
+      <div id="reviewInterpretationNotice" class="review-interpretation-notice" role="status" hidden>
+        <p data-i18n="review.improvedInterpretation">Det finns en förbättrad tolkning av inspelningen. Du ser vad som ändras innan något ändras.</p>
+        <div class="review-interpretation-actions"><button id="reviewInterpretationShow" type="button" data-i18n="review.improvedInterpretationShow">Visa förbättringar</button>
+          <button id="reviewInterpretationLater" type="button" class="secondary" data-i18n="review.improvedInterpretationLater">Inte nu</button></div>
       </div>
       <p id="reviewExportStatus" role="status" aria-live="polite" hidden></p>
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"
@@ -1213,6 +1226,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/test-suite.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/document-batch-operations.js"></script>
+<script src="exporters/zip-writer.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
 <script src="exporters/word-exporter-docx.bundle.js"></script>
 <script src="review/review-move.js"></script>

@@ -21,17 +21,21 @@ assert(dashboard.includes('event.key === "Escape"') &&
 assert(dashboard.includes('$("libraryBatchMetadataDialog").returnValue = ""'),
   "a cancelled reopened dialog must never reuse a previous apply result");
 // Destructive and reversible batch actions say so, in every UI language.
-assert(dashboard.includes('uiTf("library.deleteCountConfirm"') &&
+// Deleting is confirmed in the library's own dialog, which says the deletion is permanent.
+assert(dashboard.includes('await confirmLibraryDelete(selectedLibraryRecords())') &&
+  dashboard.includes('"library.deleteDocumentsBody"') &&
   dashboard.includes('uiTf("library.archiveCountConfirm"'));
 {
   globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
   require("../src/ui/i18n");
-  assert.match(globalThis.T9UiI18n.translate("library.deleteCountConfirm", "sv-SE"),
-    /kan inte ångras/u);
+  assert.match(globalThis.T9UiI18n.translate("library.deleteDocumentsBody", "sv-SE"),
+    /går inte att ångra/u);
   assert.match(globalThis.T9UiI18n.translate("library.archiveCountConfirm", "sv-SE"),
     /kan ångras/u);
   for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
-    for (const key of ["library.deleteCountConfirm", "library.archiveCountConfirm"]) {
+    for (const key of ["library.deleteDocumentsTitle", "library.deleteDocumentsBody",
+      "library.deleteDocumentTitle", "library.deleteDocumentBody", "library.deleteConfirm",
+      "library.archiveCountConfirm"]) {
       assert.notEqual(globalThis.T9UiI18n.translate(key, locale), key, `${key} ${locale}`);
     }
   }

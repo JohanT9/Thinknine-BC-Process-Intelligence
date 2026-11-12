@@ -57,7 +57,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   entraClientId = "", entraAdminRole = "License.Administrator", adminEntraValidator = null,
   notificationWebhookUrl = "", notificationWebhookToken = "",
   notificationRecipient = "", notifier = null, tableAccountUrl = "",
-  managedIdentityClientId = "", migrateFromFiles = false, backupEnabled = false, adminUrl = "",
+  managedIdentityClientId = "", tableClientFactory = null, migrateFromFiles = false, backupEnabled = false, adminUrl = "",
   backupContainer = "license-backups", backupCredential = null, backupFetcher = null,
   trustProxy = false }) {
   await fs.mkdir(dataDirectory, { recursive: true, mode: 0o700 });
@@ -72,8 +72,10 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     try { await fs.writeFile(file, "{}\n", { flag: "wx", mode: 0o600 }); }
     catch (error) { if (error.code !== "EEXIST") throw error; }
   }
+  // tableClientFactory lets tests run the service against tables in memory.
   const storage = tableAccountUrl ? await createTableStorage({ accountUrl: tableAccountUrl,
-    managedIdentityClientId }) : null;
+    managedIdentityClientId, ...(tableClientFactory
+      ? { clientFactory: tableClientFactory, credential: {} } : {}) }) : null;
   async function optionalJson(file) {
     try { return JSON.parse(await fs.readFile(file, "utf8")); }
     catch (error) { if (error.code === "ENOENT") return {}; throw error; }
@@ -139,6 +141,31 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       : JSON.parse(await fs.readFile(deletedLicensesFile, "utf8"));
     if (!value || Array.isArray(value) || typeof value !== "object") throw new Error("Invalid deleted license registry");
     return value;
+  }
+  // A license check reads only the entries it needs. With table storage that is one request per
+  // entry, however many customers there are; each entry is checked as the whole register is.
+  function validTenantEntry(id, entry) {
+    if (entry !== undefined && (!GUID.test(id) || !entry || typeof entry.enabled !== "boolean" ||
+      !Number.isFinite(Date.parse(entry.expiresAt)))) throw new Error("Invalid tenant license entry");
+    return entry;
+  }
+  async function tenantLicense(id) {
+    return storage ? validTenantEntry(id, await storage.readOne("tenants", id)) : (await registry())[id];
+  }
+  async function trialClaim(id) {
+    if (!storage) return (await claims())[id];
+    const claim = await storage.readOne("claims", id);
+    if (claim !== undefined && (!claim || !/^[0-9a-f]{64}$/.test(claim.emailHash || ""))) {
+      throw new Error("Invalid trial claim");
+    }
+    return claim;
+  }
+  async function consultantLicense(id) {
+    if (!storage) return (await consultants())[id];
+    const entry = await storage.readOne("consultants", id);
+    if (entry !== undefined && (!entry || typeof entry.enabled !== "boolean" ||
+      !Number.isFinite(Date.parse(entry.expiresAt)))) throw new Error("Invalid consultant license entry");
+    return entry;
   }
   async function atomicWrite(file, value, backup = false) {
     if (backup) await fs.copyFile(file, file + ".backup");
@@ -256,11 +283,11 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     const operation = trialWrites.then(async () => {
       const normalizedEmail = email(v.email);
       const emailHash = crypto.createHash("sha256").update(normalizedEmail).digest("hex");
-      const allClaims = await claims(); const existing = allClaims[v.tenantId];
+      const existing = await trialClaim(v.tenantId);
       if (existing) {
         const error = new Error("trial-already-used"); error.status = 409; throw error;
       }
-      if ((await registry())[v.tenantId]) {
+      if (await tenantLicense(v.tenantId)) {
         const error = new Error("tenant-already-registered"); error.status = 409; throw error;
       }
       const requestedAt = new Date(now()).toISOString();
@@ -270,7 +297,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         if (current[v.tenantId]) { const error = new Error("trial-already-used"); error.status = 409; throw error; }
         return { updated: { ...current, [v.tenantId]: claim } };
       });
-      else await atomicWrite(claimsFile, { ...allClaims, [v.tenantId]: claim });
+      else await atomicWrite(claimsFile, { ...(await claims()), [v.tenantId]: claim });
       const license = await mutateRegistry(current => {
         if (current[v.tenantId]) { const error = new Error("tenant-already-registered"); error.status = 409; throw error; }
         const entry = { name: "Testlicens", ...(normalizedEmail ? { contactEmail: normalizedEmail } : {}), emailVerified: false,
@@ -291,7 +318,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     trialWrites = operation.catch(() => {}); return operation;
   }
   async function registerTenantUserIdentity(value, identity) {
-    const tenantEntry = (await registry())[value.tenantId];
+    const tenantEntry = await tenantLicense(value.tenantId);
     if (!tenantEntry?.enabled || Date.parse(tenantEntry.expiresAt) <= now()) {
       const error = new Error("tenant-license-inactive"); error.status = 403; throw error;
     }
@@ -418,13 +445,15 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         if (!validUsage(value, now())) return reply(400, { error: "invalid-request" });
         try {
           const identity = await validateEntra(request.headers.authorization || "");
-          const licenses = await consultants();
-          const consultant = licenses[identity.tid + ":" + ORGANIZATION_OBJECT_ID] ||
-            licenses[identity.tid + ":" + identity.oid];
+          const consultant = await consultantLicense(identity.tid + ":" + ORGANIZATION_OBJECT_ID) ||
+            await consultantLicense(identity.tid + ":" + identity.oid);
           const active = license => license?.enabled && Date.parse(license.expiresAt) > now();
-          const tenants = await registry();
-          const registered = Object.values(await tenantUsers()).some(user =>
-            user.entraTenantId === identity.tid && user.objectId === identity.oid && active(tenants[user.tenantId]));
+          // The tenant users are read only when no consultant license covers the user.
+          const registered = !active(consultant) && await (async () => {
+            const tenants = await registry();
+            return Object.values(await tenantUsers()).some(user => user.entraTenantId === identity.tid &&
+              user.objectId === identity.oid && active(tenants[user.tenantId]));
+          })();
           if (!active(consultant) && !registered) return reply(403, { error: "license-inactive" });
           return reply(200, await usage.record(identity, value));
         } catch (error) { const { status, body } = failure(error); return reply(status, body); }
@@ -474,9 +503,8 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         if (!validRequest(value)) return reply(400, { error: "invalid-request" });
         try {
           const identity = await validateEntra(request.headers.authorization || "");
-          const allConsultants = await consultants();
-          const entry = allConsultants[`${identity.tid}:${ORGANIZATION_OBJECT_ID}`] ||
-            allConsultants[`${identity.tid}:${identity.oid}`];
+          const entry = await consultantLicense(`${identity.tid}:${ORGANIZATION_OBJECT_ID}`) ||
+            await consultantLicense(`${identity.tid}:${identity.oid}`);
           const allowed = Boolean(entry?.enabled && Date.parse(entry.expiresAt) > now());
           const status = !entry ? "unregistered" : !entry.enabled
             ? (entry.requestedAt ? "pending" : "blocked")
@@ -505,11 +533,11 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         }
       }
       if (!validRequest(value)) return reply(400, { error: "invalid-request" });
-      const tenants = await registry(), entry = tenants[value.tenantId];
+      const entry = await tenantLicense(value.tenantId);
       const allowed = Boolean(entry?.enabled && Date.parse(entry.expiresAt) > now());
       const licenseStatus = !entry ? "unregistered" : !entry.enabled ? "blocked"
         : Date.parse(entry.expiresAt) <= now() ? "expired" : "active";
-      const trialAvailable = !entry && !(await claims())[value.tenantId];
+      const trialAvailable = !entry && !(await trialClaim(value.tenantId));
       await register(value);
       return reply(200, { tenantId: value.tenantId, allowed, trialAvailable,
         licenseStatus, licenseType: entry ? (entry.licenseType || "standard") : null,

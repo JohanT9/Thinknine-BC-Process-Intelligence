@@ -45,6 +45,17 @@ async function createTableStorage({ accountUrl, managedIdentityClientId = "",
     })) result.push(entity);
     return result;
   }
+  // Reads one entity by its key: one request, whatever the size of the table. Undefined when
+  // there is none.
+  async function readOne(name, key) {
+    try {
+      const entity = await clients.get(name).getEntity(PARTITION, escapeKey(key));
+      return JSON.parse(entity.json);
+    } catch (error) {
+      if (error?.statusCode === 404) return undefined;
+      throw error;
+    }
+  }
   async function readMap(name) {
     const result = {};
     for (const entity of await entries(name)) result[decodeKey(entity.rowKey)] = JSON.parse(entity.json);
@@ -121,7 +132,7 @@ async function createTableStorage({ accountUrl, managedIdentityClientId = "",
     }
     return { count: values.length, checksum: checksum(ordered(values)) };
   }
-  return Object.freeze({ readMap, mutateMap, createOnce, append, readList, importMap, importList,
+  return Object.freeze({ readOne, readMap, mutateMap, createOnce, append, readList, importMap, importList,
     tables: TABLES, mode: "table" });
 }
 

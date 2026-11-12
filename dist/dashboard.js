@@ -13,7 +13,7 @@ const DEFAULTS = {
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
-  environmentName: "ApteanAdvance",
+  environmentName: "",
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
@@ -521,129 +521,9 @@ function dataUrlBytes(dataUrl) {
   return result;
 }
 
-const CRC_TABLE = (() => {
-  const table = new Uint32Array(256);
-
-  for (let n = 0; n < 256; n += 1) {
-    let value = n;
-
-    for (let k = 0; k < 8; k += 1) {
-      value = (value & 1)
-        ? 0xedb88320 ^ (value >>> 1)
-        : value >>> 1;
-    }
-
-    table[n] = value >>> 0;
-  }
-
-  return table;
-})();
-
-function crc32(data) {
-  let crc = 0xffffffff;
-
-  for (const value of data) {
-    crc = CRC_TABLE[(crc ^ value) & 0xff] ^ (crc >>> 8);
-  }
-
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-function dosTime(value) {
-  const date = new Date(value || Date.now());
-  const year = Math.max(1980, date.getFullYear());
-
-  return {
-    time:
-      (date.getHours() << 11) |
-      (date.getMinutes() << 5) |
-      Math.floor(date.getSeconds() / 2),
-    date:
-      ((year - 1980) << 9) |
-      ((date.getMonth() + 1) << 5) |
-      date.getDate()
-  };
-}
-
-function u16(view, offset, value) {
-  view.setUint16(offset, value, true);
-}
-
-function u32(view, offset, value) {
-  view.setUint32(offset, value >>> 0, true);
-}
-
+// The export is packed by the shared zip writer.
 function zip(files) {
-  const locals = [];
-  const centrals = [];
-  let offset = 0;
-
-  for (const file of files) {
-    const name = bytes(file.name);
-    const data = file.data;
-    const crc = crc32(data);
-    const date = dosTime(file.modifiedAt);
-
-    const local = new Uint8Array(30 + name.length + data.length);
-    const localView = new DataView(local.buffer);
-
-    u32(localView, 0, 0x04034b50);
-    u16(localView, 4, 20);
-    u16(localView, 6, 0x0800);
-    u16(localView, 8, 0);
-    u16(localView, 10, date.time);
-    u16(localView, 12, date.date);
-    u32(localView, 14, crc);
-    u32(localView, 18, data.length);
-    u32(localView, 22, data.length);
-    u16(localView, 26, name.length);
-    u16(localView, 28, 0);
-    local.set(name, 30);
-    local.set(data, 30 + name.length);
-    locals.push(local);
-
-    const central = new Uint8Array(46 + name.length);
-    const centralView = new DataView(central.buffer);
-
-    u32(centralView, 0, 0x02014b50);
-    u16(centralView, 4, 20);
-    u16(centralView, 6, 20);
-    u16(centralView, 8, 0x0800);
-    u16(centralView, 10, 0);
-    u16(centralView, 12, date.time);
-    u16(centralView, 14, date.date);
-    u32(centralView, 16, crc);
-    u32(centralView, 20, data.length);
-    u32(centralView, 24, data.length);
-    u16(centralView, 28, name.length);
-    u16(centralView, 30, 0);
-    u16(centralView, 32, 0);
-    u16(centralView, 34, 0);
-    u16(centralView, 36, 0);
-    u32(centralView, 38, 0);
-    u32(centralView, 42, offset);
-    central.set(name, 46);
-    centrals.push(central);
-
-    offset += local.length;
-  }
-
-  const centralSize = centrals.reduce((sum, value) => sum + value.length, 0);
-  const end = new Uint8Array(22);
-  const endView = new DataView(end.buffer);
-
-  u32(endView, 0, 0x06054b50);
-  u16(endView, 4, 0);
-  u16(endView, 6, 0);
-  u16(endView, 8, files.length);
-  u16(endView, 10, files.length);
-  u32(endView, 12, centralSize);
-  u32(endView, 16, offset);
-  u16(endView, 20, 0);
-
-  return new Blob([...locals, ...centrals, end], {
-    type: "application/zip"
-  });
+  return new Blob([globalThis.T9Export.zipWriter.create(files)], { type: "application/zip" });
 }
 
 function rawPageCaption(event) {
@@ -2887,6 +2767,19 @@ function interpretLegacyCompatibility(input) {
     unmatchedKnowledgeItems: [] };
 }
 
+// The recording's events name their interaction and step group, which the response carries
+// once; each event is linked to them here.
+function linkSessionEvents(response) {
+  const interactions = new Map((response.normalizedEvents || []).map(item =>
+    [item.normalizedEventId, item]));
+  const groups = new Map((response.stepGroups || []).map(group => [group.stepGroupId, group]));
+  response.events = (response.events || []).map(({ normalizedInteractionRef, stepGroupRef,
+    ...event }) => ({ ...event,
+    normalizedInteraction: interactions.get(normalizedInteractionRef) || event.normalizedInteraction || null,
+    stepGroup: groups.get(stepGroupRef) || event.stepGroup || null }));
+  return response;
+}
+
 async function prepareSessionModel(session, options = {}) {
   await knowledgePacksReady;
   const response = await send({
@@ -2898,6 +2791,7 @@ async function prepareSessionModel(session, options = {}) {
   if (!response.ok) {
     throw new Error(response.error || uiT("Sessionen kunde inte läsas."));
   }
+  linkSessionEvents(response);
 
   const imagePaths = {};
   const screenshotData = {};
@@ -3025,6 +2919,7 @@ async function exportSession(session) {
   if (!response.ok) {
     throw new Error(response.error || uiT("Sessionen kunde inte läsas."));
   }
+  linkSessionEvents(response);
 
   const imagePaths = {};
   const imageFiles = [];
@@ -5878,8 +5773,10 @@ function buildDocumentProfileVariants(pipeline) {
         pipeline.semanticActionsDocument,
         profile
       );
+      // Written in the document's language, as the export pipeline does.
       const presentationDocument = globalThis.T9PresentationGrammar.process(
-        languageDocument
+        globalThis.T9DocumentLanguage.process(languageDocument,
+          pipeline.localizedDocument?.metadata?.documentLanguage)
       );
       const screenshotResult = globalThis.T9ScreenshotIntelligence.select(
         presentationDocument,
@@ -9175,6 +9072,7 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
     if (!isCurrent()) return;
     renderReview();
     applyReviewZoom({ persist: false, preservePosition: true });
+    updateInterpretationNotice();
     void loadReviewScreenshots(model, activeReview).then(() => {
       if (!isCurrent()) return;
       renderReview();
@@ -9233,6 +9131,7 @@ async function closeReview() {
   if (activeReviewSession && activeReview) {
     documentLibraryProgress.set(activeReviewSession.id, reviewProgressSummary(activeReview));
   }
+  $("reviewInterpretationNotice").hidden = true;
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
@@ -10078,6 +9977,57 @@ function showRegenerationPreview(preview) {
   }, { once: true }));
 }
 
+// A document made by an earlier version keeps its steps until the user looks at what today's
+// interpretation of the same recording would change. The review offers that when it differs,
+// and only when the existing preview could apply it safely. "Not now" hides the offer on this
+// device until the interpretation changes again.
+const INTERPRETATION_NOTICE_PREFIX = "bcps.interpretationNotice.";
+function interpretationFingerprint(preview) {
+  const source = JSON.stringify((preview.freshReview?.generatedTasks || []).map(task =>
+    [task.instruction || "", task.taskType || ""]));
+  let hash = 5381;
+  for (let index = 0; index < source.length; index += 1) {
+    hash = ((hash * 33) ^ source.charCodeAt(index)) >>> 0;
+  }
+  return `${preview.nextStepCount}:${hash.toString(36)}`;
+}
+function interpretationNoticeDismissed(sessionId, fingerprint) {
+  try { return localStorage.getItem(INTERPRETATION_NOTICE_PREFIX + sessionId) === fingerprint; }
+  catch { return false; }
+}
+function updateInterpretationNotice() {
+  const notice = $("reviewInterpretationNotice");
+  notice.hidden = true;
+  delete notice.dataset.fingerprint;
+  if (!activeReview || !activeReviewSession || !activeReviewModel?.businessTasks?.length) return;
+  let preview;
+  try {
+    preview = globalThis.T9ReviewRegeneration.preview(activeReview, activeReviewSession,
+      activeReviewModel.businessTasks);
+  } catch { return; }
+  const differences = preview.addedStepCount + preview.removedStepCount +
+    preview.changedStepCount + preview.mergeStepCount + preview.splitStepCount;
+  if (preview.blocked || !differences) return;
+  const fingerprint = interpretationFingerprint(preview);
+  if (interpretationNoticeDismissed(activeReviewSession.id, fingerprint)) return;
+  notice.dataset.fingerprint = fingerprint;
+  notice.hidden = false;
+}
+$("reviewInterpretationShow").addEventListener("click", async () => {
+  await runReviewRegeneration();
+  updateInterpretationNotice();
+  if ($("reviewInterpretationNotice").hidden) $("regenerateReview").focus();
+});
+$("reviewInterpretationLater").addEventListener("click", () => {
+  const notice = $("reviewInterpretationNotice");
+  try {
+    if (activeReviewSession && notice.dataset.fingerprint) localStorage.setItem(
+      INTERPRETATION_NOTICE_PREFIX + activeReviewSession.id, notice.dataset.fingerprint);
+  } catch { /* The offer then returns the next time the review opens. */ }
+  notice.hidden = true;
+  $("closeReview").focus();
+});
+
 async function runReviewRegeneration(selectedIds = null) {
   if (!activeReview || !activeReviewSession || !activeReviewModel) return;
   try {
@@ -10104,6 +10054,7 @@ async function runReviewRegeneration(selectedIds = null) {
     invalidateDocumentWorkspace();
     await saveActiveReview({ announce: false, render: false });
     renderReview();
+    updateInterpretationNotice();
     show(selectedIds
       ? uiTf("review.selectedRegenerated", { count: preview.nextStepCount })
       : uiTf("Dokumentationen har regenererats fr\u00e5n inspelningen. {before} steg blev {after}.",
@@ -10307,7 +10258,7 @@ async function runLibraryMenuAction(action, projectId, card) {
       $("librarySearch").focus();
       return;
     } else if (action === "delete") {
-      if (!confirm(uiTf("library.deleteSessionConfirm", { name: session.name }))) {
+      if (!await confirmLibraryDelete([record])) {
         focusCard();
         return;
       }
@@ -10559,9 +10510,37 @@ $("libraryBatchArchive").addEventListener("click", async () => {
     show(error.message, true);
   }
 });
+// Deleting documents is confirmed in the library's own dialog, as deleting a folder is. It
+// resolves true when the user chooses Delete and returns focus to where it was.
+function confirmLibraryDelete(records) {
+  const dialog = $("libraryDeleteDialog");
+  const single = records.length === 1;
+  $("libraryDeleteTitle").textContent = single
+    ? uiTf("library.deleteDocumentTitle", { name: records[0].title })
+    : uiTf("library.deleteDocumentsTitle", { count: records.length });
+  $("libraryDeleteBody").textContent = uiT(single
+    ? "library.deleteDocumentBody" : "library.deleteDocumentsBody");
+  const returnFocus = document.activeElement;
+  return new Promise(resolve => {
+    let confirmed = false;
+    const onSubmit = () => { confirmed = true; };
+    const onClick = event => { if (event.target.closest("[data-folder-cancel]")) dialog.close(); };
+    dialog.addEventListener("submit", onSubmit, { once: true });
+    dialog.addEventListener("click", onClick);
+    dialog.addEventListener("close", () => {
+      dialog.removeEventListener("submit", onSubmit);
+      dialog.removeEventListener("click", onClick);
+      if (returnFocus?.isConnected) returnFocus.focus();
+      resolve(confirmed);
+    }, { once: true });
+    dialog.showModal();
+    // Cancel has focus, so Enter does not delete by mistake.
+    dialog.querySelector("[data-folder-cancel]").focus();
+  });
+}
+
 $("libraryBatchDelete").addEventListener("click", async () => {
-  const count = documentLibrarySelection.selectedIds.length;
-  if (!confirm(uiTf("library.deleteCountConfirm", { count }))) return;
+  if (!await confirmLibraryDelete(selectedLibraryRecords())) return;
   const plan = globalThis.T9DocumentBatchOperations.remove(
     documentLibraryRecords, documentLibrarySelection
   );
