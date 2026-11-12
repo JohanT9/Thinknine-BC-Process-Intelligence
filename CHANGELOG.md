@@ -1,3 +1,5 @@
+## 4.7.255
+- Testing: A test is checked while you run it. Start the test in the panel beside Business Central and work as usual: each step you do is passed according to the recording, and a step where Business Central shows an error is failed with the message in its comment. The panel moves on to the next step by itself and shows the failed step when something goes wrong. Results set this way say "according to the recording" on the test page, in the protocol and in exported files, and you can change any of them; a result you choose yourself is never overwritten. Finish the test adds the screenshots and shows how many steps passed and failed.
 ## 4.7.254
 - Library: The ⋯ menu of a document shows its actions in one column again, one per line. Run test in the menu was placed in the document row's button column, which split the menu into several narrow columns with wrapped text.
 - Word export: Screenshots are shown in full again. The frame around a screenshot is as wide as the page's text, so Word no longer makes it narrower than the image and cuts off its right side.

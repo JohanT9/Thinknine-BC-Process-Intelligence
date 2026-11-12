@@ -300,11 +300,14 @@ assert.match(background, /const librarySession = \(\[key, value\]\) => key\.star
 assert.strictEqual((background.match(/\.filter\(librarySession\)/gu) || []).length, 2,
   "neither the session list nor the library shows a test recording");
 const compare = /async function compareTestRecording[\s\S]*?\r?\n\}\r?\n/u.exec(background)[0];
-assert.ok(compare.indexOf("applyRecordingCheck") < compare.lastIndexOf("await deleteSession(recordingId)"),
+// The recording is interpreted the same way while it is recorded and when it stops.
+const interpret = /async function checkTestRecording[\s\S]*?\r?\n\}\r?\n/u.exec(background)[0];
+assert.ok(compare.includes("await checkTestRecording(recordingId, run)"));
+assert.ok(compare.indexOf("applyRecordingResults") < compare.lastIndexOf("await deleteSession(recordingId)"),
   "the recording is removed only after the run keeps what it showed");
 assert.match(compare, /catch \(error\) \{\s*await withTestRun\(run\.testRunId, current => globalThis\.T9TestScript\.recordingCheckFailed\(/u,
   "a recording that could not be compared is kept for another try");
-assert.ok(compare.includes('maskValues: "secrets"'), "secrets are masked as in a bug report");
+assert.ok(interpret.includes('maskValues: "secrets"'), "secrets are masked as in a bug report");
 // Errors and screenshots from the recording.
 const contentScript = read("src/recorder/content.js");
 assert.match(contentScript, /const capturesErrors = state => Boolean\(state\?\.recording\) &&\s*\(state\.recordingPurpose === "bug-report" \|\| Boolean\(state\.testRunId\)\);/u,
@@ -313,7 +316,7 @@ assert.ok(!/recordingPurpose !== "bug-report"|recordingPurpose === "bug-report"\
   "error capture depends on one flag only");
 assert.match(background, /if \(!state\.recording \|\| \(session\?\.recordingPurpose !== "bug-report" && !session\?\.testRunId\)\) \{/u);
 assert.match(background, /if \(session\.recordingPurpose === "bug-report" \|\| session\.testRunId\) \{\s*await bcErrorEvidenceStore\.initialize\(id\);/u);
-assert.ok(compare.includes("await testRecordingErrors(recordingId, masked)") &&
+assert.ok(interpret.includes("await testRecordingErrors(recordingId, masked)") &&
   compare.includes("await testRecordingScreenshots(recordingId, recording, run, check, tasks, now)"));
 assert.ok(compare.indexOf("testRecordingScreenshots(") < compare.lastIndexOf("await deleteSession(recordingId)"),
   "the screenshots are copied before the recording is removed");
@@ -321,9 +324,21 @@ assert.match(compare, /shot\.source === "recording"/u, "only screenshots from an
 for (const source of [panelScript, pageScript]) {
   assert.ok(source.includes("script.failureFromSuggestion("), "a step is failed only on request");
 }
-assert.ok(compare.includes("{ repository: true }"),
+assert.ok(interpret.includes("{ repository: true }"),
   "the recording is interpreted as the document was, with the knowledge repository");
-assert.ok(!/status: "passed"/u.test(compare), "a comparison never sets a result");
+assert.ok(!/status: "passed"/u.test(compare + interpret),
+  "results are set only by the test model, never for a step the tester set");
+// While the test is recorded it is compared shortly after each recorded action, and the last
+// check waits for one still running, so a late check never replaces the final one.
+assert.match(background, /await saveSession\(session\);\s*if \(session\.testRunId\) scheduleLiveTestCheck\(recordingId\);/u);
+assert.match(background, /function scheduleLiveTestCheck\(recordingId\) \{\s*if \(liveTestCheck\.timer\) return;/u,
+  "at most one check is waiting, so a steady stream of actions is still compared");
+assert.match(compare, /^async function compareTestRecording\(recordingId\) \{\s*await settleLiveTestCheck\(\);/u);
+const live = /async function runLiveTestCheck[\s\S]*?\r?\n\}\r?\n/u.exec(background)[0];
+assert.match(live, /session\.status !== "recording"\) return;/u);
+assert.match(live, /\?\.status !== "recording"\) return;\s*await withTestRun\(run\.testRunId, current => globalThis\.T9TestScript\.applyRecordingResults\(\s*current, \{ \.\.\.check, live: true \}/u,
+  "a check finished after the recording stopped is not stored");
+assert.match(live, /catch \(error\) \{[\s\S]*liveCheckFailed\(/u, "a failed check while recording is shown, and recording goes on");
 assert.match(background, /value\?\.testRunId && runIds\.has\(value\.testRunId\)/u,
   "a kept test recording goes with the tested document");
 assert.ok(!/recordDocumentUsage\(/u.test(compare), "a test recording is not counted as a document");
@@ -419,6 +434,75 @@ assert.match(csvSv, /\r\n1;[^;]*;Ange 500 i Antal\.;Raden för 10000 finns\.;God
 assert.ok(csvSv.includes(`"'=HYPERLINK(""x""); ""fel"""`), "a formula is kept as text and quoted");
 const csvEn = script.csv({ ...prepared, documentLanguage: "en-US" }, key => ui.T9UiI18n.translate(key, "en-US"));
 assert.ok(csvEn.startsWith("\uFEFF#,Section,Step,"), csvEn.slice(0, 40));
+
+// A recording of the test sets results: a step done passes, a step Business Central showed
+// an error after fails with the message in its comment. The tester's own results stay.
+{
+  const base = script.normalize({ ...run, steps: [...run.steps, { ...run.steps[0], stepId: "step-own" }] });
+  const [one, two, three] = base.steps.map(step => step.stepId);
+  const own = script.updateStep(base, three, { status: "skipped" }, NOW);
+  const check = (states, error = "Antal måste vara positivt.") => ({ recordedSteps: 3,
+    steps: [[one, states[0]], [two, states[1]], [three, states[2]]].filter(([, state]) => state)
+      .map(([stepId, state]) => ({ stepId, state, instruction: "Inspelat",
+        ...(state === "failed" ? { error } : {}) })) });
+  const first = script.applyRecordingResults(own, { ...check(["done", "failed", "done"]), live: true }, NOW);
+  assert.deepStrictEqual(first.steps.map(step => [step.status, step.resultSource || ""]),
+    [["passed", "recording"], ["failed", "recording"], ["skipped", ""]]);
+  assert.strictEqual(first.steps[1].comment, "Antal måste vara positivt.");
+  assert.strictEqual(first.recordingCheck.live, true);
+  assert.strictEqual(script.summary(first).passed, 1);
+  // The label says the recording set it, in every export and on the pages.
+  assert.strictEqual(script.statusKey(first.steps[0]), "test.statusByRecording.passed");
+  assert.strictEqual(script.statusKey(first.steps[2]), "test.status.skipped");
+  assert.match(script.markdown(first, key => ui.T9UiI18n.translate(key, "sv-SE")),
+    /\| 1 \| [^\n]*\| Godkänd enligt inspelningen \|/u);
+  assert.match(script.csv(first, key => ui.T9UiI18n.translate(key, "en-US")), /;Failed according to the recording;/u);
+  // Checked again: the same error is not added twice; a step no longer found is untested
+  // again and the message it added is taken out; the tester's comment stays.
+  const kept = script.applyChanges(first, { steps: [{ stepId: two,
+    patch: { comment: "Testat med 0.\nAntal måste vara positivt." } }] }, NOW);
+  assert.strictEqual(kept.steps[1].resultSource, "recording", "a comment keeps the result the recording set");
+  const again = script.applyRecordingResults(kept, check(["done", "failed", "done"]), NOW);
+  assert.strictEqual(again.steps[1].comment, "Testat med 0.\nAntal måste vara positivt.");
+  assert.strictEqual(again.recordingCheck.live, undefined, "the check when the recording stops is the last one");
+  const lost = script.applyRecordingResults(again, check([null, "not-found", "done"]), NOW);
+  assert.deepStrictEqual(lost.steps.map(step => step.status), ["not-run", "not-run", "skipped"]);
+  assert.strictEqual(lost.steps[1].comment, "Testat med 0.");
+  assert.strictEqual(lost.steps[0].resultSource, undefined);
+  // A failed step that the recording later shows done passes, without the old message.
+  const fixed = script.applyRecordingResults(again, check(["done", "done", "done"]), NOW);
+  assert.deepStrictEqual([fixed.steps[1].status, fixed.steps[1].comment], ["passed", "Testat med 0."]);
+  // The tester's choice replaces a result the recording set, and the recording leaves it.
+  const chosen = script.updateStep(first, one, { status: "failed" }, NOW);
+  assert.strictEqual(chosen.steps[0].resultSource, undefined);
+  assert.strictEqual(script.applyRecordingResults(chosen, check(["done", "done", "done"]), NOW).steps[0].status, "failed");
+  // A page cannot claim that the recording set a result.
+  assert.strictEqual(script.applyChanges(run, { steps: [{ stepId: one, patch: { status: "passed",
+    resultSource: "recording" } }] }, NOW).steps[0].resultSource, undefined);
+  assert.strictEqual(script.normalize({ ...run, steps: [{ ...run.steps[0], resultSource: "recording" }] })
+    .steps[0].resultSource, undefined, "an untested step has no result to come from the recording");
+  // A new run starts untested; a failed check while recording is kept until the next one.
+  assert.ok(script.rerun(first, { testRunId: "run-9", now: NOW }).steps.every(step =>
+    step.status === "not-run" && !step.resultSource && !step.recordingError));
+  const failedLive = script.liveCheckFailed(first, NOW);
+  assert.strictEqual(failedLive.recordingCheck.liveFailed, true);
+  assert.strictEqual(failedLive.steps[0].status, "passed");
+  assert.strictEqual(script.applyRecordingResults(failedLive, { ...check(["done"]), live: true }, NOW)
+    .recordingCheck.liveFailed, undefined);
+}
+for (const key of ["test.statusByRecording.passed", "test.statusByRecording.failed", "test.recordingFinished",
+  "test.liveProgress", "test.livePassed", "test.liveFailed", "test.liveCheckFailed"]) {
+  for (const { locale } of languages.supported("ui")) {
+    const value = ui.T9UiI18n.translate(key, locale);
+    assert.notStrictEqual(value, key, `${locale} ${key}`);
+    if (locale !== "en-US") assert.notStrictEqual(value, ui.T9UiI18n.translate(key, "en-US"), `${locale} ${key}`);
+    for (const placeholder of ui.T9UiI18n.translate(key, "en-US").match(/\{\w+\}/gu) || []) {
+      assert.ok(value.includes(placeholder), `${locale} ${key} ${placeholder}`);
+    }
+  }
+}
+// The panel follows the test while it is recorded, without moving the focus.
+assert.match(panelScript, /function showExternalChange\(value\) \{\s*if \(follow\(value\)\) \{\s*showStep\(\);/u);
 
 // The library offers the test on documentation, not on bug reports or recordings.
 const libraryView = require("../src/ui/document-library-view");

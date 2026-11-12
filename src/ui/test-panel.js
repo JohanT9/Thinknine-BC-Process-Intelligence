@@ -55,7 +55,7 @@
     const jump = document.getElementById("stepJump");
     const options = value.steps.map(step => {
       const option = element("option", "", `${step.number}. ${step.instruction} (${
-        t("test.status." + step.status)})`);
+        t(script.statusKey(step))})`);
       option.value = String(step.number - 1);
       return option;
     });
@@ -104,7 +104,9 @@
     if (suggestion && value.recordingCheck?.checkedAt) {
       const note = element("p", "panel-suggestion");
       note.dataset.state = suggestion.state;
-      note.append(element("strong", "", t(SUGGESTION_KEYS[suggestion.state])));
+      // A result the recording set says so; the tester can choose another.
+      note.append(element("strong", "", t(script.byRecording(step) ? script.statusKey(step)
+        : SUGGESTION_KEYS[suggestion.state])));
       if (suggestion.state === "failed") {
         // Business Central's own message, as it was shown.
         note.append(element("span", "panel-suggestion-error", suggestion.error || t("test.errorNoMessage")));
@@ -251,6 +253,12 @@
       const text = element("p");
       text.append(element("span", "rec-dot"), document.createTextNode(t("test.recordingActive")));
       parts.push(text);
+      // How far the recording has come, as the latest check while recording found.
+      if (check.live && check.liveFailed) parts.push(element("p", "", t("test.liveCheckFailed")));
+      else if (check.live) {
+        parts.push(element("p", "", t("test.liveProgress", { total: value.steps.length,
+          done: value.steps.filter(step => ["done", "failed"].includes(step.recordingSuggestion?.state)).length })));
+      }
       button("stopTestRecording", t("test.stopRecording"), stopRecording);
     } else if (recorder.recording) {
       parts.push(element("p", "", t("test.recordingOther")));
@@ -259,8 +267,7 @@
       button("retryTestRecording", t("test.retryCompare"), retryCheck);
       button("startTestRecording", t("test.recordAgain"), startRecording);
     } else if (check.checkedAt) {
-      const done = value.steps.filter(step => step.recordingSuggestion?.state === "done").length;
-      parts.push(element("p", "", t("test.recordingCompared", { done, total: value.steps.length })));
+      parts.push(element("p", "", finishedText(value)));
       const failed = value.steps.filter(step => step.recordingSuggestion?.state === "failed").length;
       if (failed) parts.push(element("p", "", t("test.recordingFailedCount", { n: failed })));
       if (check.additional?.length) {
@@ -324,14 +331,19 @@
       client.accept(result.run);
       recorder = { recording: false, testRunId: "" };
       const value = run();
-      message.textContent = t("test.recordingCompared", { total: value.steps.length,
-        done: value.steps.filter(step => step.recordingSuggestion?.state === "done").length });
+      message.textContent = finishedText(value);
       showStep();
       showRecording(script.suggestedPasses(value).length ? "approveSuggested" : "startTestRecording");
     } catch (error) {
       message.textContent = errorText(error);
       await loadRecorderState();
     }
+  }
+  // What the recording set when the test was finished.
+  function finishedText(value) {
+    const set = status => value.steps.filter(step => script.byRecording(step) && step.status === status).length;
+    return t("test.recordingFinished", { passed: set("passed"), failed: set("failed"),
+      total: value.steps.length });
   }
   const stopRecording = button => finishCheck(button, { type: "T9_STOP_TEST_RECORDING" });
   const retryCheck = button => finishCheck(button, { type: "T9_RETRY_TEST_RECORDING_CHECK", testRunId });
@@ -476,10 +488,39 @@
     showStep(focusSelector);
   }
 
+  // While the test is recorded the panel follows it: when the recording passes the step shown,
+  // the next step without a result is shown; when Business Central showed an error, the
+  // failed step is shown so that the tester sees what happened. Focus stays where it is.
+  let recordedResults = new Map();
+  const recordedResult = step => script.byRecording(step) ? `${step.status}:${step.recordingError || ""}` : "";
+  function follow(value) {
+    const before = recordedResults;
+    recordedResults = new Map(value.steps.map(step => [step.stepId, recordedResult(step)]));
+    if (!(recorder.recording && recorder.testRunId === testRunId)) return false;
+    const changed = value.steps.filter(step => recordedResult(step) &&
+      before.get(step.stepId) !== recordedResult(step));
+    if (!changed.length) return false;
+    const failed = changed.find(step => step.status === "failed");
+    if (failed) {
+      current = failed.number - 1;
+      message.textContent = t("test.liveFailed", { n: failed.number });
+      return true;
+    }
+    const last = changed.at(-1);
+    message.textContent = t("test.livePassed", { n: last.number });
+    if (value.steps[current]?.status === "not-run" && current > last.number - 1) return false;
+    const next = value.steps.findIndex((step, index) => index >= last.number && step.status === "not-run");
+    if (next < 0 || next === current) return false;
+    current = next;
+    return true;
+  }
+
   // A change made on the full test page shows here unless it is the step being edited and
   // nothing in it changed.
   function showExternalChange(value) {
-    if (stepSignature(value, current) !== shownSignature) {
+    if (follow(value)) {
+      showStep();
+    } else if (stepSignature(value, current) !== shownSignature) {
       const active = document.activeElement;
       const focus = active && stepSection.contains(active) && active.id ? active.id : "";
       const selection = active?.id === "panelComment" ? [active.selectionStart, active.selectionEnd] : null;
@@ -508,6 +549,7 @@
     const title = document.getElementById("panelTitle");
     title.textContent = value.title;
     title.lang = value.documentLanguage.split("-")[0];
+    recordedResults = new Map(value.steps.map(step => [step.stepId, recordedResult(step)]));
     const firstOpen = value.steps.findIndex(step => step.status === "not-run");
     current = firstOpen >= 0 ? firstOpen : 0;
     showSaveState("saved");
