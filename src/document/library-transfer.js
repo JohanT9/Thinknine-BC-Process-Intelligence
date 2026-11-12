@@ -19,10 +19,12 @@
 (function (root, factory) {
   const folders = typeof module === "object" && module.exports
     ? require("./document-folders") : root.T9DocumentFolders;
-  const api = factory(folders);
+  const reviewFormat = typeof module === "object" && module.exports
+    ? require("../engine/review-storage-format") : root.T9ReviewStorageFormat;
+  const api = factory(folders, reviewFormat);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9LibraryTransfer = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (folderModel) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (folderModel, reviewFormat) {
   const FORMAT = "bc-process-studio-library";
   const FORMAT_VERSION = 1;
   const FILE_EXTENSION = ".bcps";
@@ -143,6 +145,14 @@
     return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, "0")).join("");
   }
 
+  // An entry as the file holds it. A review is written as it was saved, without the shared
+  // parts this version stores it with (engine/review-storage-format.js), so that every version
+  // reads the file and the same review gives the same digest however it is stored.
+  function transferValue(keys, key, value) {
+    return reviewFormat && typeof key === "string" && key.startsWith(keys.REVIEW_PREFIX)
+      ? reviewFormat.unpack(value) : value;
+  }
+
   // A digest of a document's entries that does not depend on their order.
   function entryDigest() {
     const parts = [];
@@ -158,7 +168,7 @@
     for (const [id, list] of owned) {
       if (!list.length) continue;
       const digest = entryDigest();
-      await readBatches(storage, list, (key, value) => digest.add(key, value));
+      await readBatches(storage, list, (key, value) => digest.add(key, transferValue(keys, key, value)));
       result.set(id, { digest: await digest.finish(), keys: list });
     }
     return result;
@@ -207,9 +217,10 @@
         const values = await storage.get(slice) || {};
         for (const key of slice) {
           if (!Object.hasOwn(values, key)) continue;
-          await digest.add(key, values[key]);
+          const value = transferValue(keys, key, values[key]);
+          await digest.add(key, value);
           count += 1;
-          yield JSON.stringify({ type: "entry", id, key, value: values[key] });
+          yield JSON.stringify({ type: "entry", id, key, value });
         }
       }
       entryTotal += count;

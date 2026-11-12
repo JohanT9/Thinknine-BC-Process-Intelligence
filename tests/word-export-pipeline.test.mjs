@@ -199,6 +199,21 @@ assert.ok(!fieldNoiseOutput.documentXml.includes("Sortera efter Tur Nr"));
 assert.strictEqual(output.taskCount, 2);
 assert.strictEqual(output.imageCount, 2);
 assert.strictEqual(output.theme.themeId, "thinknine");
+// A framed screenshot is exactly as wide as the page's text, with a fixed layout, so Word
+// cannot make the frame narrower than the image and cut off its right side.
+{
+  const frames = [...output.documentXml.matchAll(/<w:tbl>(?:(?!<\/w:tbl>).)*?<w:drawing>.*?<\/w:tbl>/gsu)]
+    .map(match => match[0]);
+  assert.strictEqual(frames.length, 2, "each screenshot is framed");
+  for (const frame of frames) {
+    const width = Number(frame.match(/<w:tblW w:type="dxa" w:w="(\d+)"\/>/u)?.[1]);
+    assert.ok(width > 9000 && width < 11906, `frame width ${width} is the page text width`);
+    assert.match(frame, new RegExp(`<w:gridCol w:w="${width}"/>`, "u"));
+    assert.match(frame, /<w:tblLayout w:type="fixed"\/>/u);
+    const imageWidth = Number(frame.match(/<wp:extent cx="(\d+)"/u)[1]) / 635;
+    assert.ok(imageWidth <= width, `image ${imageWidth} fits in frame ${width}`);
+  }
+}
 assert.ok(Object.isFrozen(output.qualityDiagnostics));
 assert.ok(Object.isFrozen(output.qualityDiagnostics.findings));
 assert.strictEqual(

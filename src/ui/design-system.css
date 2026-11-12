@@ -530,8 +530,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-results>.library-card>.library-card-footer{display:contents}
   .library-results>.library-card>.library-state{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center;margin-inline-end:var(--space8)}
   .library-results .library-favourite{grid-column:3}
-  .library-results .library-card-footer [data-library-action="run-test"]{grid-column:4}
-  .library-results .library-card-footer [data-library-action="open"]{grid-column:5;justify-self:stretch}
+  /* Only the row's own buttons: the same actions in the card's menu stay in the menu's column. */
+  .library-results .library-card-footer>[data-library-action="run-test"]{grid-column:4}
+  .library-results .library-card-footer>[data-library-action="open"]{grid-column:5;justify-self:stretch}
   .library-results .library-card-menu{grid-column:6}
 }
 .library-card-menu>summary{display:grid;place-items:center;min-width:36px;min-height:var(--controlHeight);border:1px solid transparent;border-radius:var(--radiusMedium);color:var(--colorTextSecondary);font-size:18px;line-height:1;list-style:none;cursor:pointer}

@@ -3462,6 +3462,7 @@ async function exportLibraryDocument(record, exportSettings) {
   }
   const model = await prepareSessionModel(session);
   const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
+  if (existing?.ok === false) throw new Error(reviewReadError(existing));
   const review = existing.review
     ? globalThis.T9Review.normalizeReview({
       ...existing.review,
@@ -3498,6 +3499,12 @@ async function exportLibraryDocument(record, exportSettings) {
 
 // A manual test from the document as it reads now: its steps in the document language,
 // with the user's edits. The run opens on its own page.
+// Why a stored review could not be read, in the interface language.
+function reviewReadError(response) {
+  return response?.code === "unsupported-review-format" ? uiT("review.newerFormat")
+    : response?.error || uiT("Granskningen kunde inte läsas.");
+}
+
 async function createTestRun(record, options = {}) {
   const session = documentLibrarySessions.get(record.projectId);
   if (!session || session.status === "recording" || session.recordingPurpose === "bug-report") {
@@ -3505,6 +3512,7 @@ async function createTestRun(record, options = {}) {
   }
   const model = await prepareSessionModel(session);
   const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
+  if (existing?.ok === false) throw new Error(reviewReadError(existing));
   const review = existing.review
     ? globalThis.T9Review.normalizeReview({
       ...existing.review,
@@ -8976,7 +8984,7 @@ async function openReview(session) {
     sessionId: session.id
   });
   if (reviewOpenRequestId !== requestId || activeReviewSession !== session) return;
-  if (existing?.ok === false) throw new Error(existing.error || uiT("Granskningen kunde inte läsas."));
+  if (existing?.ok === false) throw new Error(reviewReadError(existing));
   activeReview = existing.review
     ? globalThis.T9Review.normalizeReview({
       ...existing.review,

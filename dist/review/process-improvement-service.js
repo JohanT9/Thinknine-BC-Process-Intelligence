@@ -3,11 +3,18 @@
     ? require("./process-improvement-dataset") : root.T9ProcessImprovementDataset;
   const knowledgeFeedback = typeof module === "object" && module.exports
     ? require("./knowledge-feedback-learning") : root.T9KnowledgeFeedbackLearning;
-  const api = factory(dataset, knowledgeFeedback);
+  const storageFormat = typeof module === "object" && module.exports
+    ? require("../engine/review-storage-format") : root.T9ReviewStorageFormat;
+  const api = factory(dataset, knowledgeFeedback, storageFormat);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessImprovementService = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (dataset, knowledgeFeedback) {
+})(typeof globalThis !== "undefined" ? globalThis : this,
+function (dataset, knowledgeFeedback, storageFormat) {
   "use strict";
+  // A stored review as it was saved; one a newer version stored is left out.
+  function readStored(review) {
+    try { return storageFormat ? storageFormat.unpack(review) : review; } catch { return null; }
+  }
   const VERSION = "1.0.0";
   const DRAFTS_KEY = "t9_knowledge_rule_drafts";
   const object = value => value && typeof value === "object" && !Array.isArray(value);
@@ -53,7 +60,7 @@
       return { stored: stored || {}, reviews: Object.entries(stored || {})
         .filter(([key, value]) => key.startsWith(reviewPrefix) &&
           value && typeof value === "object")
-        .map(([, value]) => value) };
+        .map(([, value]) => readStored(value)).filter(Boolean) };
     }
     return Object.freeze({
       async read(options = {}) {

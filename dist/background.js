@@ -3,6 +3,7 @@ importScripts("engine/locale-catalogs.js");
 importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/storage-queries.js");
+importScripts("engine/review-storage-format.js");
 importScripts("engine/review-progress-store.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
@@ -3210,9 +3211,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const data = await chrome.storage.local.get(
           REVIEW_PREFIX + message.sessionId
         );
+        // Stored with each repeated part once (engine/review-storage-format.js). A review a
+        // newer version stored is refused instead of being read, and so never overwritten.
         sendResponse({
           ok: true,
-          review: data[REVIEW_PREFIX + message.sessionId] || null
+          review: globalThis.T9ReviewStorageFormat.unpack(
+            data[REVIEW_PREFIX + message.sessionId] || null)
         });
         break;
       }

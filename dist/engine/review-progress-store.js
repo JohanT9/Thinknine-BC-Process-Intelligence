@@ -1,14 +1,23 @@
 (function (root, factory) {
-  const api = factory();
+  const format = typeof module === "object" && module.exports
+    ? require("./review-storage-format") : root.T9ReviewStorageFormat;
+  const api = factory(format);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewProgressStore = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (format) {
   // The library shows how far each review has come. Reading every review for that took seconds
   // once reviews were large, so each review's progress is stored beside it under its own key,
   // written together with the review. Reviews saved before that are read once to fill it in.
   const VERSION = 1;
 
-  function progress(sessionId, review, isVisible) {
+  // A stored review as it was saved (engine/review-storage-format.js); null when a newer
+  // version stored it in a format this one cannot read.
+  function readStored(review) {
+    try { return format ? format.unpack(review) : review; } catch { return null; }
+  }
+
+  function progress(sessionId, stored, isVisible) {
+    const review = readStored(stored);
     const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
     const visible = tasks.filter(task => isVisible(task, review));
     return { version: VERSION, sessionId, total: visible.length,
@@ -28,9 +37,10 @@
       throw new TypeError("A storage area, both key prefixes and a visibility rule are required.");
     }
 
-    // The entries to write with a review: the review and its progress.
+    // The entries to write with a review: the review, stored with each repeated part once,
+    // and its progress.
     function entries(sessionId, review) {
-      return { [reviewPrefix + sessionId]: review,
+      return { [reviewPrefix + sessionId]: format ? format.pack(review) : review,
         [progressPrefix + sessionId]: progress(sessionId, review, isVisible) };
     }
 
@@ -39,7 +49,7 @@
       const key = progressPrefix + sessionId;
       const stored = (await storage.get(key))[key];
       if (valid(stored)) return stored.hasTasks;
-      const review = (await storage.get(reviewPrefix + sessionId))[reviewPrefix + sessionId];
+      const review = readStored((await storage.get(reviewPrefix + sessionId))[reviewPrefix + sessionId]);
       return Array.isArray(review?.tasks) && review.tasks.length > 0;
     }
 
@@ -74,5 +84,5 @@
     return { entries, hasTasks, list };
   }
 
-  return { VERSION, create, progress };
+  return { VERSION, create, progress, readStored };
 });
