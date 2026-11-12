@@ -55,6 +55,34 @@ Review → Review Projector → Semantic Document → Language Excellence
 The same localized Semantic Document and Document Plan feed the on-screen
 document and Word, preventing renderer-specific wording differences.
 
+### Step sentences
+
+`src/engine/step-text.js` is the one place where a generated step sentence is
+written. A step is described by its kind and the values it was recorded with
+(`stepText: { kind, action, page, … }` on the semantic action model), and every
+document language has its own template per kind; there is no translation of a
+Swedish sentence.
+
+- The interaction engine still writes its Swedish sentence (`displayText`), and
+  `parse` reads it back into a description. Only an exact match against a
+  template counts, and only when the description writes the very same sentence
+  again, so Swedish text is unchanged and any other sentence is never described.
+- The knowledge domain describes a step that starts a new record directly
+  (`create`/`createRecord`). Its page is the caption Business Central showed,
+  as for fields and actions; the record kind is written in the document
+  language.
+- Presentation Grammar writes the instruction of a described step in the
+  document language. Steps with their own structured wording (search,
+  selection of a customer, vendor or item, field entry, options, check boxes
+  and action paths) keep it. A step is written from its description only while
+  its instruction still is the described sentence in some language, so merged
+  or edited steps keep their text. Steps saved before descriptions existed are
+  read from their saved sentence when shown.
+- Captured captions and values are never translated. `tests/step-text.test.js`
+  checks every kind in every registered language; the capture-quality test
+  checks that recordings interpreted in Swedish or English read the same in
+  each document language.
+
 ## Compatibility
 
 The change is additive. No recording, Bug Report, or Semantic Document schema

@@ -7,11 +7,14 @@
     ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
   const clientCaptions = typeof module === "object" && module.exports
     ? require("./bc-client-captions") : root.T9BCClientCaptions;
-  const api = factory(consolidation, explanationCatalog, pageIdentification, clientCaptions);
+  const stepText = typeof module === "object" && module.exports
+    ? require("./step-text") : root.T9StepText;
+  const api = factory(consolidation, explanationCatalog, pageIdentification, clientCaptions,
+    stepText);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9KnowledgeDomain = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (consolidation, explanationCatalog, pageIdentification, clientCaptions) {
+function (consolidation, explanationCatalog, pageIdentification, clientCaptions, stepText) {
   "use strict";
   const VERSION = "2.3.0";
   const text = value => String(value || "");
@@ -218,61 +221,8 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
     return localized[tag] || localized[base] || rule?.instructionTemplate || "";
   }
 
-  const createdEntityNames = {
-    PurchaseOrder: { "sv-SE": "inköpsorder", "en-US": "purchase order", "fr-FR": "commande achat", "de-DE": "Einkaufsbestellung", "es-ES": "pedido de compra", "da-DK": "købsordre", "fi-FI": "ostotilaus", "nb-NO": "innkjøpsordre" },
-    SalesOrder: { "sv-SE": "försäljningsorder", "en-US": "sales order", "fr-FR": "commande vente", "de-DE": "Verkaufsauftrag", "es-ES": "pedido de venta", "da-DK": "salgsordre", "fi-FI": "myyntitilaus", "nb-NO": "salgsordre" },
-    PurchaseInvoice: { "sv-SE": "inköpsfaktura", "en-US": "purchase invoice", "fr-FR": "facture achat", "de-DE": "Einkaufsrechnung", "es-ES": "factura de compra", "da-DK": "købsfaktura", "fi-FI": "ostolasku", "nb-NO": "kjøpsfaktura" },
-    SalesInvoice: { "sv-SE": "försäljningsfaktura", "en-US": "sales invoice", "fr-FR": "facture vente", "de-DE": "Verkaufsrechnung", "es-ES": "factura de venta", "da-DK": "salgsfaktura", "fi-FI": "myyntilasku", "nb-NO": "salgsfaktura" },
-    ProductionOrder: { "sv-SE": "produktionsorder", "en-US": "production order", "fr-FR": "ordre de fabrication", "de-DE": "Fertigungsauftrag", "es-ES": "orden de producción", "da-DK": "produktionsordre", "fi-FI": "tuotantotilaus", "nb-NO": "produksjonsordre" },
-    WarehouseReceipt: { "sv-SE": "lagerinleverans", "en-US": "warehouse receipt", "fr-FR": "réception entrepôt", "de-DE": "Lagerwareneingang", "es-ES": "recepción de almacén", "da-DK": "lagerindlevering", "fi-FI": "varastovastaanotto", "nb-NO": "lagerinngående levering" },
-    QualityCheck: { "sv-SE": "kvalitetskontroll", "en-US": "quality check", "fr-FR": "contrôle qualité", "de-DE": "Qualitätsprüfung", "es-ES": "control de calidad", "da-DK": "kvalitetskontrol", "fi-FI": "laaduntarkastus", "nb-NO": "kvalitetskontroll" },
-    Customer: { "sv-SE": "kund", "en-US": "customer", "fr-FR": "client", "de-DE": "Kunde", "es-ES": "cliente", "da-DK": "kunde", "fi-FI": "asiakas", "nb-NO": "kunde" },
-    Vendor: { "sv-SE": "leverantör", "en-US": "vendor", "fr-FR": "fournisseur", "de-DE": "Lieferant", "es-ES": "proveedor", "da-DK": "leverandør", "fi-FI": "toimittaja", "nb-NO": "leverandør" },
-    Item: { "sv-SE": "artikel", "en-US": "item", "fr-FR": "article", "de-DE": "Artikel", "es-ES": "artículo", "da-DK": "vare", "fi-FI": "nimike", "nb-NO": "vare" },
-    SalesQuote: { "sv-SE": "försäljningsoffert", "en-US": "sales quote", "fr-FR": "devis de vente", "de-DE": "Verkaufsangebot", "es-ES": "oferta de venta", "da-DK": "salgstilbud", "fi-FI": "myyntitarjous", "nb-NO": "salgstilbud" },
-    PurchaseCreditMemo: { "sv-SE": "inköpskreditnota", "en-US": "purchase credit memo", "fr-FR": "avoir achat", "de-DE": "Einkaufsgutschrift", "es-ES": "abono de compra", "da-DK": "købskreditnota", "fi-FI": "ostohyvityslasku", "nb-NO": "kjøpskreditnota" },
-    TransferOrder: { "sv-SE": "överföringsorder", "en-US": "transfer order", "fr-FR": "ordre de transfert", "de-DE": "Umlagerungsauftrag", "es-ES": "orden de transferencia", "da-DK": "overførselsordre", "fi-FI": "siirtotilaus", "nb-NO": "overføringsordre" },
-    AssemblyOrder: { "sv-SE": "monteringsorder", "en-US": "assembly order", "fr-FR": "ordre d’assemblage", "de-DE": "Montageauftrag", "es-ES": "orden de ensamblado", "da-DK": "samleordre", "fi-FI": "kokoonpanotilaus", "nb-NO": "monteringsordre" },
-    ServiceOrder: { "sv-SE": "serviceorder", "en-US": "service order", "fr-FR": "ordre de service", "de-DE": "Serviceauftrag", "es-ES": "orden de servicio", "da-DK": "serviceordre", "fi-FI": "huoltotilaus", "nb-NO": "serviceordre" },
-    SalesCreditMemo: { "sv-SE": "försäljningskreditnota", "en-US": "sales credit memo", "fr-FR": "avoir vente", "de-DE": "Verkaufsgutschrift", "es-ES": "abono de venta", "da-DK": "salgskreditnota", "fi-FI": "myyntihyvityslasku", "nb-NO": "salgskreditnota" },
-    SalesReturnOrder: { "sv-SE": "försäljningsreturorder", "en-US": "sales return order", "fr-FR": "commande retour vente", "de-DE": "Verkaufsrücksendung", "es-ES": "devolución de venta", "da-DK": "salgsreturordre", "fi-FI": "myyntipalautustilaus", "nb-NO": "salgsreturordre" },
-    PurchaseReturnOrder: { "sv-SE": "inköpsreturorder", "en-US": "purchase return order", "fr-FR": "commande retour achat", "de-DE": "Einkaufsrücksendung", "es-ES": "devolución de compra", "da-DK": "købsreturordre", "fi-FI": "ostopalautustilaus", "nb-NO": "kjøpsreturordre" },
-    PurchaseQuote: { "sv-SE": "inköpsoffert", "en-US": "purchase quote", "fr-FR": "devis d’achat", "de-DE": "Einkaufsanfrage", "es-ES": "oferta de compra", "da-DK": "købstilbud", "fi-FI": "ostotarjous", "nb-NO": "kjøpstilbud" },
-    BankAccount: { "sv-SE": "bankkonto", "en-US": "bank account", "fr-FR": "compte bancaire", "de-DE": "Bankkonto", "es-ES": "cuenta bancaria", "da-DK": "bankkonto", "fi-FI": "pankkitili", "nb-NO": "bankkonto" },
-    GLAccount: { "sv-SE": "huvudbokskonto", "en-US": "G/L account", "fr-FR": "compte général", "de-DE": "Sachkonto", "es-ES": "cuenta contable", "da-DK": "finanskonto", "fi-FI": "pääkirjatili", "nb-NO": "hovedbokskonto" },
-    GeneralJournal: { "sv-SE": "redovisningsjournal", "en-US": "general journal", "fr-FR": "journal général", "de-DE": "Fibu Buch.-Blatt", "es-ES": "diario general", "da-DK": "finanskladde", "fi-FI": "yleinen päiväkirja", "nb-NO": "generell journal" },
-    PaymentJournal: { "sv-SE": "betalningsjournal", "en-US": "payment journal", "fr-FR": "journal de paiement", "de-DE": "Zahlungs Buch.-Blatt", "es-ES": "diario de pagos", "da-DK": "betalingskladde", "fi-FI": "maksupäiväkirja", "nb-NO": "betalingsjournal" },
-    CashReceiptJournal: { "sv-SE": "inbetalningsjournal", "en-US": "cash receipt journal", "fr-FR": "journal des encaissements", "de-DE": "Zahlungseingang Buch.-Blatt", "es-ES": "diario de cobros", "da-DK": "indbetalingskladde", "fi-FI": "kassakuittipäiväkirja", "nb-NO": "innbetalingsjournal" },
-    BankAccountReconciliation: { "sv-SE": "bankavstämning", "en-US": "bank account reconciliation", "fr-FR": "rapprochement bancaire", "de-DE": "Bankkontoabstimmung", "es-ES": "conciliación bancaria", "da-DK": "bankafstemning", "fi-FI": "pankkitilin täsmäytys", "nb-NO": "bankavstemming" },
-    PaymentReconciliationJournal: { "sv-SE": "betalningsavstämningsjournal", "en-US": "payment reconciliation journal", "fr-FR": "journal de rapprochement des paiements", "de-DE": "Zahlungsabstimmungs-Buch.-Blatt", "es-ES": "diario de conciliación de pagos", "da-DK": "betalingsafstemningskladde", "fi-FI": "maksujen täsmäytyspäiväkirja", "nb-NO": "betalingsavstemmingsjournal" },
-    WarehouseShipment: { "sv-SE": "lagerutleverans", "en-US": "warehouse shipment", "fr-FR": "expédition entrepôt", "de-DE": "Lagerlieferung", "es-ES": "envío de almacén", "da-DK": "lagerleverance", "fi-FI": "varastotoimitus", "nb-NO": "lagerutlevering" },
-    WarehousePick: { "sv-SE": "lagerplockning", "en-US": "warehouse pick", "fr-FR": "prélèvement entrepôt", "de-DE": "Lagerkommissionierung", "es-ES": "picking de almacén", "da-DK": "lagerpluk", "fi-FI": "varastokeräily", "nb-NO": "lagerplukk" },
-    WarehousePutAway: { "sv-SE": "lagerinlagring", "en-US": "warehouse put-away", "fr-FR": "rangement entrepôt", "de-DE": "Lager Einlagerung", "es-ES": "ubicación en almacén", "da-DK": "lagerindlagring", "fi-FI": "varastopaikoitus", "nb-NO": "lagerinnlagring" },
-    InventoryPick: { "sv-SE": "lagerplockning", "en-US": "inventory pick", "fr-FR": "prélèvement stock", "de-DE": "Lagerkommissionierung", "es-ES": "picking de inventario", "da-DK": "lagerpluk", "fi-FI": "varastokeräily", "nb-NO": "lagerplukk" },
-    WarehouseActivity: { "sv-SE": "lageraktivitet", "en-US": "warehouse activity", "fr-FR": "activité entrepôt", "de-DE": "Lageraktivität", "es-ES": "actividad de almacén", "da-DK": "lageraktivitet", "fi-FI": "varastotoiminto", "nb-NO": "lageraktivitet" },
-    ItemVariant: { "sv-SE": "artikelvariant", "en-US": "item variant", "fr-FR": "variante article", "de-DE": "Artikelvariante", "es-ES": "variante de artículo", "da-DK": "varevariant", "fi-FI": "nimikevariantti", "nb-NO": "varevariant" },
-    ItemCategory: { "sv-SE": "artikelkategori", "en-US": "item category", "fr-FR": "catégorie article", "de-DE": "Artikelkategorie", "es-ES": "categoría de producto", "da-DK": "varekategori", "fi-FI": "nimikekategoria", "nb-NO": "varekategori" }
-  };
-  const createInstructionTemplates = {
-    "sv-SE": (entity, action, page) => `Börja skapa en ny **${entity}** genom att välja **${action}** på sidan **${page}**.`,
-    "en-US": (entity, action, page) => `Start creating a new **${entity}** by selecting **${action}** on the **${page}** page.`,
-    "fr-FR": (entity, action, page) => `Sélectionnez **${action}** sur la page **${page}** pour créer un nouvel enregistrement (**${entity}**).`,
-    "de-DE": (entity, action, page) => `Wählen Sie auf der Seite **${page}** **${action}** aus, um einen neuen Datensatz (**${entity}**) zu erstellen.`,
-    "es-ES": (entity, action, page) => `Seleccione **${action}** en la página **${page}** para crear un nuevo registro (**${entity}**).`,
-    "da-DK": (entity, action, page) => `Begynd at oprette en ny **${entity}** ved at vælge **${action}** på siden **${page}**.`,
-    "fi-FI": (entity, action, page) => `Luo uusi tietue (**${entity}**) valitsemalla **${action}** sivulla **${page}**.`,
-    "nb-NO": (entity, action, page) => `Begynn å opprette en ny **${entity}** ved å velge **${action}** på siden **${page}**.`
-  };
-  const genericCreateInstructionTemplates = {
-    "sv-SE": (action, page) => `Börja skapa en ny post genom att välja **${action}** på sidan **${page}**.`,
-    "en-US": (action, page) => `Start creating a new record by selecting **${action}** on the **${page}** page.`,
-    "fr-FR": (action, page) => `Sélectionnez **${action}** sur la page **${page}** pour créer un nouvel enregistrement.`,
-    "de-DE": (action, page) => `Wählen Sie auf der Seite **${page}** **${action}** aus, um einen neuen Datensatz zu erstellen.`,
-    "es-ES": (action, page) => `Seleccione **${action}** en la página **${page}** para crear un nuevo registro.`,
-    "da-DK": (action, page) => `Begynd at oprette en ny post ved at vælge **${action}** på siden **${page}**.`,
-    "fi-FI": (action, page) => `Luo uusi tietue valitsemalla **${action}** sivulla **${page}**.`,
-    "nb-NO": (action, page) => `Begynn å opprette en ny post ved å velge **${action}** på siden **${page}**.`
-  };
+  // What a step creates, in each language: the same words as the step's own sentence.
+  const createdEntityNames = stepText.ENTITY_NAMES;
   function isNewActionCaption(value) {
     // Only enrich the literal New action. Other actions whose semantic type
     // starts with Create (for example creating a warehouse receipt from a
@@ -281,20 +231,32 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
     return /^(?:(?:ny(?:tt)?(?:\s+(?:post|order|faktura|kreditnota))?)|(?:new(?:\s+(?:record|order|invoice|credit memo))?)|(?:skapa ny|create new|nouveau|nouvelle|neu(?:e|er|es)?|nuevo|nueva|uusi|opret|opprett(?:e)?))$/iu
       .test(text(value).trim().replace(/\.$/u, ""));
   }
-  function contextualCreateInstruction(rule, task) {
-    if (!/^Create/u.test(String(rule?.taskType || rule?.semanticAction || ""))) return "";
-    const names = createdEntityNames[rule.entity || task.entity];
+  // The language a task was interpreted in, as one of the step text languages.
+  function taskLanguage(task) {
     const language = text(task.language || task.locale || task.context?.language || "sv-SE");
-    const locale = genericCreateInstructionTemplates[language] ? language :
-      genericCreateInstructionTemplates[language.split("-")[0]] ? language.split("-")[0] : "sv-SE";
+    return stepText.LOCALES.find(locale => locale === language) ||
+      stepText.LOCALES.find(locale => locale.split("-")[0] === language.split("-")[0]) || "sv-SE";
+  }
+
+  // The description of a step that starts a new record: what it creates, the action and the
+  // page as Business Central showed it, so the caption reads as on the reader's screen.
+  function contextualCreateStep(rule, task) {
+    if (!/^Create/u.test(String(rule?.taskType || rule?.semanticAction || ""))) return null;
     // The page is named without the record or the product title after it.
-    const page = clientCaptions.pageName(text(task.knowledgePageCaption || task.pageCaption ||
+    const page = clientCaptions.pageName(text(task.semanticActionModel?.pageCaption ||
+      task.capturedPageCaption || task.knowledgePageCaption || task.pageCaption ||
       task.context?.currentPageCaption || task.context?.previousPageCaption));
     const action = text(task.actionCaption);
-    if (!page || !isNewActionCaption(action)) return "";
-    if (!names) return genericCreateInstructionTemplates[locale](action, page);
-    const entity = names[locale] || names["en-US"];
-    return createInstructionTemplates[locale](entity, action, page);
+    if (!page || !isNewActionCaption(action)) return null;
+    const entity = rule.entity || task.entity;
+    return createdEntityNames[entity]
+      ? stepText.describe("create", { entity, action, page })
+      : stepText.describe("createRecord", { action, page });
+  }
+
+  function contextualCreateInstruction(rule, task) {
+    const described = contextualCreateStep(rule, task);
+    return described ? stepText.markdown(described, taskLanguage(task)) : "";
   }
 
   function explanationEligible(rule, task, availableRules = [], packs = []) {
@@ -432,7 +394,9 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
       const rule = found.rule;
       const instruction = localizedInstruction(rule, task.language || task.locale ||
         task.context?.language || task.context?.locale || "en-US");
-      const contextualInstruction = contextualCreateInstruction(rule, task);
+      const contextualStep = contextualCreateStep(rule, task);
+      const contextualInstruction = contextualStep
+        ? stepText.markdown(contextualStep, taskLanguage(task)) : "";
       const effectiveInstruction = contextualInstruction || instruction;
       const explanations = explanationEligible(rule, task, availableRules, packs)
         ? localizedExplanations(rule, task) : null;
@@ -452,7 +416,8 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
         ...(contextualInstruction ? { contextualInstruction,
           instruction: contextualInstruction, description: contextualInstruction,
           semanticActionModel: task.semanticActionModel ? {
-            ...task.semanticActionModel, displayText: contextualInstruction
+            ...task.semanticActionModel, displayText: contextualInstruction,
+            stepText: contextualStep
           } : task.semanticActionModel } : {}),
         ...(explanations ? { contextualExplanations: { ...explanations },
           contextualExplanationRuleId: rule.ruleId,
@@ -498,7 +463,9 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
         ...(contextualInstruction ? { instruction: contextualInstruction,
           description: contextualInstruction,
           semanticActionModel: task.semanticActionModel ? {
-            ...task.semanticActionModel, displayText: contextualInstruction
+            ...task.semanticActionModel, displayText: contextualInstruction,
+            stepText: matches.find(item => item.contextualInstruction === contextualInstruction)
+              ?.semanticActionModel?.stepText
           } : task.semanticActionModel } : {}),
         knowledgeMatched: true,
         knowledgeRule: matched.knowledgeRule,
@@ -524,5 +491,6 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions)
   return { VERSION, apply, match, ambiguousCandidates, pageEvidence, patternsMatch, rules, score, explanationEligible,
     localizedExplanations, localizedInstruction,
     contextualInstruction: contextualCreateInstruction,
+    contextualStep: contextualCreateStep,
     localizedExplanation };
 });

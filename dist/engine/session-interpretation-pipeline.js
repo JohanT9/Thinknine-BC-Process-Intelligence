@@ -315,6 +315,8 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
         explanationContext.language);
       const contextualInstruction = knowledge.contextualInstruction?.(rule,
         explanationContext) || "";
+      const contextualStep = contextualInstruction
+        ? knowledge.contextualStep?.(rule, explanationContext) || null : null;
       return { ...task, taskType: selected.taskType, semanticAction: selected.semanticAction,
         entity: selected.entity, knowledgeRule: ruleId,
         knowledgePackId: selected.provenance.packId,
@@ -327,7 +329,8 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
         ...(contextualInstruction ? { contextualInstruction,
           instruction: contextualInstruction, description: contextualInstruction,
           semanticActionModel: task.semanticActionModel ? {
-            ...task.semanticActionModel, displayText: contextualInstruction
+            ...task.semanticActionModel, displayText: contextualInstruction,
+            ...(contextualStep ? { stepText: contextualStep } : {})
           } : task.semanticActionModel } : {}),
         ...(() => {
           return { ...(instruction ? { userDirective: instruction,
