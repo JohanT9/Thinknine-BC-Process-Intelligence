@@ -215,6 +215,78 @@ assert.ok(!dashboardSource.includes("function detectContextEntity(pageCaption)")
 assert.ok(dashboardSource.includes("T9BCUIIdentification.identifyPage"));
 assert.ok(dashboardSource.includes("T9BCUIIdentification.identifyAction"));
 
+// AL names from the web client's controlname attribute. The recorder's function runs here on a
+// small stand-in for the page: Payment Terms > list > Code cell > input, and a button on the page.
+{
+  const source = contentSource.slice(contentSource.indexOf("const AL_PATH_LIMIT"),
+    contentSource.indexOf("function descriptor(element)"));
+  const clean = (value, max) => String(value || "").replace(/\s+/gu, " ").trim().slice(0, max);
+  const alControlNames = new Function("clean", `${source}; return alControlNames;`)(clean);
+  function node(attributes = {}, parent = null) {
+    const item = { attributes, parentElement: parent, children: [],
+      getAttribute: name => attributes[name] ?? null };
+    if (parent) parent.children.push(item);
+    item.closest = selector => {
+      assert.strictEqual(selector, "[controlname]");
+      for (let at = item; at; at = at.parentElement) if (at.attributes.controlname != null) return at;
+      return null;
+    };
+    item.querySelector = selector => {
+      assert.strictEqual(selector, "[controlname]");
+      const stack = [...item.children];
+      while (stack.length) {
+        const next = stack.shift();
+        if (next.attributes.controlname != null) return next;
+        stack.push(...next.children);
+      }
+      return null;
+    };
+    return item;
+  }
+  const page = node({ controlname: "Payment Terms" });
+  const grid = node({ role: "grid" }, page);
+  const cell = node({ role: "gridcell", controlname: "Code" }, grid);
+  const input = node({}, cell);
+  const toolbar = node({}, page);
+  const button = node({ role: "menuitem" }, toolbar);
+  assert.deepStrictEqual(alControlNames(input),
+    { alControlName: "Code", alControlPath: ["Code", "Payment Terms"] });
+  assert.deepStrictEqual(alControlNames(button),
+    { alControlName: "", alControlPath: ["Payment Terms"] },
+    "a button has no name of its own: the page around it is not the button's name");
+  assert.deepStrictEqual(alControlNames(node({})), {}, "no controlname: nothing is added");
+  assert.deepStrictEqual(alControlNames(null), {});
+
+  const field = identify({ pageId: "42", alControlName: "Sell-to Customer No.",
+    alControlPath: ["Sell-to Customer No.", "Sales Order"], elementId: "b3qee" });
+  assert.deepStrictEqual(field.control.identity,
+    { value: "Sell-to Customer No.", source: "controlname", stability: "explicit" },
+    "the AL name wins over the element id, which lasts one session");
+  assert.strictEqual(field.control.alName, "Sell-to Customer No.");
+  assert.deepStrictEqual(field.control.alPath, ["Sell-to Customer No.", "Sales Order"]);
+  assert.strictEqual(field.controlIdentity.alControlName, "Sell-to Customer No.");
+  assert.strictEqual(field.fieldIdentity.alFieldName, "Sell-to Customer No.");
+  assert.strictEqual(field.confidence.control, "exact");
+  const english = identify({ pageId: "42", alControlName: "Quantity", accessibleName: "Antal",
+    label: "Antal" });
+  assert.strictEqual(english.fieldIdentity.semanticHint, "Quantity");
+  const hint = identify({ pageId: "42", alControlName: "Sell-to Customer No.",
+    accessibleName: "Kund", label: "Kund" });
+  assert.strictEqual(hint.fieldIdentity.semanticHint, "Customer",
+    "the field rules read the AL name when the caption is not one they know");
+  const pageButton = identify({ pageId: "42", role: "menuitem", controlType: "button",
+    accessibleName: "Frisläpp", label: "Frisläpp", alControlName: "",
+    alControlPath: ["Sales Order"] });
+  assert.strictEqual(pageButton.fieldIdentity.alFieldName, undefined);
+  assert.strictEqual(pageButton.control.alName, undefined);
+  assert.deepStrictEqual(pageButton.control.alPath, ["Sales Order"]);
+  for (const value of [standard.control, standard.controlIdentity, standard.fieldIdentity]) {
+    for (const key of ["alName", "alPath", "alControlName", "alControlPath", "alFieldName"]) {
+      assert.ok(!(key in value), `older recordings are unchanged: no ${key}`);
+    }
+  }
+}
+
 const started = Date.now();
 for (let index = 0; index < 5000; index += 1) identify({ sourceSequence: index });
 assert.ok(Date.now() - started < 3000, "identification performance regression");

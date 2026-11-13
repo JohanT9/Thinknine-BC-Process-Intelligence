@@ -408,3 +408,26 @@ const rewritten = script.create({ metadata: { title: "Inköp", documentLanguage:
 assert.deepStrictEqual(rewritten.steps[0].signature, { taskType: "SelectVendor", pageObjectId: "50",
   pageCaption: "ny - inköpsorder", controlId: "", fieldCaption: "leverantörsnamn", actionCaption: "" });
 console.log("Test recording match: a test from a rewritten document passed.");
+
+// The field's AL name from the web client (controlname) is the same in Swedish and English and
+// in every session: a test and a recording that only share it still match, step by step.
+{
+  const named = (taskType, alControlName, fieldCaption) => ({ taskType, pageObjectId: "4",
+    knowledgeObjectRef: { objectId: "4" }, knowledgeControlRef: { alControlName },
+    pageCaption: "", fieldCaption, actionCaption: "" });
+  const expected = [named("FillField", "Code", "Kod"),
+    named("FillField", "Due Date Calculation", "Förfallodatumformel")];
+  const alSteps = expected.map((value, index) => ({ stepId: `block:step:al-${index + 1}`,
+    signature: matcher.signature(value) }));
+  assert.strictEqual(alSteps[0].signature.alControlName, "Code");
+  const run = matcher.match(alSteps, [named("FillField", "Code", "Code"),
+    named("FillField", "Due Date Calculation", "Due Date Calculation")]);
+  assert.deepStrictEqual(run.steps.map(step => step.state), ["done", "done"]);
+  const other = matcher.match(alSteps, [named("FillField", "Description", "Description"),
+    named("FillField", "Discount %", "Discount %")]);
+  assert.ok(other.steps.every(step => step.state !== "done"),
+    "other AL names and other captions do not match");
+  assert.strictEqual(matcher.signature(task("FillField", "4", "Field-Code")).alControlName,
+    undefined, "a step without an AL name keeps its signature as before");
+  console.log("Test recording match: AL names match across languages passed.");
+}

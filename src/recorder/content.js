@@ -980,6 +980,32 @@
     } catch { return undefined; }
   }
 
+  // The AL names Business Central's web client writes in the attribute controlname: a field's
+  // cell or box carries the field's control name ("Sell-to Customer No.", "Quantity"), and a
+  // part or page around it carries its own ("Sales Order Subform", "Sales Order"). They do not
+  // depend on the language Business Central is shown in, and they are the names Page Scripting
+  // uses. alControlPath lists them from the element outwards. alControlName is the field's
+  // name: the nearest one, when that element holds no other named control, as a part or a page
+  // does. Buttons and lists carry no name of their own, so a button's nearest name is the page
+  // around it and alControlName stays empty.
+  const AL_PATH_LIMIT = 12;
+  function alControlNames(element) {
+    const path = [];
+    let leaf = "";
+    try {
+      let node = element?.closest?.("[controlname]");
+      for (let index = 0; node && path.length < AL_PATH_LIMIT; index += 1) {
+        const name = clean(node.getAttribute("controlname") || "", 180);
+        if (name) {
+          if (index === 0 && !node.querySelector("[controlname]")) leaf = name;
+          path.push(name);
+        }
+        node = node.parentElement?.closest?.("[controlname]");
+      }
+    } catch {}
+    return path.length ? { alControlName: leaf, alControlPath: path } : {};
+  }
+
   function descriptor(element) {
     const bounds = element?.getBoundingClientRect?.();
     const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
@@ -1031,7 +1057,9 @@
       });
     }
     const captureSurface = surfaceSignals(element);
+    const alNames = alControlNames(element);
     return {
+      ...alNames,
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
       controlKind: dialog &&
