@@ -64,4 +64,18 @@ const other = steps([type("isbergss", 0), choose("30043", 0.02), saved(0.1, `fra
 assert.ok(other.length > once.length, "choosing another row after the first was saved is kept");
 const later = steps([type("isbergss", 0), choose("30043", 0.02), choose("30043", 5)]);
 assert.ok(later.length > once.length, "choosing the row again later is kept");
+// A line clicked right before an action on it is marked for that action, not chosen: recorded
+// on a purchase order, the line 30043 was clicked and then Rad → Tillämpat inköpspris och rabatt
+// used. Leaving the cell made Nr report the 30043 it already showed. Before, that was "Välj
+// posten 30043" and "Välj artikel 30043".
+const marked = steps(require("./fixtures/repeated-choice/row-marked-for-line-action.json"));
+assert.deepStrictEqual(marked.map(task => task.instruction), [
+  "Markera raden **30043** på sidan **Inköpsorder**.",
+  "Välj **Rad** → **Tillämpat inköpspris och rabatt** på sidan **Inköpsorder**."
+], "a line marked for an action is one step and says so");
+// A line clicked without an action after it is still a choice.
+const chosen = steps(require("./fixtures/repeated-choice/row-marked-for-line-action.json")
+  .filter(event => event.role !== "menuitem" && event.type !== "dialog-open"));
+assert.ok(chosen.every(task => !/^Markera raden/u.test(task.instruction)),
+  "a line not followed by an action is not described as marked");
 console.log("Repeated choice tests passed.");

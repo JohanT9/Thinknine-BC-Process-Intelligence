@@ -589,6 +589,46 @@ assert.ok(Date.now() - started < 5000, "large grouping regression");
   assert.strictEqual(run([button("e1", 0), button("e2", 400)]).groups.length, 2);
 }
 
+// Typing that is replaced by other typing in the same field, without a choice or a result in
+// between, was abandoned: on a purchase order line "300043" was typed in Nr and then replaced
+// by "isber". Only the later typing is a step; the earlier stays as supporting evidence.
+{
+  const at = ms => new Date(Date.parse("2026-11-13T09:00:00.000Z") + ms).toISOString();
+  const nr = { identity: { value: "No." }, caption: "Nr" };
+  const type = (id, value, ms, subtype = "input") => event(id, "value-change", { subtype,
+    interactionId: id, interactionIds: [id], timestamp: at(ms), controlIdentification: nr,
+    value: { normalized: value } });
+  const replaced = run([type("t1", "300043", 0), type("t2", "isber", 3000)]);
+  assert.deepStrictEqual(replaced.groups.map(group => group.sourceEventIds.map(id => id.slice(7))),
+    [["t2"]], "abandoned typing is not a step");
+  assert.deepStrictEqual(replaced.supportingEvents.filter(item => item.reason === "replaced-typing")
+    .map(item => item.normalizedEventId), ["normalized:t1"]);
+  // Typing with a result in between, or long before, stays its own step.
+  assert.strictEqual(run([type("u1", "300043", 0), event("u2", "status-message", {
+    timestamp: at(100), controlIdentification: { caption: "Sparar ..." } }),
+  type("u3", "isber", 3000)]).groups.length, 3);
+  assert.strictEqual(run([type("v1", "300043", 0), type("v2", "isber", 20000)]).groups.length, 2);
+  // When the field says it held the earlier text before the new typing, that text was entered:
+  // "5", then "50" from 5, is two entries.
+  assert.ok(!run([type("w1", "5", 0), { ...type("w2", "50", 2000),
+    previousValue: { raw: "5", normalized: "5" } }]).supportingEvents
+    .some(item => item.reason === "replaced-typing"), "entered typing is not replaced");
+
+  // Clicking a cell and leaving it makes the field report the value it already showed: that
+  // changed nothing and is not a step. Another value, or a value reported later, is kept.
+  const cell = (id, value, ms) => event(id, "selection-change", { interactionId: id,
+    interactionIds: [id], timestamp: at(ms), controlIdentification: { controlType: "listRow",
+      caption: value }, selection: { value, caption: value } });
+  const echo = run([cell("c1", "30043", 0), type("c2", "30043", 400, "focusout")]);
+  assert.strictEqual(echo.groups.length, 1, "the value shown again on leaving is not a step");
+  assert.ok(echo.supportingEvents.some(item => item.normalizedEventId === "normalized:c2" &&
+    item.reason === "unchanged-value-on-leave"));
+  assert.strictEqual(run([cell("d1", "30043", 0), type("d2", "30044", 400, "focusout")])
+    .groups.length, 2);
+  assert.strictEqual(run([cell("e1", "30043", 0), type("e2", "30043", 3000, "focusout")])
+    .groups.length, 2);
+}
+
 // The client redraws the page after a commit and then shows the validated value: 1500 becomes
 // 1 500. The redraw has no interaction and does not end the field edit, so it is one step.
 {

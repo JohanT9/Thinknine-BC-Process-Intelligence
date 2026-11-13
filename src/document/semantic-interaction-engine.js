@@ -1645,6 +1645,22 @@ function (sourceReference, captions, stepText) {
         /^.+\s+Lists\s+[\uE000-\uF8FF]+$/u.test(text(value.selectedCaption)),
       actionType: () => "OpenPage",
       display: value => `Välj **${text(value.selectedCaption).replace(/\s+Lists\s+[\uE000-\uF8FF]+$/u, "")}**.` }),
+    // A click on a cell that Business Central did not answer, followed by an action on the same
+    // page, put the cursor on that row for the action: a document line before Rad → … It chose
+    // no record, so it is not written as one.
+    singleRule({ ruleId: "row-selection", priority: 53,
+      match: (value, context) => {
+        const next = context?.interactions?.[context.index + 1];
+        const answered = (value?.stepGroups || []).some(group => (group.normalizedEvents || [])
+          .some(event => ["status-message", "navigation", "dialog-open", "error-outcome",
+            "value-change"].includes(event.kind)));
+        return value?.taskType === "Select" && value?.targetControl?.role === "gridcell" &&
+          Boolean(meaningfulValue(value)) && !answered &&
+          ["RunAction", "RunActionPath", "ClickAction"].includes(next?.taskType) &&
+          pageDescriptor(value).identity && pageDescriptor(value).identity === pageDescriptor(next).identity;
+      },
+      actionType: () => "SelectRecord",
+      display: (_value, selected) => `Markera raden **${selected}**.` }),
     singleRule({ ruleId: "record-selection", priority: 52,
       match: value => value?.taskType === "Select" &&
         Boolean(meaningfulValue(value)),

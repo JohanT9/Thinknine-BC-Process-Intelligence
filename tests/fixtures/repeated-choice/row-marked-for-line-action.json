@@ -1,0 +1,279 @@
+[
+  {
+    "type": "click",
+    "role": "gridcell",
+    "category": "selection",
+    "controlType": "td",
+    "inputType": "",
+    "label": "30043",
+    "accessibleName": "30043",
+    "selectedValue": "30043",
+    "ariaHasPopup": "",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "repeater"
+      },
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "row"
+      }
+    ],
+    "interactionId": "frame:i1",
+    "timestamp": "2026-11-13T12:34:19.879Z",
+    "elementId": "",
+    "sourceSequence": 84,
+    "eventNo": 102,
+    "readOnly": false,
+    "disabled": false,
+    "clientX": 355,
+    "clientY": 779,
+    "pointerTarget": true
+  },
+  {
+    "type": "focus",
+    "role": "combobox",
+    "category": "lifecycle",
+    "controlType": "input",
+    "inputType": "text",
+    "label": "Nr",
+    "accessibleName": "Nr",
+    "value": "",
+    "ariaHasPopup": "grid",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "repeater"
+      },
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "row"
+      }
+    ],
+    "rowTypeContext": {
+      "caption": "Typ",
+      "rowId": "1",
+      "schemaVersion": 1,
+      "source": "same-row-type",
+      "value": "Artikel"
+    },
+    "interactionId": "frame:i2",
+    "timestamp": "2026-11-13T12:34:20.046Z",
+    "elementId": "b81nee",
+    "sourceSequence": 85,
+    "eventNo": 103,
+    "readOnly": false,
+    "disabled": false
+  },
+  {
+    "type": "field-change",
+    "role": "combobox",
+    "category": "field",
+    "controlType": "input",
+    "inputType": "text",
+    "inputSource": "focusout",
+    "fieldName": "Nr",
+    "label": "Nr",
+    "accessibleName": "Nr",
+    "value": "30043",
+    "previousValue": "",
+    "ariaHasPopup": "grid",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "repeater"
+      },
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "row"
+      }
+    ],
+    "rowTypeContext": {
+      "caption": "Typ",
+      "rowId": "1",
+      "schemaVersion": 1,
+      "source": "same-row-type",
+      "value": "Artikel"
+    },
+    "interactionId": "frame:i2",
+    "timestamp": "2026-11-13T12:34:20.227Z",
+    "elementId": "b81nee",
+    "sourceSequence": 86,
+    "eventNo": 104,
+    "readOnly": false,
+    "disabled": false
+  },
+  {
+    "type": "focus",
+    "role": "combobox",
+    "category": "lifecycle",
+    "controlType": "input",
+    "inputType": "text",
+    "label": "Nr",
+    "accessibleName": "Nr",
+    "value": "30043",
+    "ariaHasPopup": "grid",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "repeater"
+      },
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "row"
+      }
+    ],
+    "rowTypeContext": {
+      "caption": "Typ",
+      "rowId": "1",
+      "schemaVersion": 1,
+      "source": "same-row-type",
+      "value": "Artikel"
+    },
+    "interactionId": "frame:i2",
+    "timestamp": "2026-11-13T12:34:20.376Z",
+    "elementId": "b81nee",
+    "sourceSequence": 87,
+    "eventNo": 105,
+    "readOnly": false,
+    "disabled": false
+  },
+  {
+    "type": "click",
+    "role": "combobox",
+    "category": "interaction",
+    "controlType": "input",
+    "inputType": "text",
+    "label": "Nr",
+    "accessibleName": "Nr",
+    "ariaHasPopup": "grid",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "repeater"
+      },
+      {
+        "caption": "",
+        "heuristic": false,
+        "identity": "",
+        "type": "row"
+      }
+    ],
+    "rowTypeContext": {
+      "caption": "Typ",
+      "rowId": "1",
+      "schemaVersion": 1,
+      "source": "same-row-type",
+      "value": "Artikel"
+    },
+    "interactionId": "frame:i3",
+    "timestamp": "2026-11-13T12:34:20.523Z",
+    "elementId": "b81nee",
+    "sourceSequence": 88,
+    "eventNo": 106,
+    "readOnly": false,
+    "disabled": false,
+    "clientX": 0,
+    "clientY": 0,
+    "pointerTarget": true
+  },
+  {
+    "type": "click",
+    "role": "menuitem",
+    "category": "action",
+    "controlType": "button",
+    "inputType": "button",
+    "label": "Rad",
+    "accessibleName": "Rad",
+    "ariaHasPopup": "true",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [],
+    "interactionId": "frame:i4",
+    "timestamp": "2026-11-13T12:34:21.030Z",
+    "elementId": "commandBarItemButton7736",
+    "sourceSequence": 89,
+    "eventNo": 107,
+    "readOnly": false,
+    "disabled": false,
+    "clientX": 284,
+    "clientY": 610,
+    "pointerTarget": true
+  },
+  {
+    "type": "click",
+    "role": "menuitem",
+    "category": "action",
+    "controlType": "button",
+    "inputType": "button",
+    "label": "Tillämpat inköpspris och rabatt",
+    "accessibleName": "Tillämpat inköpspris och rabatt",
+    "ariaHasPopup": "",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [],
+    "interactionId": "frame:i5",
+    "timestamp": "2026-11-13T12:34:26.108Z",
+    "elementId": "commandBarItemButton8539",
+    "sourceSequence": 90,
+    "eventNo": 108,
+    "readOnly": false,
+    "disabled": false,
+    "clientX": 1419,
+    "clientY": 650,
+    "pointerTarget": true
+  },
+  {
+    "type": "dialog-open",
+    "role": "dialog",
+    "category": "dialog",
+    "controlType": "form",
+    "inputType": "",
+    "label": "Tillämpat inköpspris och rabatt",
+    "accessibleName": "Tillämpat inköpspris och rabatt",
+    "ariaHasPopup": "",
+    "pageId": "50",
+    "pageCaption": "Inköpsorder",
+    "uiHierarchy": [
+      {
+        "caption": "Tillämpat inköpspris och rabatt",
+        "type": "dialog"
+      }
+    ],
+    "interactionId": "frame:i5",
+    "timestamp": "2026-11-13T12:34:26.857Z",
+    "elementId": "b8sp_form",
+    "sourceSequence": 91,
+    "eventNo": 109,
+    "readOnly": false,
+    "disabled": false
+  }
+]
