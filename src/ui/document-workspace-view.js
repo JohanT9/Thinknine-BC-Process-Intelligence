@@ -190,12 +190,21 @@
         image.className = "document-workspace-page-logo";
         element.appendChild(image);
       }
-      if (band.value.company) {
-        element.appendChild(textElement(documentValue, "strong", band.value.company,
-          "document-workspace-page-company"));
+      const headerBand = band.value.band;
+      element.classList.toggle("is-banded", Boolean(headerBand));
+      if (headerBand) {
+        element.style.backgroundColor = headerBand.fillColor;
+        element.style.color = headerBand.textColor;
+        element.appendChild(textElement(documentValue, "strong", headerBand.text,
+          "document-workspace-page-title"));
+      } else {
+        if (band.value.company) {
+          element.appendChild(textElement(documentValue, "strong", band.value.company,
+            "document-workspace-page-company"));
+        }
+        element.appendChild(textElement(documentValue, "span", band.value.title,
+          "document-workspace-page-title"));
       }
-      element.appendChild(textElement(documentValue, "span", band.value.title,
-        "document-workspace-page-title"));
     } else {
       element.appendChild(textElement(documentValue, "span", band.value.text, ""));
     }
