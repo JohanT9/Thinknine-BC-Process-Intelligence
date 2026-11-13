@@ -72,4 +72,13 @@ assert.strictEqual(secondCard.dataset.selected, "true");
 assert.strictEqual(secondCard.checkbox.checked, true);
 assert.strictEqual(secondCard.tabIndex, 0);
 assert.strictEqual(secondCard.attributes["aria-current"], "true");
+// A document's row names the template it follows; a bug report has no template.
+const templateLabel = item => `Template: ${item.theme.displayName} <copy>`;
+const templated = view.card(record, false, true, "en-US", null, null, { templateLabel });
+assert(templated.includes('<span class="library-template">Template: BC Process Studio &lt;copy&gt;</span>'),
+  "the template is named on the row and escaped");
+assert(!view.card(record, false, true, "en-US").includes("library-template"),
+  "without a template label the row is as before");
+assert(!view.card(bugRecord, false, true, "en-US", null, null, { templateLabel })
+  .includes("library-template"), "a bug report's row names no template");
 console.log("Document Library view and accessibility tests passed.");

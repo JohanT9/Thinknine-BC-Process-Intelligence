@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.31.0";
+  const GROUPING_VERSION = "1.32.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
@@ -471,6 +471,29 @@
     const selected = selectedValue(row); const committed = event.value?.normalized;
     return selected != null && committed != null && String(selected) === String(committed);
   }
+  // A row of a lookup list is a link whose name ends with the row's value in quotes, after the
+  // list's own text: Nr, sorterade i Stigande order Välj posten "10247". Without the value the
+  // name is the same for every row of that list, in any language.
+  const RECORD_CHOICE_VALUE = /s*["“][^"“”]+["”]s*$/u;
+  function recordChoiceList(event) {
+    if (event?.kind !== "activation") return "";
+    const caption = observedCaption(event, "control");
+    return RECORD_CHOICE_VALUE.test(caption) ? caption.replace(RECORD_CHOICE_VALUE, "").trim() : "";
+  }
+  // A click on a row that Business Central did not answer, followed by another click in the same
+  // list, did not choose anything: the list was still being drawn or the click missed. The later
+  // choice is the step. An unanswered click on another row is kept as supporting evidence; an
+  // unanswered click on the same row joins the answered one, as one choice with both clicks.
+  const REPEATED_RECORD_CHOICE_MS = 4000;
+  function unansweredRecordChoice(events, event) {
+    const [first] = events;
+    const list = recordChoiceList(first);
+    return events.length === 1 && Boolean(list) && list === recordChoiceList(event) &&
+      pageKey(first) === pageKey(event) && elapsed(first, event) <= REPEATED_RECORD_CHOICE_MS;
+  }
+  function sameRecordChoice(first, event) {
+    return observedCaption(first, "control") === observedCaption(event, "control");
+  }
   function sameActivation(events, event) {
     const origin = events?.[0];
     return origin?.kind === "activation" && event.kind === "activation" &&
@@ -562,6 +585,19 @@
           ? "recorder-interaction-supporting-evidence"
           : "recorder-interaction-id");
         continue;
+      }
+      if (pending && unansweredRecordChoice(pending.events, event) &&
+          sameRecordChoice(pending.events[0], event)) {
+        pending.events.push(event);
+        pending.reasons.push("repeated-record-choice");
+        continue;
+      }
+      if (pending && unansweredRecordChoice(pending.events, event)) {
+        const [unanswered] = pending.events;
+        supportingEvents.push(freeze({ normalizedEventId: unanswered.normalizedEventId,
+          classification: "superseded", reason: "unanswered-record-choice" }));
+        assignments.set(unanswered.normalizedEventId, "supporting");
+        pending = null;
       }
       if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
       if (!pending && event.kind === "status-message") {

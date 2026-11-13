@@ -690,6 +690,23 @@ function (sourceReference, captions, stepText) {
   function itemNumberLookupEntryRule() {
     const sortingNumber = value => /^(?:sortera efter|sort by)\s+nr\.?$/iu
       .test(controlCaption(value));
+    // Later versions of the client name the column by its own caption ("Nr", "No.") on an item
+    // line. Searching there for something other than the number, such as a word of the item's
+    // description, and choosing the item is one step; a number typed in is left to the item
+    // rules ("Välj artikel 30043").
+    const onItemRow = value => value?.rowTypeContext?.source === "same-row-type" &&
+      value.rowTypeContext.schemaVersion === 1 &&
+      /^(?:artikel|item|article|artículo|tuote|vare)$/iu.test(text(value.rowTypeContext.value));
+    const searchedNumber = (value, selected) => {
+      const typed = meaningfulValue(value);
+      return onItemRow(value) && /^(?:nr\.?|no\.?|n°|nº|n:o|nro\.?)$/iu.test(controlCaption(value)) &&
+        Boolean(typed) && Boolean(selected) &&
+        !selected.toLocaleLowerCase().startsWith(typed.toLocaleLowerCase());
+    };
+    // The field's own commit of the chosen number, under the same caption as the search.
+    const sameNumberField = (value, search) => sortingNumber(value) ||
+      (onItemRow(value) && controlCaption(value) === controlCaption(search) &&
+        /^(?:nr\.?|no\.?|n°|nº|n:o|nro\.?)$/iu.test(controlCaption(value)));
     const rule = {
       ruleId: "item-number-lookup-entry",
       priority: 97,
@@ -703,17 +720,17 @@ function (sourceReference, captions, stepText) {
           /^(?:artikel|item|article|artículo|tuote|vare)$/iu.test(
             text(current.rowTypeContext.value));
         return ["EnterFieldValue", "ChangeField"].includes(current?.taskType) &&
-          sortingNumber(current) && selected?.taskType === "RunAction" &&
-          Boolean(selectedValue) &&
+          (sortingNumber(current) || searchedNumber(current, selectedValue)) &&
+          selected?.taskType === "RunAction" && Boolean(selectedValue) &&
           ((["EnterFieldValue", "ChangeField"].includes(result?.taskType) &&
-            sortingNumber(result) && meaningfulValue(result) === selectedValue) ||
+            sameNumberField(result, current) && meaningfulValue(result) === selectedValue) ||
             itemRow);
       },
       consolidate(context) {
         const first = context.interactions[context.index];
         const result = context.interactions[context.index + 2];
         const hasResult = ["EnterFieldValue", "ChangeField"].includes(
-          result?.taskType) && sortingNumber(result);
+          result?.taskType) && sameNumberField(result, first);
         const values = context.interactions.slice(context.index,
           context.index + (hasResult ? 3 : 2));
         const selectedValue = selectedRecordValue(values[1]);

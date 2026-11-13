@@ -48,7 +48,33 @@ evidence remains a legacy value and does not activate technical classification.
 Malformed values and semantic legacy values never become `pageObjectId`.
 
 Control identity prefers `data-automation-id`, `data-control-id`,
-`data-control-name`, name, then element ID. Control results keep ID fields,
+`data-control-name`, `controlname`, name, then element ID.
+
+### AL names (`controlname`)
+
+Business Central's web client writes AL control names in the attribute `controlname`: a
+field's box or grid cell carries the field's name (`Sell-to Customer No.`, `Quantity`), and
+the parts and pages around it carry theirs (`Sales Order Subform`, `Sales Order`,
+`Payment Terms`). The names do not depend on the display language and are the names
+Microsoft's Page Scripting uses. The recorder keeps:
+
+- `alControlPath`: every `controlname` from the element outwards, at most twelve.
+- `alControlName`: the nearest name when its element holds no other named control, which is
+  a field. A part or a page holds named controls, so a button's nearest name (the page) is not
+  taken as the button's name and `alControlName` stays empty.
+
+Identification exposes them as `control.alName`/`control.alPath`,
+`controlIdentity.alControlName`/`alControlPath` and, for field-like controls,
+`fieldIdentity.alFieldName`. The field rules also read the AL name with its punctuation
+removed (`SelltoCustomerNo`). The keys are only present when the recording saw
+`controlname`, so older recordings identify exactly as before. The session pipeline carries
+`alControlName` in `knowledgeControlRef`, and test matching treats two steps with the same AL
+name as the same field.
+
+Verified on Business Central 29 online (Payment Terms, Sales Order, Sales Order List): fields
+and pages carry `controlname`; action buttons (`Control_New`, `Release`), repeaters
+(`Control1`) and part control names (`SalesLines`) do not. `data-automationid` (without a
+hyphen) exists on buttons but only holds generic values such as `splitbuttonprimary`. Control results keep ID fields,
 automation ID, type, role, caption, conservative field hint, source, and
 evidence. React/MUI and control-add-in elements use observable attributes, ARIA,
 element/input type, bounded ancestry, and frame context—never framework internals.

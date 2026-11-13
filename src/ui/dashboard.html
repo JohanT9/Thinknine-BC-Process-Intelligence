@@ -41,7 +41,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-head{position:sticky;top:var(--home-appbar-height,0px);z-index:15;max-height:calc(100vh - var(--home-appbar-height,0px));overflow-y:auto;margin-inline:-6px;padding:0 6px 6px;background:var(--colorBackgroundCanvas);box-shadow:0 0 0 100vmax var(--colorBackgroundCanvas),0 1px 0 100vmax var(--colorBorderSubtle);clip-path:inset(0 -100vmax -1px)}
 .library-head .library-status{margin-bottom:0}
 html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + var(--library-head-height,0px) + 8px)}
-@media (max-height:600px),(max-width:640px){.library-head{position:static;max-height:none;overflow:visible;box-shadow:none;clip-path:none}html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + 8px)}.library-head:has(#libraryBatchToolbar:not([hidden])){position:sticky;top:calc(var(--home-appbar-height,0px) - var(--library-batch-offset,0px))}html:has(#documentsView:not([hidden])):has(#libraryBatchToolbar:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + var(--library-head-height,0px) - var(--library-batch-offset,0px) + 8px)}}
+@media (max-height:600px),(max-width:640px){.library-head{position:static;max-height:none;overflow:visible;box-shadow:none;clip-path:none}html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar-height,0px) + 8px)}}
+/* In a small window rows scrolled to stay clear of the floating selection toolbar. */
+@media (max-height:600px),(max-width:640px){html:has(#documentsView:not([hidden])):has(#libraryBatchToolbar:not([hidden])){scroll-padding-bottom:calc(var(--library-batch-height,72px) + 24px)}}
 .library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:var(--c-bg-eef6ff);border:1px solid var(--c-bd-9bc4e2);border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto max-content minmax(0,1fr);gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
 .library-batch-more{position:relative}.library-batch-more>summary{cursor:pointer;font-weight:600;padding:9px 13px;background:var(--c-bg-e5e7eb);border-radius:5px;color:var(--c-fg-374151)}.library-batch-more[open]{width:100%;padding-top:4px}.library-batch-more[open]>summary{width:max-content;margin-bottom:7px}.library-batch-more button{margin-right:6px}
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:hidden}
@@ -216,7 +218,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .document-workspace-page-toc ol{margin:0;padding:0;list-style:none;display:grid;gap:4px}.document-workspace-page-toc li{color:#1f2937}.document-workspace-page-toc li.document-workspace-page-toc-sub{padding-left:20px;color:#4b5563}
 .document-workspace-page-cover-brand{display:grid;justify-items:start;gap:8px;margin-bottom:14px;font-size:13px;color:#4b5563}.document-workspace-page-cover-logo{display:block;max-height:90px;max-width:260px;object-fit:contain}
 .document-workspace-page-company{color:#1f2937}
-.document-workspace-page-title{margin-left:auto;text-align:right;overflow-wrap:anywhere}
+.document-workspace-page-title{margin-left:auto;text-align:right;overflow-wrap:anywhere}.document-workspace-page-band.pageHeader.is-banded{padding:6px 8px}.document-workspace-page-band.is-banded .document-workspace-page-title{margin-left:0;text-align:left}
 .document-templates{margin:22px 0 18px;padding-top:16px;border-top:1px solid var(--c-bd-d8dee5)}
 .document-templates h4{margin:0 0 4px;font-size:16px}.document-templates h5{margin:12px 0 8px;font-size:15px;overflow-wrap:anywhere}
 .document-template-list{display:grid;gap:8px;margin:12px 0;padding:0;list-style:none}
@@ -246,19 +248,31 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .document-template-preview{margin:0;min-width:0}.document-template-preview figcaption{display:grid;gap:2px;margin-bottom:8px;font-weight:600}.document-template-preview figcaption .muted{font-weight:400;font-size:13px}
 #documentTemplateSaveStatus{margin-top:12px}#documentTemplateRetry,#documentTemplateShare,#documentTemplateDelete{margin:8px 8px 0 0}
 .document-template-list-actions{display:flex;flex-wrap:wrap;gap:8px}
+.document-template-usage{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:4px 0 12px}.document-template-usage p{margin:0;min-width:0;flex:1 1 260px}.document-template-usage button{margin:0}
 /* The page sample is document paper: it keeps the paper's own colours in both themes. */
-.document-workspace-page-sample{--sample-color:#007a82;display:grid;grid-template-rows:auto 1fr auto;gap:10px;aspect-ratio:210/297;max-width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid #d8dee5;border-radius:2px;background:#ffffff;color:#1f2937;box-shadow:0 4px 14px rgba(15,23,42,.12);font-size:9px;overflow:hidden}
+.document-workspace-page-sample{display:grid;grid-template-rows:auto 1fr auto;gap:10px;aspect-ratio:210/297;max-width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid #d8dee5;border-radius:2px;background:#ffffff;color:#1f2937;box-shadow:0 4px 14px rgba(15,23,42,.12);font-size:9px;overflow:hidden}
 .document-workspace-page-sample-header{display:flex;align-items:center;gap:6px;padding-bottom:5px;border-bottom:2px solid var(--sample-color);color:#4b5563;min-width:0}
 .document-workspace-page-sample-header img{max-height:16px;max-width:70px;object-fit:contain}
 .document-workspace-page-sample-header strong{color:#1f2937;overflow-wrap:anywhere}
 .document-workspace-page-sample-header.is-banded{padding:5px 6px;background:var(--sample-fill);font-weight:700;color:var(--sample-ink,#1f2937)}.document-workspace-page-sample-header.is-banded span{margin-left:0;text-align:left}
 .document-workspace-page-sample-header span{margin-left:auto;text-align:right;overflow-wrap:anywhere}
-.document-workspace-page-sample-cover{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
-.document-workspace-page-sample-cover img{align-self:flex-start;max-height:40px;max-width:130px;object-fit:contain}
-.document-workspace-page-sample-cover > span{overflow-wrap:anywhere}.document-workspace-page-sample-cover.is-coverless{justify-content:flex-start}
-.document-workspace-page-sample-title{font-size:17px;font-weight:700;line-height:1.2;color:#111827}
-.document-workspace-page-sample-rule{display:block;width:40%;height:3px;background:var(--sample-color)}
-.document-workspace-page-sample-heading{margin-top:14px;font-size:12px;font-weight:700;color:var(--sample-color)}
+.document-template-pages{--sample-color:#007a82;display:grid;gap:12px;max-width:300px}
+.document-workspace-page-sample > [data-sample=header]{grid-row:1}.document-workspace-page-sample-cover,.document-workspace-page-sample-body{grid-row:2}.document-workspace-page-sample > [data-sample=footer]{grid-row:3}
+.document-workspace-page-sample-cover{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;text-align:center}
+.document-workspace-page-sample-cover img{max-height:40px;max-width:130px;margin-bottom:4px;object-fit:contain}
+.document-workspace-page-sample-cover > span{max-width:100%;overflow-wrap:anywhere}
+.document-workspace-page-sample-brand{font-size:8px;font-weight:700;color:var(--sample-accent,#111827)}
+.document-workspace-page-sample-type{font-size:8px;color:var(--sample-muted,#6b7280)}
+.document-workspace-page-sample-title{font-size:16px;font-weight:700;line-height:1.2;color:var(--sample-accent,#111827)}
+.document-workspace-page-sample-metadata{display:grid;width:var(--sample-metadata-width,100%);margin-top:8px;border:1px solid var(--sample-border,#d5dce3);font-size:6.5px;text-align:left}
+.document-workspace-page-sample-metadata > div{display:grid;grid-template-columns:var(--sample-label-width,30%) minmax(0,1fr);align-items:center;border-top:1px solid var(--sample-inside,#e5e7eb)}.document-workspace-page-sample-metadata > div:first-child{border-top:0}
+.document-workspace-page-sample-metadata strong{padding:3px 4px;border-right:1px solid var(--sample-inside,#e5e7eb);background:var(--sample-label-fill,#ffffff);overflow-wrap:anywhere}
+.document-workspace-page-sample-metadata span{display:block;width:60%;height:4px;margin:0 4px;border-radius:2px;background:#e5e7eb}
+.document-workspace-page-sample-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.document-workspace-page-sample-heading{margin:6px 0 1px;padding-bottom:2px;border-bottom:1px solid var(--sample-color);font-size:11px;font-weight:700;color:var(--sample-color);overflow-wrap:anywhere}.document-workspace-page-sample-heading:first-child{margin-top:2px}
+.document-workspace-page-sample-bullet{display:flex;align-items:center;gap:5px;padding-left:6px}.document-workspace-page-sample-bullet::before{content:"";flex:none;width:3px;height:3px;border-radius:50%;background:#1f2937}.document-workspace-page-sample-bullet .document-workspace-page-sample-line{flex:1}
+.document-workspace-page-sample-step{display:grid;gap:4px;padding:4px 6px;border-left:2px solid var(--sample-step-border,var(--sample-color));background:var(--sample-step-fill,#f3f4f6)}.document-workspace-page-sample-step strong{font-size:9px;color:var(--sample-step-color,var(--sample-color))}
+.document-workspace-page-sample-shot{display:block;height:46px;margin:0 8px;border:1px solid #d5dce3;border-radius:2px;background:linear-gradient(#374151 0 12%,#e5e7eb 12%)}
 .document-workspace-page-sample-line{display:block;height:5px;border-radius:2px;background:#e5e7eb}.document-workspace-page-sample-line.short{width:65%}
 .document-workspace-page-sample-footer{padding-top:5px;border-top:1px solid color-mix(in srgb,var(--sample-color) 28%,#ffffff);color:#4b5563;text-align:center;overflow-wrap:anywhere}
 .document-workspace-section.cover{padding-top:50px;padding-bottom:35px}
@@ -344,6 +358,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .review-status div:nth-child(n+3){display:none}
 /* Review flow: screenshot beside the instruction, approval progress, undo toast. */
 .review-languages{margin-top:4px;font-size:12px;color:var(--c-fg-52606d)}
+.review-template{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:6px;font-size:13px}.review-template label{margin:0;font-weight:600}.review-template select{width:auto;max-width:min(260px,100%);min-height:30px;margin:0;padding:3px 8px}.review-template button{min-height:30px;margin:0;padding:3px 10px}.review-template .muted{flex:1 1 220px;min-width:0;font-size:12px}
 .review-step-progress{display:grid;gap:5px;margin:0 8px 10px;font-size:12px;color:var(--c-fg-52606d)}
 .review-step-progress-bar{height:6px;border-radius:3px;background:var(--c-bg-e2e8ee);overflow:hidden}
 .review-step-progress-bar span{display:block;height:100%;width:0;background:var(--c-bg-107c10);transition:width .25s}
@@ -502,28 +517,32 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <p id="libraryFolderNotice" class="library-folder-notice" role="alert" hidden></p>
     <p id="libraryFolderStatus" class="sr-only" role="status" aria-live="polite"></p>
   </div>
-  <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
-  <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"
-    aria-label="Batchåtgärder" aria-describedby="libraryBatchStatus" hidden>
-    <span id="libraryBatchCount" class="library-batch-count"></span>
-    <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
-    <button id="libraryBatchExport" class="primary">Exportera Word</button>
-    <button id="libraryBatchSuite" class="secondary" data-i18n="suite.create">Skapa testsvit</button>
-    <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
-    <button id="libraryBatchArchive" class="secondary">Arkivera</button>
-    <button id="libraryBatchMove" class="secondary" data-i18n="folder.moveSelected">Flytta till mapp</button>
-    <details class="library-batch-more">
-      <summary>Fler åtgärder</summary>
-      <div class="library-batch-more-panel">
-        <button id="libraryBatchTags" class="secondary">Taggar</button>
-        <button id="libraryBatchTheme" class="secondary" data-i18n="template.label">Mall</button>
-        <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
-        <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
-      </div>
-    </details>
-    <button id="libraryBatchClear" class="secondary">Avbryt</button>
-    <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
-      value="0" hidden aria-label="Batchförlopp"></progress>
+  <!-- While documents are marked, their actions take the place of the result count, right above
+    the list. The row keeps the actions' height, so marking a document never moves the list. -->
+  <div class="library-status-row">
+    <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
+    <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"
+      aria-label="Batchåtgärder" aria-describedby="libraryBatchStatus" hidden>
+      <span id="libraryBatchCount" class="library-batch-count"></span>
+      <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
+      <button id="libraryBatchExport" class="primary">Exportera Word</button>
+      <button id="libraryBatchSuite" class="secondary" data-i18n="suite.create">Skapa testsvit</button>
+      <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
+      <button id="libraryBatchArchive" class="secondary">Arkivera</button>
+      <button id="libraryBatchMove" class="secondary" data-i18n="folder.moveSelected">Flytta till mapp</button>
+      <details class="library-batch-more">
+        <summary>Fler åtgärder</summary>
+        <div class="library-batch-more-panel">
+          <button id="libraryBatchTags" class="secondary">Taggar</button>
+          <button id="libraryBatchTheme" class="secondary" data-i18n="template.label">Mall</button>
+          <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
+          <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
+        </div>
+      </details>
+      <button id="libraryBatchClear" class="secondary">Avbryt</button>
+      <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
+        value="0" hidden aria-label="Batchförlopp"></progress>
+    </div>
   </div>
   </div>
 
@@ -598,12 +617,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <input id="documentationProfile" type="hidden" value="generic">
 <div id="profileHelp" hidden></div>
 
-<label for="environmentName">Miljönamn</label>
-<input id="environmentName" type="text">
-
-<label for="companyName" data-i18n="settings.bcCompany">Business Central-företag</label>
-<input id="companyName" type="text" aria-describedby="companyNameHelp">
-<p id="companyNameHelp" class="muted" data-i18n="settings.bcCompanyHelp">Visas i biblioteket och kan ingå i filnamnet med {company}. Företagsnamnet i dokumentet anges i dokumentmallen.</p>
+<p id="businessCentralContext" class="muted">Miljö och företag hämtas automatiskt från Business Central när du spelar in.</p>
 
 <label for="defaultExpectedResult">Standardtext för förväntat resultat</label>
 <textarea id="defaultExpectedResult" rows="3"
@@ -684,6 +698,10 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <p data-i18n="template.builtInNote">Inbyggda mallar kan inte ändras. Kopiera mallen för att göra en egen.</p>
     <button id="documentTemplateCopyEdit" class="primary" type="button" data-i18n="template.copyAndEdit">Kopiera och redigera</button>
   </div>
+  <div class="document-template-usage">
+    <p id="documentTemplateUsageText" tabindex="-1" role="status" aria-live="polite"></p>
+    <button id="documentTemplateUsageDefault" class="secondary" type="button" data-i18n="template.makeDefault" hidden>Gör till standard</button>
+  </div>
   <div class="document-template-editor-body">
     <div id="documentTemplateFields" class="document-template-fields">
       <label for="documentTemplateName" data-i18n="template.name">Mallens namn</label>
@@ -739,24 +757,34 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <figure class="document-template-preview" aria-labelledby="documentTemplatePreviewTitle">
       <figcaption>
         <span id="documentTemplatePreviewTitle" data-i18n="template.preview">Förhandsvisning</span>
-        <span class="muted" data-i18n="template.previewHelp">Så här ser första sidan ut i Word och i förhandsvisningen.</span>
+        <span class="muted" data-i18n="template.previewHelp">Så här börjar dokumentet i Word och i förhandsvisningen: försättsbladet och nästa sida.</span>
       </figcaption>
-      <div id="documentTemplateSample" class="document-workspace-page-sample" aria-hidden="true">
-        <div class="document-workspace-page-sample-header">
-          <img id="documentTemplateSampleLogo" alt="" hidden>
-          <strong id="documentTemplateSampleCompany"></strong>
-          <span id="documentTemplateSampleHeaderTitle"></span>
+      <div id="documentTemplateSample" class="document-template-pages" aria-hidden="true">
+        <div id="documentTemplateSampleCoverPage" class="document-workspace-page-sample">
+          <div class="document-workspace-page-sample-header" data-sample="header">
+            <img data-sample="header-logo" alt="" hidden>
+            <strong data-sample="header-company"></strong>
+            <span data-sample="header-title"></span>
+          </div>
+          <div class="document-workspace-page-sample-cover">
+            <img id="documentTemplateSampleCoverLogo" alt="" hidden>
+            <span id="documentTemplateSampleBrand" class="document-workspace-page-sample-brand"></span>
+            <span id="documentTemplateSampleType" class="document-workspace-page-sample-type"></span>
+            <span id="documentTemplateSampleTitle" class="document-workspace-page-sample-title"></span>
+            <span id="documentTemplateSampleSubtitle" class="document-workspace-page-sample-type"></span>
+            <div id="documentTemplateSampleMetadata" class="document-workspace-page-sample-metadata"></div>
+          </div>
+          <div class="document-workspace-page-sample-footer" data-sample="footer"></div>
         </div>
-        <div class="document-workspace-page-sample-cover">
-          <img id="documentTemplateSampleCoverLogo" alt="" hidden>
-          <span id="documentTemplateSampleCoverCompany"></span>
-          <span id="documentTemplateSampleTitle" class="document-workspace-page-sample-title"></span>
-          <span class="document-workspace-page-sample-rule"></span>
-          <span id="documentTemplateSampleHeading" class="document-workspace-page-sample-heading"></span>
-          <span class="document-workspace-page-sample-line"></span>
-          <span class="document-workspace-page-sample-line short"></span>
+        <div id="documentTemplateSampleBodyPage" class="document-workspace-page-sample">
+          <div class="document-workspace-page-sample-header" data-sample="header">
+            <img data-sample="header-logo" alt="" hidden>
+            <strong data-sample="header-company"></strong>
+            <span data-sample="header-title"></span>
+          </div>
+          <div id="documentTemplateSampleBody" class="document-workspace-page-sample-body"></div>
+          <div class="document-workspace-page-sample-footer" data-sample="footer"></div>
         </div>
-        <div id="documentTemplateSampleFooter" class="document-workspace-page-sample-footer"></div>
       </div>
     </figure>
   </div>
@@ -1001,6 +1029,12 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           <h2 id="reviewTitle">BC Review Studio</h2>
           <div id="reviewSummary" class="muted"></div>
           <div id="reviewLanguages" class="review-languages"></div>
+          <div class="review-template">
+            <label for="reviewTemplate" data-i18n="template.label">Mall</label>
+            <select id="reviewTemplate" aria-describedby="reviewTemplateStatus"></select>
+            <button id="reviewTemplateEdit" type="button" class="secondary" data-i18n="template.editTemplates">Redigera mallar…</button>
+            <span id="reviewTemplateStatus" class="muted" role="status" aria-live="polite"></span>
+          </div>
         </div>
         <button id="reviewDocumentBeside" type="button" class="secondary review-document-beside" aria-pressed="false" aria-controls="documentWorkspacePanel">Visa dokument</button>
         <button id="closeReview" class="debug"

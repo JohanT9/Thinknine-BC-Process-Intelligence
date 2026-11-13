@@ -51,7 +51,7 @@
       }
     },
     {
-      "target": "Nr, sorterade i Stigande order Välj posten \"30043\"",
+      "target": "Sortera efter Nr",
       "value": "30043",
       "note": "Ange __gavtnpkf__ i **Nr** och välj **30043**.",
       "texts": {

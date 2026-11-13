@@ -383,6 +383,33 @@
     else removeRecordingIndicator();
   }
 
+  // The AL identity of an element (page, part, repeater, field or action), handed over by
+  // al-identity-capture.js from the page's own world as a string in a CustomEvent, just before
+  // the pointer, focus or key event that this script records. It is kept per element, and the
+  // latest one also for the control around or inside it that this script records instead.
+  const AL_IDENTITY_EVENT = "bcps-al-identity";
+  const alIdentities = new WeakMap();
+  let lastAlIdentity = null;
+  window.addEventListener(AL_IDENTITY_EVENT, event => {
+    try {
+      const target = event.target;
+      const detail = typeof event.detail === "string" ? event.detail : "";
+      if (!(target instanceof Element) || !detail || detail.length > 20000) return;
+      const identity = JSON.parse(detail);
+      if (!identity || identity.v !== 1 || typeof identity.kind !== "string") return;
+      alIdentities.set(target, identity);
+      lastAlIdentity = { element: target, identity, at: Date.now() };
+    } catch {}
+  }, true);
+  function alIdentityFor(element) {
+    if (!(element instanceof Element)) return undefined;
+    const own = alIdentities.get(element);
+    if (own) return own;
+    const last = lastAlIdentity;
+    if (!last || Date.now() - last.at > 10000) return undefined;
+    return element.contains(last.element) || last.element.contains(element) ? last.identity : undefined;
+  }
+
   chrome.storage.local.get("t9_settings").then(data => {
     showClickHighlights = data.t9_settings?.showClickHighlights !== false;
     if (!showClickHighlights) clearClickHighlight();
@@ -1058,8 +1085,10 @@
     }
     const captureSurface = surfaceSignals(element);
     const alNames = alControlNames(element);
+    const alIdentity = alIdentityFor(element);
     return {
       ...alNames,
+      ...(alIdentity ? { alIdentity } : {}),
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
       controlKind: dialog &&

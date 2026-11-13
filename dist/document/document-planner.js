@@ -529,8 +529,14 @@
         spacingIntent: spacingIntent(theme, "section"),
         appearance: {
           ...clone(theme.components[section.kind] || {}),
-          ...(localizedLanguage && section.kind === "cover"
+          // Every built-in cover names the document type, in every document language.
+          ...(section.kind === "cover"
             ? { documentType: label("Work instruction", "Arbetsinstruktion") } : {}),
+          // The built-in cover subtitle is a system text, so it follows the document language.
+          ...(section.kind === "cover" &&
+            theme.components.cover?.subtitle === "Business Central Process Documentation"
+            ? { subtitle: label("Business Central Process Documentation",
+              "Dokumentation av Business Central-process") } : {}),
           ...(localizedLanguage && section.kind === "toc"
             ? { title: label("Contents", "Innehåll") } : {})
         },

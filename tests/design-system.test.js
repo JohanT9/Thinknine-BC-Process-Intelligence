@@ -35,8 +35,10 @@ assert.ok(!dashboard.includes('<select id="documentationProfile">'));
 assert.ok(dashboard.includes('<input id="documentationProfile" type="hidden" value="generic">'));
 assert.ok(dashboard.includes('aria-controls="advancedPanel" hidden'));
 assert.ok(dashboard.includes('<div id="advancedPanel" class="advanced" hidden>'));
-assert.ok(dashboard.includes('id="environmentName"'));
-assert.ok(dashboard.includes('id="companyName"'));
+// Environment and company come from Business Central when recording; settings only show them.
+assert.ok(!dashboard.includes('id="environmentName"'));
+assert.ok(!dashboard.includes('id="companyName"'));
+assert.ok(dashboard.includes('<p id="businessCentralContext" class="muted">'));
 assert.ok(dashboard.includes('id="defaultExpectedResult"'));
 assert.ok(dashboard.includes('aria-describedby="defaultExpectedResultHelp"'));
 assert.ok(dashboard.includes("#defaultExpectedResult{width:100%;max-width:520px;box-sizing:border-box;resize:vertical}"));

@@ -43,6 +43,20 @@
     }
     return masked;
   }
+  // What the user typed in a field is test data: a Page Scripting test made from the recording
+  // has to enter exactly that. When masking hid it, it is kept beside the masked value as
+  // typedValue, which only the test export reads; documents, reports and their exports keep
+  // showing the masked value. Passwords, secrets, tokens and keys are never kept.
+  const TYPED_SOURCES = new Set(["input", "change"]);
+  function keepTypedValue(event, masked) {
+    if (!event || !masked || event.type !== "field-change" || !TYPED_SOURCES.has(event.inputSource)) return masked;
+    const typed = Object.prototype.hasOwnProperty.call(event, "enteredValue") ? event.enteredValue : event.value;
+    if ((typeof typed !== "string" && typeof typed !== "number") || String(typed) === "") return masked;
+    const shown = Object.prototype.hasOwnProperty.call(masked, "enteredValue") ? masked.enteredValue : masked.value;
+    if (String(shown) === String(typed)) return masked;
+    if (String(mask(event.fieldName, typed, { maskValues: "secrets" })) !== String(typed)) return masked;
+    return { ...masked, typedValue: String(typed) };
+  }
   // A recorded (canonical) event with its values masked as they would have been when
   // captured; the stored recording is not changed.
   function maskRecordedEvent(event, settings = {}) {
@@ -91,5 +105,5 @@
       return { taskId: task.taskId, stepId: task.stepId, instruction };
     });
   }
-  return { mask, maskFieldValues, maskRecordedEvent, maskedStepTexts };
+  return { mask, maskFieldValues, keepTypedValue, maskRecordedEvent, maskedStepTexts };
 });

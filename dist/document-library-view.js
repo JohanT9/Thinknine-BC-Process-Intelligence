@@ -105,6 +105,7 @@
               : localized("Documentation", locale, "Dokumentation"))}</span>
             ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
             ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
+            ${!bugReport && view.templateLabel?.(record) ? `<span class="library-template">${escape(view.templateLabel(record))}</span>` : ""}
             <span>${escape(localized("Changed {date}", locale,
               "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
             ${bugReport && deliveryLabel(delivery, locale) ? `<span class="library-delivery"
@@ -140,6 +141,7 @@
               localized("Run test", locale, "Kör test"))}</button>`}`}
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
+            ${recording || bugReport || !view.pageScriptLabel ? "" : `<button type="button" data-library-action="export-page-script">${escape(view.pageScriptLabel)}</button>`}
             ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
             <button type="button" data-library-action="archive">${escape(record.archived
               ? localized("Restore from archive", locale, "Återställ från arkivet")

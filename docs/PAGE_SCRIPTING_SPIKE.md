@@ -46,7 +46,7 @@ projektmappen (`C:\Development\Thinknine-BC-Process-Intelligence`), med hela sö
 filerna inom citattecken:
 
 ```bash
-node scripts/compare-page-scripting.js "C:\Users\...\PS Test\betalningsvillkor.yml" "C:\Users\...\PS Test\betalningsvillkor.bcps" --out "C:\Users\...\PS Test\jamforelse.md" --snippet "C:\Users\...\PS Test\konsol.js"
+node scripts/compare-page-scripting.js "<folder>/betalningsvillkor.yml" "<folder>/betalningsvillkor.bcps" --out "<folder>/jamforelse.md" --snippet "<folder>/konsol.js"
 ```
 
 Skriptet läser båda filerna och ändrar ingenting. Det skriver:

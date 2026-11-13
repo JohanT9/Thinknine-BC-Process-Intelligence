@@ -140,6 +140,41 @@ assert.ok(!step.components.some(component => component.kind === "callout"),
 const cover = prepared.plan.sections.find(section => section.kind === "cover")
   .components.find(component => component.kind === "cover");
 assert.strictEqual(cover.appearance.documentType, "Work instruction");
+// The built-in cover subtitle is a system text and follows the document language.
+const coverSubtitles = {
+  "sv-SE": "Dokumentation av Business Central-process",
+  "en-US": "Business Central Process Documentation",
+  "fr-FR": "Documentation de processus Business Central",
+  "de-DE": "Business Central-Prozessdokumentation",
+  "es-ES": "Documentación de procesos de Business Central",
+  "da-DK": "Business Central-procesdokumentation",
+  "fi-FI": "Business Central -prosessidokumentaatio",
+  "nb-NO": "Business Central-prosessdokumentasjon"
+};
+for (const [documentLanguage, subtitle] of Object.entries(coverSubtitles)) {
+  const localized = pipeline.create({ session, review: { ...review,
+    documentFields: { ...review.documentFields, documentLanguage } } });
+  const localizedCover = localized.plan.sections.find(section => section.kind === "cover")
+    .components.find(component => component.kind === "cover");
+  assert.strictEqual(localizedCover.appearance.subtitle, subtitle, documentLanguage);
+}
+// Every built-in template's cover names the document type in every document language.
+const documentTypes = {
+  "sv-SE": "Arbetsinstruktion", "en-US": "Work instruction", "fr-FR": "Instruction de travail",
+  "de-DE": "Arbeitsanweisung", "es-ES": "Instrucción de trabajo", "da-DK": "Arbejdsinstruktion",
+  "fi-FI": "Työohje", "nb-NO": "Arbeidsinstruksjon"
+};
+const documentTemplates = require("../src/document/document-template");
+for (const templateId of ["thinknine", "minimal", "corporate"]) {
+  for (const [documentLanguage, documentType] of Object.entries(documentTypes)) {
+    const localized = pipeline.create({ session, template: documentTemplates.builtIn(templateId),
+      review: { ...review, documentFields: { ...review.documentFields, documentLanguage } } });
+    const localizedCover = localized.plan.sections.find(section => section.kind === "cover")
+      .components.find(component => component.kind === "cover");
+    assert.strictEqual(localizedCover.appearance.documentType, documentType,
+      `${templateId} ${documentLanguage}`);
+  }
+}
 const footer = prepared.plan.components.find(component =>
   component.kind === "footer");
 assert.strictEqual(footer.content.pageLabel, "Page");

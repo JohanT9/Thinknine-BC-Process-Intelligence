@@ -235,7 +235,7 @@
     try { date = new Date(options.now || Date.now()).toLocaleDateString(locale); }
     catch { date = new Date(options.now || Date.now()).toISOString().slice(0, 10); }
     return registry.resolve(registry.BUILT_IN_REGISTRY, value.baseThemeId,
-      model.themeOverrides(value, { document: metadata.title || "", date }, base.capabilities));
+      model.themeOverrides(value, { document: metadata.title || "", date }, base.capabilities, base));
   }
 
   function screenshotComponents(plan) {

@@ -68,6 +68,19 @@
       "all_frames": true,
       "match_about_blank": true,
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://businesscentral.dynamics.com/*",
+        "https://*.businesscentral.dynamics.com/*"
+      ],
+      "js": [
+        "al-identity-capture.js"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ],
   "web_accessible_resources": [

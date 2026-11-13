@@ -20035,6 +20035,31 @@
       const textColor = color(component.appearance.textColor, "4B5563");
       const logo = logoRun(branding.logo, mediaAssets, { maxWidth: 160, maxHeight: 36 });
       const company = String(branding.organizationName || "").trim();
+      if (component.appearance.fillColor) {
+        const text = [
+          String(component.appearance.brand || "").trim(),
+          "Business Central",
+          component.content.text
+        ].filter(Boolean).join("  |  ");
+        return new Header({ children: [new Paragraph({
+          spacing: { before: 160, after: 200 },
+          shading: { type: ShadingType.CLEAR, fill: color(component.appearance.fillColor) },
+          border: { bottom: {
+            style: BorderStyle.SINGLE,
+            size: 6,
+            color: color(component.appearance.borderColor, "0F4C81")
+          } },
+          children: [
+            ...logo ? [logo] : [],
+            new TextRun({
+              text: `${logo ? "  " : ""}${text}`,
+              bold: true,
+              size,
+              color: color(component.appearance.textColor, "FFFFFF")
+            })
+          ]
+        })] });
+      }
       return new Header({ children: [new Paragraph({
         tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
         spacing: { after: 160 },

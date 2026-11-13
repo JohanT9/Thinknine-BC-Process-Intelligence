@@ -1,0 +1,345 @@
+[
+ {
+  "type": "field-change",
+  "role": "combobox",
+  "category": "field",
+  "controlType": "input",
+  "inputType": "text",
+  "inputSource": "input",
+  "fieldName": "Nr",
+  "label": "Nr",
+  "accessibleName": "Nr",
+  "value": "isber",
+  "previousValue": "",
+  "ariaHasPopup": "grid",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "rowTypeContext": {
+   "caption": "Typ",
+   "rowId": "1",
+   "schemaVersion": 1,
+   "source": "same-row-type",
+   "value": "Artikel"
+  },
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:09.570Z",
+  "elementId": "baygee",
+  "sourceSequence": 35,
+  "eventNo": 46,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "status-message",
+  "role": "div",
+  "category": "result",
+  "controlType": "div",
+  "inputType": "",
+  "label": "Lista med rubriken Välj har nu 24 objekt",
+  "accessibleName": "Lista med rubriken Välj har nu 24 objekt",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:09.892Z",
+  "elementId": "",
+  "sourceSequence": 36,
+  "eventNo": 47,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "status-message",
+  "role": "div",
+  "category": "result",
+  "controlType": "div",
+  "inputType": "",
+  "label": "24 förslag finns för isber. Använd UPPIL och NEDPIL för att granska och välja förslag.",
+  "accessibleName": "24 förslag finns för isber. Använd UPPIL och NEDPIL för att granska och välja förslag.",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:09.903Z",
+  "elementId": "",
+  "sourceSequence": 37,
+  "eventNo": 48,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "field-change",
+  "role": "combobox",
+  "category": "field",
+  "controlType": "input",
+  "inputType": "text",
+  "inputSource": "change",
+  "fieldName": "Nr",
+  "label": "Nr",
+  "accessibleName": "Nr",
+  "value": "isber",
+  "previousValue": "",
+  "ariaHasPopup": "grid",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "rowTypeContext": {
+   "caption": "Typ",
+   "rowId": "1",
+   "schemaVersion": 1,
+   "source": "same-row-type",
+   "value": "Artikel"
+  },
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:13.956Z",
+  "elementId": "baygee",
+  "sourceSequence": 38,
+  "eventNo": 49,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "click",
+  "role": "button",
+  "category": "action",
+  "controlType": "a",
+  "inputType": "",
+  "label": "Nr, sorterade i Stigande order Välj posten \"30043\"",
+  "accessibleName": "Nr, sorterade i Stigande order Välj posten \"30043\"",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:12e6ee74-cef2-4375-b501-66dc43c8f1c0",
+  "timestamp": "2026-11-13T12:41:13.980Z",
+  "clientX": 374,
+  "clientY": 982,
+  "pointerTarget": true,
+  "elementId": "bblu-rph-ee",
+  "sourceSequence": 39,
+  "eventNo": 50,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "click",
+  "role": "button",
+  "category": "action",
+  "controlType": "a",
+  "inputType": "",
+  "label": "Nr, sorterade i Stigande order Välj posten \"30043\"",
+  "accessibleName": "Nr, sorterade i Stigande order Välj posten \"30043\"",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:9aa91dea-579d-407c-8c1a-3cc9f20c24ec",
+  "timestamp": "2026-11-13T12:41:15.984Z",
+  "clientX": 369,
+  "clientY": 959,
+  "pointerTarget": true,
+  "elementId": "bblxee",
+  "sourceSequence": 40,
+  "eventNo": 51,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "status-message",
+  "role": "div",
+  "category": "result",
+  "controlType": "div",
+  "inputType": "",
+  "label": "Sparar ...",
+  "accessibleName": "Sparar ...",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:9aa91dea-579d-407c-8c1a-3cc9f20c24ec",
+  "timestamp": "2026-11-13T12:41:15.992Z",
+  "elementId": "",
+  "sourceSequence": 41,
+  "eventNo": 52,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "status-message",
+  "role": "div",
+  "category": "result",
+  "controlType": "div",
+  "inputType": "",
+  "label": "Lista med rubriken Rader har nu 4 objekt",
+  "accessibleName": "Lista med rubriken Rader har nu 4 objekt",
+  "ariaHasPopup": "",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [],
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:9aa91dea-579d-407c-8c1a-3cc9f20c24ec",
+  "timestamp": "2026-11-13T12:41:17.263Z",
+  "elementId": "",
+  "sourceSequence": 42,
+  "eventNo": 53,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "focus",
+  "role": "combobox",
+  "category": "lifecycle",
+  "controlType": "input",
+  "inputType": "text",
+  "label": "Nr",
+  "accessibleName": "Nr",
+  "value": "30043",
+  "ariaHasPopup": "grid",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "rowTypeContext": {
+   "caption": "Typ",
+   "rowId": "1",
+   "schemaVersion": 1,
+   "source": "same-row-type",
+   "value": "Artikel"
+  },
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:17.519Z",
+  "elementId": "baygee",
+  "sourceSequence": 43,
+  "eventNo": 54,
+  "readOnly": false,
+  "disabled": false
+ },
+ {
+  "type": "page-state",
+  "category": "navigation",
+  "pageId": "50",
+  "pageCaption": "Ny - Inköpsorder",
+  "timestamp": "2026-11-13T12:41:17.528Z",
+  "sourceSequence": 12,
+  "eventNo": 55
+ },
+ {
+  "type": "page-state",
+  "category": "navigation",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder - 1001",
+  "timestamp": "2026-11-13T12:41:17.530Z",
+  "sourceSequence": 13,
+  "eventNo": 56
+ },
+ {
+  "type": "field-change",
+  "role": "combobox",
+  "category": "field",
+  "controlType": "input",
+  "inputType": "text",
+  "inputSource": "validated",
+  "fieldName": "Nr",
+  "label": "Nr",
+  "accessibleName": "Nr",
+  "value": "30043",
+  "previousValue": "",
+  "ariaHasPopup": "grid",
+  "pageId": "50",
+  "pageCaption": "Inköpsorder",
+  "uiHierarchy": [
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "repeater"
+   },
+   {
+    "caption": "",
+    "heuristic": false,
+    "identity": "",
+    "type": "row"
+   }
+  ],
+  "rowTypeContext": {
+   "caption": "Typ",
+   "rowId": "1",
+   "schemaVersion": 1,
+   "source": "same-row-type",
+   "value": "Artikel"
+  },
+  "interactionId": "a9ca86dc-4892-4afa-84e5-05ee048172b4:28b36e3d-e160-4423-bcaf-004d9beb964e",
+  "timestamp": "2026-11-13T12:41:17.745Z",
+  "elementId": "baygee",
+  "sourceSequence": 44,
+  "eventNo": 57,
+  "readOnly": false,
+  "disabled": false
+ }
+]
