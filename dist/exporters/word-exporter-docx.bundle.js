@@ -189,7 +189,7 @@
     }
   });
 
-  // ../../../../../../../../../../Development/Thinknine-BC-Process-Intelligence/node_modules/docx/dist/index.mjs
+  // node_modules/docx/dist/index.mjs
   var __create2 = Object.create;
   var __defProp2 = Object.defineProperty;
   var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "BC Process Studio",
-  "version": "4.7.257",
+  "version": "4.7.258",
   "description": "Business Process Intelligence for Microsoft Dynamics 365 Business Central. Capture, review and document real processes.",
   "permissions": [
     "activeTab",
@@ -68,6 +68,19 @@
       "all_frames": true,
       "match_about_blank": true,
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://businesscentral.dynamics.com/*",
+        "https://*.businesscentral.dynamics.com/*"
+      ],
+      "js": [
+        "al-identity-capture.js"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ],
   "web_accessible_resources": [

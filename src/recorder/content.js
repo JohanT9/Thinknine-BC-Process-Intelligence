@@ -383,6 +383,33 @@
     else removeRecordingIndicator();
   }
 
+  // The AL identity of an element (page, part, repeater, field or action), handed over by
+  // al-identity-capture.js from the page's own world as a string in a CustomEvent, just before
+  // the pointer, focus or key event that this script records. It is kept per element, and the
+  // latest one also for the control around or inside it that this script records instead.
+  const AL_IDENTITY_EVENT = "bcps-al-identity";
+  const alIdentities = new WeakMap();
+  let lastAlIdentity = null;
+  window.addEventListener(AL_IDENTITY_EVENT, event => {
+    try {
+      const target = event.target;
+      const detail = typeof event.detail === "string" ? event.detail : "";
+      if (!(target instanceof Element) || !detail || detail.length > 20000) return;
+      const identity = JSON.parse(detail);
+      if (!identity || identity.v !== 1 || typeof identity.kind !== "string") return;
+      alIdentities.set(target, identity);
+      lastAlIdentity = { element: target, identity, at: Date.now() };
+    } catch {}
+  }, true);
+  function alIdentityFor(element) {
+    if (!(element instanceof Element)) return undefined;
+    const own = alIdentities.get(element);
+    if (own) return own;
+    const last = lastAlIdentity;
+    if (!last || Date.now() - last.at > 10000) return undefined;
+    return element.contains(last.element) || last.element.contains(element) ? last.identity : undefined;
+  }
+
   chrome.storage.local.get("t9_settings").then(data => {
     showClickHighlights = data.t9_settings?.showClickHighlights !== false;
     if (!showClickHighlights) clearClickHighlight();
@@ -980,6 +1007,32 @@
     } catch { return undefined; }
   }
 
+  // The AL names Business Central's web client writes in the attribute controlname: a field's
+  // cell or box carries the field's control name ("Sell-to Customer No.", "Quantity"), and a
+  // part or page around it carries its own ("Sales Order Subform", "Sales Order"). They do not
+  // depend on the language Business Central is shown in, and they are the names Page Scripting
+  // uses. alControlPath lists them from the element outwards. alControlName is the field's
+  // name: the nearest one, when that element holds no other named control, as a part or a page
+  // does. Buttons and lists carry no name of their own, so a button's nearest name is the page
+  // around it and alControlName stays empty.
+  const AL_PATH_LIMIT = 12;
+  function alControlNames(element) {
+    const path = [];
+    let leaf = "";
+    try {
+      let node = element?.closest?.("[controlname]");
+      for (let index = 0; node && path.length < AL_PATH_LIMIT; index += 1) {
+        const name = clean(node.getAttribute("controlname") || "", 180);
+        if (name) {
+          if (index === 0 && !node.querySelector("[controlname]")) leaf = name;
+          path.push(name);
+        }
+        node = node.parentElement?.closest?.("[controlname]");
+      }
+    } catch {}
+    return path.length ? { alControlName: leaf, alControlPath: path } : {};
+  }
+
   function descriptor(element) {
     const bounds = element?.getBoundingClientRect?.();
     const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
@@ -1031,7 +1084,11 @@
       });
     }
     const captureSurface = surfaceSignals(element);
+    const alNames = alControlNames(element);
+    const alIdentity = alIdentityFor(element);
     return {
+      ...alNames,
+      ...(alIdentity ? { alIdentity } : {}),
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
       controlKind: dialog &&

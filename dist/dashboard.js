@@ -3180,15 +3180,12 @@ async function exportSession(session) {
     }))
   ];
 
-  const blob = zip(files);
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = `${safeFileName(session.id)}.zip`;
-  link.click();
-
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  // The file is named like the document's Word file, after the pattern in Settings, so the two
+  // are easy to recognise and keep together.
+  const settingsResponse = await send({ type: "T9_GET_SETTINGS" });
+  const filename = globalThis.T9Engine.exportSettings.buildFileName("zip",
+    response.session || session, { ...DEFAULTS, ...(settingsResponse?.settings || {}) });
+  await downloadBlob(zip(files), filename);
   show(uiTf("library.exportSessionCreated", { events: response.events.length,
     steps: businessSteps.length, images: imageFiles.length }));
 }
@@ -3879,6 +3876,7 @@ function renderDocumentLibrary() {
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
     templateLabel: libraryCardTemplate,
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
+    pageScriptLabel: uiT("pageScript.exportAction"),
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
     // documents that are all in folders below say where they are.
     emptyMessage: libraryFolder && !documentLibraryRecords.some(record =>
@@ -11218,6 +11216,29 @@ $("libraryResults").addEventListener("dblclick", event => {
   void openLibraryDocument(card.dataset.libraryProjectId);
 });
 
+// A Page Scripting test made from the recording: generated in the background, then handed to
+// the browser's downloads. Steps that could not be included are named, so the user knows the
+// test is incomplete; a recording without the needed AL names says to record again.
+async function exportPageScript(record) {
+  show(uiTf("pageScript.exportCreating", { title: record.title }));
+  const response = await send({ type: "T9_BUILD_PAGE_SCRIPT", sessionId: record.projectId });
+  if (!response?.ok) throw new Error(uiTf("pageScript.exportFailed",
+    { detail: response?.error || uiT("Filen kunde inte sparas.") }));
+  if (!response.stepCount) {
+    show(uiTf(response.recordedIdentity ? "pageScript.exportEmpty" : "pageScript.exportNotRecorded",
+      { title: record.title }));
+    return;
+  }
+  await downloadBlob(new Blob([response.content], { type: "text/yaml" }), response.fileName);
+  const skipped = response.skipped || [];
+  const names = skipped.slice(0, 5).map(item => item.label || "?").join("; ") +
+    (skipped.length > 5 ? "; …" : "");
+  show(skipped.length
+    ? uiTf("pageScript.exportPartial", { fileName: response.fileName, count: response.stepCount,
+      skipped: skipped.length, steps: names })
+    : uiTf("pageScript.exportDone", { fileName: response.fileName, count: response.stepCount }));
+}
+
 async function runLibraryMenuAction(action, projectId, card) {
   const record = documentLibraryRecords.find(value => value.projectId === projectId);
   const session = documentLibrarySessions.get(projectId);
@@ -11237,6 +11258,8 @@ async function runLibraryMenuAction(action, projectId, card) {
       show("");
     } else if (action === "export-recording") {
       await exportSession(session);
+    } else if (action === "export-page-script") {
+      await exportPageScript(record);
     } else if (action === "move-folder") {
       openLibraryMoveDialog([projectId], card.querySelector(".library-card-menu summary"));
       return;

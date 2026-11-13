@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.31.0";
+  const GROUPING_VERSION = "1.32.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
@@ -471,6 +471,60 @@
     const selected = selectedValue(row); const committed = event.value?.normalized;
     return selected != null && committed != null && String(selected) === String(committed);
   }
+  // A row of a lookup list is a link whose name ends with the row's value in quotes, after the
+  // list's own text: Nr, sorterade i Stigande order Välj posten "10247". Without the value the
+  // name is the same for every row of that list, in any language.
+  const RECORD_CHOICE_VALUE = /s*["“][^"“”]+["”]s*$/u;
+  function recordChoiceList(event) {
+    if (event?.kind !== "activation") return "";
+    const caption = observedCaption(event, "control");
+    return RECORD_CHOICE_VALUE.test(caption) ? caption.replace(RECORD_CHOICE_VALUE, "").trim() : "";
+  }
+  // A click on a row that Business Central did not answer, followed by another click in the same
+  // list, did not choose anything: the list was still being drawn or the click missed. The later
+  // choice is the step. An unanswered click on another row is kept as supporting evidence; an
+  // unanswered click on the same row joins the answered one, as one choice with both clicks.
+  const REPEATED_RECORD_CHOICE_MS = 4000;
+  function unansweredRecordChoice(events, event) {
+    const [first] = events;
+    const list = recordChoiceList(first);
+    return events.length === 1 && Boolean(list) && list === recordChoiceList(event) &&
+      pageKey(first) === pageKey(event) && elapsed(first, event) <= REPEATED_RECORD_CHOICE_MS;
+  }
+  function sameRecordChoice(first, event) {
+    return observedCaption(first, "control") === observedCaption(event, "control");
+  }
+  // Text typed in a field that the field never took (no change, no leaving the field) and that
+  // a later edit of the same field replaces is not a step: an item number Business Central did
+  // not find, or the start of a search that the next edit completes. The later edit is the step.
+  const ABANDONED_TYPING_MS = 15000;
+  function onlyTyping(group) {
+    const edits = (group?.normalizedEvents || []).filter(item => item.kind === "value-change");
+    return edits.length > 0 && edits.every(item => item.subtype === "input") &&
+      group.normalizedEvents.every(item => ["value-change", "status-message"].includes(item.kind));
+  }
+  // When the field reports the earlier text as its value before the new typing ("5", then "50"
+  // from 5), the earlier text was entered and stays a step.
+  function replacesTyping(group, event) {
+    const typed = group?.normalizedEvents?.filter(item => item.kind === "value-change").at(-1);
+    const before = String(typed?.value?.normalized ?? "");
+    return onlyTyping(group) && event?.kind === "value-change" &&
+      controlKey(typed) === controlKey(event) && pageKey(typed) === pageKey(event) &&
+      String(event.previousValue?.normalized ?? "") !== before &&
+      elapsed(typed, event) <= ABANDONED_TYPING_MS;
+  }
+  // Clicking a cell and leaving it again makes the field report the value it already showed. A
+  // value reported on leaving the field, equal to the cell just clicked, changed nothing.
+  const UNCHANGED_ON_LEAVE_MS = 1000;
+  function unchangedOnLeave(group, events) {
+    const [event] = events;
+    const cell = group?.normalizedEvents?.length === 1 ? group.normalizedEvents[0] : null;
+    return events.length === 1 && event.kind === "value-change" && event.subtype === "focusout" &&
+      isRowSelection(cell) && cell.kind === "selection-change" &&
+      String(selectedValue(cell) ?? "") !== "" &&
+      String(selectedValue(cell)) === String(event.value?.normalized ?? "") &&
+      pageKey(cell) === pageKey(event) && elapsed(cell, event) <= UNCHANGED_ON_LEAVE_MS;
+  }
   function sameActivation(events, event) {
     const origin = events?.[0];
     return origin?.kind === "activation" && event.kind === "activation" &&
@@ -526,6 +580,22 @@
         pending = null;
         return;
       }
+      if (unchangedOnLeave(groups.at(-1), pending.events)) {
+        const [event] = pending.events;
+        supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
+          classification: "noise", reason: "unchanged-value-on-leave" }));
+        assignments.set(event.normalizedEventId, "supporting");
+        pending = null;
+        return;
+      }
+      while (replacesTyping(groups.at(-1), pending.events[0])) {
+        const replaced = groups.pop();
+        replaced.normalizedEventIds.forEach(id => {
+          supportingEvents.push(freeze({ normalizedEventId: id, classification: "superseded",
+            reason: "replaced-typing" }));
+          assignments.set(id, "supporting");
+        });
+      }
       const value = makeGroup(normalizedRecording.recordingId, pending.events,
         pending.reasons, groups.length + 1);
       groups.push(value);
@@ -562,6 +632,19 @@
           ? "recorder-interaction-supporting-evidence"
           : "recorder-interaction-id");
         continue;
+      }
+      if (pending && unansweredRecordChoice(pending.events, event) &&
+          sameRecordChoice(pending.events[0], event)) {
+        pending.events.push(event);
+        pending.reasons.push("repeated-record-choice");
+        continue;
+      }
+      if (pending && unansweredRecordChoice(pending.events, event)) {
+        const [unanswered] = pending.events;
+        supportingEvents.push(freeze({ normalizedEventId: unanswered.normalizedEventId,
+          classification: "superseded", reason: "unanswered-record-choice" }));
+        assignments.set(unanswered.normalizedEventId, "supporting");
+        pending = null;
       }
       if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
       if (!pending && event.kind === "status-message") {

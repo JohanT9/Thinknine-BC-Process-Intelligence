@@ -275,6 +275,21 @@
       };
       if (templates[locale]) return templates[locale]();
     }
+    // A row clicked on to work with it, such as a document line before a line action.
+    const rowChoice = source.match(/^Markera raden ([\s\S]+?)(?: på sidan ([\s\S]+?))?\.$/u);
+    if (rowChoice) {
+      const [, row, page] = rowChoice;
+      const templates = {
+        "en-US": () => `Select the line ${row}${page ? ` on the ${page} page` : ""}.`,
+        "fr-FR": () => `Sélectionnez la ligne ${row}${page ? ` sur la page ${page}` : ""}.`,
+        "de-DE": () => `Markieren Sie die Zeile ${row}${page ? ` auf der Seite ${page}` : ""}.`,
+        "es-ES": () => `Seleccione la línea ${row}${page ? ` en la página ${page}` : ""}.`,
+        "da-DK": () => `Marker linjen ${row}${page ? ` på siden ${page}` : ""}.`,
+        "fi-FI": () => `Valitse rivi ${row}${page ? ` sivulla ${page}` : ""}.`,
+        "nb-NO": () => `Merk linjen ${row}${page ? ` på siden ${page}` : ""}.`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
     const openList = source.match(/^Öppna listan ([\s\S]+?)\.$/u);
     if (openList) {
       const list = openList[1];

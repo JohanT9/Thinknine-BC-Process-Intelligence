@@ -86,6 +86,7 @@ importScripts("document/document-folders.js");
 importScripts("document/test-recording-match.js");
 importScripts("document/test-script.js");
 importScripts("document/test-suite.js");
+importScripts("document/page-script-export.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
@@ -848,9 +849,9 @@ async function recordEvent(rawEvent, captureContext = {}) {
 
     // A bug report keeps its values, apart from secrets, so that masking can be chosen in
     // each report; it derives a masked version of its steps when it is created.
-    const privacySafeEvent = globalThis.T9PrivacyMask
+    const privacySafeEvent = globalThis.T9PrivacyMask.keepTypedValue(sourceEvent, globalThis.T9PrivacyMask
       .maskFieldValues(sourceEvent, session.recordingPurpose === "bug-report" &&
-        settings.maskValues !== false ? { ...settings, maskValues: "secrets" } : settings);
+        settings.maskValues !== false ? { ...settings, maskValues: "secrets" } : settings));
 
     const rawResult = await rawEventStore.appendRawEvent(
       recordingId, privacySafeEvent, { maxEvents: settings.maxEvents }
@@ -1156,6 +1157,17 @@ const CAPTURE_SCRIPT_FILES = Object.freeze([
   "capture-indicator-i18n.js", "content.js"
 ]);
 
+// The manifest runs al-identity-capture.js in the page's own world in every Business Central
+// page that loads. A tab that was open before the extension was installed or updated gets it
+// here, with the capture scripts. It guards against running twice, and a failure only means
+// that tab's steps are recorded without the names a Page Scripting test needs.
+async function injectAlIdentityCapture(tabId) {
+  try {
+    await chrome.scripting.executeScript({ target: { tabId, allFrames: true },
+      files: ["al-identity-capture.js"], world: "MAIN" });
+  } catch {}
+}
+
 async function registerRecorderContentScript() {
   try {
     const registered = await chrome.scripting.getRegisteredContentScripts({
@@ -1241,6 +1253,7 @@ async function injectRecorderIntoExistingBcTabs() {
         files: [...CAPTURE_SCRIPT_FILES],
         world: "ISOLATED"
       });
+      await injectAlIdentityCapture(tab.id);
       results.push({ tabId: tab.id, ok: true });
     } catch (error) {
       results.push({
@@ -1288,6 +1301,7 @@ async function ensureContentScript(tabId) {
       },
       files: [...CAPTURE_SCRIPT_FILES]
     });
+    await injectAlIdentityCapture(tabId);
   } catch (error) {
     await setDebug({
       connected: false,
@@ -1597,7 +1611,10 @@ async function stopSession(finalName = "", documentLanguage = "") {
     sessionId: null,
     tabId: state.tabId,
     startedAt: null,
-    recordingPurpose: null
+    recordingPurpose: null,
+    // A Page Scripting file saved in this tab shortly after is kept with this recording.
+    ...(session && !session.testRunId ? { lastSessionId: session.id,
+      lastStoppedAt: session.completedAt } : {})
   });
   await setDebug({
     activeSessionId: null,
@@ -2379,6 +2396,7 @@ function extensionPageSender(sender) {
   return sender?.id === chrome.runtime.id &&
     String(sender.url || "").startsWith(chrome.runtime.getURL(""));
 }
+
 function messageAllowed(message, sender) {
   return extensionPageSender(sender) || PAGE_MESSAGE_TYPES.has(message?.type);
 }
@@ -3004,6 +3022,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await bugReportStore.remove(message.bugReportId);
         sendResponse({ ok: true });
         break;
+
+      // A Page Scripting file made from the recording, for the library to hand to downloads.
+      case "T9_BUILD_PAGE_SCRIPT": {
+        const session = await getSession(message.sessionId);
+        if (!session) throw new Error("The recording was not found.");
+        const raw = await getRawRecording(session.id).catch(() => null);
+        const result = globalThis.T9PageScriptExport.build({ name: session.name,
+          locale: session.settings?.documentLanguage || "en-US",
+          description: "BC Process Studio", events: raw?.events || [] });
+        sendResponse({ ok: true, content: result.content, stepCount: result.stepCount,
+          skipped: result.skipped, startPage: result.startPage,
+          recordedIdentity: result.recordedIdentity,
+          fileName: globalThis.T9PageScriptExport.fileName(session.name) });
+        break;
+      }
 
       case "T9_GET_STATE": {
         const state = await getState();

@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.31.0");
+assert.strictEqual(quantity.groupingVersion, "1.32.0");
 // Regression: event 125 from the user's September 7 recording. No usable name or identity.
 const legacyBack = run([event("legacy125", "activation", {
   rawEventType: "click", actionIdentification: { caption: "\uE72B" },
@@ -550,6 +550,83 @@ assert.ok(Date.now() - started < 5000, "large grouping regression");
   assert.strictEqual(late.groups.length, 2);
   const mouse = run([events[0], { ...events[2], subtype: "interaction" }]);
   assert.ok(!mouse.groups[0].groupingReason.includes("field-suggestion-choice"));
+}
+
+// A click on a row of a lookup list that Business Central did not answer, followed by another
+// click in the same list, chose nothing: the list was still being drawn. Only the answered
+// choice is a step; the unanswered clicks are kept as supporting evidence. Recorded on a sales
+// order line: 10247, then 10245 118 ms later, then 10247 again, which the client saved.
+{
+  const at = ms => new Date(Date.parse("2026-11-13T08:55:00.000Z") + ms).toISOString();
+  const pick = (id, value, ms, extra = {}) => event(id, "activation", { interactionId: id,
+    interactionIds: [id], timestamp: at(ms), controlIdentification: { role: "button",
+      caption: `Nr, sorterade i Stigande order Välj posten "${value}"` }, ...extra });
+  const saved = (id, ms, interaction) => event(id, "status-message", { interactionId: interaction,
+    interactionIds: [interaction], timestamp: at(ms), controlIdentification: { caption: "Sparar ..." } });
+  const result = run([pick("p1", "10247", 0), pick("p2", "10245", 118), pick("p3", "10247", 2607),
+    saved("p4", 2616, "p3")]);
+  assert.deepStrictEqual(result.groups.map(group => group.sourceEventIds.map(id => id.slice(7))),
+    [["p3", "p4"]], "one step for the choice the client answered");
+  assert.deepStrictEqual(result.supportingEvents.filter(item => item.reason === "unanswered-record-choice")
+    .map(item => item.normalizedEventId), ["normalized:p1", "normalized:p2"],
+  "the unanswered clicks stay as supporting evidence");
+  // Two answered choices are two steps, as are choices in different lists, choices far apart
+  // in time and choices on different pages.
+  assert.strictEqual(run([pick("a1", "10247", 0), saved("a2", 10, "a1"), pick("a3", "10245", 500),
+    saved("a4", 510, "a3")]).groups.length, 2);
+  assert.strictEqual(run([pick("b1", "10247", 0), event("b2", "activation", { interactionId: "b2",
+    interactionIds: ["b2"], timestamp: at(500), controlIdentification: { role: "button",
+      caption: 'Kundnr, sorterade i Stigande order Välj posten "1111"' } })]).groups.length, 2);
+  assert.strictEqual(run([pick("c1", "10247", 0), pick("c2", "10245", 4500)]).groups.length, 2);
+  // Two clicks on the same row are left to the field's lookup selection, which joins them.
+  assert.ok(!run([pick("f1", "30043", 0), pick("f2", "30043", 139)]).supportingEvents
+    .some(item => item.reason === "unanswered-record-choice"));
+  assert.strictEqual(run([pick("d1", "10247", 0), pick("d2", "10245", 500,
+    { pageIdentification: { id: "43", caption: "Purchase Order" } })]).groups.length, 2);
+  // A button whose name has no quoted value is not a row of a list.
+  const button = (id, ms) => event(id, "activation", { interactionId: id, interactionIds: [id],
+    timestamp: at(ms), controlIdentification: { role: "button", caption: "Ny rad" } });
+  assert.strictEqual(run([button("e1", 0), button("e2", 400)]).groups.length, 2);
+}
+
+// Typing that is replaced by other typing in the same field, without a choice or a result in
+// between, was abandoned: on a purchase order line "300043" was typed in Nr and then replaced
+// by "isber". Only the later typing is a step; the earlier stays as supporting evidence.
+{
+  const at = ms => new Date(Date.parse("2026-11-13T09:00:00.000Z") + ms).toISOString();
+  const nr = { identity: { value: "No." }, caption: "Nr" };
+  const type = (id, value, ms, subtype = "input") => event(id, "value-change", { subtype,
+    interactionId: id, interactionIds: [id], timestamp: at(ms), controlIdentification: nr,
+    value: { normalized: value } });
+  const replaced = run([type("t1", "300043", 0), type("t2", "isber", 3000)]);
+  assert.deepStrictEqual(replaced.groups.map(group => group.sourceEventIds.map(id => id.slice(7))),
+    [["t2"]], "abandoned typing is not a step");
+  assert.deepStrictEqual(replaced.supportingEvents.filter(item => item.reason === "replaced-typing")
+    .map(item => item.normalizedEventId), ["normalized:t1"]);
+  // Typing with a result in between, or long before, stays its own step.
+  assert.strictEqual(run([type("u1", "300043", 0), event("u2", "status-message", {
+    timestamp: at(100), controlIdentification: { caption: "Sparar ..." } }),
+  type("u3", "isber", 3000)]).groups.length, 3);
+  assert.strictEqual(run([type("v1", "300043", 0), type("v2", "isber", 20000)]).groups.length, 2);
+  // When the field says it held the earlier text before the new typing, that text was entered:
+  // "5", then "50" from 5, is two entries.
+  assert.ok(!run([type("w1", "5", 0), { ...type("w2", "50", 2000),
+    previousValue: { raw: "5", normalized: "5" } }]).supportingEvents
+    .some(item => item.reason === "replaced-typing"), "entered typing is not replaced");
+
+  // Clicking a cell and leaving it makes the field report the value it already showed: that
+  // changed nothing and is not a step. Another value, or a value reported later, is kept.
+  const cell = (id, value, ms) => event(id, "selection-change", { interactionId: id,
+    interactionIds: [id], timestamp: at(ms), controlIdentification: { controlType: "listRow",
+      caption: value }, selection: { value, caption: value } });
+  const echo = run([cell("c1", "30043", 0), type("c2", "30043", 400, "focusout")]);
+  assert.strictEqual(echo.groups.length, 1, "the value shown again on leaving is not a step");
+  assert.ok(echo.supportingEvents.some(item => item.normalizedEventId === "normalized:c2" &&
+    item.reason === "unchanged-value-on-leave"));
+  assert.strictEqual(run([cell("d1", "30043", 0), type("d2", "30044", 400, "focusout")])
+    .groups.length, 2);
+  assert.strictEqual(run([cell("e1", "30043", 0), type("e2", "30043", 3000, "focusout")])
+    .groups.length, 2);
 }
 
 // The client redraws the page after a commit and then shows the validated value: 1500 becomes

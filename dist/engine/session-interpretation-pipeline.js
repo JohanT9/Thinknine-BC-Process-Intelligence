@@ -210,7 +210,7 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const page = action.pageIdentification || sourceEvents.at(-1)?.identification?.pageIdentity || {};
     const control = [...sourceEvents].reverse().map(event => event.controlIdentification ||
       event.identification?.controlIdentity || {}).find(value => value.controlId || value.fieldId ||
-        value.automationId) || {};
+        value.automationId || value.alControlName) || {};
     return { taskId: `${action.actionType || "Task"}:${refs.stableIdentity(trace)}`,
       taskNo: index + 1, taskType: action.actionType || "Unclassified",
       semanticAction: action.actionType || "", semanticActionModel: action,
@@ -239,7 +239,9 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
           sourceEvents.at(-1)?.identification?.pageIdentity?.pageObjectId || null,
         appVersion: page.appVersion || null },
       knowledgeControlRef: { controlId: control.controlId || null,
-        automationId: control.automationId || null, fieldId: control.fieldId || null },
+        automationId: control.automationId || null, fieldId: control.fieldId || null,
+        // The field's AL name from Business Central's web client (controlname), when it showed one.
+        ...(control.alControlName ? { alControlName: control.alControlName } : {}) },
       fieldCaption: actionTask ? "" : action.targetField || "",
       selectedCaption: action.selectedValue || "",
       value: typeof action.checked === "boolean"

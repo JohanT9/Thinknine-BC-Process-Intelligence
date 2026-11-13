@@ -307,4 +307,15 @@ assert.ok(background.includes("chrome.downloads.download"));
 assert.ok(background.includes("chrome.downloads.open"));
 assert.ok(!background.includes("saveAs:"));
 
+// The recording's ZIP export is named like the document's Word file, after the same pattern,
+// and is handed to the browser's downloads the same way; never after the recording's id.
+assert.strictEqual(exportSettings.buildFileName("zip", session, settings, now),
+  "Lägg order Gammal miljö 2026-08-04 09-07 4.7.0.zip");
+const dashboardSource = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.js"), "utf8");
+const zipExport = dashboardSource.slice(dashboardSource.indexOf("async function exportSession("),
+  dashboardSource.indexOf("function currentFilenamePreviewSession("));
+assert.ok(/exportSettings\.buildFileName\("zip",\s*response\.session \|\| session,/u.test(zipExport));
+assert.ok(zipExport.includes("await downloadBlob(zip(files), filename);"));
+assert.ok(!zipExport.includes("safeFileName(session.id)"));
+
 console.log("Export settings behaviour tests passed.");

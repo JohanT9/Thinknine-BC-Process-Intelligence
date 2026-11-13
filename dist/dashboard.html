@@ -350,6 +350,10 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .settings-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.settings-inline input{flex:1 1 260px;max-width:380px}.settings-save-status{min-height:18px;margin:5px 0 0;color:var(--c-fg-52606d);font-size:13px}.settings-save-status.saved{color:var(--c-fg-107c10)}
 .review-zoom-content{min-height:100%;display:flex;flex-direction:column}
 .review-step-workspace{flex:1;min-height:420px}
+/* A long step list scrolls on its own and stays in view: choosing a step never moves the list.
+   The space at its end lets the last step scroll above the review footer, which covers it. */
+#reviewWorkspacePanel{container-type:size}
+@media(min-width:801px){.review-step-navigation{position:sticky;top:0;align-self:start;box-sizing:border-box;max-height:calc(100cqh / var(--review-zoom,1));padding-bottom:88px;overscroll-behavior:contain}}
 .review-step-navigation-list{padding-bottom:14px}
 .review-step-filter-label{display:flex;align-items:center;gap:8px;margin:8px 6px 10px;font-size:12px;color:var(--c-fg-52606d)}
 .review-step-filter-label select{width:auto;min-width:0;flex:1;padding:6px}

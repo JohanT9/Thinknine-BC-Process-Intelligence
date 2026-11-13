@@ -1,6 +1,7 @@
 // Business Central can report a click on a row in a list twice: the same row with the same
 // caption, a moment apart. That is one choice and one step; the repeat keeps its events as
-// evidence. Choosing a row again later, or another row, stays its own step.
+// evidence. A click on another row that Business Central did not answer chose nothing; choosing
+// a row again later, or another row after the first was saved, stays its own step.
 const assert = require("assert");
 const { replay } = require("../scripts/capture-quality/replay");
 
@@ -19,6 +20,10 @@ const type = (value, seconds) => ({ ...line, type: "field-change", role: "combob
   controlType: "input", inputType: "text", fieldName: "Sortera efter Nr", label: "Sortera efter Nr",
   accessibleName: "Sortera efter Nr", inputSource: "change", value, timestamp: at(seconds) });
 const steps = events => replay(events, { documentLanguage: "sv-SE" }).tasks;
+// Business Central's answer to a click: the line is being saved.
+const saved = (seconds, interaction) => ({ ...line, type: "status-message", category: "result",
+  controlType: "div", role: "div", label: "Sparar ...", accessibleName: "Sparar ...",
+  interactionId: interaction, timestamp: at(seconds) });
 
 // The click reported again 0.14 seconds later, at no position, is the same choice.
 const once = steps([type("isbergss", 0), choose("30043", 0.02, { clientX: 686, clientY: 891 })]);
@@ -28,9 +33,49 @@ assert.deepStrictEqual(twice.map(task => task.instruction), once.map(task => tas
   "a repeated click on the same row adds no step");
 assert.strictEqual(twice.filter(task => /30043/u.test(task.instruction)).length, 1);
 
-// Another row, or the same row chosen again later, is a step of its own.
-const other = steps([type("isbergss", 0), choose("30043", 0.02), choose("30044", 0.16)]);
-assert.ok(other.length > once.length, "choosing another row is kept");
+// A click on another row while Business Central has not answered the first chose nothing yet:
+// the list was still being drawn. The row chosen last is the one step.
+const redrawn = steps([type("isbergss", 0), choose("30044", 0.02), choose("30043", 0.16)]);
+assert.deepStrictEqual(redrawn.map(task => task.instruction), once.map(task => task.instruction),
+  "an unanswered click on another row adds no step");
+// The same row clicked again 1.7 seconds later, after the list was drawn again, is one choice
+// too: the first click was not answered, the second was saved. The step keeps the result.
+const resaved = steps([type("isbergss", 0), choose("30043", 0.02, { clientY: 1016 }),
+  choose("30043", 1.72, { clientY: 995 }), saved(1.73, `frame:click-${clicks}`)]);
+assert.strictEqual(resaved.filter(task => /30043/u.test(task.instruction)).length, 1,
+  "an unanswered click on the same row adds no step");
+// Later clients name the line's number field "Nr" instead of its sort button "Sortera efter Nr".
+// Typing in it and choosing the item is one step, as with the sort button.
+// The events are those recorded on a purchase order line: "isber" typed in Nr, the item clicked
+// twice while the list was drawn again (the first click unanswered) and the number the field
+// then shows. Before, that was three steps: "Välj artikel isber" and "Välj posten 30043" twice.
+const searchEvents = require("./fixtures/repeated-choice/item-search-in-number-field.json");
+assert.deepStrictEqual(steps(searchEvents).map(task => task.instruction),
+  ["Ange __isber__ i **Nr** och välj **30043**."], "typing in Nr and choosing the item is one step");
+// A number typed in is still named as the item chosen, not as a search.
+const typedNumber = steps(searchEvents.map(event => event.value === "isber"
+  ? { ...event, value: "30043" } : event));
+assert.ok(typedNumber.every(task => !/__30043__ i \*\*Nr\*\* och välj/u.test(task.instruction)),
+  "a typed item number is not described as a search");
+// Another row chosen after Business Central answered the first, or the same row chosen again
+// later, is a step of its own.
+const other = steps([type("isbergss", 0), choose("30043", 0.02), saved(0.1, `frame:click-${clicks}`),
+  choose("30044", 0.16)]);
+assert.ok(other.length > once.length, "choosing another row after the first was saved is kept");
 const later = steps([type("isbergss", 0), choose("30043", 0.02), choose("30043", 5)]);
 assert.ok(later.length > once.length, "choosing the row again later is kept");
+// A line clicked right before an action on it is marked for that action, not chosen: recorded
+// on a purchase order, the line 30043 was clicked and then Rad → Tillämpat inköpspris och rabatt
+// used. Leaving the cell made Nr report the 30043 it already showed. Before, that was "Välj
+// posten 30043" and "Välj artikel 30043".
+const marked = steps(require("./fixtures/repeated-choice/row-marked-for-line-action.json"));
+assert.deepStrictEqual(marked.map(task => task.instruction), [
+  "Markera raden **30043** på sidan **Inköpsorder**.",
+  "Välj **Rad** → **Tillämpat inköpspris och rabatt** på sidan **Inköpsorder**."
+], "a line marked for an action is one step and says so");
+// A line clicked without an action after it is still a choice.
+const chosen = steps(require("./fixtures/repeated-choice/row-marked-for-line-action.json")
+  .filter(event => event.role !== "menuitem" && event.type !== "dialog-open"));
+assert.ok(chosen.every(task => !/^Markera raden/u.test(task.instruction)),
+  "a line not followed by an action is not described as marked");
 console.log("Repeated choice tests passed.");

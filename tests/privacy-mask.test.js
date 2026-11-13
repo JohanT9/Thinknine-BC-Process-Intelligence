@@ -37,6 +37,27 @@ assert.deepStrictEqual(privacy.maskFieldValues({ fieldName: "Unit Price", value:
 assert(!("previousValue" in privacy.maskFieldValues({ fieldName: "Antal", value: "5" }, settings)),
   "absent values are not introduced");
 assert.strictEqual(privacy.maskFieldValues(null, settings), null);
+
+// What the user typed is kept beside the masked value for the Page Scripting test, whatever it
+// is; secrets never, and values the client showed or that masking left alone are not repeated.
+const keep = event => privacy.keepTypedValue(event, privacy.maskFieldValues(event, settings));
+const typedAmount = keep({ type: "field-change", inputSource: "change", fieldName: "Direct Unit Cost", value: "120" });
+assert.deepStrictEqual([typedAmount.value, typedAmount.typedValue], ["[belopp]", "120"]);
+const typedEntered = keep({ type: "field-change", inputSource: "input", fieldName: "Unit Price",
+  value: "1,200.00", enteredValue: "1200" });
+assert.deepStrictEqual([typedEntered.value, typedEntered.enteredValue, typedEntered.typedValue], ["[belopp]", "[belopp]", "1200"]);
+assert.strictEqual(keep({ type: "field-change", inputSource: "change", fieldName: "E-post", value: "a@b.se" }).typedValue, "a@b.se",
+  "every typed value, not only amounts");
+for (const event of [
+  { type: "field-change", inputSource: "change", fieldName: "Password", value: "hemligt" },
+  { type: "field-change", inputSource: "change", fieldName: "API key", value: "abc" },
+  { type: "field-change", inputSource: "validated", fieldName: "Amount", value: "120" },
+  { type: "field-change", inputSource: "focusout", fieldName: "Amount", value: "120" },
+  { type: "field-change", inputSource: "change", fieldName: "Amount", value: "" },
+  { type: "field-change", inputSource: "change", fieldName: "Antal", value: "5" },
+  { type: "click", inputSource: "change", fieldName: "Amount", value: "120" }
+]) assert(!("typedValue" in keep(event)), `no typed value kept for ${JSON.stringify(event)}`);
+assert(background.includes("T9PrivacyMask.keepTypedValue(sourceEvent"), "typed values are kept where events are stored");
 assert(!background.includes('return "[antal]"'));
 assert(background.includes("item.source?.eventId === sourceEventId"),
   "only exact source-message redelivery may be deduplicated");

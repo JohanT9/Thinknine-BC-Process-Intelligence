@@ -64,6 +64,8 @@ const engineSentences = {
   "Sök efter __ink ord__ och öppna listan **Inköpsorder**.":
     { kind: "searchOpenList", query: "ink ord", result: "Inköpsorder" },
   "Välj posten **PO1** på sidan **Inköpsorder**.": { kind: "recordOnPage", record: "PO1", page: "Inköpsorder" },
+  "Markera raden **30043** på sidan **Inköpsorder**.": { kind: "rowOnPage", record: "30043", page: "Inköpsorder" },
+  "Markera raden **30043**.": { kind: "row", record: "30043" },
   "Börja skapa en ny **inköpsorder** genom att välja **Ny** på sidan **Inköpsorder**.":
     { kind: "create", entity: "PurchaseOrder", action: "Ny", page: "Inköpsorder" },
   "Välj **Ja** i dialogrutan.": { kind: "dialogAction", action: "Ja" },

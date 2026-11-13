@@ -62,6 +62,9 @@
       pageObjectId: id(task.pageObjectId || objectRef.objectId),
       pageCaption: caption(task.pageCaption),
       controlId: id(controlRef.fieldId || controlRef.controlId || controlRef.automationId),
+      // The field's AL name ("Sell-to Customer No."): the same in every language Business
+      // Central is shown in, and in every session, unlike the captions.
+      ...(id(controlRef.alControlName) ? { alControlName: id(controlRef.alControlName) } : {}),
       fieldCaption: caption(task.fieldCaption || task.targetField),
       actionCaption: caption(task.actionCaption),
       ...(opened ? { openedPage: opened } : {})
@@ -70,7 +73,8 @@
 
   function hasSignature(value) {
     const sig = value || {};
-    return Boolean(sig.taskType && (sig.controlId || sig.fieldCaption || sig.actionCaption));
+    return Boolean(sig.taskType && (sig.controlId || sig.alControlName || sig.fieldCaption ||
+      sig.actionCaption));
   }
 
   // How well two steps agree, from 0 to 1. The field or button must agree and the page adds
@@ -156,6 +160,8 @@
   // How well the field or button agrees, from 0 to 1.
   function targetScore(expected, recorded) {
     if (expected.controlId && recorded.controlId && expected.controlId === recorded.controlId) return 1;
+    if (expected.alControlName && recorded.alControlName &&
+        expected.alControlName === recorded.alControlName) return 1;
     const labels = [[expected.fieldCaption, recorded.fieldCaption],
       [expected.actionCaption, recorded.actionCaption]].filter(([a, b]) => a && b);
     if (labels.length && labels.every(([a, b]) => a === b)) {

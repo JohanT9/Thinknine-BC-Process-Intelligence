@@ -84,6 +84,7 @@
       ["data-automation-id", raw.automationId],
       ["data-control-id", raw.dataControlId],
       ["data-control-name", raw.dataControlName],
+      ["controlname", raw.alControlName],
       ["name", raw.nameAttribute],
       ["id", raw.elementId]
     ]) if (text(value)) return {
@@ -92,6 +93,11 @@
     };
     return null;
   }
+  // The field's AL name as the field rules compare ids: "Sell-to Customer No." as
+  // "SelltoCustomerNo", so that it reads like the automation ids the rules were written for.
+  const alFieldKey = raw => text(raw.alControlName).replace(/[^\p{L}\p{N}]/gu, "");
+  const alPath = raw => Array.isArray(raw.alControlPath)
+    ? raw.alControlPath.map(text).filter(Boolean) : [];
   function identifyPage(raw = {}, options = {}) {
     const pageId = text(raw.pageId);
     const pageObjectId = pageIdentityContract.observedPageObjectId(raw);
@@ -124,13 +130,16 @@
     const technical = identity(raw);
     const classified = controlType(raw);
     const caption = text(raw.accessibleName || raw.fieldName || raw.label);
-    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId);
+    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId) || alFieldKey(raw);
     const fieldRule = FIELD_RULES.find(rule => rule.ids.test(stableField)) ||
       FIELD_RULES.find(rule => rule.captions.test(caption));
     return {
       controlIdentity: technical ? `bc:control:${technical.value}` : null,
       controlId: text(raw.controlId || raw.dataControlId) || null,
       automationId: text(raw.automationId) || null,
+      // Only recordings that saw controlname have these, so older ones identify as before.
+      ...(text(raw.alControlName) ? { alControlName: text(raw.alControlName) } : {}),
+      ...(alPath(raw).length ? { alControlPath: alPath(raw) } : {}),
       controlType: classified.value,
       role: text(raw.role) || null,
       caption: caption || null,
@@ -144,7 +153,7 @@
   function identifyField(raw = {}) {
     const classified = controlType(raw); const technical = identity(raw);
     const caption = text(raw.accessibleName || raw.fieldName || raw.label);
-    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId);
+    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId) || alFieldKey(raw);
     const rule = FIELD_RULES.find(item => item.ids.test(stableField)) ||
       FIELD_RULES.find(item => item.captions.test(caption));
     const fieldLike = ["field", "dateInput", "option", "checkbox", "lookup",
@@ -153,6 +162,7 @@
       fieldIdentity: fieldLike && technical ? `bc:field:${technical.value}` : null,
       fieldId: text(raw.fieldId || raw.dataControlId) || null,
       automationId: text(raw.automationId) || null,
+      ...(fieldLike && text(raw.alControlName) ? { alFieldName: text(raw.alControlName) } : {}),
       semanticHint: rule?.hint || text(raw.fieldId) || null,
       caption: caption || null,
       source: fieldLike ? technical?.source || (rule ? "semantic-field-rule" : null) : null,
@@ -254,6 +264,8 @@
     if (technicalIdentity) { control.identity = technicalIdentity; allEvidence.push(evidence(technicalIdentity.source, technicalIdentity.value)); }
     if (text(raw.fieldId)) control.fieldId = text(raw.fieldId);
     if (text(raw.controlId)) control.controlId = text(raw.controlId);
+    if (text(raw.alControlName)) control.alName = text(raw.alControlName);
+    if (alPath(raw).length) control.alPath = alPath(raw);
     if (caption) control.caption = caption;
     if (text(raw.accessibleName || raw.label)) control.accessibleName = text(raw.accessibleName || raw.label);
     if (text(raw.role)) control.role = text(raw.role);

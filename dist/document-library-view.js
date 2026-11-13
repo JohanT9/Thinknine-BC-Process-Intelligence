@@ -141,6 +141,7 @@
               localized("Run test", locale, "Kör test"))}</button>`}`}
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
+            ${recording || bugReport || !view.pageScriptLabel ? "" : `<button type="button" data-library-action="export-page-script">${escape(view.pageScriptLabel)}</button>`}
             ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
             <button type="button" data-library-action="archive">${escape(record.archived
               ? localized("Restore from archive", locale, "Återställ från arkivet")

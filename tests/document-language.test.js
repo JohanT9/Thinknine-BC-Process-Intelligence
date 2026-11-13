@@ -44,6 +44,20 @@ for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-
     }
   }
 }
+// A line marked for the action after it is marked in every document language, not chosen.
+for (const [locale, expected] of Object.entries({
+  "en-US": "Select the line **30043** on the **Inköpsorder** page.",
+  "fr-FR": "Sélectionnez la ligne **30043** sur la page **Inköpsorder**.",
+  "de-DE": "Markieren Sie die Zeile **30043** auf der Seite **Inköpsorder**.",
+  "es-ES": "Seleccione la línea **30043** en la página **Inköpsorder**.",
+  "da-DK": "Marker linjen **30043** på siden **Inköpsorder**.",
+  "fi-FI": "Valitse rivi **30043** sivulla **Inköpsorder**.",
+  "nb-NO": "Merk linjen **30043** på siden **Inköpsorder**." })) {
+  assert.strictEqual(language.translateInstruction(
+    "Markera raden **30043** på sidan **Inköpsorder**.", locale), expected, locale);
+}
+assert.strictEqual(language.translateInstruction("Markera raden **30043**.", "en-US"),
+  "Select the line **30043**.");
 assert.strictEqual(language.translateInstruction(navigationTemplates[0], "de-DE"),
   "Wählen Sie den Datensatz **101003** auf der Seite **Sales Order** aus.");
 assert.strictEqual(language.translateInstruction(navigationTemplates[3], "en-US"),
