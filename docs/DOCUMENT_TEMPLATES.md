@@ -6,16 +6,25 @@ never changes what has been written in a document. Templates are made in
 
 ## What a user can do (phases 1–3)
 
-- See the built-in templates (BC Process Studio, Minimal, Corporate) with a preview of the
-  first page. Built-in templates cannot be changed; **Copy and edit** makes an own template
+- See the built-in templates (BC Process Studio, Minimal, Corporate) with a preview of how
+  the document starts in Word: the cover page (centred, with document type, title, subtitle
+  and the details table) and the next page with the first heading. Without a cover page the
+  preview shows one page. Built-in templates cannot be changed; **Copy and edit** makes an own template
   from one.
 - Make an own template (**New template** starts from the current default template, **Copy**
   from any template) and set its name, logo, company name in the document, colour, font,
   footer, sections and default texts. Changes
   are saved as they are made, with *Saving… / Saved / could not be saved* and **Try again**.
   A change that could not be saved stays in the editor.
+- See in the editor how many documents use the template and whether new documents get it;
+  **Make default** is there too.
 - Choose the template new documents get (**Make default**). New documents get the default
   template; existing documents keep theirs.
+- See and change a document's template where it is edited: **Template** under the title lists
+  the templates, and changing it shows the new look at once without changing the content.
+  **Edit templates…** closes the document (it saves first) and opens the template settings.
+  A template that is not on this computer is listed as such, with the template it is shown with.
+- See each document's template on its library row.
 - Give documents another template from the library: select documents and use **Template**.
   The library filter **Template** lists the templates documents use.
 - Remove an own template. Its documents get the default template (BC Process Studio when the
@@ -32,9 +41,9 @@ in the preview and in the next Word export.
 
 | Part | Word | Preview |
 | --- | --- | --- |
-| Header on every page | logo (at most 160 × 36 pt), company in bold, document name right-aligned, line in the template colour | the same band above the document |
-| Cover | logo (at most 260 × 90 pt) and company above the title | the same |
-| Footer | the template's footer text; `{page}` becomes the page number field. An empty footer shows the document name and the page number | the same, page 1 |
+| Header on every page | logo (at most 160 × 36 pt), company in bold, document name right-aligned, line in the template colour. A template made from one with a header band (BC Process Studio) keeps the band: logo, then company (or the base template's name), Business Central and the document name, in the base band colour until the colour is changed and then in a dark shade of the new colour | the same band above the document |
+| Cover | logo (at most 260 × 90 pt) and company above the title; without a company of its own, the base template's name (BC Process Studio) | the same |
+| Footer | the template's footer text; `{page}` becomes the page number field. An empty footer looks as in the template that was copied: BC Process Studio for a copy of it, otherwise the document name, and the page number | the same, page 1 |
 | Colour | headings, heading lines, step headings and table labels | the same |
 | Font | the whole document | the same |
 

@@ -131,9 +131,15 @@
     const branding = header?.appearance?.branding || footer?.appearance?.branding || {};
     const footerText = String(footer?.content?.text || "");
     return planModel.deepFreeze({
+      // A template made from one with a header band shows the band, as in Word.
       pageHeader: branding.templateId && header ? {
         company: String(branding.organizationName || ""), logoAssetId: String(branding.logo || ""),
-        title: String(header.content?.text || ""), borderColor: header.appearance?.borderColor || ""
+        title: String(header.content?.text || ""), borderColor: header.appearance?.borderColor || "",
+        ...(header.appearance?.fillColor ? { band: {
+          fillColor: header.appearance.fillColor, textColor: header.appearance.textColor || "#ffffff",
+          text: [String(header.appearance.brand || "").trim(), "Business Central",
+            String(header.content?.text || "")].filter(Boolean).join("  |  ")
+        } } : {})
       } : null,
       pageFooter: branding.templateId && footer ? {
         text: footerText.includes("{page}") ? footerText.split("{page}").join("1")

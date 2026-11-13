@@ -72,19 +72,36 @@ assert.ok(dashboardHtml.indexOf('id="libraryContinue"') > headEnd &&
   dashboardHtml.indexOf('id="libraryContinue"') < dashboardHtml.indexOf('id="libraryResults"'));
 assert.match(dashboardHtml, /\.library-head\{position:sticky;top:var\(--home-appbar-height,0px\)/u);
 assert.match(dashboardHtml, /@media \(max-height:600px\),\(max-width:640px\)\{\.library-head\{position:static/u);
-// Selecting several documents shows the batch actions at the bottom of the heading, above the
-// list; in a small window only they stay in view.
+// While documents are marked their actions take the place of the result count right above the
+// list, and the heading with Export, Import and Sync stays. The row always has the actions'
+// height, so marking a row does not move the list; More actions opens upwards inside the sticky
+// heading. In a small window, where the heading scrolls away, the actions float at the bottom.
+const statusRowAt = dashboardHtml.indexOf('<div class="library-status-row">');
 const batchAt = dashboardHtml.indexOf('<div id="libraryBatchToolbar"');
-assert.ok(batchAt > headEnd && batchAt < dashboardHtml.indexOf('id="libraryContinue"'));
-assert.match(read("src/ui/design-system.css"), /\.library-batch-toolbar\{position:static;/u);
-assert.match(dashboardHtml, /\.library-head:has\(#libraryBatchToolbar:not\(\[hidden\]\)\)\{position:sticky;top:calc\(var\(--home-appbar-height,0px\) - var\(--library-batch-offset,0px\)\)\}/u);
+assert.ok(statusRowAt > 0 && statusRowAt < headEnd && headEnd < batchAt &&
+  batchAt < dashboardHtml.indexOf('id="libraryContinue"'),
+  "the selection actions share the result count's row at the end of the heading");
+const toolbarCss = read("src/ui/design-system.css");
+assert.doesNotMatch(toolbarCss, /library-batch-toolbar[^{]*\)\)>\.library-heading\{display:none\}/u,
+  "the heading with Export, Import and Sync stays while documents are marked");
+assert.match(toolbarCss, /\.library-status-row\{display:grid;align-items:center;min-height:34px;/u);
+assert.match(toolbarCss, /\.library-status-row>\*\{grid-area:1\/1\}/u);
+assert.match(toolbarCss, /\.library-status-row:has\(>\.library-batch-toolbar:not\(\[hidden\]\)\)>\.library-status\{opacity:0;/u);
+assert.match(toolbarCss, /\.library-batch-toolbar:not\(\[hidden\]\)\{position:relative;[^}]*min-height:34px;margin:0;/u);
+assert.match(toolbarCss, /\.library-batch-toolbar \.library-batch-more-panel\{position:absolute;bottom:calc\(100% \+ 4px\);/u);
+assert.match(toolbarCss, /@media \(max-height:600px\),\(max-width:640px\)\{\n {2}\.library-status-row:has\(>\.library-batch-toolbar:not\(\[hidden\]\)\)>\.library-status\{opacity:1\}\n {2}\.library-batch-toolbar:not\(\[hidden\]\)\{position:fixed;/u);
+assert.match(dashboardHtml, /@media \(max-height:600px\),\(max-width:640px\)\{html:has\(#documentsView:not\(\[hidden\]\)\):has\(#libraryBatchToolbar:not\(\[hidden\]\)\)\{scroll-padding-bottom:/u);
 assert.match(read("src/ui/dashboard.js"), /root\.setProperty\("--library-head-height", `\$\{head\.offsetHeight\}px`\);/u);
 
-// In Select several a click anywhere on a row marks or unmarks it; the checkbox label is not
-// counted twice, and the row shows that it can be clicked.
+// A click on a row marks it, as in a file list: alone, with Ctrl or Cmd added, with Shift a
+// range; in Select several a click marks or unmarks it. The checkbox label is not counted twice.
+// A double click opens the document; once a row is marked every row shows its checkbox.
 const dashboardJs = read("src/ui/dashboard.js");
 assert.match(dashboardJs, /if \(!selectionControl && event\.target\.closest\?\.\("\.library-select"\)\) return;/u);
+assert.match(dashboardJs, /if \(selectionControl \|\| !cardAction\) \{/u);
 assert.match(dashboardJs, /toggle: Boolean\(selectionControl \|\| librarySelectMode \|\| event\.ctrlKey \|\| event\.metaKey\)/u);
+assert.match(dashboardJs, /\$\("libraryResults"\)\.addEventListener\("dblclick"/u);
+assert.match(toolbarCss, /\.library-results\[data-has-selection="true"\] \.library-select\{display:flex\}/u);
 assert.match(dashboardHtml, /\.library-results\[data-select-mode=true\] \.library-card\{cursor:pointer;user-select:none\}/u);
 const batch = require("../src/document/document-batch-operations");
 let picked = batch.select(batch.clear(), ["a", "b", "c"], "a", { toggle: true });

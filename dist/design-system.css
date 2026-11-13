@@ -509,7 +509,11 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-card[data-kind="bug-report"] .library-kind{background:color-mix(in srgb,var(--colorStatusDanger) 14%,transparent);color:var(--colorStatusDanger)}
 .library-select{display:none;flex:0 0 34px;justify-content:center;margin:0}
 .library-results[data-select-mode="true"] .library-select{display:flex}
+.library-results[data-has-selection="true"] .library-select{display:flex}
 .library-results[data-select-mode="true"] .library-kind{display:none}
+.library-results[data-has-selection="true"] .library-kind{display:none}
+/* A click marks a row; Shift-click marks a range and must not select text. */
+.library-results .library-card{user-select:none}
 .library-card-title{display:grid;gap:var(--space2);min-width:0}
 .library-card-title h4{margin:0;overflow:hidden;font-size:14.5px;text-overflow:ellipsis;white-space:nowrap}
 .library-card-meta{align-items:center}
@@ -545,6 +549,30 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-card-menu-panel hr{width:100%;margin:var(--space4) 0;border:0;border-top:1px solid var(--colorBorderSubtle)}
 /* Selecting several documents shows the batch actions in the library heading, above the list. */
 .library-batch-toolbar{position:static;margin:var(--space8) 0 var(--space4);border-radius:var(--radiusLarge)!important;border:1px solid var(--colorBorderDefault)}
+/* While documents are marked, their actions take the place of the "All documents" row, at the
+   same height, so marking a row does not move the list. "More actions" opens as a menu. */
+.library-status-row{display:grid;align-items:center;min-height:34px;margin-top:var(--space8)}
+.library-status-row>*{grid-area:1/1}
+.library-status-row>.library-status{margin:0}
+.library-status-row:has(>.library-batch-toolbar:not([hidden]))>.library-status{opacity:0;pointer-events:none}
+.library-batch-toolbar:not([hidden]){position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;min-height:34px;margin:0;padding:0 0 0 12px;border:0;outline:1px solid var(--colorBorderDefault);outline-offset:-1px;background:var(--colorBackgroundSurface)!important}
+.library-batch-toolbar .library-batch-count{margin-right:auto}
+.library-batch-toolbar .library-batch-more{margin:0;padding:0;border:0}
+.library-batch-toolbar .library-batch-more>summary{box-sizing:border-box;padding-block:6px;line-height:20px}
+.library-batch-toolbar button,.library-batch-more>summary{min-height:34px;margin:0}
+.library-batch-toolbar .library-batch-more[open]{width:auto;padding-top:0}
+.library-batch-toolbar .library-batch-more[open]>summary{margin-bottom:0}
+.library-batch-toolbar .library-batch-more-panel{position:absolute;bottom:calc(100% + 4px);right:0;z-index:20;display:grid;gap:2px;min-width:220px;padding:6px;border:1px solid var(--colorBorderDefault);border-radius:var(--radiusLarge);background:var(--colorBackgroundSurface);box-shadow:0 12px 28px rgba(0,0,0,.3)}
+.library-batch-toolbar .library-batch-more-panel button{width:100%;text-align:left}
+/* In a small window the heading scrolls away, so the actions float at the bottom of the window
+   and the list keeps room for them. */
+@media (max-height:600px),(max-width:640px){
+  .library-status-row:has(>.library-batch-toolbar:not([hidden]))>.library-status{opacity:1}
+  .library-batch-toolbar:not([hidden]){position:fixed;top:auto;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:30;transform:translateX(-50%);width:calc(100% - 24px);max-height:calc(100vh - 24px);overflow:auto;margin:0;padding:8px 10px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .library-batch-toolbar .library-batch-more-panel{position:static;box-shadow:none;border:0;padding:4px 0 0}
+  .library-batch-toolbar .library-batch-more[open]{order:1;flex-basis:100%}
+  .library-results[data-has-selection="true"],.library-results[data-select-mode="true"]{padding-bottom:calc(var(--library-batch-height,72px) + 24px)}
+}
 .library-batch-more-panel{display:flex;flex-wrap:wrap;gap:var(--space6)}
 .library-batch-more-panel button{margin:0!important}
 .settings-view-heading{margin:var(--space16) 0}

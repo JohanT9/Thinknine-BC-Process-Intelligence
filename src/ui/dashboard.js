@@ -13,8 +13,6 @@ const DEFAULTS = {
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
-  environmentName: "",
-  companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
   advancedOverridesEnabled: false,
@@ -2615,6 +2613,7 @@ async function loadSettings() {
     false
   );
   initializeFilenameVariables();
+  renderBusinessCentralContext();
   updateFilenamePreview();
 }
 
@@ -2717,6 +2716,7 @@ async function changeUiLocale(event) {
   globalThis.T9UiI18n.apply(uiLocale);
   applicationSettings = { ...applicationSettings, uiLocale };
   initializeFilenameVariables();
+  renderBusinessCentralContext();
   updateFilenamePreview();
   try {
     const response = await send({ type: "T9_SAVE_UI_LOCALE", uiLocale });
@@ -3208,13 +3208,29 @@ function currentFilenamePreviewSettings() {
     exportFileNamePattern:
       $("exportFileNamePattern")?.value ||
       DEFAULTS.exportFileNamePattern,
-    environmentName:
-      $("environmentName")?.value ||
-      DEFAULTS.environmentName,
-    companyName:
-      $("companyName")?.value ||
-      DEFAULTS.companyName
+    ...lastRecordedBusinessCentralContext()
   };
+}
+
+// Environment and company come from Business Central when a recording starts. The last ones
+// are kept in the settings and used when a later recording cannot read them from the address.
+function lastRecordedBusinessCentralContext() {
+  return {
+    environmentName: String(applicationSettings.businessCentralEnvironment ||
+      applicationSettings.environmentName || "").trim(),
+    companyName: String(applicationSettings.businessCentralCompany ||
+      applicationSettings.companyName || "").trim()
+  };
+}
+
+function renderBusinessCentralContext() {
+  const element = $("businessCentralContext");
+  if (!element) return;
+  const { environmentName, companyName } = lastRecordedBusinessCentralContext();
+  const context = [environmentName, companyName].filter(Boolean).join(" — ");
+  element.textContent = context
+    ? uiTf("settings.bcContextLast", { context })
+    : uiT("settings.bcContextNone");
 }
 
 function updateFilenamePreview(
@@ -3731,6 +3747,16 @@ function libraryFinding(options = libraryOptions(), quickFilter = libraryQuickFi
     globalThis.T9DocumentLibraryView.activeFilterCount(options) > 0;
 }
 
+// The template a document follows, on its library row. A template that is not on this
+// computer is named and said to be missing.
+function libraryCardTemplate(record) {
+  const templateId = record.theme?.themeId || defaultDocumentTemplateId;
+  const template = allDocumentTemplates().find(item => item.templateId === templateId);
+  const name = template ? documentTemplateName(template)
+    : uiTf("template.missingOption", { name: record.theme?.displayName || templateId });
+  return uiTf("template.libraryLabel", { name });
+}
+
 function inLibraryFolder(record, finding) {
   const folderId = globalThis.T9DocumentFolders.folderOf(documentFolders, record);
   if (!finding) return folderId === libraryFolder;
@@ -3851,6 +3877,7 @@ function renderDocumentLibrary() {
   const viewState = { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
     storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
+    templateLabel: libraryCardTemplate,
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
     // documents that are all in folders below say where they are.
@@ -3862,6 +3889,8 @@ function renderDocumentLibrary() {
         ? uiT("folder.inFolders") : "" };
   const activeId = view.renderList($("libraryResults"), records, viewState);
   $("libraryResults").dataset.selectMode = String(librarySelectMode);
+  $("libraryResults").dataset.hasSelection =
+    String(documentLibrarySelection.selectedIds.length > 0);
   // Continue where you left off: started reviews, shown while nothing is searched.
   const continueCount = options.search.trim() ? 0 : view.renderContinue(
     $("libraryContinueList"), globalThis.T9DocumentLibrary.query(documentLibraryIndex,
@@ -3908,12 +3937,16 @@ function rebuildDocumentLibraryIndex() {
   documentLibraryIndex = globalThis.T9DocumentLibrary.create(
     documentLibraryRecords
   );
+  renderTemplateUsage();
 }
 
 function renderDocumentLibrarySelection() {
   globalThis.T9DocumentLibraryView.applySelection(
     $("libraryResults"), documentLibrarySelection
   );
+  // Once a row is marked, every row shows its checkbox, so more can be marked the same way.
+  $("libraryResults").dataset.hasSelection =
+    String(documentLibrarySelection.selectedIds.length > 0);
   renderLibraryBatchToolbar();
 }
 
@@ -5836,13 +5869,8 @@ async function documentTemplatesChanged() {
   populateBatchMetadataOptions();
   refreshLibraryFilters();
   renderDocumentLibrary();
-  if (activeReview) {
-    if (document.activeElement !== $("expectedResultEditor")) {
-      $("expectedResultEditor").value = displayedExpectedResult();
-    }
-    invalidateDocumentWorkspace();
-    if (workspaceState.active === "document") void synchronizeDocumentWorkspace();
-  }
+  renderReviewTemplate();
+  showActiveDocumentTemplate();
 }
 
 function documentTemplateAssignment(assigned) {
@@ -6023,7 +6051,9 @@ function renderTemplateSample() {
   const locale = applicationSettings.uiLocale || "en-US";
   const plan = globalThis.T9WordExportPipeline.create({
     session: { id: "template-sample", name: title },
-    review: { sessionId: "template-sample", sessionName: title, tasks: [] },
+    // One step, so the sample shows how steps look; its text is drawn as lines.
+    review: { sessionId: "template-sample", sessionName: title,
+      tasks: [{ taskId: "template-sample-step", instruction: title }] },
     documentLanguage: globalThis.T9LanguageRegistry.normalize(locale, "document"),
     template
   }).plan;
@@ -6041,43 +6071,154 @@ function renderTemplateSample() {
     (plan.sections || []).map(section => find(section.components, "cover")).find(Boolean);
   const branding = header?.appearance?.branding || {};
   const own = Boolean(branding.templateId);
-  const banded = !own && Boolean(header?.appearance?.fillColor);
+  const banded = Boolean(header?.appearance?.fillColor);
+  const hex = value => {
+    const text = String(value || "").replace(/^#?/u, "#");
+    return /^#[0-9a-f]{6}$/iu.test(text) ? text : "";
+  };
   sample.style.setProperty("--sample-color", model.readableColor(template.color));
   sample.style.fontFamily = `"${template.font}", Arial, sans-serif`;
-  const headerBand = sample.querySelector(".document-workspace-page-sample-header");
-  headerBand.hidden = !header;
-  headerBand.classList.toggle("is-banded", banded);
-  headerBand.classList.toggle("is-plain", !own && !banded);
-  const fill = String(header?.appearance?.fillColor || "").replace(/^#?/u, "#");
-  headerBand.style.setProperty("--sample-fill", banded ? fill : "transparent");
-  const ink = String(header?.appearance?.textColor || "").replace(/^#?/u, "#");
-  headerBand.style.setProperty("--sample-ink", banded && ink.length > 1 ? ink : "#1f2937");
   const logo = own && template.logo ? template.logo.dataUrl : "";
-  for (const id of ["documentTemplateSampleLogo", "documentTemplateSampleCoverLogo"]) {
-    $(id).hidden = !logo;
-    if (logo) $(id).src = logo;
-    else $(id).removeAttribute("src");
+
+  // Every page has the same header and footer, as in Word.
+  const headerText = banded
+    ? [own ? String(header.appearance.brand || "").trim() : "BC Process Studio", "Business Central",
+      header.content.text].filter(Boolean).join("  |  ")
+    : header?.content?.text || "";
+  for (const band of sample.querySelectorAll("[data-sample=header]")) {
+    band.hidden = !header;
+    band.classList.toggle("is-banded", banded);
+    band.classList.toggle("is-plain", !own && !banded);
+    band.style.setProperty("--sample-fill", banded ? hex(header.appearance.fillColor) : "transparent");
+    band.style.setProperty("--sample-ink", banded && hex(header.appearance.textColor) || "#1f2937");
+    const image = band.querySelector("[data-sample=header-logo]");
+    image.hidden = !logo;
+    if (logo) image.src = logo;
+    else image.removeAttribute("src");
+    band.querySelector("[data-sample=header-company]").textContent =
+      own && !banded ? branding.organizationName || "" : "";
+    band.querySelector("[data-sample=header-title]").textContent = headerText;
   }
-  $("documentTemplateSampleCompany").textContent = own ? branding.organizationName || "" : "";
-  $("documentTemplateSampleHeaderTitle").textContent = banded
-    ? `BC Process Studio  |  Business Central  |  ${header.content.text}` : header?.content?.text || "";
-  $("documentTemplateSampleCoverCompany").textContent = cover?.appearance?.brandText || "";
-  $("documentTemplateSampleTitle").textContent = title;
-  for (const id of ["documentTemplateSampleCoverCompany", "documentTemplateSampleTitle"]) {
-    $(id).hidden = !cover;
-  }
-  sample.querySelector(".document-workspace-page-sample-rule").hidden = !cover;
-  sample.querySelector(".document-workspace-page-sample-cover").classList.toggle("is-coverless", !cover);
-  if (!cover) $("documentTemplateSampleCoverLogo").hidden = true;
-  const firstSection = (plan.sections || []).find(section => section.kind !== "cover");
-  const firstHeading = firstSection?.kind === "toc"
-    ? find(firstSection.components, "toc")?.appearance?.title
-    : find(firstSection?.components, "heading")?.content?.text;
-  $("documentTemplateSampleHeading").textContent = firstHeading || uiT("template.sampleHeading");
   const footerText = String(footer?.content?.text || "");
-  $("documentTemplateSampleFooter").hidden = !footer;
-  $("documentTemplateSampleFooter").textContent = footerText.includes("{page}")
-    ? footerText.split("{page}").join("1") : `${footerText} | ${footer?.content?.pageLabel || ""} 1`;
+  const pages = cover ? [$("documentTemplateSampleCoverPage"), $("documentTemplateSampleBodyPage")]
+    : [$("documentTemplateSampleBodyPage")];
+  $("documentTemplateSampleCoverPage").hidden = !cover;
+  pages.forEach((page, index) => {
+    const element = page.querySelector("[data-sample=footer]");
+    element.hidden = !footer;
+    element.textContent = footerText.includes("{page}")
+      ? footerText.split("{page}").join(String(index + 1))
+      : `${footerText} | ${footer?.content?.pageLabel || ""} ${index + 1}`;
+  });
+
+  // The cover is a page of its own, centred, with the document's details in a table.
+  if (cover) {
+    const appearance = cover.appearance || {};
+    const coverPage = $("documentTemplateSampleCoverPage");
+    coverPage.style.setProperty("--sample-accent", hex(appearance.accentColor) || "#111827");
+    coverPage.style.setProperty("--sample-muted", hex(appearance.mutedColor) || "#6b7280");
+    $("documentTemplateSampleCoverLogo").hidden = !logo;
+    if (logo) $("documentTemplateSampleCoverLogo").src = logo;
+    else $("documentTemplateSampleCoverLogo").removeAttribute("src");
+    const texts = {
+      documentTemplateSampleBrand: appearance.brandText,
+      documentTemplateSampleType: appearance.documentType,
+      documentTemplateSampleTitle: title,
+      documentTemplateSampleSubtitle: appearance.subtitle
+    };
+    for (const [id, value] of Object.entries(texts)) {
+      $(id).textContent = value || "";
+      $(id).hidden = !value;
+    }
+    const metadata = find(cover.components, "metadata");
+    const table = $("documentTemplateSampleMetadata");
+    const tableLook = metadata?.appearance || {};
+    table.hidden = !metadata;
+    table.style.setProperty("--sample-metadata-width", `${Number(tableLook.width) || 100}%`);
+    table.style.setProperty("--sample-label-width", `${Number(tableLook.labelWidth) || 30}%`);
+    table.style.setProperty("--sample-border", hex(tableLook.borderColor) || "#d5dce3");
+    table.style.setProperty("--sample-inside",
+      hex(tableLook.insideBorderColor) || hex(tableLook.borderColor) || "#e5e7eb");
+    table.style.setProperty("--sample-label-fill", hex(tableLook.labelFill) || "#ffffff");
+    table.replaceChildren(...(metadata?.content?.rows || []).map(row => {
+      const line = document.createElement("div");
+      const label = document.createElement("strong");
+      label.textContent = row.label;
+      line.append(label, document.createElement("span"));
+      return line;
+    }));
+  }
+
+  // The next page: the first sections as Word lays them out, with their headings and lines
+  // for the text, a list as bullets and the first step as its band with a screenshot.
+  const element = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  };
+  const line = (short = false) =>
+    element("span", `document-workspace-page-sample-line${short ? " short" : ""}`);
+  const headingElement = heading => {
+    const node = element("span", "document-workspace-page-sample-heading", heading?.content?.text || "");
+    const look = heading?.appearance || {};
+    if (hex(look.typography?.color)) node.style.color = hex(look.typography.color);
+    if (hex(look.dividerColor)) node.style.borderBottomColor = hex(look.dividerColor);
+    if (!Number(look.dividerSize)) node.style.borderBottomStyle = "none";
+    return node;
+  };
+  const body = [];
+  for (const section of (plan.sections || []).filter(item => item.kind !== "cover").slice(0, 3)) {
+    if (section.kind === "toc") {
+      const toc = find(section.components, "toc");
+      body.push(element("span", "document-workspace-page-sample-heading",
+        toc?.appearance?.title || uiT("template.sampleHeading")), line(), line(), line(true));
+      continue;
+    }
+    const visit = components => {
+      for (const component of components || []) {
+        if (component.visibility === "hidden") continue;
+        if (component.kind === "heading") body.push(headingElement(component));
+        else if (component.kind === "paragraph") body.push(line(), line(true));
+        else if (component.kind === "list") {
+          (component.components || []).forEach(() => {
+            const bullet = element("span", "document-workspace-page-sample-bullet");
+            bullet.append(line());
+            body.push(bullet);
+          });
+        } else if (component.kind === "step") {
+          const look = component.appearance || {};
+          const step = element("span", "document-workspace-page-sample-step");
+          if (hex(look.headingFill)) step.style.setProperty("--sample-step-fill", hex(look.headingFill));
+          if (hex(look.headingBorderColor)) {
+            step.style.setProperty("--sample-step-border", hex(look.headingBorderColor));
+          }
+          if (hex(look.headingColor)) step.style.setProperty("--sample-step-color", hex(look.headingColor));
+          step.append(element("strong", "", component.content?.title || ""), line(true));
+          body.push(step, element("span", "document-workspace-page-sample-shot"));
+          return true;
+        } else if (visit(component.components)) return true;
+      }
+      return false;
+    };
+    if (visit(section.components)) break;
+  }
+  $("documentTemplateSampleBody").replaceChildren(...body);
+}
+
+// Which documents follow the template, and whether new documents get it, so it is clear why a
+// change shows in some documents and not in others.
+function renderTemplateUsage() {
+  if (!templateEditor) return;
+  const { template } = templateEditor;
+  const count = documentLibraryRecords.filter(record =>
+    record.theme?.themeId === template.templateId).length;
+  const isDefault = template.templateId === defaultDocumentTemplateId;
+  $("documentTemplateUsageText").textContent = [
+    count ? uiTf("template.usageCount", { count }) : uiT("template.usageNone"),
+    uiT(isDefault ? "template.usageDefault" : "template.usageNotDefault")
+  ].join(" ");
+  $("documentTemplateUsageDefault").hidden = isDefault;
 }
 
 function openTemplateEditor(template) {
@@ -6088,6 +6229,7 @@ function openTemplateEditor(template) {
   $("documentTemplateRetry").hidden = true;
   $("documentTemplateShareStatus").textContent = "";
   fillTemplateEditor();
+  renderTemplateUsage();
   $("documentTemplateEditorTitle").focus();
 }
 
@@ -6180,12 +6322,18 @@ async function makeDefaultDocumentTemplate(template) {
     renderDocumentTemplateSettings();
     $("documentTemplateListStatus").textContent = uiTf("template.defaultChanged",
       { name: documentTemplateName(template) });
+    if (templateEditor?.template.templateId === template.templateId) {
+      renderTemplateUsage();
+      $("documentTemplateUsageText").focus();
+      return;
+    }
     const row = [...$("documentTemplateList").children].find(item =>
       item.dataset.templateId === template.templateId);
     row?.querySelector("button")?.focus();
   } catch (error) {
     console.error("BC Process Studio default document template could not be saved", error);
     $("documentTemplateListStatus").textContent = uiT("template.actionFailed");
+    if (templateEditor) $("documentTemplateUsageText").textContent = uiT("template.actionFailed");
   }
 }
 
@@ -6293,6 +6441,9 @@ $("documentTemplateNew").addEventListener("click", () => {
   void addDocumentTemplate(documentTemplateFor(defaultDocumentTemplateId), uiT("template.newName"));
 });
 $("documentTemplateBack").addEventListener("click", closeTemplateEditor);
+$("documentTemplateUsageDefault").addEventListener("click", () => {
+  if (templateEditor) void makeDefaultDocumentTemplate(templateEditor.template);
+});
 $("documentTemplateCopyEdit").addEventListener("click", () => {
   if (templateEditor) void addDocumentTemplate(templateEditor.template,
     copyTemplateName(templateEditor.template));
@@ -7213,6 +7364,84 @@ function renderReviewAttention(tasks) {
     document: languageName(activeDocumentLanguage(), "document"),
     interface: languageName(globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale), "ui")
   });
+  renderReviewTemplate();
+}
+
+// The template the open document follows, chosen where it is edited. A template that is not on
+// this computer (not yet imported or synchronised) stays named, and the document is shown with
+// the default template until it arrives.
+function renderReviewTemplate() {
+  const select = $("reviewTemplate");
+  if (!select || !activeReviewSession) return;
+  const record = documentLibraryRecords.find(item => item.projectId === activeReviewSession.id);
+  const assignedId = record?.theme?.themeId || defaultDocumentTemplateId;
+  const templates = allDocumentTemplates();
+  const missing = !templates.some(template => template.templateId === assignedId);
+  const options = templates.map(template => new Option(documentTemplateName(template),
+    template.templateId));
+  if (missing) {
+    options.unshift(new Option(uiTf("template.missingOption",
+      { name: record?.theme?.displayName || assignedId }), assignedId));
+  }
+  select.replaceChildren(...options);
+  select.value = assignedId;
+  const status = $("reviewTemplateStatus");
+  if (missing) {
+    status.dataset.kind = "missing";
+    status.textContent = uiTf("template.missingHere",
+      { name: documentTemplateName(activeDocumentTemplate()) });
+  } else if (status.dataset.kind === "missing") {
+    status.dataset.kind = "";
+    status.textContent = "";
+  }
+}
+
+// The open document and its preview after its template changed.
+function showActiveDocumentTemplate() {
+  if (!activeReview) return;
+  if (document.activeElement !== $("expectedResultEditor")) {
+    $("expectedResultEditor").value = displayedExpectedResult();
+  }
+  invalidateDocumentWorkspace();
+  if (workspaceState.active === "document") void synchronizeDocumentWorkspace();
+}
+
+async function changeReviewTemplate() {
+  const select = $("reviewTemplate");
+  const template = allDocumentTemplates().find(item => item.templateId === select.value);
+  if (!template || !activeReviewSession) return;
+  const projectId = activeReviewSession.id;
+  const status = $("reviewTemplateStatus");
+  status.dataset.kind = "";
+  status.textContent = uiT("Sparar…");
+  select.disabled = true;
+  try {
+    await updateDocumentLibraryRecord(projectId, { theme: { themeId: template.templateId,
+      displayName: documentTemplateName(template) } });
+    status.textContent = uiTf("template.reviewChanged", { name: documentTemplateName(template) });
+    showActiveDocumentTemplate();
+  } catch (error) {
+    console.error("BC Process Studio document template could not be changed", error);
+    status.textContent = uiT("template.reviewChangeFailed");
+  } finally {
+    select.disabled = false;
+    if (activeReviewSession?.id === projectId) {
+      const keep = status.textContent;
+      renderReviewTemplate();
+      if (status.dataset.kind !== "missing") status.textContent = keep;
+    }
+  }
+}
+
+// Closes the document (it saves first) and opens Settings at the document templates.
+async function editTemplatesFromReview() {
+  await closeReview();
+  if (activeReview) return;
+  document.querySelector("[data-home-view=settings]")?.click();
+  document.querySelector("[data-settings-section=documents]")?.click();
+  $("documentTemplates")?.scrollIntoView({ block: "start" });
+  $("documentTemplatesTitle")?.setAttribute("tabindex", "-1");
+  $("documentTemplatesTitle")?.focus();
 }
 
 // Approves a step and moves to the next one that still needs review.
@@ -10165,6 +10394,8 @@ $("closeDocumentViewSettings").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
+$("reviewTemplate").addEventListener("change", () => void changeReviewTemplate());
+$("reviewTemplateEdit").addEventListener("click", () => void editTemplatesFromReview());
 // Done and Cancel save before the editor closes. While that runs both are disabled, and a failure
 // is shown in the editor, which stays open with the edits, instead of only to screen readers.
 let annotationEditorClosing = false;
@@ -10920,7 +11151,14 @@ $("libraryResults").addEventListener("click", async event => {
     return;
   }
   const card = event.target.closest?.("[data-library-project-id]");
-  if (!card) return;
+  if (!card) {
+    // A click beside the rows clears the selection, as in a file list.
+    if (event.target === event.currentTarget && documentLibrarySelection.selectedIds.length) {
+      documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+      renderDocumentLibrarySelection();
+    }
+    return;
+  }
   const projectId = card.dataset.libraryProjectId;
   const visibleIds = [...$("libraryResults").querySelectorAll(
     "[data-library-project-id]"
@@ -10929,10 +11167,10 @@ $("libraryResults").addEventListener("click", async event => {
   // A click on the checkbox label also reaches the checkbox itself, which does the selecting.
   if (!selectionControl && event.target.closest?.(".library-select")) return;
   const cardAction = event.target.closest?.("[data-library-action], [data-library-menu]");
-  // In Select several a click anywhere on the row marks or unmarks it, like its checkbox.
-  // Outside selection mode a click on the row only selects with Ctrl, Cmd or Shift.
-  if (selectionControl || (!cardAction && (librarySelectMode ||
-      event.shiftKey || event.ctrlKey || event.metaKey))) {
+  // A click on the row marks it, as in a file list: on its own, or with Ctrl or Cmd added to
+  // the others and with Shift the rows in between. In Select several a click marks or unmarks
+  // it, like its checkbox. A double click opens the document; holding and moving drags it.
+  if (selectionControl || !cardAction) {
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.select(
       documentLibrarySelection, visibleIds, projectId, {
         shift: event.shiftKey,
@@ -10972,6 +11210,12 @@ $("libraryResults").addEventListener("click", async event => {
   }
   if (!event.target.closest?.('[data-library-action="open"]')) return;
   await openLibraryDocument(projectId);
+});
+$("libraryResults").addEventListener("dblclick", event => {
+  const card = event.target.closest?.("[data-library-project-id]");
+  if (!card || librarySelectMode || event.shiftKey || event.ctrlKey || event.metaKey ||
+      event.target.closest?.("[data-library-action], [data-library-menu], .library-select")) return;
+  void openLibraryDocument(card.dataset.libraryProjectId);
 });
 
 async function runLibraryMenuAction(action, projectId, card) {
@@ -11310,8 +11554,6 @@ $("libraryBatchDelete").addEventListener("click", async () => {
   }
 });
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
-$("environmentName").addEventListener("input", updateFilenamePreview);
-$("companyName").addEventListener("input", updateFilenamePreview);
 document.addEventListener("keydown", event => {
   if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey ||
       $("reviewOverlay").classList.contains("open") ||
@@ -11399,9 +11641,8 @@ async function initializeDashboard() {
     const root = document.documentElement.style;
     root.setProperty("--home-appbar-height", `${appbar.offsetHeight}px`);
     root.setProperty("--library-head-height", `${head.offsetHeight}px`);
-    // How far the heading scrolls away in a small window before the batch actions stay.
-    root.setProperty("--library-batch-offset", batch.hidden ? "0px" : `${Math.max(0,
-      Math.round(batch.getBoundingClientRect().top - head.getBoundingClientRect().top) - 6)}px`);
+    // In a small window the selection actions float at the bottom and the list keeps room for them.
+    root.setProperty("--library-batch-height", `${batch.hidden ? 0 : batch.offsetHeight}px`);
   };
   const observer = new ResizeObserver(update);
   observer.observe(appbar);

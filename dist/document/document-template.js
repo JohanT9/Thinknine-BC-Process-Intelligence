@@ -172,23 +172,36 @@
 
   // The theme a template of the user's own lays over its built-in theme. The header shows
   // the logo and the company, the footer the template's text; the cover names the company.
-  // values: the document's name and date, for the footer.
-  function themeOverrides(template, values = {}, baseCapabilities = []) {
+  // A copy looks like the template it was made from until it is changed: a base theme with a
+  // coloured header band keeps the band (in the template's colour once that is changed), and
+  // without a company of its own the cover keeps the base theme's name.
+  // values: the document's name and date, for the footer. baseTheme: the resolved base theme.
+  function themeOverrides(template, values = {}, baseCapabilities = [], baseTheme = null) {
     const value = normalize(template);
     const primary = readableColor(value.color);
     const tint = mix(primary, "#ffffff", 0.92);
     const soft = mix(primary, "#ffffff", 0.72);
     const font = value.font;
     const logo = value.logo ? LOGO_ASSET_ID : "";
+    const baseHeader = baseTheme?.components?.header || {};
+    const ownColor = value.color !== builtIn(value.baseThemeId)?.color;
+    const band = COLOR_PATTERN.test(String(baseHeader.fillColor || ""))
+      ? ownColor ? mix(primary, "#000000", 0.45) : baseHeader.fillColor : "";
+    const header = band
+      ? { fillColor: band, textColor: "#ffffff",
+        borderColor: ownColor ? band : baseHeader.borderColor || band,
+        brand: value.company || baseTheme?.branding?.organizationName || "" }
+      : { fillColor: "", textColor: "#4b5563", borderColor: primary };
     return {
       colors: { primary },
       typography: { title: { family: font }, heading1: { family: font, color: primary },
         heading2: { family: font, color: primary }, body: { family: font }, caption: { family: font } },
       components: {
         document: { fontFamily: font },
-        header: { fillColor: "", textColor: "#4b5563", borderColor: primary },
+        header,
         footer: { borderColor: soft },
-        cover: { brandText: value.company, dividerColor: primary, brandLogo: logo },
+        cover: { brandText: value.company || baseTheme?.components?.cover?.brandText || "",
+          dividerColor: primary, brandLogo: logo },
         heading: { dividerColor: primary },
         step: { headingColor: primary, headingBorderColor: primary, headingFill: tint },
         metadataTable: { labelFill: tint },
@@ -197,7 +210,7 @@
       capabilities: [...new Set([...(baseCapabilities || []), "supportsHeader", "supportsFooter",
         "supportsBranding"])],
       branding: { templateId: value.templateId, organizationName: value.company,
-        footer: footerText(value.footer, values), logo }
+        footer: footerText(value.footer, values) || baseTheme?.branding?.footer || "", logo }
     };
   }
 

@@ -156,6 +156,45 @@ assert.deepEqual(brand.content, { logoAssetId: model.LOGO_ASSET_ID, text: "Acme 
 const coverSection = view.sections.find(section => section.items.includes(brand));
 assert.ok(coverSection.items.indexOf(brand) < coverSection.items.findIndex(item => item.kind === "heading"),
   "the logo and company come before the title");
+// A copy looks like the template it was made from until it is changed: a copy of BC Process
+// Studio keeps the header band and the name on the cover.
+const studioCopy = model.create(model.builtIn("thinknine"), { templateId: "studio-copy",
+  name: "Studio copy", now: NOW });
+const studioBase = pipeline.create({ session, review, template: model.builtIn("thinknine"), now: NOW });
+const studioPlan = pipeline.create({ session, review, template: studioCopy, now: NOW });
+const planHeader = plan => plan.components.find(component => component.kind === "header");
+const planCover = plan => plan.sections.find(section => section.kind === "cover")
+  .components.find(component => component.kind === "cover");
+assert.equal(planHeader(studioPlan.plan).appearance.fillColor,
+  planHeader(studioBase.plan).appearance.fillColor, "an unchanged copy keeps the band colour");
+assert.equal(planHeader(studioPlan.plan).appearance.brand, "BC Process Studio");
+const planFooter = plan => plan.components.find(component => component.kind === "footer");
+assert.equal(planFooter(studioPlan.plan).content.text, planFooter(studioBase.plan).content.text,
+  "an empty footer looks as in the template that was copied");
+assert.equal(planCover(studioPlan.plan).appearance.brandText, "BC Process Studio",
+  "without a company of its own the cover keeps the base template's name");
+const studioWord = await globalThis.T9Export.word.renderPlan({ plan: studioPlan.plan, mediaAssets: {} });
+const studioZip = await JSZip.loadAsync(await studioWord.blob.arrayBuffer());
+const studioHeaderXml = await studioZip.file(Object.keys(studioZip.files)
+  .find(name => /^word\/header\d*\.xml$/u.test(name))).async("string");
+assert.ok(studioHeaderXml.includes("BC Process Studio  |  Business Central  |  Create purchase order"));
+assert.ok(studioHeaderXml.includes(`w:fill="${planHeader(studioBase.plan).appearance.fillColor
+  .slice(1).toUpperCase()}"`), "the Word header keeps the band");
+const studioView = workspace.render(studioPlan.plan);
+assert.equal(studioView.pageHeader.band.fillColor, planHeader(studioBase.plan).appearance.fillColor);
+assert.equal(studioView.pageHeader.band.text, "BC Process Studio  |  Business Central  |  Create purchase order");
+// Changed: the company replaces the name, and the band takes a dark shade of the new colour
+// that white text stays readable on.
+const studioChanged = model.update(studioCopy, { company: "Acme AB", color: "#a4262c" }, NOW);
+const changedHeader = planHeader(pipeline.create({ session, review, template: studioChanged,
+  now: NOW }).plan).appearance;
+assert.equal(changedHeader.brand, "Acme AB");
+assert.notEqual(changedHeader.fillColor, planHeader(studioBase.plan).appearance.fillColor);
+assert.ok(model.contrastOnWhite(changedHeader.fillColor) >= 7, "white text is readable on the band");
+// A template made from one without a band keeps the plain header line.
+assert.equal(header.appearance.fillColor, "");
+assert.equal(view.pageHeader.band, undefined);
+
 const plainView = workspace.render(plain.plan);
 assert.equal(plainView.pageHeader, null);
 assert.equal(plainView.pageFooter, null);
