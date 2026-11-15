@@ -113,6 +113,42 @@
           testRunId: runIds[item.sessionId] })) });
   }
 
-  return { SCHEMA_VERSION, MAX_ITEMS, create, itemStatus, nextRound, normalize, progress, update,
-    withoutOwner };
+  // This round compared with the round before it (previousSuiteId), both given as progress().
+  // Tests are paired by their document, never by position. A test is compared only once it
+  // has a result in this round: a new failure passed last round, a fixed test failed then,
+  // an unchanged test had the same result, and a test that had no full result last round is
+  // said to be so rather than counted as either. A test that was not in the previous round
+  // is new in the suite. stepChanges maps a test run id to T9TestHistory.compare of that run
+  // with the previous round's run, for the step numbers of new failures.
+  const CHANGES = Object.freeze(["new-failure", "fixed", "still-failed", "still-passed",
+    "failed-untested", "passed-untested", "new"]);
+  function compareRounds(current, previous, stepChanges = {}) {
+    if (!current || !previous) return null;
+    const before = new Map((previous.items || []).map(item => [item.sessionId, item]));
+    const items = (current.items || []).map(item => {
+      const earlier = before.get(item.sessionId);
+      let change = null;
+      if (item.status === "missing") change = null;
+      else if (!earlier) change = "new";
+      else if (item.status === "failed") {
+        change = earlier.status === "failed" ? "still-failed" : earlier.status === "passed"
+          ? "new-failure" : "failed-untested";
+      } else if (item.status === "passed") {
+        change = earlier.status === "passed" ? "still-passed" : earlier.status === "failed"
+          ? "fixed" : "passed-untested";
+      }
+      const steps = item.testRunId ? stepChanges[item.testRunId] : null;
+      return { sessionId: item.sessionId, testRunId: item.testRunId,
+        previousTestRunId: earlier?.testRunId || null, change,
+        newFailureSteps: change && change !== "new" && steps
+          ? (steps.newFailures || []).map(step => step.number).filter(Boolean) : [] };
+    });
+    const count = (...changes) => items.filter(item => changes.includes(item.change)).length;
+    return { items, counts: { newFailure: count("new-failure"), fixed: count("fixed"),
+      unchanged: count("still-failed", "still-passed"),
+      untested: count("failed-untested", "passed-untested"), new: count("new") } };
+  }
+
+  return { SCHEMA_VERSION, MAX_ITEMS, CHANGES, compareRounds, create, itemStatus, nextRound,
+    normalize, progress, update, withoutOwner };
 });

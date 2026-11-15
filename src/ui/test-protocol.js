@@ -153,7 +153,7 @@
 
   // The suite's protocol. runs maps a test run id to its normalized run; a test whose run is
   // gone is listed in the overview and has no protocol of its own.
-  function renderSuite(suite, progress, runs, images) {
+  function renderSuite(suite, progress, runs, images, comparison = null) {
     const first = progress.items.map(item => runs[item.testRunId]).find(Boolean);
     const language = first?.documentLanguage || locale;
     const d = translator(language);
@@ -169,11 +169,28 @@
     if (suite.environment) meta.row(d("suite.environment"), suite.environment);
     if (suite.version) meta.row(d("suite.version"), suite.version);
     meta.row(d("test.created"), date(suite.createdAt));
+    // After an upgrade the protocol shows what changed since the previous round.
+    if (comparison) {
+      const counts = comparison.counts;
+      const previous = comparison.previous || {};
+      const where = [previous.environment, previous.version].filter(Boolean).join(" · ") ||
+        date(previous.createdAt);
+      const compared = counts.newFailure + counts.fixed + counts.unchanged + counts.untested;
+      const listed = [["countNewFailure", counts.newFailure], ["countFixed", counts.fixed],
+        ["countUnchanged", counts.unchanged], ["countUntested", counts.untested],
+        ["countNew", counts.new]].filter(([, count]) => count)
+        .map(([key, count]) => d(`suite.compare.${key}`, { count }));
+      meta.row(where ? `${d("suite.compare.label")} (${where})` : d("suite.compare.label"),
+        (compared ? listed : [d("suite.compare.nothingYet"), ...listed]).join(" · "));
+    }
     parts.push(meta.table);
 
     const overview = element("table", "overview");
     const head = element("tr");
-    for (const label of ["#", d("suite.protocolTest"), d("test.result"), d("test.protocolSteps")]) {
+    const changes = new Map((comparison?.items || []).map(item => [item.sessionId, item]));
+    const labels = ["#", d("suite.protocolTest"), d("test.result"), d("test.protocolSteps")];
+    if (comparison) labels.push(d("suite.compare.label"));
+    for (const label of labels) {
       const th = element("th", "", label); th.scope = "col"; head.append(th);
     }
     overview.append(head);
@@ -183,6 +200,16 @@
       tr.append(element("td", "", String(index + 1)), element("td", "", run?.title || item.title),
         element("td", `result-${item.status}`, d(`suite.status.${item.status}`)),
         element("td", "", run ? script.countsText(script.summary(run), d) : ""));
+      if (comparison) {
+        const change = changes.get(item.sessionId);
+        const cell = element("td", change?.change ? `change-${change.change}` : "",
+          change?.change ? d(`suite.compare.${change.change}`) : "");
+        if (change?.newFailureSteps?.length) {
+          cell.append(element("br"), document.createTextNode(d("suite.compare.newFailureSteps",
+            { steps: change.newFailureSteps.join(", ") })));
+        }
+        tr.append(cell);
+      }
       overview.append(tr);
     });
     const wrap = element("div", "table-wrap");
@@ -218,7 +245,7 @@
   }
 
   async function startSuite() {
-    const { suite, progress } = await send({ type: "T9_LOAD_TEST_SUITE", suiteId });
+    const { suite, progress, comparison } = await send({ type: "T9_LOAD_TEST_SUITE", suiteId });
     const runs = {};
     for (const item of progress.items) {
       if (!item.summary) continue;
@@ -248,7 +275,7 @@
         status.textContent = failed ? t("test.screenshotsUnavailable") : t("test.protocolHelp");
         include.disabled = false;
       }
-      renderSuite(suite, progress, runs, include.checked ? images : {});
+      renderSuite(suite, progress, runs, include.checked ? images : {}, comparison || null);
     };
     include.addEventListener("change", () => { void draw(); });
     await draw();

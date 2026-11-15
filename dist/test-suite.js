@@ -12,6 +12,7 @@
   let locale = i18n.DEFAULT_LOCALE;
   let suite = null;
   let progress = null;
+  let comparison = null;
   let pending = {};
   let timer = null;
   const t = (key, values = {}) => Object.entries(values).reduce((value, [name, item]) =>
@@ -75,6 +76,8 @@
       ? t("suite.outcome.not-started") : t(`test.outcome.${progress.outcome}`)}`;
     summary.replaceChildren(outcome, document.createTextNode(" "), element("span", "",
       t("suite.progress", { done: progress.done, total: progress.total, failed: progress.failed })));
+    showComparison();
+    const changes = new Map((comparison?.items || []).map(item => [item.sessionId, item]));
     const list = document.getElementById("suiteTests");
     const focused = document.activeElement?.dataset?.testRunId;
     list.replaceChildren(...progress.items.map(item => {
@@ -88,6 +91,16 @@
         const tested = item.summary.total - item.summary.notRun;
         status.append(document.createTextNode(" · " + t("suite.steps", { done: tested,
           total: item.summary.total })));
+      }
+      const change = changes.get(item.sessionId);
+      if (change?.change) {
+        status.append(document.createTextNode(" · "),
+          element("span", "suite-test-change", t(`suite.compare.${change.change}`)));
+        if (change.newFailureSteps.length) {
+          status.append(document.createTextNode(" · " + t("suite.compare.newFailureSteps",
+            { steps: change.newFailureSteps.join(", ") })));
+        }
+        row.dataset.change = change.change;
       }
       textBox.append(title, status);
       row.append(textBox);
@@ -106,9 +119,32 @@
     document.getElementById("nextRound").disabled = !progress.items.some(item => item.summary);
   }
 
+  // This round compared with the previous one, above the tests: how many fail anew, are
+  // fixed or unchanged. Shown only for a suite made as the next round of another.
+  function showComparison() {
+    const box = document.getElementById("suiteComparison");
+    box.hidden = !comparison;
+    if (!comparison) return;
+    const label = element("strong", "", t("suite.compare.label"));
+    const previous = comparison.previous || {};
+    const where = [previous.environment, previous.version].filter(Boolean).join(" · ") ||
+      date(previous.createdAt);
+    const counts = comparison.counts;
+    const parts = [["countNewFailure", counts.newFailure], ["countFixed", counts.fixed],
+      ["countUnchanged", counts.unchanged], ["countUntested", counts.untested],
+      ["countNew", counts.new]].filter(([, count]) => count)
+      .map(([key, count]) => t(`suite.compare.${key}`, { count }));
+    const compared = counts.newFailure + counts.fixed + counts.unchanged + counts.untested;
+    const text = element("span", "", compared ? parts.join(" · ")
+      : [t("suite.compare.nothingYet"), ...parts].join(" · "));
+    box.dataset.newFailures = String(counts.newFailure);
+    box.replaceChildren(label, document.createTextNode(where ? ` (${where}) ` : " "), text);
+  }
+
   function show(response) {
     suite = response.suite;
     progress = response.progress;
+    comparison = response.comparison || null;
     showTitle(); showMeta(); showProgress();
   }
 

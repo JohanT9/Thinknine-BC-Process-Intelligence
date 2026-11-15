@@ -363,6 +363,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 /* Review flow: screenshot beside the instruction, approval progress, undo toast. */
 .review-languages{margin-top:4px;font-size:12px;color:var(--c-fg-52606d)}
 .review-template{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:6px;font-size:13px}.review-template label{margin:0;font-weight:600}.review-template select{width:auto;max-width:min(260px,100%);min-height:30px;margin:0;padding:3px 8px}.review-template button{min-height:30px;margin:0;padding:3px 10px}.review-template .muted{flex:1 1 220px;min-width:0;font-size:12px}
+.review-tests{margin-top:6px;font-size:13px}.review-tests>summary{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;cursor:pointer;font-weight:600;min-height:30px}.review-tests>summary .library-test-marker{font-weight:400;pointer-events:none}.review-tests>summary::-webkit-details-marker{display:none}.review-tests>summary::before{content:"▸";display:inline-block;width:1em;transition:transform .15s}.review-tests[open]>summary::before{transform:rotate(90deg)}.review-tests>summary:focus-visible{outline:3px solid var(--c-bd-0f6cbd);outline-offset:2px;border-radius:4px}.review-tests-body{display:grid;gap:8px;margin-top:6px;max-height:min(40vh,420px);overflow:auto;padding:2px}.review-tests-body [role="status"]{margin:0}.review-tests-body [role="status"]:empty{display:none}.review-tests-actions{display:flex;flex-wrap:wrap;gap:8px}.review-tests-actions button{min-height:30px;margin:0;padding:3px 10px}
 .review-step-progress{display:grid;gap:5px;margin:0 8px 10px;font-size:12px;color:var(--c-fg-52606d)}
 .review-step-progress-bar{height:6px;border-radius:3px;background:var(--c-bg-e2e8ee);overflow:hidden}
 .review-step-progress-bar span{display:block;height:100%;width:0;background:var(--c-bg-107c10);transition:width .25s}
@@ -415,6 +416,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   <h1 class="home-brand">BC Process Studio <small id="extensionVersion">v—</small></h1>
   <nav class="home-views" aria-label="Vyer">
     <button id="homeViewDocuments" type="button" data-home-view="documents" aria-controls="documentsView" aria-current="page">Dokument</button>
+    <button id="homeViewTests" type="button" data-home-view="tests" aria-controls="testsView" data-i18n="testHistory.section">Tester</button>
     <button id="homeViewSettings" type="button" data-home-view="settings" aria-controls="settingsPanel">Inställningar</button>
   </nav>
 </header>
@@ -564,6 +566,49 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
   <p id="libraryBatchStatus" class="sr-only" role="status" aria-live="polite"
     aria-atomic="true"></p>
+</section>
+
+<!-- The test overview: how each process went the last time it was tested, with quick filters
+  for what needs attention and a CSV export (docs/FUTURE_FEATURES.md, view 1). -->
+<section id="testsView" class="document-library tests-overview" aria-labelledby="testsOverviewTitle" hidden>
+  <h2 id="testsOverviewTitle" class="home-title" data-i18n="testHistory.section">Tester</h2>
+  <p class="muted home-lead" data-i18n="testOverview.lead">Hur varje process gick senast den testades. Öppna historiken för att se alla körningar.</p>
+  <div class="tests-overview-tools" role="search">
+    <label for="testsOverviewSearch"><span class="sr-only" data-i18n="testOverview.searchLabel">Sök process</span>
+      <input id="testsOverviewSearch" type="search" autocomplete="off" placeholder="Processens namn"
+        data-i18n-placeholder="testOverview.searchPlaceholder"></label>
+    <button id="testsOverviewCsv" type="button" class="secondary" data-i18n="testOverview.exportCsv">Exportera CSV</button>
+  </div>
+  <div id="testsOverviewFilters" class="library-quick-filters tests-overview-filters" role="group"
+    aria-label="Visa" data-i18n-aria-label="testOverview.filtersLabel">
+    <button type="button" data-tests-filter="all" aria-pressed="true"><span data-i18n="testOverview.filter.all">Alla</span> <span class="library-quick-count"></span></button>
+    <button type="button" data-tests-filter="failed" aria-pressed="false"><span data-i18n="testOverview.filter.failed">Underkända</span> <span class="library-quick-count"></span></button>
+    <button type="button" data-tests-filter="in-progress" aria-pressed="false"><span data-i18n="testOverview.filter.in-progress">Pågår</span> <span class="library-quick-count"></span></button>
+    <button type="button" data-tests-filter="passed" aria-pressed="false"><span data-i18n="testOverview.filter.passed">Godkända</span> <span class="library-quick-count"></span></button>
+    <button type="button" data-tests-filter="never" aria-pressed="false"><span data-i18n="testOverview.filter.never">Aldrig testade</span> <span class="library-quick-count"></span></button>
+    <button type="button" data-tests-filter="stale" aria-pressed="false"><span data-tests-stale-label>Äldre än 90 dagar</span> <span class="library-quick-count"></span></button>
+  </div>
+  <details id="testsOverviewScope" class="tests-overview-scope">
+    <summary><span data-i18n="library.filters">Filter</span>
+      <span id="testsOverviewScopeCount" class="library-filter-count" hidden></span></summary>
+    <div class="tests-overview-scope-panel" role="group" aria-label="Filter" data-i18n-aria-label="testOverview.scopeLabel">
+      <p class="muted" data-i18n="testOverview.scopeHelp">Varje process visas med sin senaste körning bland dem som filtren tar med.</p>
+      <label for="testsOverviewEnvironment"><span data-i18n="testOverview.environment">Miljö</span>
+        <select id="testsOverviewEnvironment" data-tests-scope="environment"><option value="" data-i18n="testOverview.allEnvironments">Alla miljöer</option></select></label>
+      <label for="testsOverviewVersion"><span data-i18n="testOverview.version">Business Central-version</span>
+        <select id="testsOverviewVersion" data-tests-scope="version"><option value="" data-i18n="testOverview.allVersions">Alla versioner</option></select></label>
+      <label for="testsOverviewPeriod"><span data-i18n="testOverview.period">Period</span>
+        <select id="testsOverviewPeriod" data-tests-scope="periodDays"><option value="" data-i18n="testOverview.allPeriods">Hela tiden</option></select></label>
+      <label for="testsOverviewSuite"><span data-i18n="testOverview.suite">Testsvit</span>
+        <select id="testsOverviewSuite" data-tests-scope="suiteId"><option value="" data-i18n="testOverview.allSuites">Alla testsviter</option></select></label>
+    </div>
+  </details>
+  <div class="tests-overview-status-row">
+    <p id="testsOverviewStatus" class="muted" role="status" aria-live="polite"></p>
+    <button id="testsOverviewReset" type="button" class="secondary" data-i18n="library.resetFilters" hidden>Återställ filter</button>
+    <button id="testsOverviewRetry" type="button" class="secondary" data-i18n="testHistory.retry" hidden>Försök igen</button>
+  </div>
+  <ol id="testsOverviewList" class="tests-overview-list" aria-labelledby="testsOverviewTitle"></ol>
 </section>
 
 <section id="settingsPanel" class="settings-view" aria-labelledby="settingsTitle" hidden>
@@ -1025,6 +1070,17 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   </form>
 </dialog>
 
+<dialog id="testHistoryDialog" data-no-tooltip class="library-batch-dialog test-history-dialog" aria-labelledby="testHistoryTitle">
+  <form method="dialog">
+    <h3 id="testHistoryTitle"></h3>
+    <p id="testHistoryStatus" role="status" aria-live="polite"></p>
+    <div class="test-history-body"><ol id="testHistoryList" class="test-history-list"></ol></div>
+    <footer><button id="testHistoryRetry" type="button" class="secondary" data-i18n="testHistory.retry" hidden>Försök igen</button>
+      <button id="testHistoryRun" type="button" class="secondary"></button>
+      <button type="submit" class="primary" data-i18n="testHistory.close">Stäng</button></footer>
+  </form>
+</dialog>
+
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">
   <section id="reviewDialog" class="review-shell" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" aria-describedby="reviewSummary reviewKeyboardHelp" tabindex="-1">
     <header id="reviewHeader" class="review-header">
@@ -1039,6 +1095,18 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
             <button id="reviewTemplateEdit" type="button" class="secondary" data-i18n="template.editTemplates">Redigera mallar…</button>
             <span id="reviewTemplateStatus" class="muted" role="status" aria-live="polite"></span>
           </div>
+          <details id="reviewTests" class="review-tests" hidden>
+            <summary><span data-i18n="testHistory.section">Tester</span>
+              <span id="reviewTestsMarker" class="library-test-marker" data-state="none"></span></summary>
+            <div class="review-tests-body">
+              <p id="reviewTestsStatus" role="status" aria-live="polite"></p>
+              <ol id="reviewTestsList" class="test-history-list"></ol>
+              <div class="review-tests-actions">
+                <button id="reviewTestsRetry" type="button" class="secondary" data-i18n="testHistory.retry" hidden>Försök igen</button>
+                <button id="reviewTestsRun" type="button" class="secondary" data-i18n="testHistory.runTest">Kör test</button>
+              </div>
+            </div>
+          </details>
         </div>
         <button id="reviewDocumentBeside" type="button" class="secondary review-document-beside" aria-pressed="false" aria-controls="documentWorkspacePanel">Visa dokument</button>
         <button id="closeReview" class="debug"
@@ -1440,6 +1508,8 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/test-recording-match.js"></script>
 <script src="document/test-suite.js"></script>
 <script src="document/test-script.js"></script>
+<script src="document/test-history.js"></script>
+<script src="test-history-view.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/zip-writer.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>

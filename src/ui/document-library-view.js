@@ -106,6 +106,8 @@
             ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
             ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
             ${!bugReport && view.templateLabel?.(record) ? `<span class="library-template">${escape(view.templateLabel(record))}</span>` : ""}
+            ${(test => test ? `<button type="button" class="library-test-marker" data-library-action="test-history"
+              data-state="${escape(test.state)}" aria-label="${escape(test.label)}"><span aria-hidden="true">${escape(test.icon)}</span> ${escape(test.text)}</button>` : "")(!bugReport && view.testMarker?.(record))}
             <span>${escape(localized("Changed {date}", locale,
               "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
             ${bugReport && deliveryLabel(delivery, locale) ? `<span class="library-delivery"
