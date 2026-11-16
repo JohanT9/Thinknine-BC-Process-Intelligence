@@ -67,8 +67,19 @@ assert.strictEqual(latest.get("s1").state, "failed");
 assert.strictEqual(latest.get("s1").runCount, 3);
 assert.strictEqual(history.latest([run("p1", "a", [step("s1", "passed"), step("s2", "not-run")])])
   .get("s1").state, "in-progress");
-assert.strictEqual(history.latest([run("q1", "a", [])]).get("s1").state, "in-progress",
-  "a run without steps is never passed");
+assert.strictEqual(history.latest([run("q1", "a", [])]).has("s1"), false,
+  "a run without steps is never passed, nor shown");
+// A test made but not begun, such as each test of a new suite, is not in progress: it is left
+// out of the history, the latest result and the trend until a step is tested or skipped.
+const unbegun = run("u1", "2026-11-14T10:00:00.000Z", [step("s1", "not-run"), step("s2", "not-run")]);
+assert.strictEqual(history.started(unbegun), false);
+assert.strictEqual(history.started(run("u2", "a", [step("s1", "skipped"), step("s2", "not-run")])), true);
+assert.deepStrictEqual(history.history([...runs, unbegun], "s1").map(entry => entry.testRunId), ["r3", "r2", "r1"]);
+assert.strictEqual(history.latest([...runs, unbegun]).get("s1").testRunId, "r3");
+assert.strictEqual(history.latest([unbegun]).size, 0, "a document with only an unbegun test is not tested");
+const unbegunSummary = history.summaries([...runs, unbegun]).find(value => value.sessionId === "s1");
+assert.strictEqual(unbegunSummary.testRunId, "r3");
+assert.deepStrictEqual(unbegunSummary.trend.map(value => value.testRunId), ["r1", "r2", "r3"]);
 // A passed run whose steps the recording passed says so, so that it never looks more
 // verified than it is.
 assert.strictEqual(history.stateKey(latest.get("s2")), "testHistory.state.passedPartlyByRecording");
@@ -111,6 +122,10 @@ assert.deepStrictEqual(history.overviewCounts(rows),
   { all: 4, failed: 1, "in-progress": 0, passed: 2, never: 1, stale: 1 });
 assert.deepStrictEqual(history.overviewFilter(rows, { filter: "stale" }).map(row => row.sessionId), ["s4"]);
 assert.deepStrictEqual(history.overviewFilter(rows, { query: "  INKÖP " }).map(row => row.sessionId), ["s1"]);
+assert.deepStrictEqual(history.overviewFilter(rows, { query: "erik" }).map(row => row.sessionId), ["s3"],
+  "the search also finds who tested");
+assert.deepStrictEqual(history.overviewFilter(rows, { query: "uat" }).map(row => row.sessionId), ["s1", "s3", "s4"],
+  "the search also finds the environment");
 assert.deepStrictEqual(history.overviewFilter(rows, { filter: "nonsense" }).length, 4,
   "an unknown filter shows everything");
 
@@ -155,7 +170,7 @@ assert.deepStrictEqual(choices.suites.map(suite => suite.suiteId), ["su2", "su1"
 assert.strictEqual(history.activeScope({ environment: "UAT", version: "", periodDays: "30" }), 2);
 const scopeKeys = ["scopeLabel", "scopeHelp", "environment", "version", "period", "suite", "allEnvironments",
   "allVersions", "allPeriods", "allSuites", "periodDays", "scoped"].map(key => `testOverview.${key}`);
-for (const id of ["testsOverviewEnvironment", "testsOverviewVersion", "testsOverviewPeriod", "testsOverviewSuite"]) {
+for (const id of ["testsOverviewEnvironment", "testsOverviewVersion", "testsOverviewPeriod", "testsOverviewSuiteFilter"]) {
   assert.ok(fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.html"), "utf8").includes(`id="${id}"`), id);
 }
 
@@ -216,4 +231,28 @@ assert.ok(read("src/recorder/background.js").includes('case "T9_TEST_OVERVIEW"')
 assert.ok(dashboardPage.includes('data-home-view="tests"') && dashboardPage.includes('id="testsView"'));
 for (const filter of history.FILTERS) assert.ok(dashboardPage.includes(`data-tests-filter="${filter}"`), filter);
 assert.ok(dashboard.includes('$("testsView").hidden = view !== "tests";'));
+// A test in progress is continued on its own row; the footer does not repeat it.
+assert.ok(dashboard.includes('$("testHistoryRun").hidden = Boolean(testHistoryInProgress);'));
+const background = read("src/recorder/background.js");
+// A cancelled test is shown as cancelled, not in progress; the views offer Cancel test on a
+// test in progress and Resume on a cancelled one, handled in the background.
+const cancelledRun = run("x1", "2026-11-15T10:00:00.000Z", [step("s1", "passed"), step("s2", "not-run")],
+  { cancelledAt: "2026-11-15T11:00:00.000Z" });
+assert.strictEqual(history.counts(cancelledRun).outcome, "cancelled");
+assert.strictEqual(history.latest([cancelledRun]).get("s1").state, "cancelled");
+assert.strictEqual(history.stateKey({ state: "cancelled" }), "testHistory.state.cancelled");
+assert.ok(history.STATES.includes("cancelled"));
+assert.ok(view.includes('{ "in-progress": "cancel", cancelled: "resume" }'));
+assert.strictEqual((dashboard.match(/manage: true \}\)/gu) || []).length, 2, "both histories offer cancelling");
+assert.ok(background.includes('case "T9_CANCEL_TEST_RUN"') && background.includes('case "T9_RESUME_TEST_RUN"'));
+assert.ok(/cancelledAt: run\.cancelledAt/u.test(background), "the overview knows which runs are cancelled");
+// The processes in Tests are marked and opened as documents in the library: a click marks,
+// a double-click or the History button on the row opens the history.
+assert.ok(dashboard.includes('$("testsOverviewList").addEventListener("dblclick"'));
+assert.ok(dashboard.includes('T9DocumentBatchOperations.select({ selectedIds: [...testsSelection]'));
+assert.ok(dashboard.includes('history.textContent = uiT("testOverview.history");'));
+// A tested process without environment, version or tester says so instead of a blank cell.
+assert.ok(dashboard.includes('uiT("testOverview.notGiven")'));
+assert.ok(background.includes("T9TestScript.withTester(") && background.includes("account.profile?.name"),
+  "a new test gets the signed-in person, or else the last tester");
 console.log("Test history tests passed.");

@@ -38,6 +38,25 @@
     .suite-test[data-status=failed] .suite-test-status strong{color:var(--c-fg-8a1c14)}
     .suite-test[data-status=passed] .suite-test-status strong{color:var(--c-fg-166534)}
     .suite-test button{margin:0;min-height:40px}
+    .suite-test-people{margin:2px 0 0;font-size:.875rem;color:var(--c-fg-526273);display:flex;flex-wrap:wrap;gap:2px 12px}
+    .suite-test-people [data-mine=true]{font-weight:600;color:var(--c-fg-172b4d)}
+    .suite-test-actions{display:flex;flex-wrap:wrap;gap:8px}
+    .suite-tests-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin:24px 0 8px}
+    .suite-tests-head h2{margin:0}.suite-only-mine{display:flex;align-items:center;gap:6px;font-weight:400}
+    .suite-email{margin:12px 0;font-size:.875rem;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}.suite-email button{margin:0}
+    .suite-email[data-state=failed]>span{color:var(--c-fg-8a1c14);font-weight:600}
+    .assign-notify{display:flex;gap:8px;align-items:flex-start;font-weight:400;margin:12px 0 0}.assign-notify input{margin-top:3px}.assign-notify .field-help{display:block;margin:2px 0 0}
+    dialog{max-width:min(560px,calc(100vw - 32px));box-sizing:border-box;border:1px solid var(--c-bd-ccd5df);border-radius:8px;padding:20px;color:inherit;background:var(--c-bg-ffffff)}
+    dialog h2{margin:0 0 12px}dialog fieldset{border:0;margin:0 0 12px;padding:0;max-height:40vh;overflow:auto}
+    dialog legend{font-weight:600;margin-bottom:4px}.assign-test{display:flex;gap:8px;align-items:flex-start;font-weight:400;margin:4px 0}
+    dialog select{box-sizing:border-box;width:100%;padding:8px;font:inherit;margin-top:4px}
+    .assign-new{display:grid;gap:8px;margin:8px 0 0}.assign-field{position:relative}
+    .assign-suggestions{position:absolute;left:0;right:0;top:100%;z-index:3;margin:2px 0 0;padding:4px 0;list-style:none;max-height:240px;overflow:auto;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-8392a5);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+    .assign-suggestions li{padding:6px 10px;cursor:pointer;overflow-wrap:anywhere}
+    .assign-suggestions li[aria-selected=true],.assign-suggestions li:hover{background:var(--c-bg-f5f7fa)}
+    .assign-suggestions .suggestion-address{display:block;font-size:.875rem;opacity:.8}
+    .assign-people-search{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:.875rem}.assign-people-search button{margin:0}.assign-error{color:var(--c-fg-8a1c14);font-weight:600;margin:8px 0 0}
+    dialog footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:16px}dialog footer button{margin:0;min-height:40px}
     .suite-delete{margin:24px 0 0;padding:12px 14px;border:1px solid var(--c-bd-b42318);border-radius:6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
     .suite-delete p{margin:0;flex:1 1 260px;min-width:0}.suite-delete button{margin:0;min-height:40px}
     @media(max-width:640px){header{padding:10px 16px}main{padding:16px}}
@@ -47,6 +66,7 @@
   <header>
     <div class="actions">
       <button id="nextRound" type="button" class="primary" aria-describedby="nextRoundHelp" data-i18n="suite.nextRound">New round</button>
+      <button id="assignTests" type="button" data-i18n="suite.assign">Assign tests</button>
       <button id="openSuiteProtocol" type="button" data-i18n="test.openProtocol">Test protocol</button>
       <button id="deleteSuite" type="button" aria-controls="deleteConfirm" aria-expanded="false" data-i18n="suite.delete">Delete suite</button>
       <button id="closeSuite" type="button" data-i18n="test.close">Close</button>
@@ -65,8 +85,12 @@
       <div><label for="suiteVersion" data-i18n="suite.version">Business Central version</label><input id="suiteVersion" type="text" aria-describedby="suiteVersionHelp">
         <p id="suiteVersionHelp" class="field-help" data-i18n="suite.versionHelp">For example BC 28, or the version being tested.</p></div>
     </div>
-    <p id="nextRoundHelp" class="field-help" data-i18n="suite.nextRoundHelp">Run the same tests again in a new suite, for example after the next upgrade. Expected results are carried over.</p>
-    <h2 id="suiteTestsTitle" data-i18n="suite.tests">Tests</h2>
+    <p id="nextRoundHelp" class="field-help" data-i18n="suite.nextRoundHelp">Run the same tests again in a new suite, for example after the next upgrade. Every step starts as not tested. What you wrote about what should happen, the prerequisites and the test data are carried over.</p>
+    <p id="suiteEmail" class="suite-email" role="status" hidden></p>
+    <div class="suite-tests-head">
+      <h2 id="suiteTestsTitle" data-i18n="suite.tests">Tests</h2>
+      <label id="onlyMineLabel" class="suite-only-mine" hidden><input id="onlyMine" type="checkbox"> <span data-i18n="suite.onlyMine">Show only my tests</span></label>
+    </div>
     <ol id="suiteTests" class="suite-tests" aria-labelledby="suiteTestsTitle" data-i18n-ignore></ol>
     <div id="deleteConfirm" class="suite-delete" role="group" aria-labelledby="deleteConfirmText" hidden>
       <p id="deleteConfirmText" data-i18n="suite.deleteConfirm">The suite is deleted. The test runs are kept with their documents.</p>
@@ -74,11 +98,35 @@
       <button id="deleteCancel" type="button" data-i18n="suite.cancel">Cancel</button>
     </div>
   </main>
+  <dialog id="assignDialog" aria-labelledby="assignTitle">
+    <form id="assignForm" method="dialog">
+      <h2 id="assignTitle" data-i18n="suite.assignTitle">Assign tests</h2>
+      <fieldset id="assignTestsList"><legend data-i18n="suite.assignTests">Tests</legend></fieldset>
+      <label for="assignPerson" data-i18n="suite.assignPerson">Person</label>
+      <select id="assignPerson"></select>
+      <div id="assignNew" class="assign-new" hidden>
+        <ul id="assignSuggestions" class="assign-suggestions" role="listbox" data-i18n-aria-label="suite.assignSuggestions" aria-label="Suggested people" hidden></ul>
+        <div class="assign-field"><label for="assignName" data-i18n="suite.assignName">Name</label><input id="assignName" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="assignSuggestions" aria-describedby="assignNameHelp">
+          <p id="assignNameHelp" class="field-help" data-i18n="suite.assignNameHelp">Type a name to get suggestions.</p></div>
+        <div class="assign-field"><label for="assignEmail" data-i18n="suite.assignEmail">Email (Microsoft account)</label><input id="assignEmail" type="text" inputmode="email" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="assignSuggestions" aria-describedby="assignEmailHelp">
+          <p id="assignEmailHelp" class="field-help" data-i18n="suite.assignEmailHelp">The person is recognised by the account they sign in with.</p></div>
+        <div id="assignPeopleSearch" class="assign-people-search" hidden><button id="assignSearchPeople" type="button" data-i18n="outlook.peopleSearch">Search people in Microsoft 365</button></div>
+      </div>
+      <label id="assignNotifyLabel" class="assign-notify"><input id="assignNotify" type="checkbox" checked aria-describedby="assignNotifyHelp">
+        <span><span data-i18n="suite.assignNotify">Email the person about the tests</span>
+        <span id="assignNotifyHelp" class="field-help" data-i18n="suite.assignNotifyHelp">Sent from your Outlook. It names only the tests you assign now.</span></span></label>
+      <p id="assignError" class="assign-error" role="alert"></p>
+      <footer><button id="assignCancel" type="button" data-i18n="suite.cancel">Cancel</button>
+        <button id="assignSubmit" type="submit" class="primary" data-i18n="suite.assignButton">Assign</button></footer>
+    </form>
+  </dialog>
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
   <script src="i18n.js"></script>
   <script src="engine/storage-keys.js"></script>
   <script src="document/test-suite.js"></script>
+  <script src="engine/tenant-license-config.js"></script>
+  <script src="bug-report/outlook-draft.js"></script>
   <script src="test-suite.js"></script>
 </body>
 </html>

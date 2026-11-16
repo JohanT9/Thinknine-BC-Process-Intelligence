@@ -99,6 +99,105 @@ assert.strictEqual(run.suiteId, "suite-1");
 assert.strictEqual(script.rerun(run, { testRunId: "run-2" }).suiteId, undefined);
 const again = script.rerun(run, { testRunId: "run-3", suiteId: "suite-2", environment: "" });
 assert.deepStrictEqual([again.suiteId, again.environment, again.steps[0].status], ["suite-2", "", "not-run"]);
+// A new round is offered once the round has a result, not for a round nothing was run in.
+assert.strictEqual(suites.hasResults({ passed: 0, failed: 0, inProgress: 0, notStarted: 2 }), false);
+assert.strictEqual(suites.hasResults({ passed: 0, failed: 0, inProgress: 1, notStarted: 1 }), true);
+assert.strictEqual(suites.hasResults({ passed: 1, failed: 0, inProgress: 0 }), true);
+// Processes are added at the end; one already in the suite is not added again, and the suite
+// never grows past its limit.
+const growing = suites.create({ suiteId: "grow", items: [{ sessionId: "s1", testRunId: "r1" }] });
+const grown = suites.addItems(growing, [{ sessionId: "s2", testRunId: "r2" }, { sessionId: "s1", testRunId: "rX" },
+  { sessionId: "", testRunId: "r0" }], "2026-11-16T11:00:00.000Z");
+assert.deepStrictEqual(grown.suite.items.map(item => [item.sessionId, item.testRunId]), [["s1", "r1"], ["s2", "r2"]]);
+assert.deepStrictEqual([grown.added.length, grown.already.map(item => item.sessionId), grown.suite.updatedAt],
+  [1, ["s1"], "2026-11-16T11:00:00.000Z"]);
+const fullSuite = suites.create({ suiteId: "full", items: Array.from({ length: suites.MAX_ITEMS },
+  (_, index) => ({ sessionId: `f${index}`, testRunId: `fr${index}` })) });
+assert.deepStrictEqual(suites.addItems(fullSuite, [{ sessionId: "extra", testRunId: "x" }]).full.map(item => item.sessionId),
+  ["extra"]);
+const unchanged = suites.addItems(growing, [{ sessionId: "s1", testRunId: "again" }]);
+assert.strictEqual(unchanged.suite.updatedAt, growing.updatedAt, "nothing added changes nothing");
+// Archiving keeps the suite, out of the way; restoring brings it back.
+const archivedSuite = suites.update(suites.create({ suiteId: "ar", items: [{ sessionId: "x", testRunId: "rx" }] }),
+  { archived: true }, "2026-11-16T10:00:00.000Z");
+assert.deepStrictEqual([archivedSuite.archived, archivedSuite.archivedAt], [true, "2026-11-16T10:00:00.000Z"]);
+const restoredSuite = suites.update(archivedSuite, { archived: false });
+assert.deepStrictEqual([restoredSuite.archived, restoredSuite.archivedAt], [false, null]);
+assert.strictEqual(suites.normalize({ suiteId: "old" }).archived, false, "a suite saved before archiving is not archived");
+assert.strictEqual(suites.nextRound(archivedSuite, { x: "ry" }, { suiteId: "ar2" }).archived, false,
+  "a new round starts out of the archive");
+// Rounds are counted along the previous rounds that still exist.
+assert.deepStrictEqual(suites.roundNumbers([{ suiteId: "r3", previousSuiteId: "r2" }, { suiteId: "r1" },
+  { suiteId: "r2", previousSuiteId: "r1" }, { suiteId: "lone", previousSuiteId: "deleted" }]),
+{ r3: 3, r1: 1, r2: 2, lone: 1 });
+// The list: in progress until every test is run, then done; archived apart; All is every suite
+// not archived; the search finds name, environment and version.
+const listed = [
+  { suiteId: "a", title: "Uppgradering", environment: "UAT", version: "27.1", progress: { total: 3, done: 1 } },
+  { suiteId: "b", title: "Månadstest", environment: "PROD", version: "27.0", progress: { total: 2, done: 2 } },
+  { suiteId: "c", title: "Gammal", environment: "UAT", version: "26.5", archived: true, progress: { total: 2, done: 2 } },
+  { suiteId: "d", title: "Tom", environment: "", version: "", progress: { total: 0, done: 0 } }];
+assert.deepStrictEqual(listed.map(suites.listState), ["in-progress", "done", "archived", "in-progress"]);
+assert.deepStrictEqual(suites.listCounts(listed), { "in-progress": 2, done: 1, archived: 1, all: 3 });
+assert.deepStrictEqual(suites.listFilter(listed, { filter: "all" }).map(entry => entry.suiteId), ["a", "b", "d"]);
+assert.deepStrictEqual(suites.listFilter(listed, { filter: "archived" }).map(entry => entry.suiteId), ["c"]);
+assert.deepStrictEqual(suites.listFilter(listed, { filter: "all", query: " uat " }).map(entry => entry.suiteId), ["a"]);
+assert.deepStrictEqual(suites.listFilter(listed, { filter: "done", query: "27.0" }).map(entry => entry.suiteId), ["b"]);
+// A name from what is tested.
+assert.strictEqual(suites.suggestedTitle({ environment: " UAT ", version: "BC 27.1" }), "UAT – BC 27.1");
+assert.strictEqual(suites.suggestedTitle({ version: "28" }), "28");
+assert.strictEqual(suites.suggestedTitle({}), "");
+// A cancelled test will not be run in this round: it is shown as cancelled and left out of the total.
+{
+  const suite = suites.create({ suiteId: "cx", items: [{ sessionId: "a", testRunId: "ra" }, { sessionId: "b", testRunId: "rb" }] });
+  const result = suites.progress(suite, { ra: { total: 2, passed: 2, failed: 0, skipped: 0, notRun: 0, outcome: "passed" },
+    rb: { total: 2, passed: 1, failed: 0, skipped: 0, notRun: 1, outcome: "cancelled" } });
+  assert.strictEqual(result.items[1].status, "cancelled");
+  assert.strictEqual(result.cancelled, 1);
+  assert.strictEqual(result.total, 1);
+  assert.strictEqual(result.outcome, "passed");
+}
+// Assigning tests to people, known by their Microsoft account's email address.
+{
+  let suite = suites.create({ suiteId: "as", title: "UAT", environment: "UAT", version: "BC 28",
+    items: [{ sessionId: "a", title: "Order", testRunId: "ra" }, { sessionId: "b", title: "Invoice", testRunId: "rb" },
+      { sessionId: "c", title: "Credit", testRunId: "rc" }] });
+  assert.strictEqual(suites.person({ name: "X", email: "not an address" }), null, "an invalid address assigns nobody");
+  suite = suites.update(suite, { assign: { sessionIds: ["a", "b"], assignee: { name: "Bo", email: " BO@Example.com " } } }, "t1");
+  assert.deepStrictEqual(suite.items.map(item => item.assignee?.email || null), ["bo@example.com", "bo@example.com", null]);
+  suite = suites.update(suite, { assign: { sessionIds: ["b"], assignee: null } }, "t2");
+  assert.strictEqual(suite.items[1].assignee, null, "Nobody removes the assignment");
+  suite = suites.update(suite, { assign: { sessionIds: ["c"], assignee: { email: "ann@example.com" } } }, "t3");
+  assert.strictEqual(suite.items[2].assignee.name, "ann@example.com", "without a name the address names the person");
+  assert.deepStrictEqual(suites.people([suite], { name: "Me", email: "me@example.com" }).map(who => who.email),
+    ["me@example.com", "ann@example.com", "bo@example.com"], "the signed-in person first, then by name");
+  const summary = notRun => ({ total: 2, passed: 2 - notRun, failed: 0, skipped: 0, notRun,
+    outcome: notRun ? "in-progress" : "passed" });
+  const progress = suites.progress(suite, { ra: summary(1), rb: summary(2), rc: summary(0) });
+  assert.deepStrictEqual(suites.waitingFor(progress.items, { email: "BO@example.com" }).map(item => item.sessionId), ["a"]);
+  assert.strictEqual(suites.waitingFor(progress.items, { email: "ann@example.com" }).length, 0, "a finished test waits for nobody");
+  const t = (key, values = {}) =>
+    Object.entries(values).reduce((value, [name, item]) => value.replaceAll(`{${name}}`, item), `<${key}>{name}{title}{where}`);
+  const email = suites.assignmentEmail(suite, { name: "Bo", email: "BO@example.com" }, ["Order", "<Invoice>"], t);
+  assert.strictEqual(email.to, "bo@example.com", "the email goes to the one person assigned");
+  assert.match(email.text, /^<suite\.emailIntro>BoUAT \(UAT · BC 28\)\n\n- Order\n- <Invoice>/u);
+  assert.ok(!email.text.includes("Credit"), "only the tests just assigned are named");
+  assert.match(email.html, /<li>Order<\/li><li>&lt;Invoice&gt;<\/li>/u, "titles are escaped in the HTML body");
+  const greeting = name => suites.assignmentEmail(suite, { name, email: "jj@example.com" }, ["Order"], t).text.split("UAT")[0];
+  assert.strictEqual(greeting("Johan Johansson"), "<suite.emailIntro>Johan", "greeted by first name");
+  assert.strictEqual(greeting("Johansson, Johan"), "<suite.emailIntro>Johan", "also from Surname, Given name");
+  assert.strictEqual(greeting(""), "<suite.emailIntro>jj@example.com", "without a name, the address");
+  assert.strictEqual(suites.assignmentEmail(suite, { name: "Bo", email: "bo@example.com" }, [], t), null);
+  assert.strictEqual(suites.assignmentEmail(suite, null, ["Order"], t), null);
+  // Each test links to the page that opens it; only an https link is used.
+  const linked = suites.assignmentEmail(suite, { name: "Bo", email: "bo@example.com" },
+    [{ title: "Order", link: "https://license.example.net/open?suite=as&test=ra" },
+      { title: "Invoice", link: "javascript:alert(1)" }], t);
+  assert.match(linked.html, /<li><a href="https:\/\/license\.example\.net\/open\?suite=as&amp;test=ra">Order<\/a><\/li><li>Invoice<\/li>/u);
+  assert.match(linked.text, /- Order: https:\/\/license\.example\.net\/open\?suite=as&test=ra\n- Invoice\n/u);
+  const next = suites.nextRound(suite, { a: "n1", c: "n3" }, { suiteId: "as2" });
+  assert.strictEqual(next.items[0].assignee.email, "bo@example.com", "a new round keeps the assignments");
+}
 console.log("Test suite model tests passed.");
 
 // Wiring: storage, background, pages and the library.
@@ -125,6 +224,33 @@ assert.ok(dashboardPage.includes('id="libraryBatchSuite"') && dashboardPage.incl
 const dashboard = read("src/ui/dashboard.js");
 assert.ok(dashboard.includes('type: "T9_CREATE_TEST_SUITE"') && dashboard.includes('type: "T9_LIST_TEST_SUITES"'));
 assert.ok(read("src/ui/test-run.js").includes('suite.partOf'));
+// Tests has a tab with every suite by its latest round, searched and filtered; the library
+// shows only suites in progress, a few at a time. In both a click marks a suite and unfolds
+// its actions. Suites are made from the processes ticked in Tests with the library's dialog.
+assert.ok(background.includes("message.latestRounds") && background.includes("message.comparison") &&
+  background.includes("roundNumbers(suites)"));
+assert.ok(dashboard.includes('type: "T9_LIST_TEST_SUITES", latestRounds: true, comparison: true') &&
+  dashboard.includes("openLibraryTestSuiteDialog(event.currentTarget, ids") && dashboard.includes("LIBRARY_SUITES_SHOWN"));
+assert.ok(dashboard.includes('listState(suite) === "in-progress"'), "the library lists the suites in progress");
+for (const action of ["open", "next-round", "protocol", "edit", "archive", "restore", "delete", "delete-confirm", "delete-cancel"]) {
+  assert.ok(dashboard.includes(`"${action}"`), `suite action ${action}`);
+}
+for (const id of ["testsTabs", "testsTabProcesses", "testsTabSuites", "testsProcessesPanel", "testsSuitesPanel",
+  "suitesSearch", "suitesFilters", "suitesList", "testsOverviewSuite", "librarySuiteEditDialog", "libraryTestSuitesMore"]) {
+  assert.ok(dashboardPage.includes(`id="${id}"`), id);
+}
+for (const filter of suites.LIST_FILTERS) {
+  assert.ok(dashboardPage.includes(`data-suites-filter="${filter}"`), filter);
+  assert.ok(dashboard.includes("`suite.empty.${suitesFilter}`"));
+}
+// Processes are added to an existing suite from the library and from Tests, with tests made
+// as Create test suite makes them.
+assert.ok(background.includes('case "T9_ADD_TO_TEST_SUITE"') && dashboard.includes('type: "T9_ADD_TO_TEST_SUITE"'));
+for (const id of ["libraryBatchAddSuite", "testsOverviewAddSuite", "libraryAddSuiteDialog", "libraryAddSuiteSelect"]) {
+  assert.ok(dashboardPage.includes(`id="${id}"`), id);
+}
+// The name of a new suite follows the environment and version until the user writes one.
+assert.ok(dashboard.includes("suggestedTitle({") && dashboard.includes("libraryTestSuiteNameOwn"));
 // The suite's protocol: the protocol page with the suite, opened from the suite's page.
 assert.ok(read("src/ui/test-suite.js").includes("test-protocol.html?suiteId="));
 assert.ok(read("src/ui/test-protocol.js").includes('type: "T9_LOAD_TEST_SUITE"'));
@@ -149,7 +275,7 @@ const used = new Set([page, dashboardPage, read("src/ui/test-suite.js"), dashboa
   read("src/ui/test-protocol.js")]
   .flatMap(source => [...source.matchAll(/["'`](suite\.[a-zA-Z.-]+)["'`]/gu)].map(match => match[1])));
 assert.ok(used.size >= 25, `suite texts found: ${used.size}`);
-for (const key of [...used, ...["not-started", "in-progress", "passed", "failed", "missing"].map(value => `suite.status.${value}`),
+for (const key of [...used, ...["not-started", "in-progress", "passed", "failed", "missing", "cancelled"].map(value => `suite.status.${value}`),
   ...suites.CHANGES.map(change => `suite.compare.${change}`)]) {
   const english = i18n.translate(key, "en-US");
   assert.notStrictEqual(english, key, `${key} in English`);
@@ -160,4 +286,37 @@ for (const key of [...used, ...["not-started", "in-progress", "passed", "failed"
     assert.strictEqual(placeholders(value), placeholders(english), `${key} placeholders in ${locale}`);
   }
 }
+// Assigning: the page, the people, the tester filled in when a suite's test is begun, and the
+// count of tests waiting for the signed-in person.
+for (const id of ["assignTests", "assignDialog", "assignPerson", "assignEmail", "assignNotify", "onlyMine"]) {
+  assert.ok(page.includes(`id="${id}"`), id);
+}
+assert.ok(page.includes('src="bug-report/outlook-draft.js"'));
+// The email to the person assigned: asked for with the click, sent after the assignment is saved,
+// and never the old button that emailed everyone with tests waiting.
+assert.ok(!page.includes('id="emailAssignments"'), "no button that emails everyone");
+assert.ok(/const permission = notify \? chrome\.permissions\.request\(GRAPH\)[\s\S]*?await save\(\)/u.test(read("src/ui/test-suite.js")),
+  "the permission is requested before anything is awaited");
+assert.ok(/T9_UPDATE_TEST_SUITE[\s\S]*?notifyAssignee\(/u.test(read("src/ui/test-suite.js")), "the email follows the saved assignment");
+assert.ok(read("src/ui/test-suite.js").includes("await outlook().send("));
+// The link from the email: built from the configured page, and a suite that has not arrived
+// yet is waited for.
+assert.ok(read("src/ui/test-suite.js").includes("T9TenantLicenseConfig?.openLink"));
+assert.ok(read("src/ui/test-suite.js").includes('query.get("from") === "link"') &&
+  read("src/ui/test-suite.js").includes('t("suite.notSynced")'));
+assert.ok(background.includes('case "T9_OPEN_LINK"') && background.includes("&from=link"));
+// Suggestions for a new person: known people and Microsoft 365, never a sign-in while typing.
+const suitePage = read("src/ui/test-suite.js");
+for (const id of ["assignSuggestions", "assignSearchPeople"]) assert.ok(page.includes(`id="${id}"`), id);
+assert.ok(page.includes('aria-controls="assignSuggestions"'));
+assert.ok(suitePage.includes("outlook().people(term)") && suitePage.includes('outlook().people("", { interactive: true })'));
+assert.ok(/chrome\.permissions\.contains\(GRAPH\) \? await outlook\(\)\.people\(term\)/u.test(suitePage),
+  "typing searches Microsoft 365 only once it is allowed");
+assert.ok(background.includes('case "T9_TEST_PEOPLE"'));
+assert.ok(background.includes("mine: me ? globalThis.T9TestSuite.waitingFor(progress.items, me).length : 0"));
+assert.ok(background.includes("message.run?.suiteId ? carried"), "a suite's test is not filled in when the suite is made");
+assert.ok(/globalThis\.T9TestHistory\.started\(changed\)[\s\S]*?withTester/u.test(background),
+  "the tester is filled in when the test is begun");
+assert.ok(dashboard.includes('uiTf("suite.mineCount"'));
+assert.ok(read("src/bug-report/outlook-draft.js").includes("!email.withoutAttachments"));
 console.log("Test suite wiring and languages passed.");

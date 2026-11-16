@@ -81,6 +81,23 @@ sign-in identifies the user for registration; the current service does not
 independently prove that the account has Business Central access to the tenant.
 The random installation ID is used only for registration statistics.
 
+## Link page for assignment emails
+
+`GET /open?suite=<id>&test=<id>` (and `HEAD`) returns a static page in the
+browser's language (Accept-Language, the extension's eight languages, else
+English). It runs no script, sets cookies for nothing, does not write the ids
+into the page and is served with `Cache-Control: no-store`,
+`Referrer-Policy: no-referrer` and a `default-src 'none'` content security
+policy. The extension's `open-link.js` runs only on this page and asks the
+background worker to open the test; the worker accepts that message only from
+this exact page in the top frame of a tab, checks the ids and opens the test,
+the suite, or the suite's page saying it has not been synced yet. Without the
+extension the page tells the reader to open the link in Microsoft Edge with
+BC Process Studio installed. The request reaches the service like any web
+request (address and ids in the URL); the service keeps no record of it beyond
+the hosting platform's own request logs. See `services/licensing/open-link.js`
+and `tests/license-open-link.test.js`.
+
 ## Activation checklist
 
 1. Configure Entra token validation for the API and the administrator license store.

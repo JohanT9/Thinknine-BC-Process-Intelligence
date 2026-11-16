@@ -10,14 +10,18 @@ const background = fs.readFileSync(path.join(root, "src/recorder/background.js")
 const start = background.indexOf("const PAGE_MESSAGE_TYPES");
 const end = background.indexOf("chrome.runtime.onMessage.addListener(");
 assert.ok(start > 0 && end > start, "the sender check precedes the message listener");
-const context = { chrome: { runtime: { id: "studio", getURL: file => `chrome-extension://studio/${file}` } } };
+const linkPage = "https://license.example.net/open";
+const context = { chrome: { runtime: { id: "studio", getURL: file => `chrome-extension://studio/${file}` } },
+  T9TenantLicenseConfig: { openLink: linkPage }, URL };
+context.globalThis = context;
 vm.runInNewContext(`${background.slice(start, end)}
 this.messageAllowed = messageAllowed; this.PAGE_MESSAGE_TYPES = PAGE_MESSAGE_TYPES;`, context);
 const { messageAllowed, PAGE_MESSAGE_TYPES } = context;
 
 // Every message the capture scripts send is allowed from a Business Central page.
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "src/ui/manifest.json"), "utf8"));
-const captureFiles = new Set(manifest.content_scripts.flatMap(script => script.js));
+// The link page's script is not a capture script; it is checked on its own below.
+const captureFiles = new Set(manifest.content_scripts.flatMap(script => script.js).filter(file => file !== "open-link.js"));
 const sources = {
   "content.js": "src/recorder/content.js",
   "bc-error-detector.js": "src/recorder/bc-error-detector.js",
@@ -49,4 +53,22 @@ assert.equal(messageAllowed({ type: "T9_DELETE_SESSION" },
   { id: "studio", url: "https://chrome-extension.studio.example/dashboard.html" }), false);
 assert.equal(messageAllowed({ type: "T9_DELETE_SESSION" }, { id: "other", url: "chrome-extension://studio/x.html" }), false);
 assert.equal(messageAllowed(null, bcPage), false);
+
+// The link page of an assignment email may ask to open a test, and nothing else; only that
+// page, in the top frame of a tab, and only for this extension.
+const linkScript = manifest.content_scripts.find(entry => entry.js.includes("open-link.js"));
+assert.deepStrictEqual(linkScript.js, ["open-link.js"]);
+assert.ok(linkScript.matches.every(match => match.endsWith(".azurewebsites.net/open*")), "only the link page");
+assert.ok(!linkScript.all_frames, "only the top frame");
+assert.ok(fs.readFileSync(path.join(root, "src/recorder/open-link.js"), "utf8").includes('type: "T9_OPEN_LINK"'));
+const config = fs.readFileSync(path.join(root, "src/engine/tenant-license-config.js"), "utf8");
+assert.ok(linkScript.matches[0] === config.match(/openLink: "([^"]+)"/u)[1] + "*", "the script runs where the email links");
+const fromLink = { id: "studio", url: `${linkPage}?suite=s1&test=r1`, frameId: 0, tab: { id: 7 } };
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, fromLink), true);
+assert.equal(messageAllowed({ type: "T9_DELETE_SESSION" }, fromLink), false, "the link page may only open a test");
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, bcPage), false, "Business Central may not");
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, { ...fromLink, url: "https://license.example.net/openx?suite=s1" }), false);
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, { ...fromLink, url: "https://evil.example/open?suite=s1" }), false);
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, { ...fromLink, frameId: 2 }), false, "not from a frame");
+assert.equal(messageAllowed({ type: "T9_OPEN_LINK" }, { ...fromLink, id: "other" }), false);
 console.log("Background message sender tests passed.");

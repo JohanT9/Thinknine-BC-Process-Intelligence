@@ -59,6 +59,7 @@ jobs:
           node tests/license-audit-log.test.js
           node tests/license-notifications.test.js
           node tests/consultant-license.test.js
+          node tests/license-open-link.test.js
 
       - name: Package license service
         run: node scripts/package-license-service.js

@@ -11,7 +11,7 @@
   // A result is said as it is: a passed run means the tester, or the recording of the test,
   // passed every step. Steps the recording passed are counted, so that such a run never
   // looks more verified than it is, and a run with steps left untested is in progress.
-  const STATES = Object.freeze(["passed", "failed", "in-progress"]);
+  const STATES = Object.freeze(["passed", "failed", "in-progress", "cancelled"]);
 
   const text = value => typeof value === "string" ? value : value == null ? "" : String(value);
   const steps = run => Array.isArray(run?.steps) ? run.steps : [];
@@ -26,8 +26,18 @@
       byRecording: list.filter(byRecording).length };
     result.outcome = result.failed ? "failed" : result.notRun || !result.total
       ? "in-progress" : "passed";
+    // A cancelled test keeps what was tested but is no longer in progress.
+    if (result.outcome === "in-progress" && run?.cancelledAt) result.outcome = "cancelled";
     return result;
   }
+
+  // A test counts once it is begun: a step has a result or is skipped. A test made but not
+  // begun, such as each test of a new suite, is not in progress yet and is left out of the
+  // history, the latest results and the trend until a step is tested.
+  function started(run) {
+    return steps(run).some(step => step?.status && step.status !== "not-run");
+  }
+  const begun = runs => (Array.isArray(runs) ? runs : []).filter(run => run && started(run));
 
   // A step of one run is the same step in another when it has the same id, or else, for a test
   // made again from a changed document, the same action on the same page. Never its position.
@@ -97,8 +107,8 @@
 
   // Every run of one document, newest first, each compared with the run made before it.
   function history(runs, sessionId) {
-    const own = (Array.isArray(runs) ? runs : [])
-      .filter(run => run && (!sessionId || text(run.sessionId) === text(sessionId)))
+    const own = begun(runs)
+      .filter(run => (!sessionId || text(run.sessionId) === text(sessionId)))
       .slice().sort(newestFirst);
     return own.map((run, index) => entry(run, own[index + 1]));
   }
@@ -107,8 +117,8 @@
   // with how many runs there are. A document without a run has no entry.
   function latest(runs) {
     const groups = new Map();
-    for (const run of Array.isArray(runs) ? runs : []) {
-      if (!run?.sessionId) continue;
+    for (const run of begun(runs)) {
+      if (!run.sessionId) continue;
       const key = text(run.sessionId);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(run);
@@ -144,8 +154,8 @@
     const versions = new Map((Array.isArray(suites) ? suites : [])
       .map(suite => [text(suite?.suiteId), text(suite?.version)]));
     const groups = new Map();
-    for (const run of Array.isArray(runs) ? runs : []) {
-      if (!run?.sessionId) continue;
+    for (const run of begun(runs)) {
+      if (!run.sessionId) continue;
       const key = text(run.sessionId);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(run);
@@ -166,7 +176,7 @@
   // One row per process document, tested or not: the latest result, or "never". A tested
   // document whose latest run is older than staleDays is also stale, so that tests that
   // have not been run again in a long time show up. Failures come first.
-  const ORDER = Object.freeze({ failed: 0, "in-progress": 1, never: 2, passed: 3 });
+  const ORDER = Object.freeze({ failed: 0, "in-progress": 1, cancelled: 2, never: 3, passed: 4 });
   const DAY_MS = 24 * 60 * 60 * 1000;
   function overviewRows(documents, tested, options = {}) {
     const now = Date.parse(options.now || new Date().toISOString());
@@ -192,8 +202,10 @@
   function overviewFilter(rows, options = {}) {
     const filter = FILTERS.includes(options.filter) ? options.filter : "all";
     const query = text(options.query).trim().toLocaleLowerCase();
-    return rows.filter(row => matches(row, filter) &&
-      (!query || row.title.toLocaleLowerCase().includes(query)));
+    // The process, or who tested it and where.
+    const found = row => [row.title, row.summary?.tester, row.summary?.environment]
+      .some(value => text(value).toLocaleLowerCase().includes(query));
+    return rows.filter(row => matches(row, filter) && (!query || found(row)));
   }
 
   // The overview as CSV, one row per process, with headings and results in the language given
@@ -255,7 +267,7 @@
   const activeScope = scope => ["environment", "version", "suiteId", "periodDays"]
     .filter(key => scope?.[key]).length;
 
-  return { STATES, FILTERS, PERIODS, TREND_LENGTH, activeScope, compare, counts, history, latest,
+  return { STATES, FILTERS, PERIODS, TREND_LENGTH, activeScope, compare, counts, history, latest, started,
     overviewCounts, overviewCsv, overviewFilter, overviewRows, scopeOptions, scopeRuns, stateKey,
     summaries };
 });
