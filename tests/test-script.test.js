@@ -379,7 +379,7 @@ const keys = [...new Set([...pageScript.matchAll(/t\("(test\.[\w.-]+)"/gu), ...p
   "test.screenshotLimit", "test.screenshotFailed", "test.screenshotNeedsAccess", "test.activeTest", "test.continueTest", "test.continueHelp", "test.stepsTested", "test.badgeTitle", "test.accessNotice", "test.accessNoticeUnpinned", "test.noBusinessCentral","test.scriptTitle",
   "test.updated", "test.step", "test.result", "test.noSteps", "test.runNotFound",
   "test.describeFailure", "test.reportOnlyFailed", "test.creatingRun", "test.saveFailed",
-  ...["passed", "failed", "in-progress"].map(value => `test.outcome.${value}`),
+  ...["passed", "failed", "in-progress", "cancelled"].map(value => `test.outcome.${value}`),
   ...script.STATUSES.map(value => `test.status.${value}`)]))].filter(key => !key.endsWith("."));
 assert.ok(keys.length > 30);
 for (const { locale } of languages.supported("ui")) {
@@ -512,4 +512,36 @@ const card = purpose => { const target = { innerHTML: "" };
   return target.innerHTML; };
 assert.match(card("documentation"), /data-library-action="run-test">Kör test</u);
 assert.ok(!card("bug-report").includes("run-test"));
+// Cancelling a test in progress: kept with what was tested, no longer in progress, and taken
+// back by resuming it or by testing a step again. Only a begun test in progress is cancelled.
+{
+  const base = script.normalize({ schemaVersion: 1, testRunId: "c1", sessionId: "s", title: "T",
+    steps: [{ stepId: "a", status: "passed" }, { stepId: "b", status: "not-run" }] });
+  const cancelled = script.cancel(base, "2026-11-16T10:00:00.000Z");
+  assert.strictEqual(cancelled.cancelledAt, "2026-11-16T10:00:00.000Z");
+  assert.strictEqual(script.summary(cancelled).outcome, "cancelled");
+  assert.strictEqual(script.summary(cancelled).passed, 1, "what was tested is kept");
+  assert.strictEqual(script.summary(script.resume(cancelled, "x")).outcome, "in-progress");
+  assert.strictEqual(script.updateStep(cancelled, "b", { status: "passed" }, "y").cancelledAt, null,
+    "testing a step takes the test back into progress");
+  assert.strictEqual(script.rerun(cancelled, { testRunId: "c2" }).cancelledAt, null, "a new run is not cancelled");
+  const notBegun = script.normalize({ ...base, steps: [{ stepId: "a", status: "not-run" }] });
+  assert.throws(() => script.cancel(notBegun), /testHistory\.cancelNotInProgress/u);
+  const failed = script.normalize({ ...base, steps: [{ stepId: "a", status: "failed" }, { stepId: "b", status: "not-run" }] });
+  assert.throws(() => script.cancel(failed), /testHistory\.cancelNotInProgress/u, "a failed test is a result");
+  assert.strictEqual(script.summary(script.normalize({ ...cancelled, steps: [{ stepId: "a", status: "failed" }] })).outcome,
+    "failed", "a failure is never hidden as cancelled");
+}
+// A new test is filled in with the signed-in person, or else whoever tested last; a name
+// already given is kept.
+{
+  const fresh = script.normalize({ schemaVersion: 1, testRunId: "n1", sessionId: "s", steps: [] });
+  const earlier = [{ testRunId: "a", tester: "Anna", updatedAt: "2026-11-01T10:00:00Z" },
+    { testRunId: "b", tester: " Bo ", updatedAt: "2026-11-10T10:00:00Z" },
+    { testRunId: "c", tester: "", updatedAt: "2026-11-12T10:00:00Z" }];
+  assert.strictEqual(script.withTester(fresh, { signedIn: " Dana Svensson ", runs: earlier }).tester, "Dana Svensson");
+  assert.strictEqual(script.withTester(fresh, { runs: earlier }).tester, "Bo");
+  assert.strictEqual(script.withTester({ ...fresh, tester: "Cia" }, { signedIn: "Dana", runs: earlier }).tester, "Cia");
+  assert.strictEqual(script.withTester(fresh).tester, "", "with nobody to name it stays empty");
+}
 console.log("Test script tests passed.");

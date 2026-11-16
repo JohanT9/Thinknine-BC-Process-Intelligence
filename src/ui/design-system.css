@@ -427,6 +427,19 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-continue-kind{color:var(--colorTextSecondary);font-size:var(--fontSizeCaption);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .library-continue-card strong{font-size:15px;overflow-wrap:anywhere}
 .library-continue-next{color:var(--colorTextSecondary);font-size:var(--fontSizeCaption)}
+/* A test suite in the library: a click marks it and unfolds its actions, as a click marks a
+   document; a double click opens it. */
+.library-suite-card{display:grid;align-content:start;min-width:0;border:1px solid var(--colorBorderDefault);border-radius:var(--radiusLarge);background:var(--colorBackgroundSurface)}
+.library-suite-card:hover{border-color:var(--colorBrandPrimary)}
+.library-suite-card[data-selected="true"]{border-color:var(--colorBrandPrimary);background:var(--colorBrandSubtle)}
+.library-suite-toggle{display:grid!important;gap:var(--space8);width:100%;min-height:0;margin:0;padding:var(--space12) 14px;border:0!important;border-radius:var(--radiusLarge)!important;background:none;color:inherit;text-align:left;font-weight:400;cursor:pointer}
+.library-suite-toggle:hover:not(:disabled),.library-suite-toggle:active:not(:disabled){background:none}
+.library-suite-toggle strong{font-size:15px;overflow-wrap:anywhere}
+.library-suite-actions{display:flex;flex-wrap:wrap;gap:var(--space6);padding:0 14px var(--space12)}
+.library-suite-actions[hidden]{display:none}
+.library-suite-actions p{flex-basis:100%;margin:0 0 var(--space4)}
+.library-suite-actions button{margin:0;min-height:30px;padding:3px 10px}
+.library-suites-more{margin-top:var(--space8)}
 .library-progress{display:block;height:6px;border-radius:3px;background:var(--colorBorderSubtle);overflow:hidden}
 .library-progress span{display:block;height:100%;background:var(--colorStatusSuccess)}
 .library-primary-controls{margin:0}
@@ -641,6 +654,10 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .test-history-changes [data-change="fixed"] { color: var(--colorStatusSuccess); }
 .test-history-note { color: var(--colorTextSecondary); list-style: none; margin-left: calc(-1 * var(--space20)); }
 .test-history-report { margin: 0 0 0 var(--space4); min-height: 28px; padding: 2px var(--space8); }
+.test-history-manage { margin: 0; min-height: 28px; padding: 2px var(--space8); }
+.test-history-run[data-state="cancelled"] .test-history-icon, .library-test-marker[data-state="cancelled"] [aria-hidden],
+[data-state="cancelled"] > .tests-overview-icon, [data-state="cancelled"] .tests-overview-result .tests-overview-icon { color: var(--colorTextSecondary); }
+
 .library-test-marker { display: inline-flex; align-items: center; gap: var(--space4); margin: 0; padding: 0 var(--space6); min-height: 22px; border: 1px solid var(--colorBorderSubtle); border-radius: 999px; background: var(--colorBackgroundSubtle); color: var(--colorTextPrimary); font: inherit; font-size: var(--fontSizeCaption); cursor: pointer; }
 .library-test-marker:hover { border-color: var(--colorBorderDefault); }
 .library-test-marker[data-state="passed"] [aria-hidden] { color: var(--colorStatusSuccess); }
@@ -655,49 +672,98 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .test-history-dialog footer button { margin: 0; }
 .test-history-dialog [role="status"]:empty { display: none; }
 
-/* The test overview: one row per process with its latest result, when and where it was
-   tested, and its last runs as dots, oldest first. The result is always said in words. */
-.tests-overview-tools { display: flex; flex-wrap: wrap; gap: var(--space8); align-items: center; margin: var(--space12) 0 var(--space8); }
-.tests-overview-tools label { flex: 1 1 240px; min-width: 0; margin: 0; }
-.tests-overview-tools input { width: 100%; margin: 0; box-sizing: border-box; }
-.tests-overview-tools button { margin: 0; }
+/* The test overview: the latest round of each suite, then one table row per process with its
+   latest result, when and where it was tested, and its last runs, oldest first. The result is
+   always said in words; in the trend a failure is a square, so it is not told by colour alone. */
+.tests-overview-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space8) var(--space16); margin-bottom: var(--space12); }
+.tests-overview-head .home-lead { margin: 0; flex: 1 1 280px; min-width: 0; }
+.tests-overview-actions { display: flex; flex-wrap: wrap; gap: var(--space8); }
+.tests-overview-actions button { margin: 0; white-space: nowrap; }
+.tests-overview-count { display: inline-block; min-width: 1.4em; margin-left: var(--space4); padding: 0 var(--space6); border-radius: 999px; background: rgba(255, 255, 255, .22); font-size: var(--fontSizeCaption); text-align: center; }
+.tests-overview-suites { margin: 0 0 var(--space12); padding: var(--space12) var(--space16); border: 1px solid var(--colorBorderDefault); border-radius: 6px; background: var(--colorBackgroundSurface); }
+.tests-overview-suites h3 { margin: 0 0 var(--space8); font-size: var(--fontSizeCaption); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--colorTextSecondary); }
+.tests-overview-suites ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space6); }
+.tests-overview-suites li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space4) var(--space12); min-width: 0; }
+.tests-overview-suites strong { overflow-wrap: anywhere; }
+.tests-overview-suite-summary { flex: 1 1 260px; min-width: 0; color: var(--colorTextSecondary); overflow-wrap: anywhere; }
+.tests-overview-suites button { margin: 0 0 0 auto; min-height: 30px; padding: 3px 12px; }
+.tests-overview-icon { display: inline-block; width: 1em; font-weight: 700; text-align: center; }
+[data-state="passed"] > .tests-overview-icon, [data-state="passed"] .tests-overview-result .tests-overview-icon { color: var(--colorStatusSuccess); }
+[data-state="failed"] > .tests-overview-icon, [data-state="failed"] .tests-overview-result .tests-overview-icon { color: var(--colorStatusDanger); }
+[data-state="in-progress"] > .tests-overview-icon, [data-state="in-progress"] .tests-overview-result .tests-overview-icon { color: var(--colorStatusWarning); }
+.tests-overview-tools { display: flex; flex-wrap: wrap; gap: var(--space8) var(--space12); align-items: center; margin: 0 0 var(--space8); }
+.tests-overview-search { flex: 1 1 260px; min-width: 0; margin: 0; }
+.tests-overview-search input { width: 100%; margin: 0; box-sizing: border-box; }
+.tests-overview-scope { display: flex; flex-wrap: wrap; gap: var(--space8) var(--space12); align-items: center; }
+.tests-overview-scope label { display: inline-flex; align-items: center; gap: var(--space6); margin: 0; min-width: 0; color: var(--colorTextSecondary); white-space: nowrap; }
+.tests-overview-scope label[hidden] { display: none; }
+.tests-overview-scope select { margin: 0; width: auto; max-width: 15em; min-height: 32px; }
 .tests-overview-status-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space8); margin: var(--space8) 0; min-height: 30px; }
 .tests-overview-status-row p { margin: 0; flex: 1 1 240px; min-width: 0; }
 .tests-overview-status-row button { margin: 0; min-height: 30px; padding: 3px 12px; }
-.tests-overview-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space6); }
-.tests-overview-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1.4fr) auto auto; gap: var(--space4) var(--space12); align-items: center; padding: var(--space8) var(--space12); border: 1px solid var(--colorBorderSubtle); border-left: 3px solid var(--colorBorderDefault); border-radius: 6px; background: var(--colorBackgroundSurface); min-width: 0; }
-.tests-overview-row[data-state="passed"] { border-left-color: var(--colorStatusSuccess); }
-.tests-overview-row[data-state="failed"] { border-left-color: var(--colorStatusDanger); }
-.tests-overview-row[data-state="in-progress"] { border-left-color: var(--colorStatusWarning); }
-.tests-overview-title { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.tests-overview-table { border: 1px solid var(--colorBorderDefault); border-radius: 6px; background: var(--colorBackgroundSurface); overflow: hidden; }
+.tests-overview-header, .tests-overview-row { display: grid; grid-template-columns: 28px minmax(0, 2.2fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1.5fr) 144px; gap: var(--space4) var(--space12); align-items: center; padding: var(--space8) var(--space16); min-width: 0; }
+.tests-overview-header { border-bottom: 1px solid var(--colorBorderDefault); color: var(--colorTextSecondary); font-size: var(--fontSizeCaption); font-weight: 600; }
+.tests-overview-header input, .tests-overview-check input { margin: 0; width: 16px; height: 16px; }
+.tests-overview-list { list-style: none; margin: 0; padding: 0; }
+.tests-overview-row { min-height: 40px; border-top: 1px solid var(--colorBorderSubtle); }
+.tests-overview-row:first-child { border-top: 0; }
+.tests-overview-row { cursor: default; user-select: none; }
+.tests-overview-row:hover { background: var(--colorBackgroundSubtle); }
+.tests-overview-row[data-selected="true"] { background: var(--colorBrandSubtle); box-shadow: inset 3px 0 0 var(--colorBrandPrimary); }
+.tests-overview-process { display: grid; gap: 2px; min-width: 0; }
+.tests-overview-title { justify-self: start; min-height: 0; margin: 0; padding: 0; border: 0 !important; background: none; color: inherit; font: inherit; font-weight: 600; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.tests-overview-sub { color: var(--colorTextSecondary); font-size: var(--fontSizeCaption); overflow-wrap: anywhere; }
 .tests-overview-result { overflow-wrap: anywhere; }
-.tests-overview-result [aria-hidden] { font-weight: 700; margin-right: var(--space4); }
-.tests-overview-row[data-state="passed"] .tests-overview-result [aria-hidden] { color: var(--colorStatusSuccess); }
-.tests-overview-row[data-state="failed"] .tests-overview-result [aria-hidden] { color: var(--colorStatusDanger); }
-.tests-overview-row[data-state="in-progress"] .tests-overview-result [aria-hidden] { color: var(--colorStatusWarning); }
+.tests-overview-result .tests-overview-icon { margin-right: var(--space6); }
 .tests-overview-row[data-state="never"] .tests-overview-result { color: var(--colorTextSecondary); }
-.tests-overview-where { color: var(--colorTextSecondary); font-size: var(--fontSizeCaption); overflow-wrap: anywhere; }
-.tests-overview-stale { display: inline-block; margin-left: var(--space4); padding: 0 var(--space6); border: 1px solid var(--colorBorderDefault); border-radius: 999px; font-size: var(--fontSizeCaption); color: var(--colorTextPrimary); }
-.tests-overview-trend { display: inline-flex; gap: 3px; align-items: center; }
-.tests-overview-trend span { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--colorBorderDefault); box-sizing: border-box; }
-.tests-overview-trend [data-state="passed"] { background: var(--colorStatusSuccess); border-color: var(--colorStatusSuccess); }
-.tests-overview-trend [data-state="failed"] { background: var(--colorStatusDanger); border-color: var(--colorStatusDanger); }
-.tests-overview-trend [data-state="in-progress"] { border-color: var(--colorStatusWarning); background: linear-gradient(90deg, var(--colorStatusWarning) 50%, transparent 50%); }
-.tests-overview-row button { margin: 0; min-height: 30px; padding: 3px 12px; white-space: nowrap; }
-@media (max-width: 760px) {
-  .tests-overview-row { grid-template-columns: minmax(0, 1fr) auto; }
-  .tests-overview-title, .tests-overview-result, .tests-overview-where { grid-column: 1; }
-  .tests-overview-trend { grid-column: 2; grid-row: 1; justify-self: end; }
-  .tests-overview-row button { grid-column: 2; grid-row: 2 / span 2; align-self: end; }
+.tests-overview-when { display: grid; gap: 2px; color: var(--colorTextSecondary); }
+.tests-overview-stale { color: var(--colorStatusWarning); font-size: var(--fontSizeCaption); }
+.tests-overview-where { color: var(--colorTextSecondary); overflow-wrap: anywhere; }
+.tests-overview-where[data-missing="true"] { font-style: italic; }
+.tests-overview-action { display: flex; justify-content: flex-end; }
+.tests-overview-action button { min-width: 92px; }
+.tests-overview-action button { margin: 0; min-height: 28px; padding: 2px 12px; white-space: nowrap; }
+@media (max-width: 860px) {
+  .tests-overview-header { display: none; }
+  .tests-overview-table { overflow: visible; }
+  .tests-overview-row { grid-template-columns: 24px minmax(0, 1fr) auto; padding: var(--space8) var(--space12); }
+  .tests-overview-check { grid-row: 1 / span 3; align-self: start; padding-top: 2px; }
+  .tests-overview-process, .tests-overview-result { grid-column: 2; }
+  .tests-overview-when, .tests-overview-where { grid-column: 2; display: inline; font-size: var(--fontSizeCaption); }
+  .tests-overview-when { display: flex; flex-wrap: wrap; gap: 0 var(--space8); }
+  .tests-overview-action { grid-column: 3; grid-row: 1; justify-self: end; }
+}
+/* Tests has two tabs: the processes and the test suites. */
+.tests-tabs { display: flex; flex-wrap: wrap; gap: var(--space4); margin: var(--space8) 0 var(--space16); border-bottom: 1px solid var(--colorBorderDefault); }
+#testsSuitesPanel > .home-lead { margin: 0 0 var(--space12); }
+.tests-tabs button { margin: 0 0 -1px; min-height: 36px; padding: var(--space6) var(--space12); border: 0 !important; border-bottom: 2px solid transparent !important; border-radius: 0 !important; background: none; color: var(--colorTextSecondary); font-weight: 600; white-space: nowrap; }
+.tests-tabs button:hover:not(:disabled) { background: none; color: var(--colorTextPrimary); }
+.tests-tabs button[aria-selected="true"] { color: var(--colorTextPrimary); border-bottom-color: var(--colorBrandPrimary) !important; }
+.tests-tabs .library-quick-count { margin-left: var(--space4); color: var(--colorTextSecondary); font-weight: 400; }
+/* The list of test suites: one row per suite by its latest round; a marked row unfolds its
+   actions under it. */
+.suites-header, .suites-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, .8fr); gap: var(--space4) var(--space12); align-items: center; padding: var(--space8) var(--space16); min-width: 0; }
+.suites-header { border-bottom: 1px solid var(--colorBorderDefault); color: var(--colorTextSecondary); font-size: var(--fontSizeCaption); font-weight: 600; }
+.suites-row { min-height: 40px; border-top: 1px solid var(--colorBorderSubtle); cursor: pointer; }
+.suites-row:first-child { border-top: 0; }
+.suites-row:hover { background: var(--colorBackgroundSubtle); }
+.suites-row[data-selected="true"] { background: var(--colorBrandSubtle); box-shadow: inset 3px 0 0 var(--colorBrandPrimary); }
+.suites-cell-name { display: grid; gap: 2px; min-width: 0; }
+.suites-name { justify-self: start; min-height: 0; margin: 0; padding: 0; border: 0 !important; background: none; color: inherit; font: inherit; font-weight: 600; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.suites-name:hover:not(:disabled), .suites-name:active:not(:disabled) { background: none; text-decoration: underline; }
+.suite-mine { justify-self: start; align-self: start; display: inline-block; margin-top: 2px; padding: 0 var(--space6); border-radius: 999px; background: var(--colorBrandSubtle); color: var(--colorBrandText); font-size: var(--fontSizeCaption); font-weight: 600; }
+.suites-cell-progress { display: grid; gap: var(--space4); min-width: 0; color: var(--colorTextSecondary); }
+.suites-cell-progress .library-progress { max-width: 120px; }
+.suites-row-actions { grid-column: 1 / -1; padding: var(--space4) 0 var(--space4); cursor: default; }
+@media (max-width: 860px) {
+  .suites-header { display: none; }
+  .suites-row { grid-template-columns: minmax(0, 1fr) auto; padding: var(--space8) var(--space12); }
+  .suites-row > * { grid-column: 1; }
+  .suites-row > .tests-overview-when { grid-column: 2; grid-row: 1; justify-self: end; }
+  .suites-row > .tests-overview-where, .suites-row > .suites-cell-progress { font-size: var(--fontSizeCaption); }
+  .suites-row-actions { grid-column: 1 / -1; }
+  .suites-row > [data-empty="true"] { display: none; }
 }
 @media (forced-colors: active) {
-  .tests-overview-trend span { forced-color-adjust: none; border-color: CanvasText; }
-  .tests-overview-trend [data-state="passed"], .tests-overview-trend [data-state="failed"] { background: CanvasText; }
 }
-.tests-overview-scope { margin: var(--space8) 0 0; }
-.tests-overview-scope > summary { display: inline-flex; align-items: center; gap: var(--space8); min-height: 30px; padding: 3px 10px; border: 1px solid var(--colorBorderDefault); border-radius: var(--radiusMedium); background: var(--colorBackgroundSurface); font-weight: 600; cursor: pointer; }
-.tests-overview-scope-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space12); margin-top: var(--space8); padding: var(--space12); border: 1px solid var(--colorBorderDefault); background: var(--colorBackgroundSubtle); }
-.tests-overview-scope-panel p { grid-column: 1 / -1; margin: 0; }
-.tests-overview-scope-panel label { margin: 0; min-width: 0; }
-.tests-overview-scope-panel label[hidden] { display: none; }
-.tests-overview-scope-panel select { width: 100%; margin-top: var(--space4); }

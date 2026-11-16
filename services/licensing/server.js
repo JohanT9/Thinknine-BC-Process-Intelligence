@@ -8,6 +8,7 @@ const { createNotifier } = require("./notifications.js");
 const { createDocumentUsage, validUsage } = require("./document-usage.js");
 const { createAuditLog } = require("./audit-log.js");
 const { createTableStorage } = require("./table-storage.js");
+const { openPage, OPEN_HEADERS } = require("./open-link.js");
 const { createBackup, STATUS_KEY: BACKUP_STATUS_KEY } = require("./backup.js");
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -405,6 +406,15 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   const server = http.createServer(async (request, response) => {
     const pathname = new URL(request.url, "http://license.local").pathname;
     if (pathname === "/admin" || pathname.startsWith("/admin/")) return admin(request, response);
+    // The page a link to a test in an assignment email opens; see open-link.js.
+    if (pathname === "/open") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        response.writeHead(405, { ...OPEN_HEADERS, Allow: "GET, HEAD" });
+        return response.end();
+      }
+      response.writeHead(200, OPEN_HEADERS);
+      return response.end(request.method === "HEAD" ? undefined : openPage(request.headers["accept-language"]));
+    }
     const apiRoutes = ["/v1/license/usage", "/v1/license/check", "/v1/license/trial",
       "/v1/license/user/register", "/v1/license/consultant/check",
       "/v1/license/consultant/register"];

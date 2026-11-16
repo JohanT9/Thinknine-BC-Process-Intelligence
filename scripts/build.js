@@ -152,7 +152,7 @@ copyFile(
 );
 
 for (const file of ["capture-field-privacy.js", "capture-value-regions.js", "capture-indicator-i18n.js",
-  "al-identity-capture.js"]) {
+  "al-identity-capture.js", "open-link.js"]) {
   copyFile(path.join(src, "recorder", file), path.join(dist, file));
 }
 

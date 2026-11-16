@@ -191,3 +191,32 @@ Allt ligger i dag lokalt i användarens webbläsare, och det är en styrka. En l
 
 - Ska en delad länk uppdateras automatiskt när dokumentet sparas, eller först när användaren väljer Uppdatera delning?
 - Ska den delade sidan följa dokumentets mall (logga, färg) och dokumentspråk?
+
+## Påminnelse om tester att göra
+
+*Sparad 2026-11-16.*
+
+### Vad användaren ska kunna
+
+Den som äger en testsvit ska kunna skicka en påminnelse till de personer som har tilldelade tester som inte är klara, till exempel några dagar innan ett uppgraderingsfönster stänger.
+
+### Varför
+
+Tilldelningen skickar redan ett e-postmeddelande när testerna delas ut, men det glöms bort. Utan påminnelse måste testledaren själv hålla koll på vem som inte har börjat och skriva till var och en.
+
+### Vad som finns att bygga på
+
+- Varje test i en svit har en tilldelad person med e-postadress, och sviten vet vilka tester som väntar (`waitingFor`).
+- Direktsändning via Outlook (Mail.Send) finns för tilldelningsmejlet och buggrapporten.
+- Den tidigare knappen E-posta uppdraget (togs bort när tilldelningsmejlet kom) skickade till alla med tester kvar på en gång. Den var för trubbig.
+
+### Möjlig utformning
+
+- **Påminn** på svitens sida öppnar en dialog med personerna som har tester kvar, var och en med sina tester och om de har börjat. Alla är förvalda, och det går att kryssa ur någon.
+- Varje person får ett eget mejl med bara sina egna tester som inte är klara.
+- Svitens sida visar när en person senast påmindes, så att ingen får tre påminnelser samma dag.
+
+### Öppna frågor
+
+- Ska påminnelser kunna schemaläggas (till exempel ett datum då sviten ska vara klar), eller räcker en knapp?
+- Ska sviten få ett slutdatum som syns för den som testar och i påminnelsen?

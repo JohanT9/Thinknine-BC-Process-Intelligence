@@ -581,7 +581,8 @@
     });
     document.getElementById("runAgain").addEventListener("click", runAgain);
     document.getElementById("closeRun").addEventListener("click", async () => {
-      try { await client.flush(); window.close(); }
+      // Closed as a tab: a tab the email link opened may not close itself with window.close.
+      try { await client.flush(); chrome.tabs.getCurrent(tab => { if (tab?.id) chrome.tabs.remove(tab.id); else window.close(); }); }
       catch (error) { message.textContent = errorText(error); }
     });
   }

@@ -533,6 +533,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
       <button id="libraryBatchExport" class="primary">Exportera Word</button>
       <button id="libraryBatchSuite" class="secondary" data-i18n="suite.create">Skapa testsvit</button>
+      <button id="libraryBatchAddSuite" class="secondary" data-i18n="suite.addTo" hidden>Lägg till i testsvit</button>
       <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
       <button id="libraryBatchArchive" class="secondary">Arkivera</button>
       <button id="libraryBatchMove" class="secondary" data-i18n="folder.moveSelected">Flytta till mapp</button>
@@ -558,8 +559,9 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   </section>
 
   <section id="libraryTestSuites" class="library-continue" aria-labelledby="libraryTestSuitesTitle" hidden>
-    <h3 id="libraryTestSuitesTitle" data-i18n="suite.librarySection">Testsviter</h3>
-    <div id="libraryTestSuiteList" class="library-continue-list"></div>
+    <h3 id="libraryTestSuitesTitle" tabindex="-1" data-i18n="suite.pendingSection">Pågående testsviter</h3>
+    <div id="libraryTestSuiteList" class="library-continue-list" role="list" aria-labelledby="libraryTestSuitesTitle"></div>
+    <button id="libraryTestSuitesMore" type="button" class="secondary library-suites-more" hidden></button>
   </section>
 
   <div id="libraryResults" class="library-results" role="list" data-select-mode="false"
@@ -572,12 +574,34 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   for what needs attention and a CSV export (docs/FUTURE_FEATURES.md, view 1). -->
 <section id="testsView" class="document-library tests-overview" aria-labelledby="testsOverviewTitle" hidden>
   <h2 id="testsOverviewTitle" class="home-title" data-i18n="testHistory.section">Tester</h2>
-  <p class="muted home-lead" data-i18n="testOverview.lead">Hur varje process gick senast den testades. Öppna historiken för att se alla körningar.</p>
+  <div id="testsTabs" class="tests-tabs" role="tablist" aria-labelledby="testsOverviewTitle">
+    <button id="testsTabSuites" type="button" role="tab" aria-selected="true" aria-controls="testsSuitesPanel" tabindex="0" data-tests-tab="suites"><span data-i18n="suite.librarySection">Testsviter</span> <span id="testsTabSuitesCount" class="library-quick-count"></span></button>
+    <button id="testsTabProcesses" type="button" role="tab" aria-selected="false" aria-controls="testsProcessesPanel" tabindex="-1" data-tests-tab="processes" data-i18n="testOverview.tab.processes">Processer</button>
+  </div>
+  <div id="testsProcessesPanel" role="tabpanel" aria-labelledby="testsTabProcesses" hidden>
+  <div class="tests-overview-head">
+    <p class="muted home-lead" data-i18n="testOverview.lead">Senaste resultat per process. Klicka på en rad för att markera den. Historik visar alla körningar.</p>
+    <div class="tests-overview-actions">
+      <button id="testsOverviewCsv" type="button" class="secondary" data-i18n="testOverview.exportCsv">Exportera CSV</button>
+      <button id="testsOverviewAddSuite" type="button" class="secondary" data-i18n="suite.addTo" aria-describedby="testsOverviewSuiteHint" disabled hidden>Lägg till i testsvit</button>
+      <button id="testsOverviewSuite" type="button" class="primary" aria-describedby="testsOverviewSuiteHint" disabled><span data-i18n="suite.create">Skapa testsvit</span> <span id="testsOverviewSuiteCount" class="tests-overview-count" hidden></span></button>
+    </div>
+  </div>
+  <p id="testsOverviewSuiteHint" class="sr-only" data-i18n="testOverview.selectHint">Markera processer i listan för att skapa en testsvit av dem.</p>
   <div class="tests-overview-tools" role="search">
-    <label for="testsOverviewSearch"><span class="sr-only" data-i18n="testOverview.searchLabel">Sök process</span>
-      <input id="testsOverviewSearch" type="search" autocomplete="off" placeholder="Processens namn"
+    <label class="tests-overview-search" for="testsOverviewSearch"><span class="sr-only" data-i18n="testOverview.searchLabel">Sök process</span>
+      <input id="testsOverviewSearch" type="search" autocomplete="off" placeholder="Sök process eller testare"
         data-i18n-placeholder="testOverview.searchPlaceholder"></label>
-    <button id="testsOverviewCsv" type="button" class="secondary" data-i18n="testOverview.exportCsv">Exportera CSV</button>
+    <div id="testsOverviewScope" class="tests-overview-scope" role="group" aria-label="Filter" data-i18n-aria-label="testOverview.scopeLabel">
+      <label for="testsOverviewEnvironment"><span data-i18n="testOverview.environment">Miljö</span>
+        <select id="testsOverviewEnvironment" data-tests-scope="environment"><option value="" data-i18n="testOverview.allEnvironments">Alla miljöer</option></select></label>
+      <label for="testsOverviewVersion"><span data-i18n="testOverview.versionShort">Version</span>
+        <select id="testsOverviewVersion" data-tests-scope="version"><option value="" data-i18n="testOverview.allVersions">Alla versioner</option></select></label>
+      <label for="testsOverviewPeriod"><span data-i18n="testOverview.period">Period</span>
+        <select id="testsOverviewPeriod" data-tests-scope="periodDays"><option value="" data-i18n="testOverview.allPeriods">Hela tiden</option></select></label>
+      <label for="testsOverviewSuiteFilter"><span data-i18n="testOverview.suite">Testsvit</span>
+        <select id="testsOverviewSuiteFilter" data-tests-scope="suiteId"><option value="" data-i18n="testOverview.allSuites">Alla testsviter</option></select></label>
+    </div>
   </div>
   <div id="testsOverviewFilters" class="library-quick-filters tests-overview-filters" role="group"
     aria-label="Visa" data-i18n-aria-label="testOverview.filtersLabel">
@@ -588,27 +612,54 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     <button type="button" data-tests-filter="never" aria-pressed="false"><span data-i18n="testOverview.filter.never">Aldrig testade</span> <span class="library-quick-count"></span></button>
     <button type="button" data-tests-filter="stale" aria-pressed="false"><span data-tests-stale-label>Äldre än 90 dagar</span> <span class="library-quick-count"></span></button>
   </div>
-  <details id="testsOverviewScope" class="tests-overview-scope">
-    <summary><span data-i18n="library.filters">Filter</span>
-      <span id="testsOverviewScopeCount" class="library-filter-count" hidden></span></summary>
-    <div class="tests-overview-scope-panel" role="group" aria-label="Filter" data-i18n-aria-label="testOverview.scopeLabel">
-      <p class="muted" data-i18n="testOverview.scopeHelp">Varje process visas med sin senaste körning bland dem som filtren tar med.</p>
-      <label for="testsOverviewEnvironment"><span data-i18n="testOverview.environment">Miljö</span>
-        <select id="testsOverviewEnvironment" data-tests-scope="environment"><option value="" data-i18n="testOverview.allEnvironments">Alla miljöer</option></select></label>
-      <label for="testsOverviewVersion"><span data-i18n="testOverview.version">Business Central-version</span>
-        <select id="testsOverviewVersion" data-tests-scope="version"><option value="" data-i18n="testOverview.allVersions">Alla versioner</option></select></label>
-      <label for="testsOverviewPeriod"><span data-i18n="testOverview.period">Period</span>
-        <select id="testsOverviewPeriod" data-tests-scope="periodDays"><option value="" data-i18n="testOverview.allPeriods">Hela tiden</option></select></label>
-      <label for="testsOverviewSuite"><span data-i18n="testOverview.suite">Testsvit</span>
-        <select id="testsOverviewSuite" data-tests-scope="suiteId"><option value="" data-i18n="testOverview.allSuites">Alla testsviter</option></select></label>
-    </div>
-  </details>
   <div class="tests-overview-status-row">
     <p id="testsOverviewStatus" class="muted" role="status" aria-live="polite"></p>
     <button id="testsOverviewReset" type="button" class="secondary" data-i18n="library.resetFilters" hidden>Återställ filter</button>
     <button id="testsOverviewRetry" type="button" class="secondary" data-i18n="testHistory.retry" hidden>Försök igen</button>
   </div>
-  <ol id="testsOverviewList" class="tests-overview-list" aria-labelledby="testsOverviewTitle"></ol>
+  <div id="testsOverviewTable" class="tests-overview-table" hidden>
+    <div class="tests-overview-header">
+      <span><input id="testsOverviewSelectAll" type="checkbox" aria-label="Markera alla som visas" data-i18n-aria-label="testOverview.selectAll"></span>
+      <span aria-hidden="true" data-i18n="testOverview.csv.process">Process</span>
+      <span aria-hidden="true" data-i18n="testOverview.csv.result">Senaste resultat</span>
+      <span aria-hidden="true" data-i18n="testOverview.col.when">När</span>
+      <span aria-hidden="true" data-i18n="testOverview.col.where">Miljö · version · testare</span>
+      <span aria-hidden="true"></span>
+    </div>
+    <ol id="testsOverviewList" class="tests-overview-list" aria-labelledby="testsOverviewTitle"></ol>
+  </div>
+  </div>
+  <div id="testsSuitesPanel" role="tabpanel" aria-labelledby="testsTabSuites">
+    <p class="muted home-lead" data-i18n="suite.listLead">Varje testsvit visas med sin senaste omgång. Klicka på en svit för att se vad du kan göra med den.</p>
+    <div class="tests-overview-tools" role="search">
+      <label class="tests-overview-search" for="suitesSearch"><span class="sr-only" data-i18n="suite.searchLabel">Sök testsvit</span>
+        <input id="suitesSearch" type="search" autocomplete="off" placeholder="Sök namn, miljö eller version"
+          data-i18n-placeholder="suite.searchPlaceholder"></label>
+    </div>
+    <div id="suitesFilters" class="library-quick-filters tests-overview-filters" role="group"
+      aria-label="Visa" data-i18n-aria-label="testOverview.filtersLabel">
+      <button type="button" data-suites-filter="in-progress" aria-pressed="true"><span data-i18n="suite.filter.in-progress">Pågående</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-suites-filter="done" aria-pressed="false"><span data-i18n="suite.filter.done">Klara</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-suites-filter="all" aria-pressed="false"><span data-i18n="suite.filter.all">Alla</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-suites-filter="archived" aria-pressed="false"><span data-i18n="suite.filter.archived">Arkiverade</span> <span class="library-quick-count"></span></button>
+    </div>
+    <div class="tests-overview-status-row">
+      <p id="suitesStatus" class="muted" role="status" aria-live="polite"></p>
+      <button id="suitesReset" type="button" class="secondary" data-i18n="library.resetFilters" hidden>Återställ filter</button>
+      <button id="suitesShowProcesses" type="button" class="secondary" data-i18n="suite.goToProcesses" hidden>Välj processer</button>
+    </div>
+    <div id="suitesTable" class="tests-overview-table suites-table" hidden>
+      <div class="suites-header" aria-hidden="true">
+        <span data-i18n="suite.pageTitle">Testsvit</span>
+        <span data-i18n="testOverview.col.whereSuite">Miljö · version</span>
+        <span data-i18n="suite.col.progress">Körda tester</span>
+        <span data-i18n="suite.col.result">Resultat</span>
+        <span data-i18n="suite.col.compared">Jämfört med förra omgången</span>
+        <span data-i18n="suite.col.created">Skapad</span>
+      </div>
+      <ol id="suitesList" class="tests-overview-list" aria-label="Testsviter" data-i18n-aria-label="suite.librarySection"></ol>
+    </div>
+  </div>
 </section>
 
 <section id="settingsPanel" class="settings-view" aria-labelledby="settingsTitle" hidden>
@@ -916,21 +967,48 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <button id="libraryFolderSubmit" type="submit" class="primary"></button></footer>
   </form>
 </dialog>
+<dialog id="librarySuiteEditDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="librarySuiteEditTitle">
+  <form id="librarySuiteEditForm" class="library-test-suite-form" method="dialog" novalidate>
+    <h3 id="librarySuiteEditTitle" data-i18n="suite.editTitle">Redigera testsvit</h3>
+    <label class="library-folder-field" for="librarySuiteEditName"><span data-i18n="suite.title">Namn</span>
+      <input id="librarySuiteEditName" type="text" maxlength="120" autocomplete="off" required aria-describedby="librarySuiteEditError"></label>
+    <label class="library-folder-field" for="librarySuiteEditEnvironment"><span data-i18n="suite.environment">Miljö</span>
+      <input id="librarySuiteEditEnvironment" type="text" maxlength="80" autocomplete="off"></label>
+    <label class="library-folder-field" for="librarySuiteEditVersion"><span data-i18n="suite.version">Business Central-version</span>
+      <input id="librarySuiteEditVersion" type="text" maxlength="40" autocomplete="off"></label>
+    <p id="librarySuiteEditError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" value="cancel" class="secondary" data-folder-cancel data-i18n="suite.cancel">Avbryt</button>
+      <button id="librarySuiteEditSubmit" type="submit" class="primary" data-i18n="suite.save">Spara</button></footer>
+  </form>
+</dialog>
 <dialog id="libraryTestSuiteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryTestSuiteTitle" aria-describedby="libraryTestSuiteHelp">
   <form id="libraryTestSuiteForm" class="library-test-suite-form" method="dialog" novalidate>
     <h3 id="libraryTestSuiteTitle" data-i18n="suite.createTitle">Skapa testsvit</h3>
     <p id="libraryTestSuiteHelp" data-i18n="suite.createHelp">Ett test skapas för varje valt dokument.</p>
-    <label class="library-folder-field" for="libraryTestSuiteName"><span data-i18n="suite.title">Namn</span>
-      <input id="libraryTestSuiteName" type="text" maxlength="120" autocomplete="off"></label>
     <label class="library-folder-field" for="libraryTestSuiteEnvironment"><span data-i18n="suite.environment">Miljö</span>
       <input id="libraryTestSuiteEnvironment" type="text" maxlength="120" autocomplete="off"></label>
     <label class="library-folder-field" for="libraryTestSuiteVersion"><span data-i18n="suite.version">Business Central-version</span>
       <input id="libraryTestSuiteVersion" type="text" maxlength="60" autocomplete="off" aria-describedby="libraryTestSuiteVersionHelp">
       <span id="libraryTestSuiteVersionHelp" class="library-test-suite-help" data-i18n="suite.versionHelp">Till exempel BC 28 eller den version som testas.</span></label>
+    <label class="library-folder-field" for="libraryTestSuiteName"><span data-i18n="suite.title">Namn</span>
+      <input id="libraryTestSuiteName" type="text" maxlength="120" autocomplete="off" aria-describedby="libraryTestSuiteNameHelp">
+      <span id="libraryTestSuiteNameHelp" class="library-test-suite-help" data-i18n="suite.nameHelp">Föreslås från miljö och version. Du kan ändra det.</span></label>
     <p id="libraryTestSuiteStatus" role="status" aria-live="polite"></p>
     <p id="libraryTestSuiteError" class="library-folder-error" role="alert"></p>
     <footer><button type="button" class="secondary" data-folder-cancel data-i18n="suite.cancel">Avbryt</button>
       <button id="libraryTestSuiteSubmit" type="submit" class="primary" data-i18n="suite.createButton">Skapa</button></footer>
+  </form>
+</dialog>
+<dialog id="libraryAddSuiteDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryAddSuiteTitle" aria-describedby="libraryAddSuiteHelp">
+  <form id="libraryAddSuiteForm" class="library-test-suite-form" method="dialog" novalidate>
+    <h3 id="libraryAddSuiteTitle" data-i18n="suite.addTitle">Lägg till i testsvit</h3>
+    <p id="libraryAddSuiteHelp"></p>
+    <label class="library-folder-field" for="libraryAddSuiteSelect"><span data-i18n="suite.pageTitle">Testsvit</span>
+      <select id="libraryAddSuiteSelect"></select></label>
+    <p id="libraryAddSuiteStatus" role="status" aria-live="polite"></p>
+    <p id="libraryAddSuiteError" class="library-folder-error" role="alert"></p>
+    <footer><button type="button" value="cancel" class="secondary" data-folder-cancel data-i18n="suite.cancel">Avbryt</button>
+      <button id="libraryAddSuiteSubmit" type="submit" class="primary" data-i18n="suite.addButton">Lägg till</button></footer>
   </form>
 </dialog>
 <dialog id="libraryMoveDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryMoveTitle">

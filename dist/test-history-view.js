@@ -3,7 +3,7 @@
   // A document's test history as a timeline, newest run first: the result, when, where and by
   // whom, links to the run and its protocol, and under a failed run what changed since the run
   // before it. The same component is shown in the library and on the test page.
-  const ICONS = Object.freeze({ passed: "✓", failed: "●", "in-progress": "◐" });
+  const ICONS = Object.freeze({ passed: "✓", failed: "●", "in-progress": "◐", cancelled: "⊘" });
 
   function create(tag, className, text) {
     const element = document.createElement(tag);
@@ -84,7 +84,7 @@
   // Renders the history into the list; returns how many runs it shows. The run given as
   // currentRunId is left out, for the test page that shows that run itself.
   function render(list, history, options) {
-    const { t, locale, currentRunId = "" } = options;
+    const { t, locale, currentRunId = "", manage = false } = options;
     const entries = (history || []).filter(entry => entry.testRunId !== currentRunId);
     list.replaceChildren(...entries.map(entry => {
       const item = create("li", "test-history-run");
@@ -106,6 +106,17 @@
       if (entry.suiteId) {
         actions.append(link(t("testHistory.suite"),
           `test-suite.html?suiteId=${encodeURIComponent(entry.suiteId)}`));
+      }
+      // Where the page handles it (options.manage), a test in progress can be cancelled and a
+      // cancelled test resumed; the page acts on data-test-run-action.
+      const manageAction = { "in-progress": "cancel", cancelled: "resume" }[entry.counts.outcome];
+      if (manage && manageAction) {
+        const button = create("button", "secondary test-history-manage",
+          t(manageAction === "cancel" ? "testHistory.cancel" : "testHistory.resume"));
+        button.type = "button";
+        button.dataset.testRunAction = manageAction;
+        button.dataset.testRunId = entry.testRunId;
+        actions.append(button);
       }
       head.append(icon, when, result);
       if (details.textContent) head.append(details);

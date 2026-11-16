@@ -3975,7 +3975,7 @@ function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
   $("libraryBatchMove").hidden = !documentFoldersEditable;
-  for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
+  for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchAddSuite", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
     "libraryBatchTags", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
@@ -4657,10 +4657,19 @@ $("libraryBatchMove").addEventListener("click", event =>
 // makes it; a document that cannot become a test is left out and named.
 let libraryTestSuiteOpener = null;
 let libraryTestSuiteBusy = false;
-function openLibraryTestSuiteDialog(opener) {
-  if (!documentLibrarySelection.selectedIds.length) return;
+// The documents the dialog makes a suite of: those selected in the library, or in Tests.
+let libraryTestSuiteIds = [];
+let libraryTestSuiteDone = null;
+function openLibraryTestSuiteDialog(opener, ids = documentLibrarySelection.selectedIds, done = null) {
+  if (!ids.length) return;
+  libraryTestSuiteIds = [...ids];
+  libraryTestSuiteDone = done;
   libraryTestSuiteOpener = opener;
-  $("libraryTestSuiteName").value = uiTf("suite.defaultTitle", {
+  // The name follows the environment and version until the user writes one of their own;
+  // with neither, the date is used, as the placeholder shows.
+  libraryTestSuiteNameOwn = false;
+  $("libraryTestSuiteName").value = "";
+  $("libraryTestSuiteName").placeholder = uiTf("suite.defaultTitle", {
     date: new Date().toLocaleDateString(applicationSettings.uiLocale || "en-US") });
   $("libraryTestSuiteEnvironment").value = "";
   $("libraryTestSuiteVersion").value = "";
@@ -4668,11 +4677,22 @@ function openLibraryTestSuiteDialog(opener) {
   $("libraryTestSuiteError").textContent = "";
   $("libraryTestSuiteSubmit").disabled = false;
   $("libraryTestSuiteDialog").showModal();
-  $("libraryTestSuiteName").select();
+  $("libraryTestSuiteEnvironment").focus();
 }
+let libraryTestSuiteNameOwn = false;
+for (const id of ["libraryTestSuiteEnvironment", "libraryTestSuiteVersion"]) {
+  $(id).addEventListener("input", () => {
+    if (libraryTestSuiteNameOwn) return;
+    $("libraryTestSuiteName").value = globalThis.T9TestSuite.suggestedTitle({
+      environment: $("libraryTestSuiteEnvironment").value, version: $("libraryTestSuiteVersion").value });
+  });
+}
+$("libraryTestSuiteName").addEventListener("input", event => {
+  libraryTestSuiteNameOwn = Boolean(event.target.value.trim());
+});
 async function createLibraryTestSuite() {
   if (libraryTestSuiteBusy) return;
-  const ids = [...documentLibrarySelection.selectedIds];
+  const ids = [...libraryTestSuiteIds];
   const records = ids.map(id => documentLibraryRecords.find(record => record.projectId === id))
     .filter(Boolean);
   const environment = $("libraryTestSuiteEnvironment").value.trim();
@@ -4706,6 +4726,7 @@ async function createLibraryTestSuite() {
     $("libraryTestSuiteDialog").close();
     show(skipped.length ? uiTf("suite.skipped", { titles: skipped.join(", ") }) : "");
     void refreshLibraryTestSuites();
+    libraryTestSuiteDone?.(suite);
   } catch (error) {
     $("libraryTestSuiteStatus").textContent = "";
     $("libraryTestSuiteError").textContent = error?.message || String(error);
@@ -4714,41 +4735,533 @@ async function createLibraryTestSuite() {
     $("libraryTestSuiteSubmit").disabled = false;
   }
 }
-// The suites, newest first, with their progress. Shown above the documents while nothing is
-// searched; each opens its own page.
-async function refreshLibraryTestSuites() {
-  let suites = [];
-  try { suites = (await send({ type: "T9_LIST_TEST_SUITES" }))?.suites || []; } catch { suites = []; }
-  const list = $("libraryTestSuiteList");
-  list.replaceChildren(...suites.map(suite => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "library-continue-card";
-    card.dataset.testSuiteId = suite.suiteId;
-    const kind = document.createElement("span");
-    kind.className = "library-continue-kind";
-    // Rounds of the same suite share a name; the environment, or else the date, tells them apart.
-    kind.textContent = [suite.environment, suite.version].filter(Boolean).join(" · ") ||
-      uiTf("suite.created", { date: new Date(suite.createdAt).toLocaleDateString(
-        applicationSettings.uiLocale || "en-US") });
-    const title = document.createElement("strong");
-    title.textContent = suite.title || uiT("suite.pageTitle");
-    const bar = document.createElement("span");
-    bar.className = "library-progress";
-    bar.setAttribute("aria-hidden", "true");
-    const fill = document.createElement("span");
-    fill.style.width = `${suite.progress.total ? Math.round(100 * suite.progress.done / suite.progress.total) : 0}%`;
-    bar.append(fill);
-    const next = document.createElement("span");
-    next.className = "library-continue-next";
-    next.textContent = uiTf("suite.progress", { done: suite.progress.done,
-      total: suite.progress.total, failed: suite.progress.failed });
-    card.append(kind, title, bar, next);
-    return card;
-  }));
-  $("libraryTestSuites").hidden = suites.length === 0;
+// Test suites, in two places: the library shows the suites in progress, a few at a time, to
+// continue where the user left off; the Test suites tab in Tests lists them all, with search
+// and filters, so that many suites stay manageable. Each suite is shown by its latest round;
+// earlier rounds open from it. In both places a click marks a suite and unfolds what can be
+// done with it, as a click marks a document; a double click opens it.
+const LIBRARY_SUITES_SHOWN = 3;
+let testSuitesList = [];
+let testSuitesLoaded = false;
+let testSuitesFailed = false;
+let suitesFilter = "in-progress";
+const suiteUi = { library: { selected: "", deleting: "" }, tests: { selected: "", deleting: "" } };
+const suiteContainers = { library: "libraryTestSuiteList", tests: "suitesList" };
+function openTestSuitePage(suiteId) {
+  void chrome.tabs.create({ url: chrome.runtime.getURL(
+    `test-suite.html?suiteId=${encodeURIComponent(suiteId)}`) });
 }
+function suiteButton(action, text, className = "secondary") {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = className;
+  button.dataset.suiteAction = action;
+  button.textContent = text;
+  return button;
+}
+function suiteTitle(suite) {
+  return suite.title || uiT("suite.pageTitle");
+}
+// "UAT · 27.1", or when the suite says neither, the day it was made.
+function suiteWhere(suite) {
+  return [suite.environment, suite.version].filter(Boolean).join(" · ");
+}
+// What can be done with a marked suite. Deleting asks first, in place.
+function suiteActionsElement(suite, scope) {
+  const state = suiteUi[scope];
+  const actions = document.createElement("div");
+  actions.id = `suiteActions-${scope}-${suite.suiteId}`;
+  actions.className = "library-suite-actions";
+  actions.setAttribute("role", "group");
+  actions.setAttribute("aria-label", uiTf("suite.actionsLabel", { title: suiteTitle(suite) }));
+  actions.hidden = state.selected !== suite.suiteId;
+  if (state.deleting === suite.suiteId) {
+    const question = document.createElement("p");
+    question.id = `suiteDelete-${scope}-${suite.suiteId}`;
+    question.textContent = uiT("suite.deleteConfirm");
+    actions.setAttribute("aria-describedby", question.id);
+    actions.append(question, suiteButton("delete-confirm", uiT("suite.deleteButton"), "danger"),
+      suiteButton("delete-cancel", uiT("suite.cancel")));
+    return actions;
+  }
+  // A new round runs the same tests again, so it is offered once this round has results;
+  // before that it would only be an empty copy.
+  const nextRound = suiteButton("next-round", uiT("suite.nextRound"));
+  nextRound.title = uiT("suite.nextRoundHelp");
+  actions.append(suiteButton("open", uiT("suite.open"), "primary"),
+    ...(globalThis.T9TestSuite.hasResults(suite.progress) && !suite.archived ? [nextRound] : []),
+    suiteButton("protocol", uiT("test.openProtocol")),
+    suiteButton("edit", uiT("suite.edit")),
+    suiteButton(suite.archived ? "restore" : "archive", uiT(suite.archived ? "suite.restore" : "suite.archive")),
+    suiteButton("delete", uiT("suite.delete"), "danger"));
+  return actions;
+}
+function suiteToggle(suite, scope) {
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = scope === "library" ? "library-suite-toggle" : "suites-name";
+  toggle.dataset.suiteAction = "select";
+  toggle.setAttribute("aria-expanded", String(suiteUi[scope].selected === suite.suiteId));
+  toggle.setAttribute("aria-controls", `suiteActions-${scope}-${suite.suiteId}`);
+  return toggle;
+}
+function suiteProgressBar(suite) {
+  const bar = document.createElement("span");
+  bar.className = "library-progress";
+  bar.setAttribute("aria-hidden", "true");
+  const fill = document.createElement("span");
+  fill.style.width = `${suite.progress.total ? Math.round(100 * suite.progress.done / suite.progress.total) : 0}%`;
+  bar.append(fill);
+  return bar;
+}
+function librarySuiteCard(suite) {
+  const card = document.createElement("article");
+  card.className = "library-suite-card";
+  card.setAttribute("role", "listitem");
+  card.dataset.testSuiteId = suite.suiteId;
+  card.dataset.selected = String(suiteUi.library.selected === suite.suiteId);
+  const toggle = suiteToggle(suite, "library");
+  const kind = document.createElement("span");
+  kind.className = "library-continue-kind";
+  kind.textContent = suiteWhere(suite) || uiTf("suite.created", { date: new Date(suite.createdAt)
+    .toLocaleDateString(applicationSettings.uiLocale || "en-US") });
+  const name = document.createElement("strong");
+  name.textContent = suiteTitle(suite);
+  const next = document.createElement("span");
+  next.className = "library-continue-next";
+  next.textContent = uiTf("suite.progress", { done: suite.progress.done,
+    total: suite.progress.total, failed: suite.progress.failed });
+  toggle.append(kind, name, suiteProgressBar(suite), next);
+  if (suite.mine) toggle.append(suiteMineBadge(suite));
+  card.append(toggle, suiteActionsElement(suite, "library"));
+  return card;
+}
+// How the round went: failures first, then whether it is finished.
+// How many of the suite's tests are assigned to the signed-in person and wait for them.
+function suiteMineBadge(suite) {
+  const badge = document.createElement("span");
+  badge.className = "suite-mine";
+  badge.textContent = uiTf("suite.mineCount", { count: suite.mine });
+  return badge;
+}
+function suiteResultText(suite) {
+  const progress = suite.progress;
+  if (progress.failed) return uiTf("suite.result.failed", { count: progress.failed });
+  if (progress.total && progress.done === progress.total) return uiT("suite.result.passed");
+  return uiT(globalThis.T9TestSuite.hasResults(progress) ? "suite.result.inProgress" : "suite.result.notStarted");
+}
+// The round compared with the one before it, such as "26.5: New failures: 1, Fixed: 2".
+function suiteComparisonText(suite) {
+  const comparison = suite.comparison;
+  if (!comparison || !suite.progress.done) return "";
+  const previous = comparison.previous || {};
+  const round = previous.version || previous.environment ||
+    globalThis.T9TestHistoryView.formatDate(previous.createdAt, testsLocale());
+  const changes = [
+    ...(comparison.counts.newFailure ? [uiTf("suite.compare.countNewFailure", { count: comparison.counts.newFailure })] : []),
+    ...(comparison.counts.fixed ? [uiTf("suite.compare.countFixed", { count: comparison.counts.fixed })] : [])];
+  return uiTf("suite.comparedWith", { round,
+    changes: changes.length ? changes.join(", ") : uiT("testOverview.suiteNoChanges") });
+}
+function suitesRow(suite) {
+  const selected = suiteUi.tests.selected === suite.suiteId;
+  const item = document.createElement("li");
+  item.className = "suites-row";
+  item.dataset.testSuiteId = suite.suiteId;
+  item.dataset.selected = String(selected);
+  item.dataset.state = suite.progress.outcome;
+  const toggle = suiteToggle(suite, "tests");
+  toggle.textContent = suiteTitle(suite);
+  const nameCell = testsCell("suites-cell-name", toggle);
+  if (suite.round > 1) {
+    const round = document.createElement("span");
+    round.className = "tests-overview-sub";
+    round.textContent = uiTf("suite.round", { n: suite.round });
+    nameCell.append(round);
+  }
+  if (suite.archived) {
+    const archived = document.createElement("span");
+    archived.className = "tests-overview-sub";
+    archived.textContent = uiT("suite.archived");
+    nameCell.append(archived);
+  }
+  if (suite.mine) nameCell.append(suiteMineBadge(suite));
+  // An empty cell shows a dash in the table; on a narrow screen it is left out.
+  const where = testsCell("tests-overview-where", suiteWhere(suite) || "–");
+  where.dataset.empty = String(!suiteWhere(suite));
+  const count = document.createElement("span");
+  count.textContent = uiTf("suite.count", { done: suite.progress.done, total: suite.progress.total });
+  const progress = testsCell("suites-cell-progress", suiteProgressBar(suite), count);
+  const icon = document.createElement("span");
+  icon.className = "tests-overview-icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = globalThis.T9TestHistoryView.ICONS[suite.progress.outcome] || "–";
+  const result = testsCell("tests-overview-result", icon, suiteResultText(suite));
+  const compared = testsCell("tests-overview-where", suiteComparisonText(suite) || "–");
+  compared.dataset.empty = String(!suiteComparisonText(suite));
+  const created = document.createElement("time");
+  created.dateTime = suite.createdAt;
+  created.title = globalThis.T9TestHistoryView.formatDate(suite.createdAt, testsLocale(), true);
+  created.textContent = testsShortDate(suite.createdAt);
+  const actions = suiteActionsElement(suite, "tests");
+  actions.classList.add("suites-row-actions");
+  item.append(nameCell, where, progress, result, compared, testsCell("tests-overview-when", created), actions);
+  return item;
+}
+// The library: only suites still in progress, so the documents are never pushed away.
+function renderLibraryTestSuites() {
+  const pending = testSuitesList.filter(suite => globalThis.T9TestSuite.listState(suite) === "in-progress");
+  if (suiteUi.library.selected && !pending.some(suite => suite.suiteId === suiteUi.library.selected)) {
+    suiteUi.library.selected = "";
+  }
+  $("libraryTestSuiteList").replaceChildren(...pending.slice(0, LIBRARY_SUITES_SHOWN).map(librarySuiteCard));
+  const more = $("libraryTestSuitesMore");
+  const all = globalThis.T9TestSuite.listCounts(testSuitesList).all;
+  more.hidden = pending.length <= LIBRARY_SUITES_SHOWN;
+  more.textContent = uiTf("suite.showAllInTests", { count: all });
+  $("libraryTestSuites").hidden = pending.length === 0;
+}
+function suitesShown() {
+  return globalThis.T9TestSuite.listFilter(testSuitesList, { filter: suitesFilter,
+    query: $("suitesSearch").value });
+}
+// The Test suites tab: every suite by its latest round, filtered, newest first.
+function renderSuitesList() {
+  const model = globalThis.T9TestSuite;
+  const counts = model.listCounts(testSuitesList);
+  $("testsTabSuitesCount").textContent = String(counts.all);
+  for (const button of $("suitesFilters").querySelectorAll("[data-suites-filter]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.suitesFilter === suitesFilter));
+    button.querySelector(".library-quick-count").textContent = String(counts[button.dataset.suitesFilter]);
+  }
+  const query = $("suitesSearch").value;
+  const shown = testSuitesLoaded ? suitesShown() : [];
+  if (suiteUi.tests.selected && !shown.some(suite => suite.suiteId === suiteUi.tests.selected)) {
+    suiteUi.tests.selected = "";
+    suiteUi.tests.deleting = "";
+  }
+  $("suitesList").replaceChildren(...shown.map(suitesRow));
+  $("suitesTable").hidden = !shown.length;
+  $("suitesReset").hidden = !query.trim() && suitesFilter === "in-progress";
+  $("suitesShowProcesses").hidden = !testSuitesLoaded || testSuitesList.length > 0;
+  $("suitesStatus").textContent = testSuitesFailed ? uiT("suite.loadFailed")
+    : !testSuitesLoaded ? uiT("testHistory.loading")
+      : !testSuitesList.length ? uiT("suite.none")
+        : !shown.length ? (query.trim() ? uiT("suite.noMatch") : uiT(`suite.empty.${suitesFilter}`))
+          : uiTf("suite.shown", { shown: shown.length });
+}
+function renderTestSuites() {
+  renderLibraryTestSuites();
+  renderSuitesList();
+  renderAddSuiteButtons();
+}
+async function refreshLibraryTestSuites() {
+  try {
+    const response = await send({ type: "T9_LIST_TEST_SUITES", latestRounds: true, comparison: true });
+    if (!response?.ok) throw new Error(response?.error || "");
+    testSuitesList = response.suites || [];
+    testSuitesFailed = false;
+  } catch {
+    testSuitesFailed = true;
+  }
+  testSuitesLoaded = true;
+  const active = document.activeElement;
+  const focused = active?.closest?.("[data-test-suite-id]");
+  const scope = focused?.closest("#suitesList") ? "tests" : "library";
+  const focusKey = focused && [focused.dataset.testSuiteId, active.dataset.suiteAction];
+  renderTestSuites();
+  if (focusKey) suiteFocus(scope, focusKey[0], focusKey[1]);
+}
+function suiteFocus(scope, suiteId, action = "select") {
+  const element = $(suiteContainers[scope]).querySelector(`[data-test-suite-id="${CSS.escape(suiteId)}"]`);
+  (element?.querySelector(`[data-suite-action="${action}"]`) ||
+    element?.querySelector('[data-suite-action="select"]'))?.focus();
+}
+function selectSuite(scope, suiteId) {
+  const state = suiteUi[scope];
+  state.selected = state.selected === suiteId ? "" : suiteId;
+  state.deleting = "";
+  renderTestSuites();
+  suiteFocus(scope, suiteId);
+}
+// Name, environment and version, as on the suite's own page.
+let librarySuiteEditing = null;
+function openLibrarySuiteEdit(suite, scope) {
+  librarySuiteEditing = { suiteId: suite.suiteId, scope };
+  $("librarySuiteEditName").value = suite.title || "";
+  $("librarySuiteEditEnvironment").value = suite.environment || "";
+  $("librarySuiteEditVersion").value = suite.version || "";
+  $("librarySuiteEditError").textContent = "";
+  $("librarySuiteEditSubmit").disabled = false;
+  $("librarySuiteEditDialog").showModal();
+  $("librarySuiteEditName").select();
+}
+$("librarySuiteEditForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!librarySuiteEditing) return;
+  const name = $("librarySuiteEditName").value.trim();
+  if (!name) {
+    $("librarySuiteEditError").textContent = uiT("suite.nameRequired");
+    $("librarySuiteEditName").focus();
+    return;
+  }
+  $("librarySuiteEditSubmit").disabled = true;
+  $("librarySuiteEditError").textContent = "";
+  try {
+    const response = await send({ type: "T9_UPDATE_TEST_SUITE", suiteId: librarySuiteEditing.suiteId,
+      patch: { title: name, environment: $("librarySuiteEditEnvironment").value.trim(),
+        version: $("librarySuiteEditVersion").value.trim() } });
+    if (!response?.ok) throw new Error(uiT(response?.error || "suite.notFound"));
+    $("librarySuiteEditDialog").close();
+    await refreshLibraryTestSuites();
+  } catch (error) {
+    // The dialog stays open with what was typed, so nothing is lost.
+    $("librarySuiteEditError").textContent = uiTf("suite.saveFailed",
+      { error: error?.message || String(error) });
+    $("librarySuiteEditSubmit").disabled = false;
+  }
+});
+$("librarySuiteEditDialog").addEventListener("click", event => {
+  if (event.target.closest("[data-folder-cancel]")) $("librarySuiteEditDialog").close();
+});
+$("librarySuiteEditDialog").addEventListener("close", () => {
+  const editing = librarySuiteEditing;
+  librarySuiteEditing = null;
+  if (editing) suiteFocus(editing.scope, editing.suiteId, "edit");
+});
+async function suiteListClick(scope, event) {
+  const element = event.target.closest?.("[data-test-suite-id]");
+  if (!element) return;
+  const state = suiteUi[scope];
+  const suiteId = element.dataset.testSuiteId;
+  const suite = testSuitesList.find(value => value.suiteId === suiteId);
+  const button = event.target.closest("[data-suite-action]");
+  // A click anywhere on a row of the list marks it, like its name; text being selected is left be.
+  if (!button && (scope === "library" || getSelection()?.toString())) return;
+  const action = button?.dataset.suiteAction || "select";
+  // The second click of a double click opens the suite rather than unmarking it.
+  if (action === "select") { if (event.detail < 2) selectSuite(scope, suiteId); return; }
+  if (action === "open") { openTestSuitePage(suiteId); return; }
+  if (action === "protocol") {
+    void chrome.tabs.create({ url: chrome.runtime.getURL(
+      `test-protocol.html?suiteId=${encodeURIComponent(suiteId)}`) });
+    return;
+  }
+  if (action === "edit" && suite) { openLibrarySuiteEdit(suite, scope); return; }
+  if (action === "delete" || action === "delete-cancel") {
+    state.deleting = action === "delete" ? suiteId : "";
+    renderTestSuites();
+    suiteFocus(scope, suiteId, action === "delete" ? "delete-cancel" : "delete");
+    return;
+  }
+  button.disabled = true;
+  try {
+    let response;
+    if (action === "next-round") {
+      show(uiT("suite.creatingRound"));
+      response = await send({ type: "T9_NEXT_TEST_SUITE_ROUND", suiteId });
+    } else if (action === "archive" || action === "restore") {
+      response = await send({ type: "T9_UPDATE_TEST_SUITE", suiteId,
+        patch: { archived: action === "archive" } });
+    } else if (action === "delete-confirm") {
+      response = await send({ type: "T9_DELETE_TEST_SUITE", suiteId });
+    }
+    if (!response?.ok) throw new Error(uiT(response?.error || "suite.notFound"));
+    if (action === "next-round") {
+      show("");
+      state.selected = response.suite?.suiteId || "";
+    } else if (action === "delete-confirm") {
+      state.selected = "";
+      state.deleting = "";
+      show(uiT("suite.deleted"));
+    } else {
+      show(uiTf(action === "archive" ? "suite.archivedDone" : "suite.restoredDone", { title: suiteTitle(suite || {}) }));
+    }
+    await refreshLibraryTestSuites();
+    // Focus stays where the suite was, or goes to the list's heading when it left the list.
+    if (state.selected && $(suiteContainers[scope]).querySelector(`[data-test-suite-id="${CSS.escape(state.selected)}"]`)) {
+      suiteFocus(scope, state.selected);
+    } else (scope === "library" ? $("libraryTestSuitesTitle") : $("suitesSearch")).focus();
+  } catch (error) {
+    show(error?.message || String(error), true);
+    if (button.isConnected) button.disabled = false;
+  }
+}
+function suiteListDoubleClick(event) {
+  const element = event.target.closest?.("[data-test-suite-id]");
+  if (element && !event.target.closest(".library-suite-actions")) openTestSuitePage(element.dataset.testSuiteId);
+}
+function suiteListEscape(scope, event) {
+  const state = suiteUi[scope];
+  if (event.key !== "Escape" || !state.selected) return;
+  const suiteId = state.selected;
+  state.selected = "";
+  state.deleting = "";
+  renderTestSuites();
+  suiteFocus(scope, suiteId);
+}
+for (const scope of ["library", "tests"]) {
+  const list = $(suiteContainers[scope]);
+  list.addEventListener("click", event => { void suiteListClick(scope, event); });
+  list.addEventListener("dblclick", suiteListDoubleClick);
+  list.addEventListener("keydown", event => suiteListEscape(scope, event));
+}
+$("libraryTestSuitesMore").addEventListener("click", () => {
+  suitesFilter = "in-progress";
+  showHomeView("tests", true);
+  showTestsTab("suites", true);
+});
+$("suitesFilters").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-suites-filter]");
+  if (!button) return;
+  suitesFilter = button.dataset.suitesFilter;
+  renderSuitesList();
+});
+$("suitesSearch").addEventListener("input", () => renderSuitesList());
+$("suitesReset").addEventListener("click", () => {
+  suitesFilter = "in-progress";
+  $("suitesSearch").value = "";
+  renderSuitesList();
+  $("suitesSearch").focus();
+});
+$("suitesShowProcesses").addEventListener("click", () => showTestsTab("processes", true));
+// The two tabs of Tests. Arrow keys move between them, as in any tab list.
+// Test suites come first: they are where tests are planned and run.
+let testsTab = "suites";
+function showTestsTab(tab, focus = false) {
+  testsTab = tab;
+  for (const button of $("testsTabs").querySelectorAll("[data-tests-tab]")) {
+    const selected = button.dataset.testsTab === tab;
+    button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
+    if (selected && focus) button.focus();
+  }
+  $("testsProcessesPanel").hidden = tab !== "processes";
+  $("testsSuitesPanel").hidden = tab !== "suites";
+  if (tab === "suites") renderSuitesList();
+}
+$("testsTabs").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-tests-tab]");
+  if (button) showTestsTab(button.dataset.testsTab);
+});
+$("testsTabs").addEventListener("keydown", event => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  event.preventDefault();
+  const tabs = ["suites", "processes"];
+  const index = tabs.indexOf(testsTab);
+  const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
+    : (index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
+  showTestsTab(tabs[next], true);
+});
 $("libraryBatchSuite").addEventListener("click", event => openLibraryTestSuiteDialog(event.currentTarget));
+// Adding processes to a suite that already exists, such as a new process before the next
+// round. The suites offered are those not archived, in progress first, newest first. A test is
+// made for each process that is not in the suite yet, as Create test suite makes them, and
+// added at the end of the suite; a process already in it is left as it is and named.
+let libraryAddSuiteIds = [];
+let libraryAddSuiteOpener = null;
+let libraryAddSuiteDone = null;
+let libraryAddSuiteBusy = false;
+function addableTestSuites() {
+  const model = globalThis.T9TestSuite;
+  const open = testSuitesList.filter(suite => model.listState(suite) !== "archived");
+  return [...open.filter(suite => model.listState(suite) === "in-progress"),
+    ...open.filter(suite => model.listState(suite) === "done")];
+}
+function renderAddSuiteButtons() {
+  const none = !addableTestSuites().length;
+  $("libraryBatchAddSuite").hidden = none;
+  $("testsOverviewAddSuite").hidden = none;
+}
+function openLibraryAddSuiteDialog(opener, ids, done = null) {
+  const suites = addableTestSuites();
+  if (!ids.length || !suites.length) return;
+  libraryAddSuiteIds = [...ids];
+  libraryAddSuiteOpener = opener;
+  libraryAddSuiteDone = done;
+  $("libraryAddSuiteHelp").textContent = uiTf(ids.length === 1 ? "suite.addHelpOne" : "suite.addHelp",
+    { count: ids.length });
+  // A name suggested from environment and version already says where; do not repeat it.
+  $("libraryAddSuiteSelect").replaceChildren(...suites.map(suite => new Option([suiteTitle(suite),
+    suite.title === globalThis.T9TestSuite.suggestedTitle(suite) ? "" : suiteWhere(suite), suite.round > 1 ? uiTf("suite.round", { n: suite.round }) : ""]
+    .filter(Boolean).join(" – "), suite.suiteId)));
+  $("libraryAddSuiteStatus").textContent = "";
+  $("libraryAddSuiteError").textContent = "";
+  $("libraryAddSuiteSubmit").disabled = false;
+  $("libraryAddSuiteDialog").showModal();
+  $("libraryAddSuiteSelect").focus();
+}
+async function addToLibraryTestSuite() {
+  if (libraryAddSuiteBusy) return;
+  const suiteId = $("libraryAddSuiteSelect").value;
+  libraryAddSuiteBusy = true;
+  $("libraryAddSuiteSubmit").disabled = true;
+  $("libraryAddSuiteError").textContent = "";
+  try {
+    const loaded = await send({ type: "T9_LOAD_TEST_SUITE", suiteId });
+    if (!loaded?.ok) throw new Error(uiT(loaded?.error || "suite.notFound"));
+    const suite = loaded.suite;
+    const present = new Set(suite.items.map(item => item.sessionId));
+    const records = libraryAddSuiteIds.map(id => documentLibraryRecords.find(record => record.projectId === id))
+      .filter(Boolean);
+    const already = records.filter(record => present.has(record.projectId)).map(record => record.title);
+    const fresh = records.filter(record => !present.has(record.projectId));
+    const items = [];
+    const skipped = [];
+    for (const [index, record] of fresh.entries()) {
+      $("libraryAddSuiteStatus").textContent = uiTf("suite.creating", {
+        current: index + 1, total: fresh.length, title: record.title });
+      try {
+        const run = await createTestRun(record, { suiteId,
+          environment: [suite.environment, suite.version].filter(Boolean).join(", ") });
+        items.push({ sessionId: record.projectId, title: record.title, testRunId: run.testRunId });
+      } catch { skipped.push(record.title); }
+    }
+    let added = 0;
+    if (items.length) {
+      const response = await send({ type: "T9_ADD_TO_TEST_SUITE", suiteId, items });
+      if (!response?.ok) throw new Error(uiT(response?.error || "suite.notFound"));
+      added = response.added;
+    }
+    $("libraryAddSuiteDialog").close();
+    // What happened, in one message: how many were added, and which were not and why.
+    show([
+      ...(added ? [uiTf(added === 1 ? "suite.addedOne" : "suite.added", { count: added, title: suiteTitle(suite) })] : []),
+      ...(already.length ? [uiTf("suite.alreadyIn", { titles: already.join(", ") })] : []),
+      ...(skipped.length ? [uiTf("suite.skipped", { titles: skipped.join(", ") })] : [])].join(" "));
+    await refreshLibraryTestSuites();
+    libraryAddSuiteDone?.(suite);
+  } catch (error) {
+    $("libraryAddSuiteStatus").textContent = "";
+    $("libraryAddSuiteError").textContent = error?.message || String(error);
+  } finally {
+    libraryAddSuiteBusy = false;
+    $("libraryAddSuiteSubmit").disabled = false;
+  }
+}
+$("libraryAddSuiteForm").addEventListener("submit", event => {
+  event.preventDefault();
+  void addToLibraryTestSuite();
+});
+$("libraryAddSuiteDialog").addEventListener("click", event => {
+  if (event.target.closest("[data-folder-cancel]") && !libraryAddSuiteBusy) $("libraryAddSuiteDialog").close();
+});
+$("libraryAddSuiteDialog").addEventListener("cancel", event => {
+  if (libraryAddSuiteBusy) event.preventDefault();
+});
+$("libraryAddSuiteDialog").addEventListener("close", () => {
+  (libraryAddSuiteOpener?.isConnected ? libraryAddSuiteOpener : $("librarySearch")).focus();
+});
+$("libraryBatchAddSuite").addEventListener("click", event =>
+  openLibraryAddSuiteDialog(event.currentTarget, documentLibrarySelection.selectedIds));
+$("testsOverviewAddSuite").addEventListener("click", event => {
+  const order = testsOverviewAllRows().map(row => row.projectId);
+  const ids = [...testsSelection].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  openLibraryAddSuiteDialog(event.currentTarget, ids, () => {
+    testsSelection.clear();
+    void loadTestsOverview();
+  });
+});
 $("libraryTestSuiteForm").addEventListener("submit", event => {
   event.preventDefault();
   void createLibraryTestSuite();
@@ -4761,11 +5274,6 @@ $("libraryTestSuiteDialog").addEventListener("cancel", event => {
 });
 $("libraryTestSuiteDialog").addEventListener("close", () => {
   (libraryTestSuiteOpener?.isConnected ? libraryTestSuiteOpener : $("librarySearch")).focus();
-});
-$("libraryTestSuiteList").addEventListener("click", event => {
-  const card = event.target.closest("[data-test-suite-id]");
-  if (card) void chrome.tabs.create({ url: chrome.runtime.getURL(
-    `test-suite.html?suiteId=${encodeURIComponent(card.dataset.testSuiteId)}`) });
 });
 // A document's test history (vy 2 in docs/FUTURE_FEATURES.md): every run, newest first, with
 // what changed since the run before. Opened from the marker on the library row; focus returns
@@ -4785,7 +5293,7 @@ async function loadTestHistory() {
     if (!response?.ok) throw new Error(response?.error || "");
     const history = response.history || [];
     globalThis.T9TestHistoryView.render(list, history, { t: testHistoryT,
-      locale: applicationSettings.uiLocale || "en-US" });
+      locale: applicationSettings.uiLocale || "en-US", manage: true });
     testHistoryInProgress = history.find(entry => entry.counts.outcome === "in-progress")?.testRunId || "";
     status.textContent = history.length ? "" : uiT("testHistory.empty");
   } catch {
@@ -4794,7 +5302,10 @@ async function loadTestHistory() {
     status.textContent = uiT("testHistory.loadFailed");
     $("testHistoryRetry").hidden = false;
   }
-  $("testHistoryRun").textContent = uiT(testHistoryInProgress ? "testHistory.continue" : "testHistory.runTest");
+  // A test in progress is continued on its own row; the footer offers a new test
+  // only when none is in progress, so that the same test is not started twice.
+  $("testHistoryRun").hidden = Boolean(testHistoryInProgress);
+  $("testHistoryRun").textContent = uiT("testHistory.runTest");
 }
 async function openTestHistory(projectId, opener) {
   const record = documentLibraryRecords.find(value => value.projectId === projectId);
@@ -4804,6 +5315,7 @@ async function openTestHistory(projectId, opener) {
   $("testHistoryTitle").textContent = uiTf("testHistory.title", { title: record.title });
   $("testHistoryList").replaceChildren();
   $("testHistoryRun").textContent = uiT("testHistory.runTest");
+  $("testHistoryRun").hidden = true;
   if (!$("testHistoryDialog").open) $("testHistoryDialog").showModal();
   await loadTestHistory();
 }
@@ -4826,7 +5338,32 @@ $("testHistoryRun").addEventListener("click", async () => {
   const card = $("libraryResults").querySelector(`[data-library-project-id="${CSS.escape(projectId)}"]`);
   await runLibraryMenuAction("run-test", projectId, card);
 });
+// Cancelling a test in progress, or resuming a cancelled one, from its row in a history. Both
+// can be undone, so neither asks first. The history, the library markers, the overview and
+// the suites are drawn again from what is stored, and focus goes to the button that undoes it.
+async function testRunActionClick(event, status, reload, list) {
+  const button = event.target.closest?.("[data-test-run-action]");
+  if (!button) return false;
+  const { testRunAction: action, testRunId } = button.dataset;
+  button.disabled = true;
+  try {
+    const response = await send({ type: action === "cancel" ? "T9_CANCEL_TEST_RUN" : "T9_RESUME_TEST_RUN",
+      testRunId });
+    if (!response?.ok) throw new Error(response?.error || "testHistory.cancelNotInProgress");
+    await reload();
+    status.textContent = uiT(action === "cancel" ? "testHistory.cancelledDone" : "testHistory.resumedDone");
+    list.querySelector(`[data-test-run-id="${CSS.escape(testRunId)}"][data-test-run-action]`)?.focus();
+    void refreshLibraryTests();
+    if (!$("testsView").hidden) void loadTestsOverview();
+    else void refreshLibraryTestSuites();
+  } catch (error) {
+    button.disabled = false;
+    status.textContent = uiTf("testHistory.actionFailed", { error: uiT(error?.message || String(error)) });
+  }
+  return true;
+}
 $("testHistoryList").addEventListener("click", async event => {
+  if (await testRunActionClick(event, $("testHistoryStatus"), loadTestHistory, $("testHistoryList"))) return;
   const report = event.target.closest?.("[data-bug-report-id]");
   if (!report) return;
   try { await send({ type: "T9_OPEN_TECHNICAL_REPORT", bugReportId: report.dataset.bugReportId }); }
@@ -4877,7 +5414,7 @@ function drawReviewTests() {
   icon.textContent = shown.icon;
   marker.replaceChildren(icon, ` ${shown.text}`);
   globalThis.T9TestHistoryView.render(list, history, { t: testHistoryT,
-    locale: applicationSettings.uiLocale || "en-US" });
+    locale: applicationSettings.uiLocale || "en-US", manage: true });
   status.textContent = history.length ? "" : uiT("testHistory.empty");
   const inProgress = history.find(entry => entry.counts.outcome === "in-progress");
   $("reviewTestsRun").hidden = false;
@@ -4936,6 +5473,7 @@ $("reviewTestsRun").addEventListener("click", async () => {
   }
 });
 $("reviewTestsList").addEventListener("click", async event => {
+  if (await testRunActionClick(event, $("reviewTestsStatus"), loadReviewTests, $("reviewTestsList"))) return;
   const report = event.target.closest?.("[data-bug-report-id]");
   if (!report) return;
   try { await send({ type: "T9_OPEN_TECHNICAL_REPORT", bugReportId: report.dataset.bugReportId }); }
@@ -4979,69 +5517,128 @@ function renderTestsScope() {
   fill($("testsOverviewVersion"), options.versions.map(value => [value, value]), false);
   fill($("testsOverviewPeriod"), globalThis.T9TestHistory.PERIODS.map(days =>
     [String(days), uiTf("testOverview.periodDays", { days })]));
-  fill($("testsOverviewSuite"), options.suites.map(suite => [suite.suiteId,
+  fill($("testsOverviewSuiteFilter"), options.suites.map(suite => [suite.suiteId,
     [suite.title || uiT("suite.pageTitle"), [suite.environment, suite.version].filter(Boolean).join(" · "),
       globalThis.T9TestHistoryView.formatDate(suite.createdAt, testsLocale())].filter(Boolean).join(" – ")]), false);
-  const active = globalThis.T9TestHistory.activeScope(testsScope);
-  $("testsOverviewScopeCount").hidden = !active;
-  $("testsOverviewScopeCount").textContent = String(active);
-  return active;
+  return globalThis.T9TestHistory.activeScope(testsScope);
 }
-function testsOverviewRow(row) {
+// "12 nov", with the year only when it is not this year.
+function testsShortDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value || "");
+  const options = { day: "numeric", month: "short" };
+  if (date.getFullYear() !== new Date().getFullYear()) options.year = "numeric";
+  try { return new Intl.DateTimeFormat(testsLocale(), options).format(date); }
+  catch { return globalThis.T9TestHistoryView.formatDate(value, testsLocale()); }
+}
+// The processes ticked in Tests, to make a test suite of. Kept while filters change.
+const testsSelection = new Set();
+let testsSelectionAnchor = "";
+// The rows and their checkboxes follow the marked processes.
+function syncTestsRows() {
+  for (const row of $("testsOverviewList").querySelectorAll(".tests-overview-row")) {
+    const selected = testsSelection.has(row.dataset.projectId);
+    row.dataset.selected = String(selected);
+    const box = row.querySelector("[data-tests-select]");
+    if (box) box.checked = selected;
+  }
+}
+function testsCell(className, ...children) {
+  const cell = document.createElement("div");
+  cell.className = className;
+  cell.append(...children);
+  return cell;
+}
+function testsOverviewRow(row, showTemplate) {
   const view = globalThis.T9TestHistoryView;
   const item = document.createElement("li");
   item.className = "tests-overview-row";
   item.dataset.state = row.state;
   item.dataset.projectId = row.projectId;
-  const title = document.createElement("p");
+  item.dataset.selected = String(testsSelection.has(row.projectId));
+  const check = document.createElement("input");
+  check.type = "checkbox";
+  check.dataset.testsSelect = row.projectId;
+  check.checked = testsSelection.has(row.projectId);
+  check.setAttribute("aria-label", uiTf("testOverview.selectRow", { title: row.title }));
+  const title = document.createElement("span");
   title.className = "tests-overview-title";
   title.textContent = row.title;
-  const result = document.createElement("span");
-  result.className = "tests-overview-result";
+  const process = testsCell("tests-overview-process", title);
+  const record = showTemplate && documentLibraryRecords.find(value => value.projectId === row.projectId);
+  if (record) {
+    const template = document.createElement("span");
+    template.className = "tests-overview-sub";
+    template.textContent = libraryCardTemplate(record);
+    process.append(template);
+  }
   const icon = document.createElement("span");
+  icon.className = "tests-overview-icon";
   icon.setAttribute("aria-hidden", "true");
   icon.textContent = row.summary ? view.ICONS[row.state] || "◐" : "–";
-  result.append(icon, row.summary ? view.resultText({ counts: row.summary.counts }, testHistoryT)
-    : uiT("testHistory.notTested"));
-  const where = document.createElement("span");
-  where.className = "tests-overview-where";
+  const result = testsCell("tests-overview-result", icon, row.summary
+    ? view.resultText({ counts: row.summary.counts }, testHistoryT) : uiT("testHistory.notTested"));
+  const when = testsCell("tests-overview-when");
+  const where = testsCell("tests-overview-where");
+  // The row's action in a column of its own, so History and Run test line up down the list.
+  const action = testsCell("tests-overview-action");
   if (row.summary) {
     const time = document.createElement("time");
     time.dateTime = row.summary.date;
-    time.textContent = view.formatDate(row.summary.date, testsLocale());
-    where.append(time);
-    const details = [row.summary.environment, row.summary.version, row.summary.tester].filter(Boolean);
-    if (details.length) where.append(` · ${details.join(" · ")}`);
+    time.title = view.formatDate(row.summary.date, testsLocale(), true);
+    time.textContent = testsShortDate(row.summary.date);
+    when.append(time);
     if (row.stale) {
       const stale = document.createElement("span");
       stale.className = "tests-overview-stale";
-      stale.textContent = uiTf("testOverview.filter.stale", { days: TESTS_STALE_DAYS });
-      where.append(" ", stale);
+      stale.textContent = uiTf("testOverview.daysAgo", {
+        days: Math.floor((Date.now() - Date.parse(row.summary.date)) / 86400000) });
+      when.append(stale);
     }
+    // Missing details are said to be missing rather than left blank.
+    const details = [row.summary.environment, row.summary.version, row.summary.tester]
+      .map(value => String(value || "").trim()).filter(Boolean);
+    where.textContent = details.length ? details.join(" · ") : uiT("testOverview.notGiven");
+    where.dataset.missing = String(!details.length);
+    // History is offered on the row, as Open is on a document; a double click is the shortcut.
+    const history = document.createElement("button");
+    history.type = "button";
+    history.className = "secondary";
+    history.dataset.testsAction = "history";
+    history.textContent = uiT("testOverview.history");
+    history.setAttribute("aria-label", uiTf("testOverview.historyLabel", { title: row.title }));
+    action.append(history);
+  } else {
+    const run = document.createElement("button");
+    run.type = "button";
+    run.className = "secondary";
+    run.dataset.testsAction = "run";
+    run.textContent = uiT("testHistory.runTest");
+    run.setAttribute("aria-label", uiTf("testOverview.runLabel", { title: row.title }));
+    action.append(run);
   }
-  const trend = document.createElement("span");
-  trend.className = "tests-overview-trend";
-  if (row.summary?.trend.length) {
-    const runs = row.summary.trend.map(run => `${view.formatDate(run.date, testsLocale())}: ${
-      uiT(`testHistory.state.${run.state}`)}`);
-    trend.setAttribute("role", "img");
-    trend.setAttribute("aria-label", uiTf("testOverview.trendLabel", { runs: runs.join(", ") }));
-    trend.title = runs.join("\n");
-    for (const run of row.summary.trend) {
-      const dot = document.createElement("span");
-      dot.dataset.state = run.state;
-      trend.append(dot);
-    }
-  }
-  const action = document.createElement("button");
-  action.type = "button";
-  action.className = "secondary";
-  action.dataset.testsAction = row.summary ? "history" : "run";
-  action.textContent = uiT(row.summary ? "testOverview.history" : "testHistory.runTest");
-  action.setAttribute("aria-label", uiTf(row.summary ? "testOverview.historyLabel"
-    : "testOverview.runLabel", { title: row.title }));
-  item.append(title, result, where, trend, action);
+  item.append(testsCell("tests-overview-check", check), process, result, when, where, action);
   return item;
+}
+// The ticked processes still in the library; the button says how many a suite would get.
+function renderTestsSelection(shown = []) {
+  const known = new Set(testsOverviewDocuments().map(record => record.projectId));
+  for (const id of [...testsSelection]) if (!known.has(id)) testsSelection.delete(id);
+  const count = testsSelection.size;
+  $("testsOverviewSuite").disabled = !count;
+  $("testsOverviewAddSuite").disabled = !count;
+  $("testsOverviewSuite").title = count ? "" : uiT("testOverview.selectHint");
+  $("testsOverviewSuiteCount").hidden = !count;
+  $("testsOverviewSuiteCount").textContent = String(count);
+  const all = $("testsOverviewSelectAll");
+  const ticked = shown.filter(row => testsSelection.has(row.projectId)).length;
+  all.checked = Boolean(shown.length) && ticked === shown.length;
+  all.indeterminate = ticked > 0 && ticked < shown.length;
+  all.disabled = !shown.length;
+}
+function testsOverviewShown() {
+  return globalThis.T9TestHistory.overviewFilter(testsOverviewAllRows(),
+    { filter: testsOverviewFilter, query: $("testsOverviewSearch").value });
 }
 function renderTestsOverview() {
   const status = $("testsOverviewStatus");
@@ -5052,8 +5649,10 @@ function renderTestsOverview() {
   staleLabel.textContent = uiTf("testOverview.filter.stale", { days: TESTS_STALE_DAYS });
   if (testsOverview.failed || !testsOverview.runs) {
     list.replaceChildren();
+    $("testsOverviewTable").hidden = true;
     reset.hidden = true;
     $("testsOverviewCsv").disabled = true;
+    renderTestsSelection();
     status.textContent = uiT(testsOverview.failed ? "testHistory.loadFailed" : "testHistory.loading");
     return;
   }
@@ -5065,10 +5664,22 @@ function renderTestsOverview() {
     button.querySelector(".library-quick-count").textContent = String(counts[button.dataset.testsFilter]);
   }
   const query = $("testsOverviewSearch").value;
-  const shown = globalThis.T9TestHistory.overviewFilter(rows, { filter: testsOverviewFilter, query });
-  const focused = document.activeElement?.closest?.(".tests-overview-row")?.dataset.projectId;
-  list.replaceChildren(...shown.map(testsOverviewRow));
-  if (focused) list.querySelector(`[data-project-id="${CSS.escape(focused)}"] button`)?.focus();
+  const shown = testsOverviewShown();
+  const active = document.activeElement;
+  const focused = active?.closest?.(".tests-overview-row");
+  const focusKey = focused && [focused.dataset.projectId, active.dataset.testsSelect
+    ? "select" : active.dataset.testsAction];
+  // The template is named only when the processes do not all follow the same one.
+  const templates = new Set(rows.map(row => documentLibraryRecords.find(value =>
+    value.projectId === row.projectId)?.theme?.themeId || defaultDocumentTemplateId));
+  list.replaceChildren(...shown.map(row => testsOverviewRow(row, templates.size > 1)));
+  $("testsOverviewTable").hidden = !shown.length;
+  if (focusKey) {
+    const target = list.querySelector(`[data-project-id="${CSS.escape(focusKey[0])}"]`);
+    (focusKey[1] === "select" ? target?.querySelector("[data-tests-select]")
+      : target?.querySelector(`[data-tests-action="${focusKey[1]}"]`))?.focus();
+  }
+  renderTestsSelection(shown);
   const filtered = testsOverviewFilter !== "all" || query.trim() || scoped;
   reset.hidden = !filtered;
   $("testsOverviewCsv").disabled = !shown.length;
@@ -5082,7 +5693,7 @@ async function loadTestsOverview() {
   const request = ++testsOverviewRequest;
   if (!testsOverview.runs) renderTestsOverview();
   try {
-    const response = await send({ type: "T9_TEST_OVERVIEW" });
+    const [response] = await Promise.all([send({ type: "T9_TEST_OVERVIEW" }), refreshLibraryTestSuites()]);
     if (!response?.ok) throw new Error(response?.error || "");
     if (request !== testsOverviewRequest) return;
     testsOverview = { runs: response.runs || [], suites: response.suites || [], failed: false };
@@ -5113,25 +5724,81 @@ $("testsOverviewReset").addEventListener("click", () => {
   $("testsOverviewSearch").focus();
 });
 $("testsOverviewRetry").addEventListener("click", () => { void loadTestsOverview(); });
+$("testsOverviewSelectAll").addEventListener("change", event => {
+  const shown = testsOverviewShown();
+  for (const row of shown) {
+    if (event.target.checked) testsSelection.add(row.projectId);
+    else testsSelection.delete(row.projectId);
+  }
+  syncTestsRows();
+  renderTestsSelection(shown);
+});
+$("testsOverviewList").addEventListener("change", event => {
+  const box = event.target.closest?.("[data-tests-select]");
+  if (!box) return;
+  if (box.checked) testsSelection.add(box.dataset.testsSelect);
+  else testsSelection.delete(box.dataset.testsSelect);
+  testsSelectionAnchor = box.dataset.testsSelect;
+  syncTestsRows();
+  renderTestsSelection(testsOverviewShown());
+});
+// As in the library: a click on a row marks it, on its own, or with Ctrl or Cmd added to the
+// others and with Shift the rows in between; its checkbox marks or unmarks it. A double click
+// opens its history, as its History button does. Run test keeps its own action.
 $("testsOverviewList").addEventListener("click", async event => {
-  const button = event.target.closest?.("[data-tests-action]");
-  if (!button) return;
-  const projectId = button.closest(".tests-overview-row").dataset.projectId;
-  if (button.dataset.testsAction === "history") {
+  if (event.target.closest?.("input")) return;
+  const row = event.target.closest?.(".tests-overview-row");
+  if (!row) return;
+  const projectId = row.dataset.projectId;
+  const button = event.target.closest("[data-tests-action]");
+  if (button?.dataset.testsAction === "history") {
     await openTestHistory(projectId, button);
+    return;
+  }
+  if (!button) {
+    if (getSelection()?.toString()) return;
+    const ids = testsOverviewShown().map(value => value.projectId);
+    const next = globalThis.T9DocumentBatchOperations.select({ selectedIds: [...testsSelection],
+      anchorId: testsSelectionAnchor }, ids, projectId,
+    { shift: event.shiftKey, toggle: event.ctrlKey || event.metaKey });
+    testsSelection.clear();
+    for (const id of next.selectedIds) testsSelection.add(id);
+    testsSelectionAnchor = next.anchorId || projectId;
+    syncTestsRows();
+    renderTestsSelection(testsOverviewShown());
     return;
   }
   button.disabled = true;
   try { await runLibraryMenuAction("run-test", projectId, null); }
   finally { button.disabled = false; }
 });
+$("testsOverviewList").addEventListener("dblclick", event => {
+  const row = event.target.closest?.(".tests-overview-row");
+  if (!row || event.shiftKey || event.ctrlKey || event.metaKey ||
+      event.target.closest?.("input, [data-tests-action]")) return;
+  const title = row.querySelector('[data-tests-action="history"]');
+  if (title) void openTestHistory(row.dataset.projectId, title);
+});
+$("testsOverviewSuite").addEventListener("click", event => {
+  // In the order the list shows them, so the suite runs them in the same order.
+  const order = testsOverviewAllRows().map(row => row.projectId);
+  const ids = [...testsSelection].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  // The new suite is shown marked in the Test suites tab, ready to open.
+  openLibraryTestSuiteDialog(event.currentTarget, ids, suite => {
+    testsSelection.clear();
+    suitesFilter = "in-progress";
+    $("suitesSearch").value = "";
+    suiteUi.tests.selected = suite.suiteId;
+    showTestsTab("suites");
+    void loadTestsOverview().then(() => suiteFocus("tests", suite.suiteId));
+  });
+});
 // The rows shown, as a CSV file in the interface language. The file is said to be saved only
 // once the browser has saved it.
 $("testsOverviewCsv").addEventListener("click", async () => {
   const button = $("testsOverviewCsv");
   const status = $("testsOverviewStatus");
-  const rows = globalThis.T9TestHistory.overviewFilter(testsOverviewAllRows(),
-    { filter: testsOverviewFilter, query: $("testsOverviewSearch").value });
+  const rows = testsOverviewShown();
   const locale = testsLocale();
   const csv = globalThis.T9TestHistory.overviewCsv(rows, { t: testHistoryT,
     separator: locale.startsWith("en") ? "," : ";",

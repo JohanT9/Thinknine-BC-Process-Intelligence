@@ -5,6 +5,8 @@ globalThis.T9TenantLicenseConfig = Object.freeze({
   enabled: true,
   endpoint: "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/v1/license/check",
   trialEndpoint: "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/v1/license/trial",
+  // The page a link to a test in an assignment email goes to; open-link.js opens the test.
+  openLink: "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/open",
   consultant: Object.freeze({
     enabled: true,
     clientId: "62602b18-789f-4755-9791-7f13eaf02503",

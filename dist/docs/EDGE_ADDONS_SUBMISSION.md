@@ -33,7 +33,8 @@ analytics, AI service, or application-content upload is part of the extension.
 | `tabs` | Query the active tab, message frames, open dashboard, and capture the correct window | Required | Coordinate the explicitly selected recording tab and product UI. |
 | `unlimitedStorage` | Retain screenshot-rich recordings and document projects beyond the normal extension quota | Required for current storage model | Avoid losing larger authorized recording projects. |
 | `webNavigation` | Enumerate frame topology for control add-ins and diagnostics in `background.js` | Required | Capture and diagnose Business Central nested frames. |
-| BC host permissions | Content scripts run only on `businesscentral.dynamics.com` and its subdomains | Required | Record only supported Business Central web environments. |
+| BC host permissions | Capture content scripts run only on `businesscentral.dynamics.com` and its subdomains | Required | Record only supported Business Central web environments. |
+| License service host | Already granted for licensing; `open-link.js` runs only on its `/open` page, reads the suite and test ids in the link and asks the extension to open that test | Required | Open a test from the link in an assignment email. |
 
 No permission was removed: each has a concrete production call site. Human
 review must confirm that the explanations match current Edge policy wording.

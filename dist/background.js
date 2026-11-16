@@ -1981,6 +1981,12 @@ async function saveDocumentLibrary(records) {
 }
 
 // Test runs of a process document. A run is stored on its own and names the recording.
+// The person signed in with their Microsoft account on this computer, or null.
+async function signedInPerson() {
+  const account = await consultantLicense.state().catch(() => ({}));
+  return account?.refreshToken ? globalThis.T9TestSuite.person(account.profile) ||
+    (account.profile?.name ? { name: String(account.profile.name), email: "" } : null) : null;
+}
 async function loadTestRun(testRunId) {
   const key = TEST_RUN_PREFIX + String(testRunId || "");
   const value = (await chrome.storage.local.get(key))[key];
@@ -2198,7 +2204,7 @@ async function testSuiteProgress(suite) {
   for (const value of Object.values(runs)) {
     try {
       const run = globalThis.T9TestScript.normalize(value);
-      summaries[run.testRunId] = globalThis.T9TestScript.summary(run);
+      summaries[run.testRunId] = { ...globalThis.T9TestScript.summary(run), tester: run.tester };
     } catch { /* A run that cannot be read counts as missing. */ }
   }
   return globalThis.T9TestSuite.progress(suite, summaries);
@@ -2239,8 +2245,9 @@ async function nextTestSuiteRound(suiteId) {
   for (const item of suite.items) {
     const previous = item.testRunId ? await loadTestRun(item.testRunId) : null;
     if (!previous) continue;
-    const run = globalThis.T9TestScript.rerun(previous, {
-      testRunId: `test-run-${crypto.randomUUID()}`, suiteId: newSuiteId });
+    // Whoever begins the test in the new round becomes its tester.
+    const run = { ...globalThis.T9TestScript.rerun(previous, {
+      testRunId: `test-run-${crypto.randomUUID()}`, suiteId: newSuiteId }), tester: "" };
     runIds[item.sessionId] = (await saveTestRun(globalThis.T9TestScript.carryOver(run, previous))).testRunId;
   }
   if (!Object.keys(runIds).length) throw new Error("suite.noTests");
@@ -2424,8 +2431,19 @@ function extensionPageSender(sender) {
     String(sender.url || "").startsWith(chrome.runtime.getURL(""));
 }
 
+// The link page of an assignment email, in the top frame of a tab, may only ask for a test
+// to be opened.
+function openLinkSender(sender) {
+  const page = globalThis.T9TenantLicenseConfig?.openLink;
+  let url;
+  try { url = new URL(String(sender?.url || "")); } catch { return false; }
+  return Boolean(page && sender?.id === chrome.runtime.id && sender.frameId === 0 && sender.tab?.id &&
+    url.origin + url.pathname === page);
+}
+
 function messageAllowed(message, sender) {
-  return extensionPageSender(sender) || PAGE_MESSAGE_TYPES.has(message?.type);
+  return extensionPageSender(sender) || PAGE_MESSAGE_TYPES.has(message?.type) ||
+    (message?.type === "T9_OPEN_LINK" && openLinkSender(sender));
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -2758,8 +2776,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_CREATE_TEST_RUN": {
         // Expected results written in the latest earlier run of the document are kept.
-        const previous = (await listTestRuns(String(message.run?.sessionId || "")))[0];
-        const run = await saveTestRun(globalThis.T9TestScript.carryOver(message.run, previous));
+        const runs = await listTestRuns();
+        const sessionId = String(message.run?.sessionId || "");
+        const previous = runs.find(value => value.sessionId === sessionId);
+        // The tester is the signed-in person, or else whoever tested last; the test page can
+        // change it. The name stays on this computer with the test.
+        // A test made for a suite is filled in by whoever begins it, on their computer.
+        const carried = globalThis.T9TestScript.carryOver(message.run, previous);
+        const run = await saveTestRun(message.run?.suiteId ? carried : globalThis.T9TestScript
+          .withTester(carried, { signedIn: (await signedInPerson())?.name, runs }));
         // A run made for a suite is opened from the suite's page.
         const tab = message.open === false ? null : await chrome.tabs.create({ url: chrome.runtime.getURL(
           `test-run.html?testRunId=${encodeURIComponent(run.testRunId)}`) });
@@ -2774,25 +2799,73 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_ADD_TO_TEST_SUITE": {
+        // Tests for more documents, made by the page with this suite's id, added at the end.
+        const current = await loadTestSuite(message.suiteId);
+        if (!current) throw new Error("suite.notFound");
+        const result = globalThis.T9TestSuite.addItems(current, message.items, new Date().toISOString());
+        const suite = result.added.length ? await saveTestSuite(result.suite) : current;
+        sendResponse({ ok: true, suite, added: result.added.length,
+          already: result.already.map(item => item.sessionId), full: result.full.map(item => item.sessionId) });
+        break;
+      }
+
+      case "T9_TEST_PEOPLE": {
+        // Who tests can be assigned to: the signed-in person and everyone assigned before.
+        const me = await signedInPerson();
+        sendResponse({ ok: true, me, people: globalThis.T9TestSuite.people(await listTestSuites(), me) });
+        break;
+      }
+
+      // A link to a test from an assignment email: the test when it is on this computer,
+      // else its suite, else the suite's page saying the suite has not arrived yet.
+      case "T9_OPEN_LINK": {
+        const id = value => /^[A-Za-z0-9_-]{1,128}$/u.test(String(value || "")) ? String(value) : "";
+        const suiteId = id(message.suiteId), testRunId = id(message.testRunId);
+        if (!suiteId) throw new Error("suite.notFound");
+        const page = testRunId && await loadTestRun(testRunId)
+          ? `test-run.html?testRunId=${encodeURIComponent(testRunId)}`
+          : `test-suite.html?suiteId=${encodeURIComponent(suiteId)}${await loadTestSuite(suiteId) ? "" : "&from=link"}`;
+        await chrome.tabs.update(sender.tab.id, { url: chrome.runtime.getURL(page) });
+        sendResponse({ ok: true });
+        break;
+      }
+
       case "T9_LOAD_TEST_SUITE": {
         const suite = await loadTestSuite(message.suiteId);
         if (!suite) throw new Error("suite.notFound");
         const progress = await testSuiteProgress(suite);
-        sendResponse({ ok: true, suite, progress,
+        sendResponse({ ok: true, suite, progress, me: await signedInPerson(),
           comparison: await testSuiteComparison(suite, progress) });
         break;
       }
 
       case "T9_LIST_TEST_SUITES": {
-        const suites = await listTestSuites();
+        let suites = await listTestSuites();
+        const rounds = globalThis.T9TestSuite.roundNumbers(suites);
+        const me = await signedInPerson();
+        // Tests shows only the latest round of each suite, with its comparison counts.
+        if (message.latestRounds) {
+          const replaced = new Set(suites.map(suite => suite.previousSuiteId).filter(Boolean));
+          suites = suites.filter(suite => !replaced.has(suite.suiteId));
+        }
+        if (Number(message.limit) > 0) suites = suites.slice(0, Number(message.limit));
         const listed = [];
         for (const suite of suites) {
           const progress = await testSuiteProgress(suite);
-          listed.push({ suiteId: suite.suiteId, title: suite.title, environment: suite.environment,
-            version: suite.version, createdAt: suite.createdAt,
-            progress: { ...progress, items: undefined } });
+          const entry = { suiteId: suite.suiteId, title: suite.title, environment: suite.environment,
+            version: suite.version, createdAt: suite.createdAt, round: rounds[suite.suiteId] || 1,
+            archived: suite.archived, archivedAt: suite.archivedAt,
+            mine: me ? globalThis.T9TestSuite.waitingFor(progress.items, me).length : 0,
+            progress: { ...progress, items: undefined } };
+          if (message.comparison) {
+            let comparison = null;
+            try { comparison = await testSuiteComparison(suite, progress); } catch { comparison = null; }
+            entry.comparison = comparison && { counts: comparison.counts, previous: comparison.previous };
+          }
+          listed.push(entry);
         }
-        sendResponse({ ok: true, suites: listed });
+        sendResponse({ ok: true, suites: listed, me });
         break;
       }
 
@@ -2802,7 +2875,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const suite = await saveTestSuite(globalThis.T9TestSuite.update(current, message.patch || {},
           new Date().toISOString()));
         const progress = await testSuiteProgress(suite);
-        sendResponse({ ok: true, suite, progress,
+        sendResponse({ ok: true, suite, progress, me: await signedInPerson(),
           comparison: await testSuiteComparison(suite, progress) });
         break;
       }
@@ -2829,8 +2902,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_UPDATE_TEST_RUN": {
+        const run = await withTestRun(message.testRunId, async current => {
+          const changed = globalThis.T9TestScript.applyChanges(current, message.changes,
+            new Date().toISOString());
+          // The person who begins a test without a tester is the one doing it: the signed-in
+          // person on this computer, or else whoever tested last.
+          if (changed.tester.trim() || !globalThis.T9TestHistory.started(changed)) return changed;
+          return globalThis.T9TestScript.withTester(changed, { signedIn: (await signedInPerson())?.name,
+            runs: await listTestRuns() });
+        });
+        sendResponse({ ok: true, run });
+        break;
+      }
+
+      case "T9_CANCEL_TEST_RUN": {
+        // A test in progress is cancelled: kept with what was tested, no longer in progress.
         const run = await withTestRun(message.testRunId, current =>
-          globalThis.T9TestScript.applyChanges(current, message.changes, new Date().toISOString()));
+          globalThis.T9TestScript.cancel(current, new Date().toISOString()));
+        const key = globalThis.T9StorageKeys.ACTIVE_TEST_RUN_KEY;
+        if ((await chrome.storage.local.get(key))[key]?.testRunId === run.testRunId) {
+          await chrome.storage.local.remove(key);
+        }
+        sendResponse({ ok: true, run });
+        break;
+      }
+
+      case "T9_RESUME_TEST_RUN": {
+        const run = await withTestRun(message.testRunId, current =>
+          globalThis.T9TestScript.resume(current, new Date().toISOString()));
         sendResponse({ ok: true, run });
         break;
       }
@@ -2932,6 +3031,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, runs: runs.map(run => ({ testRunId: run.testRunId,
           sessionId: run.sessionId, createdAt: run.createdAt, updatedAt: run.updatedAt,
           environment: run.environment, tester: run.tester, suiteId: run.suiteId || null,
+          cancelledAt: run.cancelledAt || null,
           steps: run.steps.map(step => ({ status: step.status, resultSource: step.resultSource })) })),
         suites: suites.map(suite => ({ suiteId: suite.suiteId, title: suite.title,
           environment: suite.environment, version: suite.version, createdAt: suite.createdAt })) });

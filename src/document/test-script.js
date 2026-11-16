@@ -129,6 +129,9 @@
     result.prerequisites = text(result.prerequisites);
     result.testData = normalizeTestData(result.testData);
     result.steps = (Array.isArray(result.steps) ? result.steps : []).map(normalizeStep);
+    // A test in progress that the tester cancelled: kept with what was tested, no longer in
+    // progress. Testing a step again, or resuming it, takes it back into progress.
+    result.cancelledAt = result.cancelledAt ? String(result.cancelledAt) : null;
     return result;
   }
 
@@ -151,6 +154,7 @@
       if (!STATUSES.includes(patch.status)) throw new TypeError("Unknown test step status.");
       // A result the tester chooses is the tester's own, even the one the recording had set.
       step.status = patch.status;
+      result.cancelledAt = null;
       delete step.resultSource;
       delete step.recordingError;
     }
@@ -206,6 +210,44 @@
 
   // Expected results written in an earlier run of the same document fill the steps that
   // have none, matched by the step's identity in the document.
+  // Cancelling a test in progress, and taking it back. Only a test begun and still in progress
+  // can be cancelled: one not begun is not shown anywhere yet, and a failed or finished test
+  // is a result.
+  function cancel(run, now) {
+    const result = normalize(run);
+    const value = summary(result);
+    if (value.outcome !== "in-progress" || value.notRun === value.total) {
+      throw new Error("testHistory.cancelNotInProgress");
+    }
+    result.cancelledAt = now || new Date().toISOString();
+    result.updatedAt = result.cancelledAt;
+    return normalize(result);
+  }
+  function resume(run, now) {
+    const result = normalize(run);
+    if (!result.cancelledAt) return result;
+    result.cancelledAt = null;
+    result.updatedAt = now || new Date().toISOString();
+    return normalize(result);
+  }
+
+  // Who tests a new test: the person signed in with their Microsoft account when someone is,
+  // or else whoever tested last, nearly always the same person. A name already given is kept,
+  // and the test page can change it.
+  function withTester(run, { signedIn = "", runs = [] } = {}) {
+    const result = normalize(run);
+    if (result.tester.trim()) return result;
+    if (text(signedIn).trim()) {
+      result.tester = text(signedIn).trim();
+      return result;
+    }
+    const last = (Array.isArray(runs) ? runs : [])
+      .filter(value => value && text(value.tester).trim() && value.testRunId !== result.testRunId)
+      .sort((a, b) => text(b.updatedAt || b.createdAt).localeCompare(text(a.updatedAt || a.createdAt)))[0];
+    if (last) result.tester = text(last.tester).trim();
+    return result;
+  }
+
   function carryOver(run, previous) {
     const result = normalize(run);
     if (!previous) return result;
@@ -231,7 +273,7 @@
     // A run belongs to the suite it was made for; a new run belongs to one only when it is
     // made for that suite's next round.
     return normalize({ ...value, testRunId: String(options.testRunId || ""), createdAt: now,
-      updatedAt: now, environment: text(options.environment), recordingCheck: undefined,
+      updatedAt: now, environment: text(options.environment), recordingCheck: undefined, cancelledAt: null,
       suiteId: options.suiteId ? String(options.suiteId) : undefined,
       steps: value.steps.map(step => ({ ...step, recordingSuggestion: undefined,
         resultSource: undefined, recordingError: undefined, status: "not-run", comment: "", bugReportId: null, screenshots: [] })) });
@@ -351,11 +393,13 @@
   // Passed only when every step passed or was deliberately skipped; failed as soon as one
   // step failed; otherwise still in progress.
   function summary(run) {
-    const steps = normalize(run).steps;
+    const value = normalize(run);
+    const steps = value.steps;
     const count = status => steps.filter(step => step.status === status).length;
     const result = { total: steps.length, passed: count("passed"), failed: count("failed"),
       skipped: count("skipped"), notRun: count("not-run") };
     result.outcome = result.failed ? "failed" : result.notRun ? "in-progress" : "passed";
+    if (result.outcome === "in-progress" && value.cancelledAt) result.outcome = "cancelled";
     return result;
   }
 
@@ -433,7 +477,7 @@
 
   return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot,
     applyChanges, applyRecordingCheck, applyRecordingResults, bugReportContent, byRecording,
-    failureFromSuggestion, liveCheckFailed, statusKey,
+    cancel, withTester, failureFromSuggestion, liveCheckFailed, resume, statusKey,
     recordingCheckFailed, suggestedPasses, carryOver, countsText, create, csv, markdown, normalize,
     filledTestData, removeScreenshot, rerun, resolveText, screenshotIds, stepsFromDocument, summary, update,
     updateStep };

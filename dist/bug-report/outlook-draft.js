@@ -132,9 +132,10 @@
       return token.value;
     }
     // The message as Graph takes it, with the PDF attached; Graph accepts up to about 4 MB.
+    // A message without attachments, such as the tests assigned in a suite, says so.
     function graphMessage(email) {
       const attachments = email.attachments || [];
-      if (!attachments.length || attachments.some(item => item.mediaType !== "application/pdf" ||
+      if ((!attachments.length && !email.withoutAttachments) || attachments.some(item => item.mediaType !== "application/pdf" ||
           !/^[A-Za-z0-9+/]+={0,2}$/u.test(item.base64) || item.base64.length % 4 !== 0 ||
           item.base64.length * 3 / 4 >= 3 * 1024 * 1024)) throw failure("size");
       return { subject: email.subject, importance: email.importance,
