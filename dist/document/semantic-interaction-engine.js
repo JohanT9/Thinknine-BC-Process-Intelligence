@@ -137,7 +137,25 @@ function (sourceReference, captions, stepText) {
         .match(EMBEDDED_RECORD_SELECTION);
       if (embedded) return (embedded[1] || embedded[2]).replace(/["“”]+$/gu, "").trim();
     }
+    // A list row in any client language: the column's sort order, then the row's own name with
+    // the record in quotes at the end, such as N°, trié dans l'ordre Croissant … « 30043 ».
+    for (const candidate of [value?.selectedCaption, value?.actionCaption]) {
+      if (!hasSortOrder(candidate)) continue;
+      const quoted = captions.withoutSorting(candidate).match(QUOTED_RECORD);
+      if (quoted) return quoted[1].trim();
+    }
     return "";
+  }
+
+  // The sort order the client adds to a column's name for screen readers, in any language.
+  const QUOTED_RECORD = /["“”„«‹]\s*([^"“”„«»‹›]{1,80}?)\s*["“”»›](?:\s+\p{L}+){0,2}\s*\.?\s*$/u;
+  // Older clients also wrote "Stigande ordning", which the client's own template does not cover.
+  const LEGACY_SORT_ORDER =
+    /(?:sorterade?\s+i|sorted\s+in)\s+(?:stigande|fallande|ascending|descending)(?:\s+order|\s+ordning)?/iu;
+  function hasSortOrder(value) {
+    const caption = text(value).replace(/\s+/gu, " ").trim();
+    return Boolean(caption) &&
+      (captions.withoutSorting(caption) !== caption || LEGACY_SORT_ORDER.test(caption));
   }
 
   function meaningfulValue(value) {
@@ -798,9 +816,8 @@ function (sourceReference, captions, stepText) {
   }
 
   function sortedRecordSelectionRule() {
-    const sortingDescription = value =>
-      /(?:sorterade?\s+i|sorted\s+in)\s+(?:stigande|fallande|ascending|descending)(?:\s+order|\s+ordning)?/iu
-        .test(interactionText(value));
+    // Business Central's sort order text in every client language, not only Swedish and English.
+    const sortingDescription = value => hasSortOrder(interactionText(value));
     const rule = {
       ruleId: "sorted-record-selection",
       priority: 111,
@@ -845,7 +862,7 @@ function (sourceReference, captions, stepText) {
           selectedValue.toLocaleLowerCase().startsWith(
             enteredValue.toLocaleLowerCase()
           ) && selectionText.includes(field) &&
-          /sorterade|sorted/iu.test(selectionText);
+          hasSortOrder(interactionText(selected));
       },
       consolidate(context) {
         const values = context.interactions.slice(context.index,

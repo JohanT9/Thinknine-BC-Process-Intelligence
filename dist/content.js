@@ -274,6 +274,10 @@
       chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
         if (chrome.runtime.lastError || !response?.state?.recording) return;
         updateRecordingIndicator(response.liveStatus);
+        // The recording panel beside the page shows the same status and markers.
+        if (recordingIndicator.host) {
+          recordingIndicator.host.dataset.panel = response.recordingPanelOpen ? "open" : "";
+        }
       });
     } catch {}
   }
@@ -315,6 +319,7 @@
       :host([data-minimized="true"]) .body,:host([data-minimized="true"]) .guidance,
       :host([data-minimized="true"]) .actions{display:none}
       :host([data-minimized="true"]) .panel{width:190px}
+      :host([data-panel="open"]) .panel{display:none}
     </style><aside class="panel" role="status" aria-live="polite">
       <div class="head"><span class="dot"></span><strong id="indicatorState">${uiText("Inspelning pågår", "Recording in progress")}</strong>
         <button id="indicatorMinimize" type="button" title="${uiText("Minimera", "Minimize")}">−</button></div>

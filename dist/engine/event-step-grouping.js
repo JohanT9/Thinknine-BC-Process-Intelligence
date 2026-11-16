@@ -128,8 +128,12 @@
     return COMPLETION_MESSAGE.test(value) && !REFUSAL_MESSAGE.test(value);
   }
   function isListAnnouncement(text) {
+    const value = String(text || "");
+    const caption = value.replace(/\s+/gu, " ").trim();
+    // The sort order of a column, in every language the client has.
+    if (caption && captions?.withoutSorting && captions.withoutSorting(caption) !== caption) return true;
     return /(?:^|\b)(?:lista med rubriken|list with (?:the )?title|list titled|sorterade? i|sorted (?:in|by)|attributnamn|attribute name)(?:\b|$)/iu
-      .test(String(text || ""));
+      .test(value);
   }
   // A dialog whose text is not a question, such as "Status must be equal to Open …", is a
   // message Business Central showed in response; a question asks the user to confirm.
@@ -474,7 +478,7 @@
   // A row of a lookup list is a link whose name ends with the row's value in quotes, after the
   // list's own text: Nr, sorterade i Stigande order Välj posten "10247". Without the value the
   // name is the same for every row of that list, in any language.
-  const RECORD_CHOICE_VALUE = /s*["“][^"“”]+["”]s*$/u;
+  const RECORD_CHOICE_VALUE = /\s*["“„«][^"“”„«»]+["”»]\s*$/u;
   function recordChoiceList(event) {
     if (event?.kind !== "activation") return "";
     const caption = observedCaption(event, "control");

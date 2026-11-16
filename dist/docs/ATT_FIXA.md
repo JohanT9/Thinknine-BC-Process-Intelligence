@@ -2,6 +2,26 @@
 
 Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varje punkt beskriver vad som är fel, vad användaren märker och ett förslag. En punkt är bekräftad i koden eller i Business Central om inget annat sägs; det som bara är en misstanke står som **Att kontrollera**. När en punkt är åtgärdad flyttas den till CHANGELOG och tas bort här. Nya funktioner hör hemma i [FUTURE_FEATURES.md](FUTURE_FEATURES.md).
 
+## Markeringen "Viktigt steg" gör ingenting i dokumentet
+
+*Tillagd 2026-11-16.*
+
+**Vad är fel:** knappen Viktigt steg i den flytande inspelningsrutan sparar en markering (`guidanceKind: "important"`). Den förs vidare till stegets `important` i `session-interpretation-pipeline.js`, men ingen granskningsvy, förhandsvisning eller export läser den.
+
+**Vad användaren märker:** man klickar på Viktigt steg och får bekräftelsen att steget markerats, men dokumentet ser likadant ut som utan markering.
+
+**Förslag:** bestäm vad ett viktigt steg ska innebära, till exempel en framhävd ruta i dokumentet och en markering i granskningen, och visa det. Tills dess finns knappen inte i den nya inspelningspanelen, bara i den flytande rutan.
+
+## Sektioner från inspelningen heter "Sektion 1" på alla språk
+
+*Tillagd 2026-11-16.*
+
+**Vad är fel:** när man väljer Ny sektion under inspelningen skapar `review-studio.js` sektionerna med det fasta namnet `Sektion ${index + 1}`, på svenska, oavsett dokumentspråk.
+
+**Vad användaren märker:** ett engelskt eller tyskt dokument får sektionsrubriker på svenska tills man byter namn på dem i granskningen.
+
+**Förslag:** ta namnet från dokumentspråkets katalog ("Section 1", "Abschnitt 1" och så vidare), på samma sätt som andra genererade texter.
+
 ## Sekretesstexten för Edge-butiken stämmer inte längre
 
 *Tillagd 2026-11-13. Bör vara klar före nästa inlämning till Edge-butiken.*

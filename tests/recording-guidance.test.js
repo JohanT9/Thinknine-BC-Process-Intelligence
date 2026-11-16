@@ -108,6 +108,8 @@ assert.match(background, /case "T9_CAPTURE_GUIDANCE"/);
 assert.match(background, /targetSourceEventId: target\.id/);
 assert.match(background, /targetInteractionId/);
 assert.match(background, /event\.raw\?\.type !== "capture-guidance"/);
-assert.match(background, /sender\.tab\?\.id !== state\.tabId/);
+// Markers come from the recording tab or from the recording panel; tests/recording-panel.test.js
+// checks that other tabs and web pages are refused.
+assert.match(background, /!\(fromPanel \|\| sender\.tab\?\.id === state\.tabId\)/);
 
 console.log("Recording guidance behaviour tests passed.");
