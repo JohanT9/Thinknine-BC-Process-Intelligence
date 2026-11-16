@@ -41,13 +41,35 @@
     const text = String(value ?? "");
     if (element.textContent !== text) element.textContent = text;
   };
-  const send = message => new Promise((resolve, reject) => {
+  // A panel left open while the extension was updated or reloaded keeps showing, but can no
+  // longer reach it. Loading the page again connects it to the extension as it is now; it is
+  // done at most once a minute so a lasting fault cannot make the panel reload over and over.
+  const RELOAD_KEY = "t9RecordingPanelReloadedAt";
+  function disconnectedFromExtension(error) {
+    return !chrome.runtime?.id || /context invalidated/i.test(String(error?.message || error || ""));
+  }
+  function reconnectPage() {
+    let last = 0;
+    try { last = Number(sessionStorage.getItem(RELOAD_KEY)) || 0; } catch {}
+    if (Date.now() - last < 60000) return false;
+    try { sessionStorage.setItem(RELOAD_KEY, String(Date.now())); } catch {}
+    location.reload();
+    return true;
+  }
+  // An answer that never comes must not hold up the panel: every request has a time limit.
+  const SEND_TIMEOUT_MS = 8000;
+  const send = (message, timeout = SEND_TIMEOUT_MS) => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("technical.requestTimeout")), timeout);
+    const finish = (fn, value) => { clearTimeout(timer); fn(value); };
     try {
       chrome.runtime.sendMessage(message, response => {
-        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
-        else resolve(response);
+        if (chrome.runtime.lastError) finish(reject, new Error(chrome.runtime.lastError.message));
+        else finish(resolve, response);
       });
-    } catch (error) { reject(error); }
+    } catch (error) {
+      if (disconnectedFromExtension(error)) reconnectPage();
+      finish(reject, error);
+    }
   });
   // Messages from the background worker are translated when they are known interface text.
   const errorText = (error, fallbackKey) => {
@@ -59,11 +81,17 @@
   function connect() {
     let port;
     try { port = chrome.runtime.connect({ name: "T9_RECORDING_PANEL" }); }
-    catch { setTimeout(connect, 2000); return; }
+    catch (error) {
+      if (disconnectedFromExtension(error) && reconnectPage()) return;
+      setTimeout(connect, 2000);
+      return;
+    }
     chrome.windows.getCurrent().then(window => port.postMessage({ windowId: window.id }))
       .catch(() => {});
     port.onDisconnect.addListener(() => {
       void chrome.runtime.lastError;
+      // The extension was updated or reloaded: this page belongs to the old one.
+      if (disconnectedFromExtension() && reconnectPage()) return;
       setTimeout(connect, 1000);
     });
   }
@@ -304,7 +332,8 @@
     startBusy("recorder.creatingReport");
     try {
       const response = await send({ type: "T9_FINISH_BUG_RECORDING", name: "",
-        documentLanguage: globalThis.T9LanguageRegistry.normalize(documentLanguage, "document") });
+        documentLanguage: globalThis.T9LanguageRegistry.normalize(documentLanguage, "document") },
+        240000);
       if (!response?.ok) throw new Error(response?.error || "recorder.stopFailed");
       showDone({ titleKey: "recorder.reportOpened" });
     } catch (error) {
@@ -327,7 +356,7 @@
     const language = globalThis.T9LanguageRegistry.normalize($("rpDocumentLanguage").value, "document");
     startBusy("recorder.stopping");
     try {
-      const response = await send({ type: "T9_STOP", name, documentLanguage: language });
+      const response = await send({ type: "T9_STOP", name, documentLanguage: language }, 240000);
       if (!response?.ok) throw new Error(response?.error || "recorder.stopFailed");
       showDone({ titleKey: "recPanel.savedTitle", name: response.session?.name || name,
         helpKey: "recorder.completionHelp", recordingId: response.session?.id || "" });
@@ -343,7 +372,7 @@
   async function discard() {
     startBusy("recorder.discarding");
     try {
-      const response = await send({ type: "T9_CANCEL_RECORDING" });
+      const response = await send({ type: "T9_CANCEL_RECORDING" }, 30000);
       if (!response?.ok) throw new Error(response?.error || "recorder.cancelFailed");
       showDone({ titleKey: "recorder.discarded" });
     } catch (error) {
@@ -416,10 +445,14 @@
       if (message?.type === "T9_RECORDING_PANEL_START_FAILED" && !recordingSeen) window.close();
     });
     setView(startingUntil > Date.now() ? "starting" : "idle");
-    connect();
-    await refresh();
+    // The updates run on their own timer, so one slow answer never stops the next.
     setInterval(() => { void refresh(); }, REFRESH_MS);
+    await refresh();
   }
 
+  // Connected before anything else, so the floating box steps aside even while the panel
+  // is still loading its settings.
+  if (disconnectedFromExtension() && reconnectPage()) return;
+  connect();
   void start();
 })();

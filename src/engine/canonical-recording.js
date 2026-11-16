@@ -207,7 +207,14 @@
     result.updatedAt = source.timestamp || new Date().toISOString();
     return result;
   }
-  // details may carry where the screenshot shows values a bug report can mask.
+  function highlightBox(value) {
+    const box = value && typeof value === "object" ? value : null;
+    if (!box || ![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
+        !(box.width > 0) || !(box.height > 0)) return null;
+    return { x: box.x, y: box.y, width: box.width, height: box.height };
+  }
+  // details may carry where the screenshot shows values a bug report can mask, and the control
+  // it was taken for (highlight).
   function addScreenshot(recording, eventReference, dataUrl, createdAt = new Date().toISOString(), details = {}) {
     const result = normalize(recording);
     if (result.metadata.finishedAt) throw new Error("Completed recording evidence is immutable.");
@@ -218,7 +225,9 @@
     const eventNo = event.raw?.eventNo || event.sequence;
     const asset = { ...assetFor(result.id, eventNo, dataUrl), createdAt,
       ...(Array.isArray(details?.valueRegions) ? { valueRegions: clone(details.valueRegions),
-        valueRegionsComplete: details.valueRegionsComplete !== false } : {}) };
+        valueRegionsComplete: details.valueRegionsComplete !== false } : {}),
+      // The control the screenshot was taken for, as shares of it, to be outlined.
+      ...(highlightBox(details?.highlight) ? { highlight: highlightBox(details.highlight) } : {}) };
     if (event.screenshotAssetId) {
       if (!result.assets.some(item => item.id === event.screenshotAssetId)) {
         throw new Error(`Missing canonical screenshot asset: ${event.screenshotAssetId}`);

@@ -431,3 +431,138 @@ console.log("Test recording match: a test from a rewritten document passed.");
     undefined, "a step without an AL name keeps its signature as before");
   console.log("Test recording match: AL names match across languages passed.");
 }
+
+// Page Scripting plays a test back without clicks or typing: the steps it announces in a
+// status message ("Pågående steg: Mata in 10000 i Leverantörsnr") count for the test's steps.
+{
+  const status = (label, extra = {}) => ({ id: `e-${label}`, raw: { type: "status-message", label,
+    timestamp: "2026-11-16T10:00:00.000Z", ...extra } });
+  const page = caption => ({ id: `p-${caption}`, raw: { type: "page-state", pageCaption: caption } });
+  assert.strictEqual(matcher.playbackStep("Lista med rubriken Inköpsorder har nu 147 objekt"), null);
+  assert.strictEqual(matcher.playbackStep("Sparad"), null);
+  assert.deepStrictEqual(matcher.playbackStep("Pågående steg: Mata in 10000 i Leverantörsnr"),
+    { kind: "input", instruction: "Mata in 10000 i Leverantörsnr", caption: "Leverantörsnr", value: "10000" });
+  assert.strictEqual(matcher.playbackStep("Pågående steg: Anropa Skapa ny på Ny").operation, "New");
+  assert.strictEqual(matcher.playbackStep("Pågående steg: Anropa Släpp").kind, "invoke");
+  // In every language Page Scripting writes its steps in, whatever the words before the colon.
+  assert.deepStrictEqual(["Current step: Enter 75 in Quantity", "Aktueller Schritt: 75 in Menge eingeben",
+    "Étape en cours : Saisir 75 dans Quantité", "Paso actual: Introducir 75 en Cantidad",
+    "Aktuelt trin: Indtast 75 i Antal", "Nykyinen vaihe: Syötä 75 kenttään Määrä",
+    "Gjeldende trinn: Angi 75 i Antall"].map(said => matcher.playbackStep(said)?.value), Array(7).fill("75"));
+
+  const played = matcher.playbackSteps([
+    status("Pågående steg: Öppna Purchase Order List"), page("Inköpsorder"),
+    status("Pågående steg: Anropa Skapa ny på Ny"),
+    status("Pågående steg: Mata in 10000 i Leverantörsnr"),
+    status("Pågående steg: Mata in 75 i Antal"),
+    status("Pågående steg: Anropa Bokför"), { id: "err", raw: { type: "bc-error" } }]);
+  assert.strictEqual(played.length, 5);
+  assert.strictEqual(played[0].openedPage, "Inköpsorder");
+  assert.strictEqual(played[4].errorEventId, "err", "an error before the next step is the step's");
+  const named = documented.map((value, index) => ({ stepId: `block:step:${index + 1}`,
+    instruction: index === 0 ? "Sök efter och öppna **Inköpsorder**" : "",
+    signature: matcher.signature(value) }));
+  const check = matcher.check(named, [], played.map((step, index) => index === 4
+    ? { ...step, error: "Det finns inget att bokföra." } : step));
+  assert.deepStrictEqual(check.steps.map(step => step.state), ["done", "done", "done", "done", "failed"]);
+  assert.strictEqual(check.steps[2].instruction, "Mata in 10000 i Leverantörsnr");
+  assert.strictEqual(check.steps[4].error, "Det finns inget att bokföra.");
+  assert.strictEqual(check.recordedSteps, 5);
+  assert.deepStrictEqual(check.additional, []);
+
+  // Another script: its steps are not the test's and are listed as additional.
+  const other = matcher.check(named, [], matcher.playbackSteps([
+    status("Pågående steg: Mata in 5 i Rabattprocent")]));
+  assert.ok(other.steps.every(step => step.state !== "done"));
+  assert.deepStrictEqual(other.additional, ["Mata in 5 i Rabattprocent"]);
+  console.log("Test recording match: Page Scripting playback passed.");
+}
+
+// The test from a real run: a step without a signature that opens a page, and records the test
+// chose from a list that Page Scripting enters in a field captioned otherwise.
+{
+  const status = label => ({ id: `e-${label}`, raw: { type: "status-message", label: `Pågående steg: ${label}` } });
+  const step = (stepId, instruction, signature) => ({ stepId, instruction, ...(signature ? { signature } : {}) });
+  const sig = (taskType, fieldCaption = "", actionCaption = "") => ({ taskType, pageObjectId: "", pageCaption: "",
+    controlId: "", fieldCaption, actionCaption });
+  const run = [
+    step("s1", "Välj Huvudnavigering på sidan Tillgängliga funktioner.", sig("RunAction", "huvudnavigering")),
+    step("s2", "Sök efter ink ord och öppna listan Inköpsorder."),
+    step("s3", "Börja skapa en ny inköpsorder genom att välja Ny.", sig("CreatePurchaseOrder", "ny", "ny")),
+    step("s4", "Välj posten 10000 på sidan Inköpsorder.", sig("SelectRecord", "", "nr, sorterade i stigande order välj posten")),
+    step("s5", "Ange isbergs i Nr och välj 30043.", sig("SearchAndSelectRecord", "artikel nr", "nr")),
+    step("s6", "Ange 4 500 i Antal.", sig("EnterQuantity", "antal")),
+    step("s10", "Välj Hantera på sidan Inköpsorder.", sig("RunAction", "hantera")),
+    step("s12", "Välj Artikelnummer 10244.", sig("SelectItem", "artikelnummer")),
+    step("s13", "Ange 75 i Antal.", sig("EnterQuantity", "antal")),
+    step("s17", "Välj Släpp på sidan Inköpsorder.", sig("ReleasePurchaseDocument", "", "släpp"))];
+  const played = matcher.playbackSteps([status("Öppna Purchase Order List"),
+    { id: "p", raw: { type: "page-state", pageCaption: "Inköpsorder" } },
+    status("Anropa Skapa ny på Ny"), status("Mata in 10000 i Leverantörsnr"), status("Mata in 30043 i Nr"),
+    status("Mata in 4500 i Antal"), status("Anropa Skapa ny på Ny rad"), status("Mata in 10244 i Nr"),
+    status("Mata in 75 i Antal"), status("Anropa Släpp")]);
+  const result = matcher.check(run, [], played);
+  // Menus Page Scripting does not open (Main navigation, Manage) count with the step after them.
+  assert.deepStrictEqual(result.steps.map(item => item.state), ["done", "done", "done", "done", "done",
+    "done", "done", "done", "done", "done"]);
+  assert.strictEqual(result.recorded.find(item => item.instruction === "Mata in 10244 i Nr").stepId, "s12",
+    "a played step is listed with its own test step, not the menu before it");
+
+  // An action left out of the script, and the menu it sits in, stay not done; the arrow of a
+  // split button before a step that failed was still opened.
+  const tail = [step("s14", "Välj Visa fler alternativ på sidan Inköpsorder.", sig("RunAction", "visa fler alternativ")),
+    step("s15", "Välj Ta bort rad på sidan Inköpsorder.", sig("RunAction", "ta bort rad")),
+    step("s16", "Välj Relaterade åtgärder för Släpp på sidan Inköpsorder.", sig("RunAction", "relaterade åtgärder för släpp")),
+    step("s17", "Välj Släpp på sidan Inköpsorder.", sig("ReleasePurchaseDocument", "", "släpp")),
+    step("s18", "Ange 5 i Rabattprocent.", sig("EnterValue", "rabattprocent")),
+    step("s19", "Välj Bokför.", sig("PostDocument", "", "bokför"))];
+  const ending = matcher.check(tail, [], [{ ...matcher.playbackStep("Pågående steg: Anropa Släpp"),
+    error: "Det finns inget att släppa." }, matcher.playbackStep("Pågående steg: Anropa Bokför")]);
+  assert.deepStrictEqual(ending.steps.map(item => item.state),
+    ["not-found", "not-found", "done", "failed", "not-found", "done"],
+    "only a plain action right before a played step counts with it");
+  console.log("Test recording match: a Page Scripting run of a real test passed.");
+}
+
+// What was captured while a played step ran goes with it: its event and the next step's.
+{
+  const at = (eventNo, label) => ({ id: `e${eventNo}`, raw: { type: "status-message", eventNo,
+    label: `Pågående steg: ${label}` } });
+  const played = matcher.playbackSteps([at(4, "Mata in 75 i Antal"),
+    { id: "e5", raw: { type: "page-state", eventNo: 5 } }, at(7, "Anropa Släpp")]);
+  assert.deepStrictEqual(played.map(item => [item.eventNo, item.endEventNo]), [[4, 7], [7, undefined]]);
+  const result = matcher.check([{ stepId: "a", instruction: "Ange 75 i Antal.", signature: {
+    taskType: "EnterQuantity", fieldCaption: "antal" } }], [], played);
+  assert.strictEqual(result.steps[0].playedIndex, 0, "the check says which played step it was");
+  console.log("Test recording match: Page Scripting screenshots passed.");
+}
+
+// A played step's screenshot goes by when it was taken: one taken while the step ran, never one
+// of a later step; a page opened shows once the next step began. One capture saved for several
+// events goes with one step only.
+{
+  const time = seconds => new Date(Date.UTC(2026, 10, 16, 15, 0, seconds)).toISOString();
+  const played = [{ at: time(0), kind: "open" }, { at: time(10) }, { at: time(20) }, { at: time(30) }];
+  const shot = (id, seconds, eventNo) => ({ id, createdAt: time(seconds), metadata: { legacyEventNo: eventNo } });
+  const chosen = matcher.playbackScreenshots([
+    shot("list", 11, 2), // the list, taken as step 2 began: step 1 opened it
+    shot("card", 25, 3), // taken while step 3 ran: step 3's, not step 2's
+    shot("end-a", 40, 9), shot("end-b", 40, 12) // one capture saved for two earlier events
+  ], played).map(asset => asset?.id.replace(/-[ab]$/u, "") || null);
+  assert.deepStrictEqual(chosen, ["list", null, "card", "end"], "the end goes with the last step");
+  console.log("Test recording match: Page Scripting screenshots by time passed.");
+}
+
+// A screenshot taken for a played step itself, with its control outlined, comes before one
+// found by time, and is not used again for another step.
+{
+  const time = seconds => new Date(Date.UTC(2026, 10, 16, 15, 0, seconds)).toISOString();
+  const played = [{ at: time(0), eventNo: 5 }, { at: time(10), eventNo: 8 }];
+  const chosen = matcher.playbackScreenshots([
+    { id: "own-1", createdAt: time(2), metadata: { legacyEventNo: 5 }, highlight: { x: 0.1, y: 0.2, width: 0.1, height: 0.03 } },
+    { id: "other", createdAt: time(11), metadata: { legacyEventNo: 6 } },
+    { id: "own-2", createdAt: time(12), metadata: { legacyEventNo: 8 } }
+  ], played).map(asset => asset?.id || null);
+  assert.deepStrictEqual(chosen, ["own-1", "own-2"]);
+  console.log("Test recording match: a played step's own screenshot passed.");
+}

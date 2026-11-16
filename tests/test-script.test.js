@@ -102,6 +102,13 @@ assert.deepStrictEqual(script.bugReportContent(shot, run.steps[1].stepId).screen
   ["shot-a", "shot-b"]);
 assert.deepStrictEqual(script.bugReportContent(shot, run.steps[0].stepId).screenshotIds, []);
 assert.throws(() => script.addScreenshot(shot, run.steps[1].stepId, { screenshotId: "../x" }), TypeError);
+// A screenshot of a step Page Scripting played keeps the box of its field or button.
+const boxed = script.addScreenshot(tested, run.steps[1].stepId, { screenshotId: "shot-c", capturedAt: NOW,
+  source: "recording", highlight: { x: 0.1, y: 0.2, width: 0.3, height: 0.04 } }, NOW);
+assert.deepStrictEqual(script.normalize(JSON.parse(JSON.stringify(boxed))).steps[1].screenshots[0].highlight,
+  { x: 0.1, y: 0.2, width: 0.3, height: 0.04 });
+assert.strictEqual(script.addScreenshot(tested, run.steps[1].stepId, { screenshotId: "shot-d",
+  highlight: { x: "a" } }, NOW).steps[1].screenshots[0].highlight, undefined);
 let full = shot;
 for (let index = 2; index < script.MAX_SCREENSHOTS_PER_STEP; index += 1) {
   full = script.addScreenshot(full, run.steps[1].stepId, { screenshotId: `shot-${index}` });
@@ -317,7 +324,7 @@ assert.ok(!/recordingPurpose !== "bug-report"|recordingPurpose === "bug-report"\
 assert.match(background, /if \(!state\.recording \|\| \(session\?\.recordingPurpose !== "bug-report" && !session\?\.testRunId\)\) \{/u);
 assert.match(background, /if \(session\.recordingPurpose === "bug-report" \|\| session\.testRunId\) \{\s*await bcErrorEvidenceStore\.initialize\(id\);/u);
 assert.ok(interpret.includes("await testRecordingErrors(recordingId, masked)") &&
-  compare.includes("await testRecordingScreenshots(recordingId, recording, run, check, tasks, now)"));
+  compare.includes("await testRecordingScreenshots(recordingId, recording, run, check, tasks, now, played)"));
 assert.ok(compare.indexOf("testRecordingScreenshots(") < compare.lastIndexOf("await deleteSession(recordingId)"),
   "the screenshots are copied before the recording is removed");
 assert.match(compare, /shot\.source === "recording"/u, "only screenshots from an earlier recording are replaced");

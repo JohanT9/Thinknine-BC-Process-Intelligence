@@ -276,12 +276,204 @@
     };
   }
 
+  // Business Central's Page Scripting plays a script back without clicks or typing on the
+  // page, so nothing of it becomes a recorded step. It announces each step it starts in a
+  // status message, a localized prefix and the step's text: "Pågående steg: Mata in 10000 i
+  // Leverantörsnr". The step texts are worded as page-script-export.js writes them, in the
+  // language Business Central is shown in; the captions and values in them are the page's.
+  const pageScripting = () => globalThis.T9PageScriptExport ||
+    (typeof require === "function" ? require("./page-script-export") : null);
+  const escape = value => value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const PLAYBACK_KINDS = ["input", "operation", "row", "choose", "open", "invoke"];
+  let playbackPatterns = null;
+  function patterns() {
+    if (playbackPatterns) return playbackPatterns;
+    const phrases = pageScripting()?.PHRASES || {};
+    playbackPatterns = Object.values(phrases).flatMap(words => PLAYBACK_KINDS.map(kind => {
+      const names = [];
+      const source = escape(words[kind]).replace(/\\\{(page|caption|value|operation)\\\}/gu, (_, name) => {
+        names.push(name);
+        return "(.+?)";
+      });
+      return { kind, words, names, pattern: new RegExp(`^${source}$`, "u") };
+    }));
+    return playbackPatterns;
+  }
+  // The step a Page Scripting announcement names, or null for any other status message.
+  function playbackStep(message) {
+    const said = text(message).replace(/\s+/gu, " ").trim();
+    const colon = said.indexOf(": ");
+    if (colon < 1 || colon > 60) return null;
+    const step = said.slice(colon + 2).trim();
+    for (const { kind, words, names, pattern } of patterns()) {
+      const found = step.match(pattern);
+      if (!found) continue;
+      const parts = Object.fromEntries(names.map((name, index) => [name, found[index + 1].trim()]));
+      const operation = parts.operation ? Object.keys(words).find(key => /^[A-Z]/u.test(key) &&
+        words[key] === parts.operation) || parts.operation : "";
+      return { kind, instruction: step, caption: parts.caption || parts.page || "",
+        value: parts.value || "", ...(operation ? { operation, operationText: parts.operation } : {}) };
+    }
+    return null;
+  }
+  // The steps a recording shows Page Scripting playing back, in order, from canonical events.
+  // Each has the number of its event (eventNo) and of the next step's (endEventNo, none for
+  // the last), so that what was captured while it ran, such as a screenshot, goes with it.
+  // A step opening a page is given the page shown before the next step started. An error
+  // Business Central showed before the next step started is the step's (`errorEventId`).
+  function playbackSteps(events = []) {
+    const steps = [];
+    for (const event of Array.isArray(events) ? events : []) {
+      const raw = event?.raw || event || {};
+      const step = raw.type === "status-message" ? playbackStep(raw.label) : null;
+      if (step) {
+        const eventNo = Number(raw.eventNo) || 0;
+        if (steps.length) steps.at(-1).endEventNo = eventNo;
+        steps.push({ ...step, at: text(raw.timestamp || event.timestamp), eventId: text(event.id), eventNo });
+        continue;
+      }
+      const current = steps.at(-1);
+      if (!current) continue;
+      if (raw.type === "bc-error" && !current.errorEventId) current.errorEventId = text(event.id);
+      const shown = raw.pageCaption || event.page?.caption;
+      if (current.kind === "open" && shown) current.openedPage = text(shown);
+    }
+    return steps;
+  }
+
+  // The screenshot for each step Page Scripting played back: the one taken for the step when it
+  // was announced, with its field or button outlined; otherwise by when it was taken, not by the
+  // event it was saved with, which can be an earlier click or field: the last one taken while the
+  // step ran, before the next step began; for a step that opens a page, the first one taken
+  // after, which shows the page. Screenshots are queued, and one capture can be saved for
+  // several events: a capture (its time) goes with one step only. Null where there is none.
+  function playbackScreenshots(assets = [], played = []) {
+    const shots = (Array.isArray(assets) ? assets : []).map(asset => ({ asset, at: Date.parse(asset?.createdAt || "") }))
+      .filter(item => Number.isFinite(item.at)).sort((a, b) => a.at - b.at);
+    const starts = played.map(item => Date.parse(item?.at || ""));
+    const used = new Set();
+    const between = (from, to) => shots.filter(item => !used.has(item.at) &&
+      Number.isFinite(from) && item.at >= from && (!Number.isFinite(to) || item.at < to));
+    const take = found => {
+      if (found) used.add(found.at);
+      return found?.asset || null;
+    };
+    // A screenshot taken for the step itself, when it was played (the step's event), comes first.
+    const own = played.map(item => {
+      const found = item?.eventNo ? shots.find(shot => Number(shot.asset?.metadata?.legacyEventNo) === item.eventNo) : null;
+      return found && !used.has(found.at) ? take(found) : null;
+    });
+    // The last step first: the screen after it is what the whole script left.
+    const lastIndex = played.length - 1;
+    const last = played.length && !own[lastIndex] ? take(between(starts.at(-1), Infinity).at(-1)) : null;
+    return played.map((item, index) => {
+      if (own[index]) return own[index];
+      if (index === lastIndex) return last;
+      const [start, next, after] = [starts[index], starts[index + 1], starts[index + 2]];
+      // A page opened shows once the next step has begun; any other step is shown only by a
+      // screenshot taken while it ran, never by one of a later step.
+      return take((item?.kind === "open" ? between(next, after)[0] : null) || between(start, next).at(-1));
+    });
+  }
+
+  // Without a trailing "…" or "...", which Business Central adds to an action that opens a page.
+  const bare = value => caption(value).replace(/(?:\.\.\.|…)$/u, "").trim();
+  // How well a played-back step agrees with a test step: 1 or 0.9, or 0.
+  function playbackScore(expected, played) {
+    if (!expected) return 0;
+    // A step without a signature, such as an older document's search for a page, can only
+    // be the page it names opening.
+    if (!hasSignature(expected) && !(played.kind === "open" && expected.unsigned)) return 0;
+    const target = bare(played.caption);
+    const field = bare(expected.fieldCaption);
+    const action = bare(expected.actionCaption);
+    let found = false;
+    if (played.kind === "open") {
+      const pages = [played.openedPage, played.caption].filter(Boolean);
+      found = (expected.unsigned || OPENS_PAGE.has(expected.taskType)) && (expected.destination
+        ? pages.some(page => samePage(page, expected.destination))
+        // An instruction saved as plain text names the page in its words.
+        : expected.unsigned && pages.some(page => word(expected.instruction, pageName(page))));
+    } else if (played.kind === "input") {
+      const family = [fieldFamily(field), fieldFamily(target)];
+      // A record the test chose from a list, such as item 10244 picked in Item No., is
+      // entered by Page Scripting in the field, which may be captioned otherwise (No.): the
+      // same value in the step's instruction is the same choice.
+      const value = caption(played.value);
+      found = field === target || (Boolean(family[0].stem) && family[0].stem === family[1].stem &&
+        (family[0].marked || family[1].marked)) ||
+        (chooses(expected.taskType) && value.length >= 3 && word(expected.instruction, value));
+    } else if (played.kind === "operation") {
+      // An operation on a page, such as OK in a lookup, is named by its own words; a dialog's
+      // button is the last word of them ("Bekräfta med Ja", "Sökning OK").
+      const words = bare(played.operationText);
+      found = [target, words, words.split(" ").at(-1)].some(name => name && (name === action || name === field));
+    } else {
+      found = Boolean(target) && (target === action || target === field);
+    }
+    if (!found) return 0;
+    return played.value && word(expected.instruction, caption(played.value)) ? 1 : 0.9;
+  }
+  // Test steps against played-back steps, in order, as match() pairs recorded steps.
+  function matchPlayback(expectedSteps = [], played = []) {
+    const named = instruction => [...text(instruction).matchAll(/\*\*([^*]+)\*\*/gu)].map(item => item[1]);
+    const expected = expectedSteps.map(step => step.signature ? { ...step.signature,
+      instruction: caption(plain(step.instruction)),
+      destination: destination(step.signature, step.instruction) }
+      : text(step.instruction).trim() ? { unsigned: true, instruction: caption(plain(step.instruction)),
+        destination: named(step.instruction).length ? pageName(named(step.instruction).at(-1)) : "" } : null);
+    const rows = expected.length;
+    const cols = played.length;
+    const best = Array.from({ length: rows + 1 }, () => new Float64Array(cols + 1));
+    const pair = (i, j) => playbackScore(expected[i], played[j]);
+    for (let i = rows - 1; i >= 0; i -= 1) {
+      for (let j = cols - 1; j >= 0; j -= 1) {
+        const value = pair(i, j);
+        best[i][j] = Math.max(best[i + 1][j], best[i][j + 1], value ? value + best[i + 1][j + 1] : 0);
+      }
+    }
+    const matches = new Map();
+    for (let i = 0, j = 0; i < rows && j < cols;) {
+      const value = pair(i, j);
+      if (value && Math.abs(best[i][j] - (value + best[i + 1][j + 1])) < 1e-9) {
+        matches.set(i, j);
+        i += 1; j += 1;
+      } else if (best[i + 1][j] >= best[i][j + 1]) {
+        i += 1;
+      } else {
+        j += 1;
+      }
+    }
+    return matches;
+  }
+
   // What a recording shows for a test, kept with the run: for a step found in it, what was
   // recorded and when; and the recorded steps that are not in the test. Recorded tasks may
   // carry the time they were done as `at`, and `failed` with Business Central's message as
   // `error` when it showed an error after the step; such a step is suggested as failed.
-  function check(expectedSteps = [], recordedTasks = []) {
+  // Steps Page Scripting played back (playbackSteps(), with `error` for a step that failed)
+  // count for test steps no recorded step was found for.
+  function check(expectedSteps = [], recordedTasks = [], played = []) {
     const result = match(expectedSteps, recordedTasks);
+    const playedFor = matchPlayback(expectedSteps, played);
+    result.steps = result.steps.map((step, index) => {
+      if (!["not-found", "unknown"].includes(step.state) || !playedFor.has(index)) return step;
+      return { stepId: step.stepId, state: "played", playedIndex: playedFor.get(index) };
+    });
+    // Page Scripting runs an action directly, without opening the menu or the group it sits
+    // in (Manage, Show more options, the arrow of a split button). A plain action step of the
+    // test that Page Scripting did not play, right before a step it played, is that way to the
+    // next step and counts with it. A step before a step not played is not: an action left out
+    // of the script, such as Delete line, and the menu it was in stay not done.
+    result.steps = result.steps.map((step, index) => {
+      const next = result.steps[index + 1];
+      const signatureOf = expectedSteps[index]?.signature;
+      if (!["not-found", "unknown"].includes(step.state) || next?.state !== "played" ||
+          signatureOf?.taskType !== "RunAction") return step;
+      return { stepId: step.stepId, state: "played", playedIndex: next.playedIndex, onTheWay: true };
+    });
+    const playedWith = new Map(result.steps.filter(step => step.state === "played" && !step.onTheWay)
+      .map(step => [step.playedIndex, step.stepId]));
     // A recorded search can stand for several steps of an older test; it is shown with the first.
     const pairedWith = new Map();
     for (const step of result.steps) {
@@ -290,23 +482,40 @@
     // The recorded instruction as plain text: the marks for captions (**) and values (__)
     // are for the document only.
     const said = task => plain(task?.instruction || task?.displayText).trim();
+    const failedPlay = item => Boolean(item?.failed || item?.errorEventId || item?.error);
+    const playedItem = (item, stepId = "") => ({ instruction: text(item.instruction).trim(), stepId,
+      playback: true, ...(failedPlay(item) ? { failed: true, error: text(item.error).trim() } : {}) });
     return {
-      recordedSteps: recordedTasks.filter(task => hasSignature(signature(task))).length,
+      recordedSteps: recordedTasks.filter(task => hasSignature(signature(task))).length + played.length,
       steps: result.steps.map(step => {
+        if (step.state === "played") {
+          const item = played[step.playedIndex] || {};
+          // The way to a step that failed was still taken.
+          const failed = failedPlay(item) && !step.onTheWay;
+          return { stepId: step.stepId, state: failed ? "failed" : "done", playback: true,
+            playedIndex: step.playedIndex, ...(step.onTheWay ? { onTheWay: true } : {}),
+            instruction: text(item.instruction).trim(), at: text(item.at),
+            ...(failed ? { error: text(item.error).trim() } : {}) };
+        }
         if (step.state !== "done") return { stepId: step.stepId, state: step.state };
         const task = recordedTasks[step.taskIndex] || {};
         return { stepId: step.stepId, state: task.failed ? "failed" : "done",
           taskIndex: step.taskIndex, score: step.score, instruction: said(task), at: text(task.at),
           ...(task.failed ? { error: text(task.error).trim() } : {}) };
       }),
-      additional: result.additional.map(index => said(recordedTasks[index])).filter(Boolean),
+      additional: [...result.additional.map(index => said(recordedTasks[index])),
+        ...played.filter((_, index) => !playedWith.has(index)).map(item => text(item.instruction).trim())]
+        .filter(Boolean),
       // Every recorded step in order, with the test step it was paired with, so the tester
-      // can see what the recording held.
-      recorded: recordedTasks.map((task, index) => ({ instruction: said(task),
+      // can see what the recording held; then the steps Page Scripting played back.
+      recorded: [...recordedTasks.map((task, index) => ({ instruction: said(task),
         stepId: pairedWith.get(index) || "", ...(task.failed ? { failed: true,
-          error: text(task.error).trim() } : {}) })).filter(item => item.instruction)
+          error: text(task.error).trim() } : {}) })),
+        ...played.map((item, index) => playedItem(item, playedWith.get(index) || ""))]
+        .filter(item => item.instruction)
     };
   }
 
-  return { MATCH_THRESHOLD, signature, hasSignature, score, match, check, fieldFamily, pageName };
+  return { MATCH_THRESHOLD, signature, hasSignature, score, match, check, fieldFamily, pageName,
+    playbackStep, playbackSteps, playbackScreenshots };
 });

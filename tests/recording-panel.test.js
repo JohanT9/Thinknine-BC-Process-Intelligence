@@ -260,5 +260,74 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
     "the panel offers only markers that change the document");
   assert.match(read("scripts/build.js"), /"recording-panel\.html", "recording-panel\.js"/);
 
+  // ---- The panel keeps up when an answer is lost or the extension was reloaded --------------
+  function element() {
+    const target = { dataset: {}, style: {}, hidden: false, textContent: "", value: "",
+      classList: { add() {}, remove() {}, toggle() {}, contains: () => false } };
+    return new Proxy(target, { get: (object, key) => key in object ? object[key] :
+      (key === "querySelectorAll" ? () => [] : () => element()) });
+  }
+  function runPanel({ runtimeId = "studio", answer, search = "?starting=1" } = {}) {
+    const timers = []; const sent = []; const events = { reloads: 0, connects: 0 };
+    const chrome = {
+      runtime: { id: runtimeId, lastError: null,
+        sendMessage(message, callback) { sent.push(message.type); answer?.(message, callback); },
+        connect() {
+          events.connects += 1;
+          if (!chrome.runtime.id) throw new Error("Extension context invalidated.");
+          return { postMessage() {}, onDisconnect: { addListener(fn) { events.disconnect = fn; } } };
+        },
+        onMessage: { addListener() {} } },
+      windows: { getCurrent: () => Promise.resolve({ id: 1 }) },
+      storage: { onChanged: { addListener() {} } }
+    };
+    const store = new Map();
+    const sandbox = {
+      globalThis: null, chrome, URLSearchParams, Date, Promise, Error, String, Number, Math,
+      JSON, Object, Set, Map, Array, console,
+      location: { search, reload() { events.reloads += 1; } },
+      sessionStorage: { getItem: key => store.get(key) ?? null, setItem: (key, value) => store.set(key, value) },
+      document: { getElementById: () => element(), querySelector: () => element(), querySelectorAll: () => [],
+        createElement: () => element(), createTextNode: () => element(), addEventListener() {},
+        title: "" },
+      setTimeout: (fn, ms) => { timers.push({ fn, ms }); return timers.length; },
+      clearTimeout: id => { if (timers[id - 1]) timers[id - 1].cleared = true; },
+      setInterval: (fn, ms) => { timers.push({ fn, ms, interval: true }); return timers.length; },
+      window: { close() {} }
+    };
+    sandbox.globalThis = Object.assign(sandbox, { T9UiI18n: i18n,
+      T9LanguageRegistry: context.globalThis.T9LanguageRegistry });
+    vm.runInNewContext(read("src/ui/recording-panel.js"), sandbox);
+    return { timers, sent, events, chrome };
+  }
+  const flush = () => new Promise(resolve => setImmediate(resolve));
+
+  // Settings answer at once, but the first status request is never answered.
+  const lost = runPanel({ answer: (message, callback) => {
+    if (message.type === "T9_GET_SETTINGS") callback({ ok: true, settings: { uiLocale: "sv-SE" } });
+  } });
+  for (let i = 0; i < 5; i += 1) await flush();
+  assert.equal(lost.events.connects, 1, "the panel connects at once, before its settings arrive");
+  assert.ok(lost.timers.some(timer => timer.interval), "updates run on their own timer");
+  const timeout = lost.timers.find(timer => timer.ms === 8000 && !timer.cleared);
+  assert.ok(timeout, "an unanswered request has a time limit");
+  timeout.fn(); await flush();
+  const before = lost.sent.filter(type => type === "T9_GET_STATE").length;
+  lost.timers.find(timer => timer.interval).fn(); await flush();
+  assert.equal(lost.sent.filter(type => type === "T9_GET_STATE").length, before + 1,
+    "after a lost answer the next update is asked for again");
+
+  // A panel left from before the extension was reloaded loads itself again, once.
+  const stale = runPanel({ answer: (message, callback) => callback({ ok: true, state: {} }) });
+  for (let i = 0; i < 3; i += 1) await flush();
+  stale.chrome.runtime.id = undefined;
+  stale.events.disconnect();
+  assert.equal(stale.events.reloads, 1, "the panel reconnects to the reloaded extension");
+  stale.events.disconnect();
+  assert.equal(stale.events.reloads, 1, "it does not reload over and over");
+  const orphan = runPanel({ runtimeId: null });
+  assert.equal(orphan.events.reloads, 1, "a panel opened without the extension reloads");
+  assert.equal(orphan.sent.length, 0);
+
   console.log("Recording panel tests passed.");
 })().catch(error => { console.error(error); process.exit(1); });

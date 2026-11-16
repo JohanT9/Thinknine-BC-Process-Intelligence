@@ -112,17 +112,33 @@
     wrap.append(steps);
     parts.push(element(section, "", d("test.protocolSteps")), wrap);
 
-    const shown = run.steps.flatMap(step => step.screenshots.map((shot, index) =>
-      ({ step, index, source: images[shot.screenshotId] }))).filter(item => item.source);
+    // After the summary, each step with screenshots: the step as written, its result and
+    // comment, then its screenshots, so that a screenshot is read with the step it shows.
+    const shown = run.steps.map(step => ({ step, sources: step.screenshots
+      .map(shot => images[shot.screenshotId]).filter(Boolean) })).filter(item => item.sources.length);
     if (shown.length) {
-      parts.push(element(section, "", d("test.screenshots")));
-      shown.forEach(({ step, index, source }) => {
-        const figure = element("figure");
-        const image = element("img");
-        image.src = source;
-        image.alt = d("test.screenshotAlt", { n: index + 1, step: step.number });
-        figure.append(image, element("figcaption", "", d("test.screenshotAlt", { n: index + 1, step: step.number })));
-        parts.push(figure);
+      parts.push(element(section, "screenshots-title", d("test.screenshots")));
+      const subsection = `h${Math.min(6, level + 2)}`;
+      shown.forEach(({ step, sources }) => {
+        const block = element("section", "shot-step");
+        const title = element(subsection, "", `${d("test.step")} ${step.number}: ${step.instruction}`);
+        if (step.heading) title.prepend(element("span", "section", step.heading));
+        const result = element("p", "shot-result");
+        result.append(document.createTextNode(`${d("test.result")}: `),
+          element("span", `result-${step.status}`, d(script.statusKey(step))));
+        block.append(title, result);
+        if (step.comment.trim()) block.append(element("p", "", step.comment.trim()));
+        sources.forEach((source, index) => {
+          const figure = element("figure");
+          const image = element("img");
+          image.src = source;
+          image.alt = d("test.screenshotAlt", { n: index + 1, step: step.number });
+          figure.append(image);
+          // With more than one, each is numbered.
+          if (sources.length > 1) figure.append(element("figcaption", "", image.alt));
+          block.append(figure);
+        });
+        parts.push(block);
       });
     }
     return parts;
@@ -228,13 +244,26 @@
     document.title = title;
   }
 
+  // The screenshots of a run as shown in the protocol: one taken for a step Page Scripting
+  // played has its field or button outlined.
+  async function outlined(run, images = {}) {
+    const boxes = new Map(run.steps.flatMap(step => step.screenshots
+      .filter(shot => shot.highlight).map(shot => [shot.screenshotId, shot.highlight])));
+    const result = { ...images };
+    for (const [id, box] of boxes) {
+      if (result[id]) result[id] = await script.outlinedImage(result[id], box);
+    }
+    return result;
+  }
+
   async function startRun() {
     const run = script.normalize((await send({ type: "T9_LOAD_TEST_RUN", testRunId })).run);
     let images = {};
     const ids = script.screenshotIds(run);
     if (ids.length) {
       try {
-        images = (await send({ type: "T9_LOAD_TEST_SCREENSHOTS", testRunId, screenshotIds: ids })).screenshots;
+        images = await outlined(run, (await send({ type: "T9_LOAD_TEST_SCREENSHOTS", testRunId,
+          screenshotIds: ids })).screenshots);
       } catch { status.textContent = t("test.screenshotsUnavailable"); }
     }
     const include = document.getElementById("includeScreenshots");
@@ -268,8 +297,8 @@
         let failed = false;
         for (const run of withShots) {
           try {
-            images[run.testRunId] = (await send({ type: "T9_LOAD_TEST_SCREENSHOTS", testRunId: run.testRunId,
-              screenshotIds: script.screenshotIds(run) })).screenshots;
+            images[run.testRunId] = await outlined(run, (await send({ type: "T9_LOAD_TEST_SCREENSHOTS",
+              testRunId: run.testRunId, screenshotIds: script.screenshotIds(run) })).screenshots);
           } catch { failed = true; }
         }
         status.textContent = failed ? t("test.screenshotsUnavailable") : t("test.protocolHelp");

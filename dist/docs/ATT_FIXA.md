@@ -79,3 +79,13 @@ Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varj
 **Att kontrollera:** väljer användaren en leverantör eller kund i namnfältet (Leverantörsnamn) i stället för i nummerfältet, skriver testet det valda numret i namnfältet. Business Central brukar godta ett nummer där, men det är inte prövat genom uppspelning.
 
 **Förslag:** spela in ett sådant val, exportera och spela upp. Godtas inte numret ska testet skriva i nummerfältet i stället.
+
+## Klick i en radcell får fel kolumnnamn
+
+*Tillagd 2026-11-16.*
+
+**Vad är fel:** i Prod.order komponenter klickade användaren i cellen **Bokföringsmetod** (som visade Bakåt) och valde sedan Manuellt. Dokumentet fick ett eget steg "Välj *Artikelnummer* **Bakåt**": klicket fick namnet på en annan kolumn och blev ett eget steg före valet.
+
+**Vad användaren märker:** ett extra, felaktigt steg före valet av alternativ.
+
+**Att kontrollera:** hur cellens kolumn hittas i `src/recorder/content.js` (kolumnrubrik via `aria-colindex` eller `cellIndex`); dolda eller låsta kolumner kan ge fel rubrik. Behöver den verkliga inspelningens händelser, till exempel genom förbättringsdata. När kolumnen blir rätt kan klicket räknas till valet i samma fält, som klick på fältet redan gör (`field-click-before-entry`).

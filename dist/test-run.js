@@ -118,11 +118,13 @@
       });
       entry.append(link, remove);
       list.append(entry);
-      client.screenshots([shot.screenshotId]).then(images => {
+      client.screenshots([shot.screenshotId]).then(async images => {
         const source = images[shot.screenshotId];
         if (!source) return;
-        image.src = source;
-        link.href = source;
+        // A screenshot taken for a step Page Scripting played shows its field or button outlined.
+        const shown = await script.outlinedImage(source, shot.highlight);
+        image.src = shown;
+        link.href = shown;
       }, () => { image.alt = t("test.screenshotsUnavailable"); });
     });
     wrapper.append(list);
