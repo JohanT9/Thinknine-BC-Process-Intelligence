@@ -32,6 +32,10 @@
     .protocol figure{margin:0 0 12px;break-inside:avoid}
     .protocol figure img{display:block;max-width:100%;border:1px solid #c8ced6}
     .protocol figcaption{font-size:.8125rem;color:#4b5563;margin-top:4px}
+    .protocol .shot-step{margin:0 0 20px}
+    .protocol .shot-step :is(h3,h4,h5,h6){margin:16px 0 4px;font-size:1rem;overflow-wrap:anywhere}
+    .protocol .shot-step .section{display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#4b5563}
+    .protocol .shot-result{margin:0 0 8px;font-size:.875rem}
     .protocol .overview th:first-child,.protocol .overview td:first-child{width:2.5em;text-align:right}
     .protocol .result-missing{color:#4b5563}
     .protocol .change-new-failure{color:#a4161a;font-weight:700}.protocol .change-fixed{color:#14632d;font-weight:700}
@@ -49,6 +53,9 @@
       .protocol tr,.protocol .signatures{break-inside:avoid}.protocol :is(h1,h2,h3){break-after:avoid}
       .protocol .table-wrap{overflow:visible}
       .protocol-test{break-before:page;margin-top:0;padding-top:0;border-top:0}
+      .protocol .screenshots-title{break-before:page}
+      .protocol .shot-step :is(h3,h4,h5,h6),.protocol .shot-result{break-after:avoid}
+      .protocol .shot-step{break-inside:avoid}
     }
   </style>
 </head>

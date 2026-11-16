@@ -492,6 +492,7 @@
     } else if (!recording && observing) {
       observing = false;
       observer.disconnect();
+      statusObserver.disconnect();
       // Dialogs are seen afresh by the next recording.
       observedDialogs.clear();
       clearInterval(urlTimer);
@@ -538,6 +539,17 @@
       return false;
     }
 
+    if (message.type === "T9_PLAYBACK_TARGET") {
+      if (!recording) { sendResponse({ ok: false }); return false; }
+      playbackTarget = null;
+      findPlaybackTarget(message).then(target => {
+        playbackTarget = target || null;
+        if (target) showClickHighlight(target, {});
+        sendResponse({ ok: true, found: Boolean(target) });
+      }, () => sendResponse({ ok: false }));
+      return true;
+    }
+
     if (message.type === "T9_SET_INDICATOR_CAPTURE_VISIBILITY") {
       const captureToken = message.captureId || "legacy";
       if (message.hidden) captureUiTokens.add(captureToken);
@@ -571,7 +583,11 @@
                 ({ x: 0, y: 0, width: 1, height: 1 }), 1).length) valueRegions = undefined;
           } catch { valueRegions = undefined; }
         }
-        sendResponse(valueRegions ? { ok: true, valueRegions } : { ok: true });
+        // The control of a step Page Scripting played, measured as the screenshot is taken: a
+        // button whose page has gone, or that is covered, is not outlined.
+        const playbackBounds = message.collectPlaybackTarget ? playbackTargetBounds() : undefined;
+        sendResponse({ ok: true, ...(valueRegions ? { valueRegions } : {}),
+          ...(playbackBounds ? { playbackBounds } : {}) });
       };
       const fallback = setTimeout(acknowledge, 100);
       requestAnimationFrame(() => requestAnimationFrame(acknowledge));
@@ -1156,10 +1172,12 @@
       return element.value;
     }
 
-    if (
-      element instanceof HTMLTextAreaElement ||
-      element instanceof HTMLSelectElement
-    ) return element.value;
+    if (element instanceof HTMLTextAreaElement) return element.value;
+    // An option field's value is the option's number (Manuellt is 0); the user chose its text.
+    if (element instanceof HTMLSelectElement) {
+      const chosen = clean(element.selectedOptions?.[0]?.textContent, 500);
+      return chosen || element.value;
+    }
 
     if (element?.getAttribute?.("contenteditable") === "true") {
       return clean(element.textContent, 500);
@@ -1482,6 +1500,89 @@
   const SETTLE_DELAYS_MS = [300, 1200, 3000, 6000];
   const settling = new Set();
 
+  // The field or button a step Page Scripting plays names, by its caption on the page, for the
+  // step's screenshot. A field is chosen once it shows the value the step enters, so that among
+  // the lines of a list it is the line entered; a field whose caption is read otherwise is found
+  // by that value alone. Only what is on screen and not covered counts. The wait ends when the
+  // value shows, when Page Scripting announces its next step, or after a short time; a button
+  // is looked for briefly, since one in a closed menu is not shown. Captions are compared as
+  // shown, without a closing "…".
+  const PLAYBACK_FIELD_WAIT_MS = 2500;
+  const PLAYBACK_BUTTON_WAIT_MS = 400;
+  let latestStatusMessage = "";
+  let playbackTarget = null;
+  const comparable = value => clean(value).toLocaleLowerCase().replace(/(?:\.\.\.|…)$/u, "").trim();
+  // "4 500", "4 500" with a no-break space and "4500" are one value; so are "15" and "15,00".
+  function sameValue(shown, entered) {
+    const plain = value => comparable(value).replace(/\s/gu, "");
+    const a = plain(shown); const b = plain(entered);
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const number = value => /^-?\d+(?:[.,]\d+)?$/u.test(value) ? Number(value.replace(",", ".")) : NaN;
+    // A thousands separator such as "4.500" or "4,500": the digits are the value.
+    const grouped = value => /^-?\d{1,3}(?:[.,]\d{3})+$/u.test(value) ? value.replace(/[.,]/gu, "") : value;
+    return number(a) === number(b) || grouped(a) === grouped(b);
+  }
+  function uncovered(element) {
+    const box = element.getBoundingClientRect();
+    if (!(box.width > 0 && box.height > 0 && box.bottom > 0 && box.right > 0 &&
+      box.top < innerHeight && box.left < innerWidth)) return false;
+    const style = getComputedStyle(element);
+    if (style.visibility !== "visible" || Number(style.opacity) === 0) return false;
+    const x = Math.min(innerWidth - 1, Math.max(0, box.left + box.width / 2));
+    const y = Math.min(innerHeight - 1, Math.max(0, box.top + box.height / 2));
+    const hit = document.elementFromPoint(x, y);
+    return Boolean(hit) && (hit === element || element.contains(hit) || hit.contains(element));
+  }
+  function playbackTargetBounds() {
+    const target = playbackTarget;
+    if (!target?.isConnected || !uncovered(target)) return null;
+    return viewportBounds(target.getBoundingClientRect(), target) || null;
+  }
+  const inDialog = element => Boolean(element.closest('[role="dialog"],[aria-modal="true"]'));
+  function playbackField(caption, value) {
+    const wanted = comparable(caption);
+    const fields = [...document.querySelectorAll(EDITABLE_SELECTOR)].filter(uncovered);
+    const named = wanted ? fields.filter(element => comparable(getLabel(element)) === wanted) : [];
+    const showing = value ? fields.filter(element => sameValue(valueOf(element), value)) : [];
+    const entered = named.find(element => showing.includes(element)) ||
+      (showing.length === 1 ? showing[0] : showing.find(element => element === document.activeElement));
+    const field = entered || named.find(element => element === document.activeElement) ||
+      named.find(inDialog) || named[0] || null;
+    return { field, entered: Boolean(entered) || (!value && Boolean(field)) };
+  }
+  function playbackButton(names) {
+    const buttons = [...document.querySelectorAll(
+      'button,[role="button"],[role="menuitem"],[role="link"],[role="tab"],a[href]')].filter(uncovered);
+    for (const name of names.map(comparable).filter(Boolean)) {
+      const found = buttons.filter(element => comparable(textOf(element)) === name);
+      const button = found.find(inDialog) || found[0];
+      if (button) return button;
+    }
+    return null;
+  }
+  async function findPlaybackTarget({ kind, caption, value, operationText, label }) {
+    const words = comparable(operationText).split(" ");
+    const field = ["input", "row", "choose"].includes(kind);
+    if (!field && kind !== "invoke" && kind !== "operation") return null;
+    const until = Date.now() + (field ? PLAYBACK_FIELD_WAIT_MS : PLAYBACK_BUTTON_WAIT_MS);
+    let best = null;
+    while (recording) {
+      if (field) {
+        const found = playbackField(caption, kind === "input" ? value : "");
+        best = found.field || best;
+        if (found.field && found.entered) return found.field;
+      } else {
+        const button = playbackButton(kind === "operation" ? [caption, operationText, words.at(-1)] : [caption]);
+        if (button) return button;
+      }
+      const moved = label && latestStatusMessage && latestStatusMessage !== label;
+      if (moved || Date.now() >= until) return best;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return null;
+  }
+
   function fieldLocator(element) {
     const grid = element.closest('[role="grid"],[role="treegrid"],table');
     return { label: getLabel(element),
@@ -1760,6 +1861,74 @@
     keyboardActivation = pending;
   }, true);
 
+  const STATUS_SELECTOR = '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]';
+  function recordableStatus(status) {
+    return status instanceof Element && !status.closest('[role="dialog"],[aria-modal="true"]') &&
+      !status.closest('#t9-recording-indicator-host') && !status.hidden &&
+      status.getAttribute('aria-hidden') !== 'true';
+  }
+  // A status message, once for each time it is shown.
+  function recordStatus(status, text) {
+    const message = String(text || "").slice(0, 300);
+    const previous = observedStatusMessages.get(status) || "";
+    observedStatusMessages.set(status, message);
+    if (!message || message === previous) return;
+    latestStatusMessage = message;
+    const interactionId = currentInteractionId();
+    const statusDescriptor = descriptor(status);
+    record({ type: "status-message", category: "result",
+      ...(interactionId ? { interactionId } : {}),
+      label: message, ...statusDescriptor,
+      uiState: { ...statusDescriptor.uiState, resultVisible: true } });
+  }
+  // A status message can change faster than anything else on the page, and by its text alone:
+  // Business Central's Page Scripting announces each step it plays ("Current step: Enter 4500
+  // in Quantity"), several in a second. Each text the message showed in between is recorded,
+  // from what the changes replaced, before the one it shows now. This observer is created
+  // before the page observer, so it sees the changes first.
+  // When a page opens, Business Central can replace a status message with a new one: what the
+  // removed message last showed is recorded, once, and so is what a new message shows when it
+  // differs from the last message recorded (a message re-created with the same text is not new).
+  const statusesIn = node => node instanceof Element
+    ? [...(node.matches(STATUS_SELECTOR) ? [node] : []), ...node.querySelectorAll(STATUS_SELECTOR)] : [];
+  const usable = status => !status.hasAttribute("aria-label") && !status.hasAttribute("title") &&
+    !status.closest('[role="dialog"],[aria-modal="true"],#t9-recording-indicator-host') &&
+    !status.hidden && status.getAttribute('aria-hidden') !== 'true';
+  const statusObserver = new MutationObserver(records => {
+    const shown = new Map();
+    for (const item of records) {
+      if (item.type === "childList") {
+        item.removedNodes.forEach(node => statusesIn(node).filter(usable)
+          .forEach(status => recordStatus(status, clean(textOf(status)))));
+        item.addedNodes.forEach(node => statusesIn(node).forEach(status => {
+          if (observedStatusMessages.has(status) || !node.isConnected || !recordableStatus(status) ||
+              !usable(status)) return;
+          const message = clean(textOf(status)).slice(0, 300);
+          if (message && message === latestStatusMessage) observedStatusMessages.set(status, message);
+          else recordStatus(status, message);
+        }));
+      }
+      const node = item.target.nodeType === Node.TEXT_NODE ? item.target.parentElement : item.target;
+      const status = node?.closest?.(STATUS_SELECTOR);
+      if (!status || !recordableStatus(status) || status.hasAttribute("aria-label") ||
+          status.hasAttribute("title")) continue;
+      // Only a change of the whole message says what it showed before: its one text, or all
+      // that the message held.
+      let before = null;
+      if (item.type === "characterData" && status.childNodes.length === 1 &&
+          status.firstChild === item.target) before = item.oldValue;
+      else if (item.type === "childList" && item.target === status) {
+        before = [...item.removedNodes].map(removed => removed.textContent || "").join("");
+      }
+      if (!shown.has(status)) shown.set(status, []);
+      if (before !== null) shown.get(status).push(clean(before));
+    }
+    shown.forEach((texts, status) => {
+      texts.forEach(text => recordStatus(status, text));
+      recordStatus(status, textOf(status));
+    });
+  });
+
   const observer = new MutationObserver(() => {
     const currentDialogs = new Set(document
       .querySelectorAll('[role="dialog"],[aria-modal="true"]'));
@@ -1793,22 +1962,8 @@
           dialogClosed: true } });
     });
 
-    document.querySelectorAll(
-      '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]'
-    ).forEach(status => {
-      if (status.closest('[role="dialog"],[aria-modal="true"]') ||
-          status.closest('#t9-recording-indicator-host') || status.hidden ||
-          status.getAttribute('aria-hidden') === 'true') return;
-      const message = textOf(status).slice(0, 300);
-      const previous = observedStatusMessages.get(status) || "";
-      observedStatusMessages.set(status, message);
-      if (!message || message === previous) return;
-      const interactionId = currentInteractionId();
-      const statusDescriptor = descriptor(status);
-      record({ type: "status-message", category: "result",
-        ...(interactionId ? { interactionId } : {}),
-        label: message, ...statusDescriptor,
-        uiState: { ...statusDescriptor.uiState, resultVisible: true } });
+    document.querySelectorAll(STATUS_SELECTOR).forEach(status => {
+      if (recordableStatus(status)) recordStatus(status, textOf(status));
     });
 
     // During a bug recording the page's error banner is error evidence, like an error dialog.
@@ -1843,10 +1998,11 @@
         .forEach(dialog => observedDialogs.add(dialog));
     }
 
-    document.querySelectorAll(
-      '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]'
-    ).forEach(status => observedStatusMessages.set(status,
+    document.querySelectorAll(STATUS_SELECTOR).forEach(status => observedStatusMessages.set(status,
       textOf(status).slice(0, 300)));
+    statusObserver.observe(document.documentElement, {
+      childList: true, subtree: true, characterData: true, characterDataOldValue: true
+    });
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true

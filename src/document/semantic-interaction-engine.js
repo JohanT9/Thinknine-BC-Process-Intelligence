@@ -659,6 +659,76 @@ function (sourceReference, captions, stepText) {
     return deepFreeze(rule);
   }
 
+  // A click in a cell of a line, and then that cell reported with the value it already showed:
+  // the click records the cell's text before anything was entered, so nothing was changed. Such
+  // a value was filled in by Business Central, for example a line's Description from its item.
+  // The click read like choosing a record ("Välj posten Isbergssallad …") and the report like
+  // entering the value; neither is a step. Both are kept as evidence, hidden like a focus change.
+  function cellClickBeforeEntryRule() {
+    const same = (first, second) => text(first).toLocaleLowerCase() === text(second).toLocaleLowerCase();
+    const rule = {
+      ruleId: "cell-click-before-entry",
+      priority: 117,
+      match(context) {
+        const value = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        if (value?.taskType !== "Select" ||
+            !["ChangeField", "EnterFieldValue"].includes(next?.taskType)) return false;
+        const clicked = meaningfulValue(value);
+        // A cell is named by its text; only a name other than the value says which field it is.
+        const field = same(controlCaption(value), clicked) ? "" : controlCaption(value);
+        const page = pageDescriptor(value).identity;
+        return Boolean(clicked) && same(clicked, meaningfulValue(next)) &&
+          (!field || !controlCaption(next) || same(businessField(field), businessField(controlCaption(next)))) &&
+          (!page || !pageDescriptor(next).identity || page === pageDescriptor(next).identity);
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index, context.index + 2);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "FocusTransition",
+          displayText: "",
+          targetField: controlCaption(values[1]),
+          hidden: true
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  // A click on a field to open it, such as an option field's list, followed by the value chosen or
+  // entered in that field: the value is the step. Alone the click read as "Välj Bokföringsmetod".
+  // Only a field's own control counts; a button or menu item with the field's name stays a step.
+  const FIELD_ROLES = new Set(["combobox", "textbox", "listbox", "searchbox", "spinbutton"]);
+  const FIELD_TYPES = new Set(["option", "lookup", "text", "date", "number"]);
+  function fieldClickBeforeEntryRule() {
+    const same = (first, second) => text(first).toLocaleLowerCase() === text(second).toLocaleLowerCase();
+    const rule = {
+      ruleId: "field-click-before-entry",
+      priority: 116,
+      match(context) {
+        const value = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        if (!["RunAction", "ClickAction"].includes(value?.taskType) ||
+            !["ChangeField", "EnterFieldValue", "SelectOption"].includes(next?.taskType)) return false;
+        const control = value.targetControl || {};
+        const page = pageDescriptor(value).identity;
+        return (FIELD_ROLES.has(text(control.role)) || FIELD_TYPES.has(text(control.type))) &&
+          Boolean(controlCaption(value)) && same(controlCaption(value), controlCaption(next)) &&
+          (!page || !pageDescriptor(next).identity || page === pageDescriptor(next).identity);
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "FocusTransition",
+          displayText: "",
+          targetField: controlCaption(value),
+          hidden: true
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   function focusTransitionRule() {
     const rule = {
       ruleId: "focus-transition",
@@ -846,6 +916,14 @@ function (sourceReference, captions, stepText) {
   function fieldEntryWithRedundantRecordSelectionRule() {
     const comparable = value => text(value).replace(/[.:]+$/gu, "")
       .toLocaleLowerCase();
+    // A row of a list names only the list's column (Nr), not the field it fills (Ursprungsnr).
+    // A row chosen right after typing in a lookup field on the same page is that field's list.
+    const lookupField = value => [value?.targetControl?.type, value?.targetControl?.controlType]
+      .includes("lookup");
+    const samePage = (first, second) => {
+      const page = value => text(value?.pageIdentity || value?.pageCaption);
+      return !page(first) || !page(second) || page(first) === page(second);
+    };
     const rule = {
       ruleId: "field-entry-with-redundant-record-selection",
       priority: 96,
@@ -861,7 +939,8 @@ function (sourceReference, captions, stepText) {
           Boolean(field && enteredValue && selectedValue) &&
           selectedValue.toLocaleLowerCase().startsWith(
             enteredValue.toLocaleLowerCase()
-          ) && selectionText.includes(field) &&
+          ) && (selectionText.includes(field) ||
+            (lookupField(current) && samePage(current, selected))) &&
           hasSortOrder(interactionText(selected));
       },
       consolidate(context) {
@@ -1495,6 +1574,8 @@ function (sourceReference, captions, stepText) {
     validatedValueOfEarlierStepRule(),
     successAcknowledgementRule(),
     fieldDialogConfirmationRule(),
+    cellClickBeforeEntryRule(),
+    fieldClickBeforeEntryRule(),
     sortedRecordSelectionRule(),
     purchaseManualPriceMenuPathRule(),
     salesPriceDiscountMenuPathRule(),

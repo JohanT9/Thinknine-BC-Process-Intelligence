@@ -20,6 +20,13 @@ const eventSnapshot = JSON.stringify(withEvent);
 const withAsset = recording.addScreenshot(deepFreeze(withEvent), 1,
   "data:image/png;base64,abc", "2026-08-10T08:01:01.000Z");
 assert.strictEqual(JSON.stringify(withEvent), eventSnapshot);
+// A screenshot taken for a control keeps where the control is, to be outlined; a box that is
+// not one is left out.
+const outlinedAsset = recording.addScreenshot(withEvent, 1, "data:image/png;base64,abc",
+  "2026-08-10T08:01:01.000Z", { highlight: { x: 0.1, y: 0.2, width: 0.3, height: 0.04 } });
+assert.deepStrictEqual(outlinedAsset.assets[0].highlight, { x: 0.1, y: 0.2, width: 0.3, height: 0.04 });
+assert.strictEqual(recording.addScreenshot(withEvent, 1, "data:image/png;base64,abc",
+  "2026-08-10T08:01:01.000Z", { highlight: { x: 0.1, y: 0.2, width: 0 } }).assets[0].highlight, undefined);
 const loaded = recording.normalize(JSON.parse(JSON.stringify(withAsset)));
 assert.strictEqual(loaded.events[0].type, "fieldChanged");
 assert.deepStrictEqual(loaded.events[0].raw.futureCaptureProperty, { retained: true });

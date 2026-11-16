@@ -189,8 +189,13 @@
     if (step.screenshots.length >= MAX_SCREENSHOTS_PER_STEP) throw new Error("test.screenshotLimit");
     // A screenshot taken from a recording of the test says so, so that a new recording can
     // replace it without touching the tester's own.
+    // It can name the control it was taken for, outlined where it is shown.
+    const box = shot.highlight || {};
+    const highlight = [box.x, box.y, box.width, box.height].every(Number.isFinite) &&
+      box.width > 0 && box.height > 0 ? { x: box.x, y: box.y, width: box.width, height: box.height } : null;
     step.screenshots.push({ screenshotId: shot.screenshotId, capturedAt: text(shot.capturedAt),
-      ...(shot.source === "recording" ? { source: "recording" } : {}) });
+      ...(shot.source === "recording" ? { source: "recording" } : {}),
+      ...(highlight ? { highlight } : {}) });
     result.updatedAt = now || result.updatedAt;
     return normalize(result);
   }
@@ -475,7 +480,38 @@
     return lines.join("\n") + "\n";
   }
 
-  return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot,
+  // A screenshot with the control it was taken for outlined, as a process document outlines the
+  // control a step clicked: red, as thin as there, a little outside the control. The stored
+  // screenshot is not changed; without a box, or outside a browser, it is shown as it is.
+  const OUTLINE = Object.freeze({ color: "#dc2626", width: 0.003, padding: 0.004 });
+  function outlinedImage(source, box) {
+    const valid = box && [box.x, box.y, box.width, box.height].every(Number.isFinite) &&
+      box.width > 0 && box.height > 0;
+    if (!valid || typeof document === "undefined" || typeof Image === "undefined") {
+      return Promise.resolve(source);
+    }
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+          const context = canvas.getContext("2d");
+          context.drawImage(image, 0, 0);
+          const line = Math.max(2, Math.round(canvas.width * OUTLINE.width));
+          context.strokeStyle = OUTLINE.color;
+          context.lineWidth = line;
+          context.strokeRect((box.x - OUTLINE.padding) * canvas.width, (box.y - OUTLINE.padding) * canvas.height,
+            (box.width + 2 * OUTLINE.padding) * canvas.width, (box.height + 2 * OUTLINE.padding) * canvas.height);
+          resolve(canvas.toDataURL("image/png"));
+        } catch { resolve(source); }
+      };
+      image.onerror = () => resolve(source);
+      image.src = source;
+    });
+  }
+
+  return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot, outlinedImage,
     applyChanges, applyRecordingCheck, applyRecordingResults, bugReportContent, byRecording,
     cancel, withTester, failureFromSuggestion, liveCheckFailed, resume, statusKey,
     recordingCheckFailed, suggestedPasses, carryOver, countsText, create, csv, markdown, normalize,

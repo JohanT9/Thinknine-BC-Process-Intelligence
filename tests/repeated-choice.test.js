@@ -78,4 +78,25 @@ const chosen = steps(require("./fixtures/repeated-choice/row-marked-for-line-act
   .filter(event => event.role !== "menuitem" && event.type !== "dialog-open"));
 assert.ok(chosen.every(task => !/^Markera raden/u.test(task.instruction)),
   "a line not followed by an action is not described as marked");
+// A click in a line's cell, and then the cell reported with the value it already showed (filled in
+// by Business Central from the item), is no step: nothing was chosen or entered. Before, this read
+// as choosing a record named after the description and as entering it.
+const description = "Isbergssallad strimlad 6mm 6x1,5kg SE/DK/NO WELL";
+const lineRow = [{ caption: "", heuristic: false, identity: "", type: "repeater" },
+  { caption: "", heuristic: false, identity: "", type: "row" }];
+const production = { pageCaption: "Släppt produktionsorder", pageId: "99000831", uiHierarchy: lineRow };
+const cellThenEntry = [
+  { ...production, type: "click", category: "selection", role: "gridcell", controlType: "td",
+    label: description, accessibleName: description, selectedValue: description, pointerTarget: true,
+    interactionId: "frame:cell", timestamp: at(1) },
+  { ...production, type: "field-change", category: "field", role: "textbox", controlType: "input",
+    label: "Beskrivning", fieldName: "Beskrivning", accessibleName: "Beskrivning", value: description,
+    inputSource: "change", interactionId: "frame:entry", timestamp: at(3) }
+].map((event, index) => ({ ...event, sourceEventId: `cell:${index + 1}`, sourceSequence: index + 1 }));
+const cellSteps = replay(cellThenEntry, { documentLanguage: "sv-SE" }).tasks.map(task => task.instruction);
+assert.deepStrictEqual(cellSteps, [], JSON.stringify(cellSteps));
+// Another value entered after the click is a change and stays a step.
+const cellOther = replay(cellThenEntry.map((event, index) => index === 1 ? { ...event, value: "Ny text" } : event),
+  { documentLanguage: "sv-SE" }).tasks.map(task => task.instruction);
+assert.ok(cellOther.includes("Ange __Ny text__ i **Beskrivning**."), JSON.stringify(cellOther));
 console.log("Repeated choice tests passed.");

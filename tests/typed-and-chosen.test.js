@@ -38,4 +38,25 @@ const prefix = replay([typeIn(page, "Leverantörsnamn", "1197", 1, "inner:vendor
   ({ ...event, sourceEventId: `prefix:${index + 1}`, sourceSequence: index + 1 })),
 { documentLanguage: "sv-SE" }).tasks;
 assert.ok(prefix.every(task => !/1197__/u.test(task.instruction)), JSON.stringify(prefix.map(t => t.instruction)));
+// Any lookup field, not only a known one: typing a number and clicking its row in the field's
+// list is one step, although the row names only the list's column (Nr), not the field.
+const production = { ...page, recordingId: "origin", pageCaption: "Släppt produktionsorder", pageId: "99000831" };
+for (const [row, typedValue, chosen] of [
+  ['Nr, sorterade i Stigande order Välj posten "3"', "3", "3"],
+  ['Nr, sorterade i Stigande order Välj posten "30043"', "300", "30043"],
+  ["N°, trié dans l’ordre Croissant Choisir l’enregistrement « 30043 »", "300", "30043"],
+  ['Nr., Sortierreihenfolge Aufsteigend Datensatz "30043" auswählen', "300", "30043"]]) {
+  const origin = replay([typeIn(production, "Ursprungsnr", typedValue, 1, "inner:origin"),
+    choose(production, "", 2, "inner:origin-row")].map((event, index) => ({ ...event,
+    ...(index === 1 ? { label: row, accessibleName: row } : {}),
+    sourceEventId: `origin:${index + 1}`, sourceSequence: index + 1 })),
+  { documentLanguage: "sv-SE" }).tasks.map(task => task.instruction);
+  assert.deepStrictEqual(origin, [`Ange __${chosen}__ i **Ursprungsnr**.`], row);
+}
+// A typed value that is not the start of the record chosen stays two steps: both are kept.
+const other = replay([typeIn(production, "Ursprungsnr", "9", 1, "inner:origin"),
+  choose(production, "30043", 2, "inner:origin-row")].map((event, index) =>
+  ({ ...event, sourceEventId: `other:${index + 1}`, sourceSequence: index + 1 })),
+{ documentLanguage: "sv-SE" }).tasks.map(task => task.instruction);
+assert.strictEqual(other.length, 2, JSON.stringify(other));
 console.log("Typed and chosen tests passed in all document languages.");

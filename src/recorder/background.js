@@ -303,6 +303,11 @@ let screenshotQueue = [];
 let screenshotWorkerRunning = false;
 let screenshotWorkerPromise = Promise.resolve();
 let lastScreenshotAt = 0;
+// When a screenshot was last asked of Edge, by any part of the recording: Edge allows about
+// two a second and refuses more.
+let lastCaptureCallAt = 0;
+// Screenshots of played steps waiting to be taken; other screenshots wait for them.
+let playbackPending = 0;
 let lastScreenshotError = null;
 const preActionCaptures = new Map();
 
@@ -589,6 +594,13 @@ async function technicalDiagnosticsPolicyEnabled() {
 // Value regions measured for recent bug report screenshots, by image, until the image is
 // stored with its event.
 const captureValueRegions = new Map();
+// When screenshots were asked for in the last second: Edge allows two a second.
+const captureCalls = [];
+const CAPTURE_CALLS_PER_SECOND = 2;
+function captureSlotWait(now = Date.now()) {
+  while (captureCalls.length && now - captureCalls[0] >= 1000) captureCalls.shift();
+  return captureCalls.length < CAPTURE_CALLS_PER_SECOND ? 0 : captureCalls[0] + 1000 + 50 - now;
+}
 function valueRegionsFor(image) {
   const details = captureValueRegions.get(image);
   captureValueRegions.delete(image);
@@ -611,9 +623,12 @@ async function capture(tabId, options = {}) {
     } catch {}
     const hidden = await Promise.allSettled(captureFrames.map(frameId => chrome.tabs.sendMessage(tabId, {
       type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", captureId, hidden: true,
-      collectValueRegions: Boolean(options.valueRegions)
+      collectValueRegions: Boolean(options.valueRegions),
+      collectPlaybackTarget: Boolean(options.playbackTarget)
     }, { frameId })));
 
+    lastCaptureCallAt = Date.now();
+    captureCalls.push(lastCaptureCallAt);
     const image = await chrome.tabs.captureVisibleTab(tab.windowId, {
       format: "png"
     });
@@ -625,6 +640,11 @@ async function capture(tabId, options = {}) {
       while (captureValueRegions.size > 8) {
         captureValueRegions.delete(captureValueRegions.keys().next().value);
       }
+    }
+    // Where the control of a played step was as the screenshot was taken, if it still shows.
+    if (image && options.playbackTarget) {
+      options.playbackTarget.bounds = hidden.map(result => result.value?.playbackBounds)
+        .find(Boolean) || null;
     }
     return image;
   } catch (error) {
@@ -720,9 +740,15 @@ async function processScreenshotQueue() {
 
   try {
     while (screenshotQueue.length) {
+      // A played step's control can be gone a moment later: its screenshot goes first, such
+      // as before that of the click that stepped the script on.
+      for (const until = Date.now() + 4000; playbackPending > 0 && Date.now() < until;) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
       const waitMs = Math.max(
         0,
-        SCREENSHOT_MIN_INTERVAL_MS - (Date.now() - lastScreenshotAt)
+        SCREENSHOT_MIN_INTERVAL_MS - (Date.now() - Math.max(lastScreenshotAt, lastCaptureCallAt)),
+        captureSlotWait()
       );
 
       if (waitMs > 0) {
@@ -794,6 +820,50 @@ async function processScreenshotQueue() {
   } finally {
     screenshotWorkerRunning = false;
   }
+}
+
+// Screenshots of played steps are taken one at a time, at Edge's pace for screenshots, in the
+// order the steps were played. The page finds the step's control and waits briefly for the
+// value the step entered; the screenshot is taken whether or not the control was found.
+const PLAYBACK_TARGET_TIMEOUT_MS = 2500;
+const PLAYBACK_CAPTURE_ATTEMPTS = 3;
+let playbackScreenshots = Promise.resolve();
+function schedulePlaybackScreenshot(item) {
+  screenshotStats.requested += 1;
+  playbackPending += 1;
+  playbackScreenshots = playbackScreenshots.then(() => takePlaybackScreenshot(item)).catch(error => {
+    screenshotStats.errors += 1;
+    lastScreenshotError = String(error?.message || error);
+  }).finally(() => { playbackPending -= 1; });
+}
+async function takePlaybackScreenshot({ recordingId, eventNo, eventId, tabId, frameId, step }) {
+  const state = await getState();
+  if (!state.recording || state.sessionId !== recordingId || !tabId) return;
+  await Promise.race([
+    chrome.tabs.sendMessage(tabId, { type: "T9_PLAYBACK_TARGET", kind: step.kind,
+      caption: step.caption, value: step.value, operationText: step.operationText || "",
+      label: step.label || "" }, { frameId }).catch(() => null),
+    new Promise(resolve => setTimeout(() => resolve(null), PLAYBACK_TARGET_TIMEOUT_MS + 500))]);
+  // The control is measured as the screenshot is taken, so the outline is where it is shown.
+  // Edge refuses a screenshot asked too soon after another, such as those of the click that
+  // stepped the script on; it is asked again, a few times.
+  const playbackTarget = {};
+  let image = null;
+  for (let attempt = 0; attempt < PLAYBACK_CAPTURE_ATTEMPTS && !image; attempt += 1) {
+    // Taken as soon as Edge allows, which can be right after another screenshot; once a
+    // screenshot was refused, at Edge's usual pace.
+    const waitMs = attempt === 0 ? captureSlotWait()
+      : SCREENSHOT_MIN_INTERVAL_MS - (Date.now() - Math.max(lastScreenshotAt, lastCaptureCallAt));
+    if (waitMs > 0) await new Promise(resolve => setTimeout(resolve, waitMs));
+    if (!(await getState()).recording) return;
+    image = await capture(tabId, { playbackTarget });
+    lastScreenshotAt = Date.now();
+  }
+  if (!image) { screenshotStats.dropped += 1; return; }
+  await saveScreenshot(recordingId, String(eventNo), image);
+  await canonicalStore.associateScreenshot(recordingId, eventId, image, new Date().toISOString(),
+    playbackTarget.bounds ? { highlight: playbackTarget.bounds } : {});
+  screenshotStats.captured += 1;
 }
 
 async function consumePreActionCapture(event, captureContext, recordingId) {
@@ -913,7 +983,16 @@ async function recordEvent(rawEvent, captureContext = {}) {
 
     if (alreadyCanonical) return { recordingId, canonicalEvent, event };
 
-    if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
+    // A step Page Scripting plays during a test is announced, not clicked: its screenshot is
+    // taken once its field or button is found, with that control outlined.
+    const playedStep = session.testRunId && event.type === "status-message" &&
+      settings.captureScreenshots !== false && settings.screenshotMode !== "none"
+      ? globalThis.T9TestRecordingMatch.playbackStep(event.label) : null;
+    if (playedStep && playedStep.kind !== "open") {
+      schedulePlaybackScreenshot({ recordingId, eventNo: event.eventNo, eventId: canonicalEvent.id,
+        tabId: captureContext.tabId || acceptedState.tabId, frameId: captureContext.frameId ?? 0,
+        step: { ...playedStep, label: String(event.label || "") } });
+    } else if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
       const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
       const preActionImage = await consumePreActionCapture(event,
         captureContext, recordingId);
@@ -1712,6 +1791,8 @@ async function stopTestRecording() {
   const active = state.sessionId ? await getSession(state.sessionId) : null;
   if (!active?.testRunId) throw new Error("test.noTestRecording");
   const run = await loadTestRun(active.testRunId);
+  // Screenshots of the steps Page Scripting played last are taken before the recording ends.
+  await Promise.race([playbackScreenshots, new Promise(resolve => setTimeout(resolve, 8000))]);
   const session = await stopSession("", run?.documentLanguage || "");
   return compareTestRecording(session.id);
 }
@@ -1729,22 +1810,30 @@ async function testRecordingErrors(recordingId, recording) {
       : raw.accessibleName || raw.label || raw.text;
     return String(value || "").replace(/\s+/gu, " ").trim();
   };
-  return task => {
+  const failure = task => {
     const verification = task.resultVerification || {};
     if (verification.status !== "error") return {};
     const outcomes = (verification.outcomes || []).filter(item => item.kind === "error-outcome");
     const text = outcomes.flatMap(item => item.sourceEventIds || []).map(message).find(Boolean) || "";
     return { failed: true, error: text };
   };
+  // A step Page Scripting played back fails with the error Business Central showed after it.
+  failure.played = step => step.errorEventId
+    ? { ...step, failed: true, error: message(step.errorEventId) } : step;
+  return failure;
 }
 
 // For each step found in a test recording, the last screenshot of the recorded step, stored
 // as a test screenshot with the values measured when it was taken.
-async function testRecordingScreenshots(recordingId, recording, run, check, tasks, capturedAt) {
+async function testRecordingScreenshots(recordingId, recording, run, check, tasks, capturedAt, played = []) {
   const assets = new Map((recording.assets || []).map(asset => [asset.id, asset]));
-  const wanted = check.steps.filter(step => Number.isInteger(step.taskIndex)).map(step => {
-    const assetId = (tasks[step.taskIndex]?.screenshotAssetIds || []).at(-1);
-    const asset = assetId && assets.get(assetId);
+  // A step Page Scripting played back has its screenshot by when it was taken.
+  const playedAssets = globalThis.T9TestRecordingMatch.playbackScreenshots(recording.assets, played);
+  const wanted = check.steps.filter(step => Number.isInteger(step.taskIndex) ||
+    (Number.isInteger(step.playedIndex) && !step.onTheWay)).map(step => {
+    const assetId = Number.isInteger(step.taskIndex) ? (tasks[step.taskIndex]?.screenshotAssetIds || []).at(-1) : "";
+    const asset = Number.isInteger(step.taskIndex) ? assetId && assets.get(assetId)
+      : playedAssets[step.playedIndex];
     const eventNo = Number(asset?.metadata?.legacyEventNo);
     return asset && Number.isSafeInteger(eventNo) ? { stepId: step.stepId, asset, key: String(eventNo) } : null;
   }).filter(Boolean);
@@ -1759,7 +1848,8 @@ async function testRecordingScreenshots(recordingId, recording, run, check, task
     await chrome.storage.local.set({ [key]: { image, capturedAt: item.asset.createdAt || capturedAt,
       ...(Array.isArray(item.asset.valueRegions) ? { valueRegions: item.asset.valueRegions,
         valueRegionsComplete: item.asset.valueRegionsComplete !== false } : {}) } });
-    shots.push({ stepId: item.stepId, screenshotId, key, capturedAt: item.asset.createdAt || capturedAt });
+    shots.push({ stepId: item.stepId, screenshotId, key, capturedAt: item.asset.createdAt || capturedAt,
+      ...(item.asset.highlight ? { highlight: item.asset.highlight } : {}) });
   }
   return shots;
 }
@@ -1778,7 +1868,9 @@ async function checkTestRecording(recordingId, run) {
   const tasks = (await deriveBugReportTasks(masked,
     await screenshotAssetStore.manifest(recordingId), { repository: true })).map(task => ({ ...task,
     at: timeOf.get((task.sourceEventIds || [])[0]) || "", ...errorOf(task) }));
-  return { recording, tasks, check: globalThis.T9TestRecordingMatch.check(run.steps, tasks) };
+  // Page Scripting plays a test back without clicks or typing; its announced steps count.
+  const played = globalThis.T9TestRecordingMatch.playbackSteps(masked.events).map(errorOf.played);
+  return { recording, tasks, played, check: globalThis.T9TestRecordingMatch.check(run.steps, tasks, played) };
 }
 
 // While a test is recorded, the recording is compared with the test shortly after the
@@ -1828,11 +1920,11 @@ async function compareTestRecording(recordingId) {
     throw new Error("test.runNotFound");
   }
   try {
-    const { recording, tasks, check } = await checkTestRecording(recordingId, run);
+    const { recording, tasks, played, check } = await checkTestRecording(recordingId, run);
     const now = new Date().toISOString();
     // The screenshot of each step found in the recording goes with the step, in place of the
     // ones an earlier recording gave it; the tester's own screenshots are kept.
-    const shots = await testRecordingScreenshots(recordingId, recording, run, check, tasks, now);
+    const shots = await testRecordingScreenshots(recordingId, recording, run, check, tasks, now, played);
     const replaced = run.steps.flatMap(step => step.screenshots.filter(shot =>
       shot.source === "recording").map(shot => ({ stepId: step.stepId, screenshotId: shot.screenshotId })));
     let saved;
@@ -1846,7 +1938,8 @@ async function compareTestRecording(recordingId) {
           const step = result.steps.find(entry => entry.stepId === shot.stepId);
           if (step && step.screenshots.length < globalThis.T9TestScript.MAX_SCREENSHOTS_PER_STEP) {
             result = globalThis.T9TestScript.addScreenshot(result, shot.stepId, { screenshotId:
-              shot.screenshotId, capturedAt: shot.capturedAt, source: "recording" }, now);
+              shot.screenshotId, capturedAt: shot.capturedAt, source: "recording",
+              ...(shot.highlight ? { highlight: shot.highlight } : {}) }, now);
           }
         }
         return result;
