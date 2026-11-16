@@ -369,6 +369,8 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
     $("status").className = "status" + (active ? " rec" : "");
     updateText($("recordingGuidance"), testRecording ? t("test.recordingTestGuidance")
       : bugRecording ? t("recorder.bugGuidance") : t("recorder.processGuidance"));
+    // A test recording is followed in the test's own panel.
+    $("showRecordingPanel").hidden = testRecording;
     updateText($("stop"), testRecording ? t("test.stopTest")
       : bugRecording ? t("recorder.stopBug") : t("recorder.stopProcess"));
 
@@ -390,7 +392,25 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
   }
 });
 
+// The tab the popup was opened on, known before any click: the browser opens a side panel only
+// straight from a click, so nothing may be awaited before the panel is opened.
+let popupTab = null;
+void currentTab().then(tab => { popupTab = tab || null; }, () => {});
+
+// Opens the recording beside Business Central in the side panel of the popup's window. It
+// resolves to whether the panel was opened; null when this browser has no side panel.
+function openRecordingPanel({ starting = false } = {}) {
+  const tab = popupTab;
+  if (!chrome.sidePanel?.open || !tab?.windowId) return null;
+  chrome.sidePanel.setOptions({ enabled: true,
+    path: starting ? "recording-panel.html?starting=1" : "recording-panel.html" }).catch(() => {});
+  return chrome.sidePanel.open({ windowId: tab.windowId }).then(() => true, () => false);
+}
+
 async function startRecording(recordingPurpose) {
+  // The panel opens at once and waits there while the start is checked below.
+  const panelOpened = isBusinessCentralTab(popupTab)
+    ? openRecordingPanel({ starting: true }) : null;
   setStarting(true);
   showMessage(t("recorder.checking"));
   try {
@@ -418,14 +438,26 @@ async function startRecording(recordingPurpose) {
     }
     showMessage(recordingPurpose === "bug-report"
       ? t("recorder.bugStarted") : t("recorder.processStarted"));
+    // The panel beside Business Central takes over from here.
+    if (await panelOpened) { window.close(); return; }
     await refresh();
     await updateLicenseCard();
   } catch (error) {
     showMessage(error.message, true);
+    // The panel opened for this start would otherwise wait for a recording that never comes.
+    if (panelOpened) {
+      void chrome.runtime.sendMessage({ type: "T9_RECORDING_PANEL_START_FAILED" }).catch(() => {});
+    }
   } finally {
     setStarting(false);
   }
 }
+
+$("showRecordingPanel").addEventListener("click", () => {
+  const opened = openRecordingPanel();
+  if (!opened) { showMessage(t("recPanel.unavailable"), true); return; }
+  opened.then(ok => ok ? window.close() : showMessage(t("recPanel.unavailable"), true));
+});
 
 // Creates a bug report from the Business Central error dialog that is open now, without a
 // recording of the steps before it.

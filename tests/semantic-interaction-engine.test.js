@@ -46,6 +46,19 @@ const englishSortedRecord = only([{
   instruction: 'Välj No., sorted in Ascending order Open record "SO100049".'
 }], "SelectRecord", "Välj försäljningsordern **SO100049**.");
 assert.strictEqual(englishSortedRecord.selectedValue, "SO100049");
+// A list row in any client language: the step names the record, not the column's sort order.
+for (const caption of [
+  "N°, trié dans l’ordre Croissant Choisir l’enregistrement « 30043 »",
+  'Nr., Sortierreihenfolge Aufsteigend Datensatz "30043" auswählen',
+  'N.º, ordenados en el pedido Ascendente Elegir el registro "30043"',
+  'Nr., sorteret i rækkefølgen Stigende Vælg posten "30043".',
+  'Nro, järjestettynä Nouseva mukaan Valitse tietue "30043"',
+  'Nr., sortert i Stigende rekkefølge Velg posten "30043"']) {
+  const row = only([{ taskId: "row", taskType: "RunAction", actionCaption: caption,
+    sourceEventNos: [2] }], "SelectRecord", "Välj posten **30043**.");
+  assert.strictEqual(row.selectedValue, "30043", caption);
+  assert.strictEqual(row.rawInteractions[0].actionCaption, caption, "the captured caption is kept");
+}
 assert.strictEqual(englishSortedRecord.rawInteractions[0].actionCaption,
   'No., sorted in Ascending order Open record "SO100049".');
 only([{

@@ -119,4 +119,21 @@ for (const text of ["Aviseringar: 2 Denna kund har förfallet saldo", "SO1000269
   assert(!captions.isAnnouncement(text), `not an announcement: ${text}`);
 }
 
+// The sort order a column's name carries for screen readers is left out, in every language.
+for (const [caption, expected] of [
+  ["Nr, sorterade i Stigande order Välj posten \"3\"", "Nr Välj posten \"3\""],
+  ["No., sorted in Descending order Select record \"3\"", "No. Select record \"3\""],
+  ["N°, trié dans l'ordre Croissant Choisir", "N° Choisir"],
+  ["N°, trié dans l’ordre Décroissant Choisir", "N° Choisir"],
+  ["Nr., Sortierreihenfolge Aufsteigend Datensatz", "Nr. Datensatz"],
+  ["N.º, ordenados en el pedido Ascendente Elegir", "N.º Elegir"],
+  ["Nr., sorteret i rækkefølgen Stigende Vælg", "Nr. Vælg"],
+  ["Nro, järjestettynä Nouseva mukaan Valitse", "Nro Valitse"],
+  ["Nr., sortert i Stigende rekkefølge Velg", "Nr. Velg"],
+  ["Bokför", "Bokför"], ["Sorteringsordning", "Sorteringsordning"], ["", ""]]) {
+  assert.strictEqual(captions.withoutSorting(caption), expected, caption);
+}
+assert.deepStrictEqual(Object.keys(captions.SORT_TEXTS).sort(),
+  ["da-DK", "de-DE", "en-US", "es-ES", "fi-FI", "fr-FR", "nb-NO", "sv-SE"]);
+
 console.log("Business Central client caption tests passed.");

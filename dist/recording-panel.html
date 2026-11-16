@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Recording</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    [hidden]{display:none!important}
+    html{overflow-x:hidden}
+    body{font:15px "Segoe UI",system-ui,sans-serif;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-ffffff);overflow-x:hidden}
+    main{box-sizing:border-box;min-height:100vh;display:flex;flex-direction:column;min-width:0}
+    .rp-head{display:grid;gap:4px;padding:12px 14px 10px;border-bottom:1px solid var(--c-bd-ccd5df)}
+    .rp-state{display:flex;align-items:center;gap:8px;margin:0;font-size:.875rem;font-weight:700;color:var(--c-fg-526273)}
+    .rp-state .dot{width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:var(--c-bd-8392a5)}
+    .rp-state[data-state=recording]{color:var(--c-fg-8a1c14)}
+    .rp-state[data-state=recording] .dot{background:var(--c-bd-b42318);animation:rp-pulse 1.6s infinite}
+    @keyframes rp-pulse{50%{opacity:.35}}
+    @media (prefers-reduced-motion:reduce){.rp-state[data-state=recording] .dot{animation:none}}
+    .rp-time{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-fg-526273)}
+    .rp-meta{margin:0;font-size:.8125rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .rp-warning{margin:6px 0 0;padding:8px 10px;border-left:4px solid var(--c-fg-9a3412);border-radius:6px;background:var(--c-bg-fff7ed);color:var(--c-fg-9a3412);font-size:.8125rem;font-weight:600;overflow-wrap:anywhere}
+    .rp-body{flex:1;display:grid;align-content:start;gap:12px;padding:12px 14px;min-width:0}
+    .rp-body h1{margin:0;font-size:1.05rem;line-height:1.3}
+    .rp-body h2{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c-fg-526273)}
+    .rp-body p{margin:0;line-height:1.45;overflow-wrap:anywhere}
+    .rp-help{font-size:.875rem;color:var(--c-fg-526273)}
+    .rp-earlier{margin:-4px 0 0;padding:0;list-style:none;display:grid;gap:2px}
+    .rp-earlier li{display:grid;gap:0;padding:5px 10px;border-left:3px solid var(--c-bd-ccd5df);font-size:.875rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .rp-earlier li span{font-size:.75rem}
+    .rp-latest{display:grid;gap:2px;padding:10px 12px;border:2px solid var(--c-bd-008489);border-radius:8px;min-width:0}
+    .rp-latest-text{font-weight:600}
+    .rp-latest-page{font-size:.8125rem;color:var(--c-fg-526273)}
+    .rp-latest[data-empty]{border-style:dashed;border-color:var(--c-bd-ccd5df)}
+    .rp-latest[data-empty] .rp-latest-text{font-weight:400;color:var(--c-fg-526273)}
+    .rp-actions{display:grid;gap:6px}
+    .rp-action{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:start;gap:10px;width:100%;margin:0;padding:9px 10px;border:1px solid var(--c-bd-8392a5);border-radius:8px;background:var(--c-bg-ffffff);color:var(--c-fg-172b4d);font:inherit;text-align:left;cursor:pointer}
+    .rp-action:hover:not(:disabled){background:var(--c-bg-eefafa);border-color:var(--c-bd-008489)}
+    .rp-action:focus-visible{outline:var(--focusWidth, 2px) solid var(--colorFocusIndicator, var(--c-bd-008489));outline-offset:2px}
+    .rp-action:disabled{cursor:default;opacity:.6}
+    .rp-action[data-applied],.rp-action[data-applied]:hover{border-color:var(--c-bd-15803d);background:var(--c-bg-e9f7ed);cursor:default}
+    .rp-action svg{width:20px;height:20px;margin-top:1px}
+    .rp-action-copy{display:grid;gap:2px;min-width:0}
+    .rp-action-copy strong{font-size:.9375rem}
+    .rp-action-copy span{font-size:.8125rem;line-height:1.4;color:var(--c-fg-526273)}
+    .rp-done{align-self:center;font-size:.75rem;font-weight:700;color:var(--c-fg-18713a);white-space:nowrap}
+    .rp-feedback{min-height:1.3em;font-size:.875rem;color:var(--c-fg-166534)}
+    .rp-feedback[data-error]{color:var(--c-fg-8a1c14);font-weight:600}
+    .rp-foot{display:grid;gap:10px;padding:12px 14px 14px;border-top:1px solid var(--c-bd-ccd5df);background:var(--c-bg-ffffff);position:sticky;bottom:0}
+    .rp-foot form{display:grid;gap:10px;margin:0}
+    main[data-view=form] .rp-foot,main[data-view=busy] .rp-foot,main[data-view=done] .rp-foot{flex:1;align-content:start;border-top:0;position:static}
+    .rp-foot h2{margin:0;font-size:1rem}
+    .rp-foot label{display:grid;gap:4px;font-size:.8125rem;font-weight:600}
+    .rp-foot input,.rp-foot select{box-sizing:border-box;width:100%;padding:8px 9px;border:1px solid var(--c-bd-8392a5);border-radius:5px;font:inherit;background:var(--c-bg-ffffff);color:inherit}
+    .rp-foot .rp-help{font-size:.8125rem;margin:0}
+    .rp-buttons{display:flex;flex-wrap:wrap;gap:8px}
+    .rp-buttons button{flex:1 1 140px}
+    .rp-foot button,.rp-body .rp-buttons button{margin:0;min-height:38px;padding:8px 12px;font:inherit;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid var(--c-bd-8392a5);background:var(--c-bg-ffffff);color:var(--c-fg-172b4d)}
+    .rp-foot button.primary,.rp-body .rp-buttons button.primary{background:var(--c-bg-008489);border-color:var(--c-bd-008489);color:var(--c-fg-ffffff)}
+    .rp-foot button.primary:hover:not(:disabled),.rp-body .rp-buttons button.primary:hover:not(:disabled){background:var(--c-bg-006f73)}
+    .rp-foot button.danger{background:var(--c-bg-b42318);border-color:var(--c-bd-b42318);color:var(--c-fg-ffffff)}
+    .rp-foot button:disabled{opacity:.6;cursor:default}
+    .rp-foot button.rp-link,.rp-foot button.rp-link:hover{justify-self:start;min-height:0;padding:2px 0;border-color:transparent!important;background:none;color:var(--c-fg-8a1c14);font-weight:500;text-decoration:underline}
+    .rp-confirm{display:grid;gap:8px;padding:10px;border-left:4px solid var(--c-bd-b42318);border-radius:6px;background:var(--c-bg-fff4f2)}
+    .rp-error{margin:0;font-size:.875rem;font-weight:600;color:var(--c-fg-8a1c14);overflow-wrap:anywhere}
+    .rp-error:empty{display:none}
+    .rp-busy{margin:0;font-size:.9375rem;font-weight:600}
+    .rp-done-box{display:grid;gap:10px}.rp-done-box h2{margin:0;font-size:1rem}.rp-done-box h2:focus{outline:none}
+    .rp-done-box p{margin:0;line-height:1.45;overflow-wrap:anywhere}
+    .rp-done-name{padding:8px 10px;border-left:4px solid var(--c-bd-008489);background:var(--c-bg-eefafa);font-weight:600}
+  </style>
+</head>
+<body>
+  <main id="recordingPanel" data-view="starting">
+    <header class="rp-head">
+      <p id="rpState" class="rp-state" role="status" data-state="idle">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="rpStateText" data-i18n="recPanel.stateStarting">Starting the recording…</span>
+        <span id="rpTime" class="rp-time" data-i18n-ignore hidden></span>
+      </p>
+      <p id="rpContext" class="rp-meta" data-i18n-ignore hidden></p>
+      <p id="rpCounts" class="rp-meta" data-i18n-ignore hidden></p>
+      <p id="rpWarning" class="rp-warning" role="status" data-i18n-ignore hidden></p>
+    </header>
+
+    <!-- Starting, no recording, a test recording, or a recording ended elsewhere. -->
+    <section id="rpInfo" class="rp-body" aria-labelledby="rpInfoTitle">
+      <h1 id="rpInfoTitle" data-i18n-ignore></h1>
+      <p id="rpInfoHelp" class="rp-help" data-i18n-ignore></p>
+      <div class="rp-buttons">
+        <button id="rpOpenLibrary" type="button" data-i18n="recorder.openLibrary" hidden>Open Document Library</button>
+        <button id="rpCloseInfo" type="button" data-i18n="recPanel.close">Close panel</button>
+      </div>
+    </section>
+
+    <!-- The latest step and what can be marked on it. -->
+    <section id="rpLive" class="rp-body" aria-labelledby="rpLatestHeading" hidden>
+      <h2 id="rpEarlierHeading" data-i18n="recPanel.earlierHeading" hidden>Earlier steps</h2>
+      <ol id="rpEarlier" class="rp-earlier" aria-labelledby="rpEarlierHeading" data-i18n-ignore hidden></ol>
+      <h2 id="rpLatestHeading" data-i18n="recPanel.latestHeading">Latest step</h2>
+      <div id="rpLatest" class="rp-latest" data-empty>
+        <p id="rpLatestText" class="rp-latest-text" data-i18n-ignore></p>
+        <p id="rpLatestPage" class="rp-latest-page" data-i18n-ignore hidden></p>
+      </div>
+      <h2 id="rpActionsHeading" data-i18n="recPanel.actionsHeading">Change how the step appears in the document</h2>
+      <div class="rp-actions" role="group" aria-labelledby="rpActionsHeading">
+        <button class="rp-action" type="button" data-kind="use-image" aria-describedby="rpHelpImage">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="16" height="12" rx="1.5"/><circle cx="7" cy="8.5" r="1.5"/><path d="M17.5 13.5l-4-4L6 16"/></svg>
+          <span class="rp-action-copy"><strong data-i18n="recPanel.useImage">Use this screenshot</strong>
+            <span id="rpHelpImage" data-i18n="recPanel.useImageHelp"></span></span>
+          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
+        </button>
+        <button class="rp-action" type="button" data-kind="new-section" aria-describedby="rpHelpSection">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M3 9h9M3 14h14" /><path d="M3 11.5h14" stroke-dasharray="2 2"/></svg>
+          <span class="rp-action-copy"><strong data-i18n="recPanel.newSection">New section after this step</strong>
+            <span id="rpHelpSection" data-i18n="recPanel.newSectionHelp"></span></span>
+          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
+        </button>
+        <button class="rp-action" type="button" data-kind="ignore" aria-describedby="rpHelpIgnore">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z"/><circle cx="10" cy="10" r="2.3"/><path d="M3 17L17 3"/></svg>
+          <span class="rp-action-copy"><strong data-i18n="recPanel.ignore">Leave out of the document</strong>
+            <span id="rpHelpIgnore" data-i18n="recPanel.ignoreHelp"></span></span>
+          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
+        </button>
+      </div>
+      <p class="rp-help" data-i18n="recPanel.reviewLater">You can change everything when you review the document.</p>
+      <p id="rpFeedback" class="rp-feedback" role="status" aria-live="polite" data-i18n-ignore></p>
+    </section>
+
+    <footer id="rpFoot" class="rp-foot" hidden>
+      <div id="rpRecordingActions" class="rp-buttons">
+        <button id="rpStop" type="button" class="primary" data-i18n-ignore></button>
+      </div>
+
+      <form id="rpSaveForm" aria-labelledby="rpSaveTitle" novalidate hidden>
+        <h2 id="rpSaveTitle" data-i18n="recPanel.saveTitle">Save the recording</h2>
+        <label for="rpName"><span data-i18n="recPanel.nameLabel">Name</span>
+          <input id="rpName" maxlength="120" autocomplete="off" required aria-describedby="rpNameHelp"
+            data-i18n-placeholder="recorder.nameProcessPlaceholder">
+        </label>
+        <p id="rpNameHelp" class="rp-help" data-i18n="recorder.nameProcessHelp">Enter the name to display in the Document Library.</p>
+        <label for="rpDocumentLanguage"><span data-i18n="settings.documentLanguage">Document language</span>
+          <select id="rpDocumentLanguage" data-language-select="document" aria-describedby="rpLanguageHelp"></select>
+        </label>
+        <p id="rpLanguageHelp" class="rp-help" data-i18n="recorder.documentLanguageHelp"></p>
+        <p class="rp-help" data-i18n="recPanel.stillRecording">The recording continues until you save.</p>
+        <p id="rpFormError" class="rp-error" role="alert" data-i18n-ignore></p>
+        <div class="rp-buttons">
+          <button id="rpContinue" type="button" data-i18n="recorder.continueRecording">Continue recording</button>
+          <button id="rpSave" type="submit" class="primary" data-i18n="recorder.saveAndStop">Save and stop</button>
+        </div>
+        <button id="rpDiscard" type="button" class="rp-link" data-i18n="recorder.discardRecording" aria-expanded="false" aria-controls="rpConfirm">Delete recording</button>
+        <div id="rpConfirm" class="rp-confirm" hidden>
+          <p data-i18n="recorder.discardConfirm"></p>
+          <div class="rp-buttons">
+            <button id="rpDiscardNo" type="button" data-i18n="recPanel.keepRecording">Keep the recording</button>
+            <button id="rpDiscardYes" type="button" class="danger" data-i18n="recorder.discardRecording">Delete recording</button>
+          </div>
+        </div>
+      </form>
+
+      <p id="rpBusy" class="rp-busy" role="status" aria-live="polite" data-i18n-ignore hidden></p>
+
+      <div id="rpDone" class="rp-done-box" hidden>
+        <h2 id="rpDoneTitle" data-i18n-ignore tabindex="-1"></h2>
+        <p id="rpDoneName" class="rp-done-name" data-i18n-ignore hidden></p>
+        <p id="rpDoneHelp" class="rp-help" data-i18n-ignore></p>
+        <div class="rp-buttons">
+          <button id="rpOpenDocument" type="button" class="primary" data-i18n="recorder.openDocumentation" hidden>Open documentation</button>
+          <button id="rpCloseDone" type="button" data-i18n="recPanel.close">Close panel</button>
+        </div>
+      </div>
+    </footer>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="recording-panel.js"></script>
+</body>
+</html>

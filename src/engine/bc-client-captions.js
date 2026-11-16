@@ -255,12 +255,34 @@
     return name.split(/\s*[∙·•]/u)[0].replace(/\s*\([^()]*\)\s*$/u, "").trim() || value;
   }
 
+  // Sorting_AriaSortText from the same resources, also among the announcements above: the client
+  // adds a column's sort order to its name, and a list row's name then reads, for example,
+  // Nr, sorterade i Stigande order Välj posten "3". The sort order is only for screen readers.
+  const SORT_TEXTS = Object.freeze({
+    "sv-SE": "{0}, sorterade i {1} order",
+    "en-US": "{0}, sorted in {1} order",
+    "fr-FR": "{0}, trié dans l'ordre {1}",
+    "de-DE": "{0}, Sortierreihenfolge {1}",
+    "es-ES": "{0}, ordenados en el pedido {1}",
+    "da-DK": "{0}, sorteret i rækkefølgen {1}",
+    "fi-FI": "{0}, järjestettynä {1} mukaan",
+    "nb-NO": "{0}, sortert i {1} rekkefølge"
+  });
+  const SORT_ORDER = new RegExp(Object.values(SORT_TEXTS).map(text => text.replace("{0}", "")
+    .split("{1}").map(part => escape(part).replace(/\s+/gu, "\\s*").replace(/'/gu, "['’]"))
+    .join("[\\p{L}-]+"))
+    .join("|"), "giu");
+  // A caption without the sort order the client adds for screen readers.
+  function withoutSorting(caption) {
+    return String(caption || "").replace(SORT_ORDER, " ").replace(/\s+/gu, " ").trim();
+  }
+
   // Category and language pairs without captions.
   function gaps(locales = []) {
     return Object.entries(CAPTIONS).flatMap(([category, byLocale]) =>
       locales.filter(locale => !byLocale[locale]).map(locale => ({ category, locale })));
   }
 
-  return { ANNOUNCEMENTS, CAPTIONS, PAGE_ERRORS, gaps, isAnnouncement, isPageError, matches,
-    pageName };
+  return { ANNOUNCEMENTS, CAPTIONS, PAGE_ERRORS, SORT_TEXTS, gaps, isAnnouncement, isPageError,
+    matches, pageName, withoutSorting };
 });

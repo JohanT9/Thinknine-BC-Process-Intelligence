@@ -966,6 +966,8 @@ async function recordEvent(rawEvent, captureContext = {}) {
       eventCount: canonical.events.length,
       screenshotQueueLength: screenshotQueue.length,
       screenshotStats: { ...screenshotStats },
+      recentSteps: rawResult.status === "duplicate" ? current.recentSteps || []
+        : globalThis.T9RecordingLiveStatus.addStep(current.recentSteps, sourceEvent),
       lastEvent: {
         eventNo: event.eventNo,
         type: event.type,
@@ -996,13 +998,23 @@ const CAPTURE_GUIDANCE_KINDS = new Set([
   "important", "use-image", "new-section", "ignore"
 ]);
 
+// A refused marker carries a code as well as its message, so a page can explain it in the
+// interface language.
+function guidanceError(message, code) {
+  return Object.assign(new Error(message), { code });
+}
+
 async function recordCaptureGuidance(kind, sender = {}) {
   if (!CAPTURE_GUIDANCE_KINDS.has(kind)) {
-    throw new Error("Ok\u00e4nd inspelningsmarkering.");
+    throw guidanceError("Ok\u00e4nd inspelningsmarkering.", "unknown-kind");
   }
   const state = await getState();
-  if (!state.recording || !state.sessionId || sender.tab?.id !== state.tabId) {
-    throw new Error("Ingen aktiv inspelning hittades i den h\u00e4r fliken.");
+  // The recording panel beside Business Central is an extension page without a tab of its
+  // own; it marks the latest step of the active recording, wherever that recording runs.
+  const fromPanel = !sender.tab && extensionPageSender(sender);
+  if (!state.recording || !state.sessionId ||
+      !(fromPanel || sender.tab?.id === state.tabId)) {
+    throw guidanceError("Ingen aktiv inspelning hittades i den h\u00e4r fliken.", "no-recording");
   }
   await settleBounded(writeQueue, "accepted event writes before guidance");
   if (kind === "use-image") {
@@ -1012,24 +1024,33 @@ async function recordCaptureGuidance(kind, sender = {}) {
   const recording = await getCanonicalRecording(state.sessionId);
   const candidates = [...(recording.events || [])].reverse().filter(event =>
     event.raw?.type !== "capture-guidance");
-  const target = candidates.find(event =>
-    event.raw?.interactionId || event.interaction?.id) || candidates[0];
-  if (!target) throw new Error("Registrera ett steg innan du markerar det.");
+  // The latest step the user took, as the recording panel shows it: moving into a field is
+  // not a step, so a marker made before typing applies to the previous step.
+  const target = candidates.find(event => globalThis.T9RecordingLiveStatus.isUserStep({
+    interactionId: event.raw?.interactionId || event.interaction?.id,
+    category: event.raw?.category })) ||
+    candidates.find(event => event.raw?.interactionId || event.interaction?.id) || candidates[0];
+  if (!target) throw guidanceError("Registrera ett steg innan du markerar det.", "no-step");
   const targetInteractionId = target.raw?.interactionId || target.interaction?.id || "";
   const preferredScreenshotAssetId = target.screenshotAssetId || "";
   if (kind === "use-image" && !preferredScreenshotAssetId) {
-    throw new Error("Det finns \u00e4nnu ingen bild f\u00f6r det senaste steget.");
+    throw guidanceError("Det finns \u00e4nnu ingen bild f\u00f6r det senaste steget.", "no-image");
   }
   const recorded = await recordEvent({
     type: "capture-guidance", category: "guidance", guidanceKind: kind,
     targetSourceEventId: target.id,
     ...(targetInteractionId ? { targetInteractionId } : {}),
     ...(preferredScreenshotAssetId ? { preferredScreenshotAssetId } : {}),
-    source: "recording-indicator"
-  }, { tabId: sender.tab?.id, frameId: sender.frameId,
-    parentFrameId: sender.parentFrameId, documentId: sender.documentId,
-    origin: sender.origin || sender.url });
+    source: fromPanel ? "recording-panel" : "recording-indicator"
+  }, fromPanel ? { tabId: state.tabId, origin: sender.origin || sender.url }
+    : { tabId: sender.tab?.id, frameId: sender.frameId,
+      parentFrameId: sender.parentFrameId, documentId: sender.documentId,
+      origin: sender.origin || sender.url });
+  const raw = target.raw || {};
   return { targetSourceEventId: target.id,
+    // What the panel names in its confirmation: the caption the user acted on.
+    targetLabel: String(raw.actionCaption || raw.fieldName || raw.controlCaption ||
+      raw.label || "").replace(/\s+/g, " ").trim().slice(0, 100),
     targetInteractionId: targetInteractionId || undefined,
     markerSourceEventId: recorded?.canonicalEvent?.id || "",
     preferredScreenshotAssetId: preferredScreenshotAssetId || undefined };
@@ -2419,6 +2440,28 @@ chrome.runtime.onStartup.addListener(async () => {
   await registerRecorderContentScript();
 });
 
+// Recording panels open beside Business Central, by the window they are shown in. While one is
+// shown in the recording tab's window, the floating box in the page steps aside for it; the
+// frame around the page stays. A panel that closes, or a worker that restarts, drops its port.
+const RECORDING_PANEL_PORT = "T9_RECORDING_PANEL";
+const recordingPanels = new Map();
+chrome.runtime.onConnect.addListener(port => {
+  if (port.name !== RECORDING_PANEL_PORT || !extensionPageSender(port.sender)) return;
+  recordingPanels.set(port, null);
+  port.onMessage.addListener(message => {
+    if (Number.isInteger(message?.windowId)) recordingPanels.set(port, message.windowId);
+  });
+  port.onDisconnect.addListener(() => recordingPanels.delete(port));
+});
+
+async function recordingPanelShown(state) {
+  if (!state?.recording || !state.tabId || !recordingPanels.size) return false;
+  try {
+    const tab = await chrome.tabs.get(state.tabId);
+    return [...recordingPanels.values()].includes(tab.windowId);
+  } catch { return false; }
+}
+
 // What the capture scripts in Business Central pages send. Every other message changes or
 // reads the library, settings, licenses or files and is taken only from the extension's own
 // pages, so a script running in a web page cannot delete recordings, change settings, start
@@ -3205,6 +3248,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, state, session,
           isRecordingTab: Boolean(state.recording &&
             sender.tab?.id === state.tabId),
+          recordingPanelOpen: await recordingPanelShown(state),
           liveStatus: state.recording
             ? globalThis.T9RecordingLiveStatus.derive({ session, debug,
               connected: debug.connected !== false })
@@ -3259,7 +3303,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const guidance = await recordCaptureGuidance(message.kind, sender);
           sendResponse({ ok: true, guidance });
         } catch (error) {
-          sendResponse({ ok: false, error: String(error?.message || error) });
+          sendResponse({ ok: false, error: String(error?.message || error),
+            ...(error?.code ? { code: error.code } : {}) });
         }
         break;
       }
