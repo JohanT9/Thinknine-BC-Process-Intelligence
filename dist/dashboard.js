@@ -3744,6 +3744,28 @@ function libraryFinding(options = libraryOptions(), quickFilter = libraryQuickFi
     globalThis.T9DocumentLibraryView.activeFilterCount(options) > 0;
 }
 
+// The latest test result of each document (T9TestHistory.latest), by recording id. Rows show a
+// marker once anything has been tested, so that documents that never were stand out; a
+// library where nothing has been tested shows none.
+let documentLibraryTests = new Map();
+async function refreshLibraryTests() {
+  try {
+    const response = await send({ type: "T9_TEST_LATEST" });
+    if (!response?.ok) return;
+    documentLibraryTests = new Map((response.latest || []).map(value => [value.sessionId, value]));
+  } catch { return; }
+  renderDocumentLibrary();
+  if (activeReviewSession) drawReviewTests();
+}
+const testHistoryT = (key, values) => values ? uiTf(key, values) : uiT(key);
+function libraryCardTest(record) {
+  if (!documentLibraryTests.size) return null;
+  const latest = documentLibraryTests.get(record.sessionId || record.projectId);
+  const marker = globalThis.T9TestHistoryView.marker(latest, testHistoryT,
+    applicationSettings.uiLocale || "en-US");
+  return { ...marker, label: uiTf("testHistory.markerLabel", { status: marker.text }) };
+}
+
 // The template a document follows, on its library row. A template that is not on this
 // computer is named and said to be missing.
 function libraryCardTemplate(record) {
@@ -3875,6 +3897,7 @@ function renderDocumentLibrary() {
     storedCount: documentLibraryRecords.length, progress: documentLibraryProgress,
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
     templateLabel: libraryCardTemplate,
+    testMarker: libraryCardTest,
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
     pageScriptLabel: uiT("pageScript.exportAction"),
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
@@ -4744,6 +4767,391 @@ $("libraryTestSuiteList").addEventListener("click", event => {
   if (card) void chrome.tabs.create({ url: chrome.runtime.getURL(
     `test-suite.html?suiteId=${encodeURIComponent(card.dataset.testSuiteId)}`) });
 });
+// A document's test history (vy 2 in docs/FUTURE_FEATURES.md): every run, newest first, with
+// what changed since the run before. Opened from the marker on the library row; focus returns
+// to the marker when it closes.
+let testHistoryProjectId = "";
+let testHistoryOpener = null;
+let testHistoryInProgress = "";
+async function loadTestHistory() {
+  const record = documentLibraryRecords.find(value => value.projectId === testHistoryProjectId);
+  if (!record) return;
+  const status = $("testHistoryStatus");
+  const list = $("testHistoryList");
+  $("testHistoryRetry").hidden = true;
+  status.textContent = uiT("testHistory.loading");
+  try {
+    const response = await send({ type: "T9_TEST_HISTORY", sessionId: record.sessionId || record.projectId });
+    if (!response?.ok) throw new Error(response?.error || "");
+    const history = response.history || [];
+    globalThis.T9TestHistoryView.render(list, history, { t: testHistoryT,
+      locale: applicationSettings.uiLocale || "en-US" });
+    testHistoryInProgress = history.find(entry => entry.counts.outcome === "in-progress")?.testRunId || "";
+    status.textContent = history.length ? "" : uiT("testHistory.empty");
+  } catch {
+    list.replaceChildren();
+    testHistoryInProgress = "";
+    status.textContent = uiT("testHistory.loadFailed");
+    $("testHistoryRetry").hidden = false;
+  }
+  $("testHistoryRun").textContent = uiT(testHistoryInProgress ? "testHistory.continue" : "testHistory.runTest");
+}
+async function openTestHistory(projectId, opener) {
+  const record = documentLibraryRecords.find(value => value.projectId === projectId);
+  if (!record) return;
+  testHistoryProjectId = projectId;
+  testHistoryOpener = opener || null;
+  $("testHistoryTitle").textContent = uiTf("testHistory.title", { title: record.title });
+  $("testHistoryList").replaceChildren();
+  $("testHistoryRun").textContent = uiT("testHistory.runTest");
+  if (!$("testHistoryDialog").open) $("testHistoryDialog").showModal();
+  await loadTestHistory();
+}
+$("testHistoryDialog").addEventListener("close", () => {
+  const opener = testHistoryOpener;
+  testHistoryOpener = null;
+  // The row may have been drawn again while the dialog was open; its marker takes the focus.
+  (opener?.isConnected ? opener : $("libraryResults").querySelector(
+    `[data-library-project-id="${CSS.escape(testHistoryProjectId)}"] [data-library-action="test-history"]`))?.focus();
+});
+$("testHistoryRetry").addEventListener("click", () => { void loadTestHistory(); });
+$("testHistoryRun").addEventListener("click", async () => {
+  const projectId = testHistoryProjectId;
+  if (testHistoryInProgress) {
+    await chrome.tabs.create({ url: chrome.runtime.getURL(
+      `test-run.html?testRunId=${encodeURIComponent(testHistoryInProgress)}`) });
+    return;
+  }
+  $("testHistoryDialog").close();
+  const card = $("libraryResults").querySelector(`[data-library-project-id="${CSS.escape(projectId)}"]`);
+  await runLibraryMenuAction("run-test", projectId, card);
+});
+$("testHistoryList").addEventListener("click", async event => {
+  const report = event.target.closest?.("[data-bug-report-id]");
+  if (!report) return;
+  try { await send({ type: "T9_OPEN_TECHNICAL_REPORT", bugReportId: report.dataset.bugReportId }); }
+  catch (error) { $("testHistoryStatus").textContent = error?.message || String(error); }
+});
+// Runs change on the test pages; an open history follows.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !$("testHistoryDialog").open) return;
+  if (Object.keys(changes).some(key => key.startsWith(globalThis.T9StorageKeys.TEST_RUN_PREFIX))) {
+    void loadTestHistory();
+  }
+});
+
+// The open document's tests in the review: its latest result in the header, and when the
+// section is opened every run with what changed since the run before (test-history-view.js).
+// Shown once anything in the library has been tested, as the markers on the library rows.
+let reviewTests = { sessionId: "", history: null, failed: false };
+let reviewTestsRequest = 0;
+function drawReviewTests() {
+  const section = $("reviewTests");
+  const session = activeReviewSession;
+  const own = session && reviewTests.sessionId === session.id;
+  const history = own ? reviewTests.history : null;
+  const failed = own && reviewTests.failed;
+  section.hidden = !session || session.recordingPurpose === "bug-report" ||
+    (!failed && !history?.length && !documentLibraryTests.size);
+  if (section.hidden) return;
+  const marker = $("reviewTestsMarker");
+  const status = $("reviewTestsStatus");
+  const list = $("reviewTestsList");
+  $("reviewTestsRetry").hidden = !failed;
+  if (failed || !history) {
+    marker.hidden = true;
+    list.replaceChildren();
+    status.textContent = uiT(failed ? "testHistory.loadFailed" : "testHistory.loading");
+    $("reviewTestsRun").hidden = failed;
+    $("reviewTestsRun").textContent = uiT("testHistory.runTest");
+    return;
+  }
+  const newest = history[0];
+  const shown = globalThis.T9TestHistoryView.marker(newest ? { state: newest.counts.outcome,
+    date: newest.updatedAt, counts: newest.counts } : null, testHistoryT,
+  applicationSettings.uiLocale || "en-US");
+  marker.hidden = false;
+  marker.dataset.state = shown.state;
+  const icon = document.createElement("span");
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = shown.icon;
+  marker.replaceChildren(icon, ` ${shown.text}`);
+  globalThis.T9TestHistoryView.render(list, history, { t: testHistoryT,
+    locale: applicationSettings.uiLocale || "en-US" });
+  status.textContent = history.length ? "" : uiT("testHistory.empty");
+  const inProgress = history.find(entry => entry.counts.outcome === "in-progress");
+  $("reviewTestsRun").hidden = false;
+  $("reviewTestsRun").dataset.testRunId = inProgress?.testRunId || "";
+  $("reviewTestsRun").textContent = uiT(inProgress ? "testHistory.continue" : "testHistory.runTest");
+}
+async function loadReviewTests() {
+  const session = activeReviewSession;
+  if (!session) return;
+  const request = ++reviewTestsRequest;
+  if (reviewTests.sessionId !== session.id) reviewTests = { sessionId: session.id, history: null, failed: false };
+  drawReviewTests();
+  let next;
+  try {
+    const response = await send({ type: "T9_TEST_HISTORY", sessionId: session.id });
+    if (!response?.ok) throw new Error(response?.error || "");
+    next = { sessionId: session.id, history: response.history || [], failed: false };
+  } catch {
+    next = { sessionId: session.id, history: null, failed: true };
+  }
+  if (request !== reviewTestsRequest || activeReviewSession !== session) return;
+  reviewTests = next;
+  drawReviewTests();
+}
+function closeReviewTests() {
+  reviewTestsRequest += 1;
+  reviewTests = { sessionId: "", history: null, failed: false };
+  $("reviewTests").open = false;
+  $("reviewTests").hidden = true;
+  $("reviewTestsList").replaceChildren();
+}
+$("reviewTestsRetry").addEventListener("click", () => { void loadReviewTests(); });
+$("reviewTestsRun").addEventListener("click", async () => {
+  const session = activeReviewSession;
+  if (!session) return;
+  const continueRunId = $("reviewTestsRun").dataset.testRunId;
+  if (continueRunId) {
+    await chrome.tabs.create({ url: chrome.runtime.getURL(
+      `test-run.html?testRunId=${encodeURIComponent(continueRunId)}`) });
+    return;
+  }
+  const record = documentLibraryRecords.find(value => value.projectId === session.id);
+  if (!record) return;
+  const button = $("reviewTestsRun");
+  button.disabled = true;
+  try {
+    // The test is made from the saved document, so edits made here are saved first.
+    await flushReviewPersistence();
+    show(uiT("test.creatingRun"));
+    await createTestRun(record);
+    show("");
+  } catch (error) {
+    show(error?.message || String(error), true);
+  } finally {
+    button.disabled = false;
+  }
+});
+$("reviewTestsList").addEventListener("click", async event => {
+  const report = event.target.closest?.("[data-bug-report-id]");
+  if (!report) return;
+  try { await send({ type: "T9_OPEN_TECHNICAL_REPORT", bugReportId: report.dataset.bugReportId }); }
+  catch (error) { show(error?.message || String(error), true); }
+});
+
+// The test overview (view "tests"): one row per process document with its latest result,
+// filtered by what needs attention. Counted again from the runs each time it is shown.
+const TESTS_STALE_DAYS = 90;
+let testsOverview = { runs: null, suites: [], failed: false };
+let testsOverviewFilter = "all";
+// The filters in the Filter panel: which runs count. Empty means all.
+const TESTS_SCOPE_EMPTY = Object.freeze({ environment: "", version: "", suiteId: "", periodDays: "" });
+let testsScope = { ...TESTS_SCOPE_EMPTY };
+let testsOverviewRequest = 0;
+const testsLocale = () => applicationSettings.uiLocale || "en-US";
+function testsOverviewDocuments() {
+  return documentLibraryRecords.filter(record => !record.archived &&
+    record.metadata?.recordingPurpose !== "bug-report");
+}
+function testsOverviewAllRows() {
+  const history = globalThis.T9TestHistory;
+  const runs = history.scopeRuns(testsOverview.runs || [], testsOverview.suites, testsScope);
+  return history.overviewRows(testsOverviewDocuments(), history.summaries(runs, testsOverview.suites),
+    { staleDays: TESTS_STALE_DAYS });
+}
+// The filter choices come from the runs, so that none matches nothing. A choice that no longer
+// occurs (its runs were deleted) is cleared rather than left matching nothing.
+function renderTestsScope() {
+  const options = globalThis.T9TestHistory.scopeOptions(testsOverview.runs || [], testsOverview.suites);
+  const fill = (select, values, keep = true) => {
+    const first = select.options[0];
+    first.textContent = uiT(first.dataset.i18n);
+    select.replaceChildren(first, ...values.map(([value, label]) => new Option(label, value)));
+    const key = select.dataset.testsScope;
+    if (![...select.options].some(option => option.value === testsScope[key])) testsScope[key] = "";
+    select.value = testsScope[key];
+    select.closest("label").hidden = !keep && !values.length;
+  };
+  fill($("testsOverviewEnvironment"), options.environments.map(value => [value, value]), false);
+  fill($("testsOverviewVersion"), options.versions.map(value => [value, value]), false);
+  fill($("testsOverviewPeriod"), globalThis.T9TestHistory.PERIODS.map(days =>
+    [String(days), uiTf("testOverview.periodDays", { days })]));
+  fill($("testsOverviewSuite"), options.suites.map(suite => [suite.suiteId,
+    [suite.title || uiT("suite.pageTitle"), [suite.environment, suite.version].filter(Boolean).join(" · "),
+      globalThis.T9TestHistoryView.formatDate(suite.createdAt, testsLocale())].filter(Boolean).join(" – ")]), false);
+  const active = globalThis.T9TestHistory.activeScope(testsScope);
+  $("testsOverviewScopeCount").hidden = !active;
+  $("testsOverviewScopeCount").textContent = String(active);
+  return active;
+}
+function testsOverviewRow(row) {
+  const view = globalThis.T9TestHistoryView;
+  const item = document.createElement("li");
+  item.className = "tests-overview-row";
+  item.dataset.state = row.state;
+  item.dataset.projectId = row.projectId;
+  const title = document.createElement("p");
+  title.className = "tests-overview-title";
+  title.textContent = row.title;
+  const result = document.createElement("span");
+  result.className = "tests-overview-result";
+  const icon = document.createElement("span");
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = row.summary ? view.ICONS[row.state] || "◐" : "–";
+  result.append(icon, row.summary ? view.resultText({ counts: row.summary.counts }, testHistoryT)
+    : uiT("testHistory.notTested"));
+  const where = document.createElement("span");
+  where.className = "tests-overview-where";
+  if (row.summary) {
+    const time = document.createElement("time");
+    time.dateTime = row.summary.date;
+    time.textContent = view.formatDate(row.summary.date, testsLocale());
+    where.append(time);
+    const details = [row.summary.environment, row.summary.version, row.summary.tester].filter(Boolean);
+    if (details.length) where.append(` · ${details.join(" · ")}`);
+    if (row.stale) {
+      const stale = document.createElement("span");
+      stale.className = "tests-overview-stale";
+      stale.textContent = uiTf("testOverview.filter.stale", { days: TESTS_STALE_DAYS });
+      where.append(" ", stale);
+    }
+  }
+  const trend = document.createElement("span");
+  trend.className = "tests-overview-trend";
+  if (row.summary?.trend.length) {
+    const runs = row.summary.trend.map(run => `${view.formatDate(run.date, testsLocale())}: ${
+      uiT(`testHistory.state.${run.state}`)}`);
+    trend.setAttribute("role", "img");
+    trend.setAttribute("aria-label", uiTf("testOverview.trendLabel", { runs: runs.join(", ") }));
+    trend.title = runs.join("\n");
+    for (const run of row.summary.trend) {
+      const dot = document.createElement("span");
+      dot.dataset.state = run.state;
+      trend.append(dot);
+    }
+  }
+  const action = document.createElement("button");
+  action.type = "button";
+  action.className = "secondary";
+  action.dataset.testsAction = row.summary ? "history" : "run";
+  action.textContent = uiT(row.summary ? "testOverview.history" : "testHistory.runTest");
+  action.setAttribute("aria-label", uiTf(row.summary ? "testOverview.historyLabel"
+    : "testOverview.runLabel", { title: row.title }));
+  item.append(title, result, where, trend, action);
+  return item;
+}
+function renderTestsOverview() {
+  const status = $("testsOverviewStatus");
+  const list = $("testsOverviewList");
+  const reset = $("testsOverviewReset");
+  $("testsOverviewRetry").hidden = !testsOverview.failed;
+  const staleLabel = $("testsOverviewFilters").querySelector("[data-tests-stale-label]");
+  staleLabel.textContent = uiTf("testOverview.filter.stale", { days: TESTS_STALE_DAYS });
+  if (testsOverview.failed || !testsOverview.runs) {
+    list.replaceChildren();
+    reset.hidden = true;
+    $("testsOverviewCsv").disabled = true;
+    status.textContent = uiT(testsOverview.failed ? "testHistory.loadFailed" : "testHistory.loading");
+    return;
+  }
+  const scoped = renderTestsScope();
+  const rows = testsOverviewAllRows();
+  const counts = globalThis.T9TestHistory.overviewCounts(rows);
+  for (const button of $("testsOverviewFilters").querySelectorAll("[data-tests-filter]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.testsFilter === testsOverviewFilter));
+    button.querySelector(".library-quick-count").textContent = String(counts[button.dataset.testsFilter]);
+  }
+  const query = $("testsOverviewSearch").value;
+  const shown = globalThis.T9TestHistory.overviewFilter(rows, { filter: testsOverviewFilter, query });
+  const focused = document.activeElement?.closest?.(".tests-overview-row")?.dataset.projectId;
+  list.replaceChildren(...shown.map(testsOverviewRow));
+  if (focused) list.querySelector(`[data-project-id="${CSS.escape(focused)}"] button`)?.focus();
+  const filtered = testsOverviewFilter !== "all" || query.trim() || scoped;
+  reset.hidden = !filtered;
+  $("testsOverviewCsv").disabled = !shown.length;
+  status.textContent = !rows.length ? uiT("testOverview.noDocuments")
+    : !shown.length ? uiT("testOverview.noMatch")
+      : !testsOverview.runs.length ? uiT("testOverview.nothingRun")
+        : [uiTf("testOverview.shown", { shown: shown.length, total: rows.length }),
+          ...(scoped ? [uiT("testOverview.scoped")] : [])].join(" · ");
+}
+async function loadTestsOverview() {
+  const request = ++testsOverviewRequest;
+  if (!testsOverview.runs) renderTestsOverview();
+  try {
+    const response = await send({ type: "T9_TEST_OVERVIEW" });
+    if (!response?.ok) throw new Error(response?.error || "");
+    if (request !== testsOverviewRequest) return;
+    testsOverview = { runs: response.runs || [], suites: response.suites || [], failed: false };
+  } catch {
+    if (request !== testsOverviewRequest) return;
+    testsOverview = { runs: null, suites: [], failed: true };
+  }
+  renderTestsOverview();
+}
+$("testsOverviewFilters").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-tests-filter]");
+  if (!button) return;
+  testsOverviewFilter = button.dataset.testsFilter;
+  renderTestsOverview();
+});
+$("testsOverviewSearch").addEventListener("input", () => renderTestsOverview());
+$("testsOverviewScope").addEventListener("change", event => {
+  const key = event.target.dataset?.testsScope;
+  if (!key) return;
+  testsScope = { ...testsScope, [key]: event.target.value };
+  renderTestsOverview();
+});
+$("testsOverviewReset").addEventListener("click", () => {
+  testsOverviewFilter = "all";
+  testsScope = { ...TESTS_SCOPE_EMPTY };
+  $("testsOverviewSearch").value = "";
+  renderTestsOverview();
+  $("testsOverviewSearch").focus();
+});
+$("testsOverviewRetry").addEventListener("click", () => { void loadTestsOverview(); });
+$("testsOverviewList").addEventListener("click", async event => {
+  const button = event.target.closest?.("[data-tests-action]");
+  if (!button) return;
+  const projectId = button.closest(".tests-overview-row").dataset.projectId;
+  if (button.dataset.testsAction === "history") {
+    await openTestHistory(projectId, button);
+    return;
+  }
+  button.disabled = true;
+  try { await runLibraryMenuAction("run-test", projectId, null); }
+  finally { button.disabled = false; }
+});
+// The rows shown, as a CSV file in the interface language. The file is said to be saved only
+// once the browser has saved it.
+$("testsOverviewCsv").addEventListener("click", async () => {
+  const button = $("testsOverviewCsv");
+  const status = $("testsOverviewStatus");
+  const rows = globalThis.T9TestHistory.overviewFilter(testsOverviewAllRows(),
+    { filter: testsOverviewFilter, query: $("testsOverviewSearch").value });
+  const locale = testsLocale();
+  const csv = globalThis.T9TestHistory.overviewCsv(rows, { t: testHistoryT,
+    separator: locale.startsWith("en") ? "," : ";",
+    formatDate: value => globalThis.T9TestHistoryView.formatDate(value, locale) });
+  const filename = `${uiTf("testOverview.fileName", { date: new Date().toISOString().slice(0, 10) })}.csv`
+    .replace(/[\\/:*?"<>|]+/gu, "-");
+  button.disabled = true;
+  status.textContent = uiT("testOverview.csvSaving");
+  try {
+    await libraryDownloadCompleted(await downloadBlob(new Blob(["﻿", csv],
+      { type: "text/csv;charset=utf-8" }), filename));
+    status.textContent = uiTf("testOverview.csvSaved", { file: filename });
+  } catch (error) {
+    status.textContent = error?.code === "downloadNotSaved" ? uiT("transfer.downloadNotSaved")
+      : uiTf("testOverview.csvFailed", { error: error?.message || String(error) });
+  } finally {
+    button.disabled = !rows.length;
+  }
+});
+
 // Progress changes on the test pages; the list follows, a little later.
 let libraryTestSuiteTimer = null;
 let documentTemplateChangeTimer = null;
@@ -4758,7 +5166,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (!Object.keys(changes).some(key => key.startsWith(storageKeys.TEST_SUITE_PREFIX) ||
       key.startsWith(storageKeys.TEST_RUN_PREFIX))) return;
   clearTimeout(libraryTestSuiteTimer);
-  libraryTestSuiteTimer = setTimeout(() => { void refreshLibraryTestSuites(); }, 500);
+  libraryTestSuiteTimer = setTimeout(() => {
+    void refreshLibraryTestSuites();
+    void refreshLibraryTests();
+    if (activeReviewSession) void loadReviewTests();
+    if (!$("testsView").hidden) void loadTestsOverview();
+  }, 500);
 });
 
 // Moving documents to another computer (document/library-transfer.js): an export file with
@@ -7363,6 +7776,7 @@ function renderReviewAttention(tasks) {
     interface: languageName(globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale), "ui")
   });
   renderReviewTemplate();
+  drawReviewTests();
 }
 
 // The template the open document follows, chosen where it is edited. A template that is not on
@@ -9991,6 +10405,7 @@ async function openReview(session) {
     loadStatus.hidden = true;
     loadStatus.textContent = "";
   }
+  void loadReviewTests();
   void completeReviewOpen(session, existing.review, activeReview.updatedAt,
     requestId);
 }
@@ -10097,6 +10512,7 @@ async function closeReview() {
     documentLibraryProgress.set(activeReviewSession.id, reviewProgressSummary(activeReview));
   }
   $("reviewInterpretationNotice").hidden = true;
+  closeReviewTests();
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
@@ -10143,6 +10559,8 @@ async function loadSessions(request = null) {
     : [];
   await loadDocumentLibrary(sessions, response || {});
   void refreshLibraryTestSuites();
+  void refreshLibraryTests();
+  if (!$("testsView").hidden) void loadTestsOverview();
 }
 
 async function openRequestedReview() {
@@ -11108,9 +11526,11 @@ function showHomeView(view, focus = false) {
     else button.removeAttribute("aria-current");
   }
   $("documentsView").hidden = view !== "documents";
+  $("testsView").hidden = view !== "tests";
   $("settingsPanel").hidden = view !== "settings";
-  if (focus) (view === "settings" ? $("settingsTitle") : $("documentLibraryTitle"))
-    .scrollIntoView({ block: "nearest" });
+  if (view === "tests") void loadTestsOverview();
+  if (focus) (view === "settings" ? $("settingsTitle") : view === "tests" ? $("testsOverviewTitle")
+    : $("documentLibraryTitle")).scrollIntoView({ block: "nearest" });
 }
 for (const button of document.querySelectorAll("[data-home-view]")) {
   button.addEventListener("click", () => showHomeView(button.dataset.homeView, true));
@@ -11179,6 +11599,10 @@ $("libraryResults").addEventListener("click", async event => {
     $("libraryResults").querySelector(
       `[data-library-project-id="${CSS.escape(projectId)}"]`
     )?.focus();
+    return;
+  }
+  if (event.target.closest?.('[data-library-action="test-history"]')) {
+    await openTestHistory(projectId, event.target.closest('[data-library-action="test-history"]'));
     return;
   }
   if (event.target.closest?.('[data-library-action="favourite"]')) {

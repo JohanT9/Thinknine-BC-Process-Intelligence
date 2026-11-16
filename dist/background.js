@@ -85,6 +85,7 @@ importScripts("document/document-library.js");
 importScripts("document/document-folders.js");
 importScripts("document/test-recording-match.js");
 importScripts("document/test-script.js");
+importScripts("document/test-history.js");
 importScripts("document/test-suite.js");
 importScripts("document/page-script-export.js");
 importScripts("review/process-improvement-dataset.js");
@@ -2202,6 +2203,32 @@ async function testSuiteProgress(suite) {
   }
   return globalThis.T9TestSuite.progress(suite, summaries);
 }
+// The suite compared with its previous round, or null when it has none or that round was
+// deleted. Runs of both rounds are read to name the steps that failed anew.
+async function testSuiteComparison(suite, progress) {
+  if (!suite.previousSuiteId) return null;
+  const previousSuite = await loadTestSuite(suite.previousSuiteId);
+  if (!previousSuite) return null;
+  const previous = await testSuiteProgress(previousSuite);
+  const first = globalThis.T9TestSuite.compareRounds(progress, previous);
+  const pairs = first.items.filter(item => item.testRunId && item.previousTestRunId &&
+    ["new-failure", "still-failed", "failed-untested"].includes(item.change));
+  const keys = pairs.flatMap(item => [TEST_RUN_PREFIX + item.testRunId,
+    TEST_RUN_PREFIX + item.previousTestRunId]);
+  const stored = keys.length ? await chrome.storage.local.get(keys) : {};
+  const stepChanges = {};
+  for (const item of pairs) {
+    try {
+      const run = globalThis.T9TestScript.normalize(stored[TEST_RUN_PREFIX + item.testRunId]);
+      const before = globalThis.T9TestScript.normalize(stored[TEST_RUN_PREFIX + item.previousTestRunId]);
+      stepChanges[item.testRunId] = globalThis.T9TestHistory.compare(run, before);
+    } catch { /* Without both runs the test is compared by its result only. */ }
+  }
+  return { ...globalThis.T9TestSuite.compareRounds(progress, previous, stepChanges),
+    previous: { suiteId: previousSuite.suiteId, title: previousSuite.title,
+      environment: previousSuite.environment, version: previousSuite.version,
+      createdAt: previousSuite.createdAt } };
+}
 // The next round of a suite: a new run of each test still there, with the expected results
 // carried over, in a new suite that names the previous one.
 async function nextTestSuiteRound(suiteId) {
@@ -2750,7 +2777,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_LOAD_TEST_SUITE": {
         const suite = await loadTestSuite(message.suiteId);
         if (!suite) throw new Error("suite.notFound");
-        sendResponse({ ok: true, suite, progress: await testSuiteProgress(suite) });
+        const progress = await testSuiteProgress(suite);
+        sendResponse({ ok: true, suite, progress,
+          comparison: await testSuiteComparison(suite, progress) });
         break;
       }
 
@@ -2772,7 +2801,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!current) throw new Error("suite.notFound");
         const suite = await saveTestSuite(globalThis.T9TestSuite.update(current, message.patch || {},
           new Date().toISOString()));
-        sendResponse({ ok: true, suite, progress: await testSuiteProgress(suite) });
+        const progress = await testSuiteProgress(suite);
+        sendResponse({ ok: true, suite, progress,
+          comparison: await testSuiteComparison(suite, progress) });
         break;
       }
 
@@ -2883,6 +2914,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, runs: runs.map(run => ({ testRunId: run.testRunId,
           title: run.title, createdAt: run.createdAt, updatedAt: run.updatedAt, tester: run.tester,
           environment: run.environment, summary: globalThis.T9TestScript.summary(run) })) });
+        break;
+      }
+
+      case "T9_TEST_HISTORY": {
+        // Every run of one document, newest first, each compared with the run before it.
+        const runs = await listTestRuns(String(message.sessionId || ""));
+        sendResponse({ ok: true, history: globalThis.T9TestHistory.history(runs,
+          String(message.sessionId || "")) });
+        break;
+      }
+
+      case "T9_TEST_OVERVIEW": {
+        // Every run in brief (its results, not its texts or screenshots) and the suites, for the
+        // test overview, which picks the runs its filters keep.
+        const [runs, suites] = await Promise.all([listTestRuns(), listTestSuites()]);
+        sendResponse({ ok: true, runs: runs.map(run => ({ testRunId: run.testRunId,
+          sessionId: run.sessionId, createdAt: run.createdAt, updatedAt: run.updatedAt,
+          environment: run.environment, tester: run.tester, suiteId: run.suiteId || null,
+          steps: run.steps.map(step => ({ status: step.status, resultSource: step.resultSource })) })),
+        suites: suites.map(suite => ({ suiteId: suite.suiteId, title: suite.title,
+          environment: suite.environment, version: suite.version, createdAt: suite.createdAt })) });
+        break;
+      }
+
+      case "T9_TEST_LATEST": {
+        // The latest test result of every document that has been tested, for the library.
+        const latest = globalThis.T9TestHistory.latest(await listTestRuns());
+        sendResponse({ ok: true, latest: [...latest.values()] });
         break;
       }
 

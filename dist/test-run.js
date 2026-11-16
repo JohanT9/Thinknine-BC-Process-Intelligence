@@ -400,29 +400,24 @@
     showSummary();
   }
 
+  // Earlier runs of the same test, with what changed from run to run (test-history-view.js).
   async function showEarlierRuns() {
     const section = document.getElementById("earlierRuns");
     try {
-      const { runs } = await send({ type: "T9_LIST_TEST_RUNS", sessionId: run().sessionId });
-      const earlier = runs.filter(item => item.testRunId !== testRunId);
-      section.hidden = !earlier.length;
-      const date = value => { try {
-        return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" })
-          .format(new Date(value)); } catch { return String(value || ""); } };
-      document.getElementById("earlierRunList").replaceChildren(...earlier.map(item => {
-        const entry = element("li");
-        const link = element("a", "", date(item.createdAt));
-        link.href = `test-run.html?testRunId=${encodeURIComponent(item.testRunId)}`;
-        link.target = "_blank"; link.rel = "noopener";
-        const details = [t("test.outcome." + item.summary.outcome), t("test.counts", {
-          passed: item.summary.passed, failed: item.summary.failed,
-          skipped: item.summary.skipped, notRun: item.summary.notRun }),
-        item.environment, item.tester].filter(Boolean).join(" · ");
-        entry.append(link, document.createTextNode(` · ${details}`));
-        return entry;
-      }));
+      const { history } = await send({ type: "T9_TEST_HISTORY", sessionId: run().sessionId });
+      const shown = globalThis.T9TestHistoryView.render(document.getElementById("earlierRunList"),
+        history, { t, locale, currentRunId: testRunId });
+      section.hidden = !shown;
     } catch { section.hidden = true; }
   }
+
+  // A bug report made from a step of an earlier run opens as from the step itself.
+  document.getElementById("earlierRunList").addEventListener("click", async event => {
+    const report = event.target.closest?.("[data-bug-report-id]");
+    if (!report) return;
+    try { await send({ type: "T9_OPEN_TECHNICAL_REPORT", bugReportId: report.dataset.bugReportId }); }
+    catch (error) { message.textContent = errorText(error); }
+  });
 
   // Resolves when the browser has written the file, so a message never claims a file was
   // saved while the download is still running or was cancelled.

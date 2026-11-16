@@ -176,6 +176,7 @@ for (const file of [
   "license-status.js",
   "workspace-controller.js",
   "workspace-context.js",
+  "test-history-view.js",
   "technical-report.html", "technical-report.js",
   "technical-report-workspace-view.js", "test-run.html", "test-run.js", "test-run-client.js", "test-panel.html",
   "test-panel.js", "test-protocol.html", "test-protocol.js", "test-suite.html", "test-suite.js", "knowledge-admin.html",

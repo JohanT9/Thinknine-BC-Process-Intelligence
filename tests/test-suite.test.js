@@ -71,6 +71,26 @@ assert.deepStrictEqual([round.suiteId, round.previousSuiteId, round.title, round
 assert.deepStrictEqual(round.items.map(item => [item.sessionId, item.testRunId]),
   [["doc-a", "run-a2"], ["doc-c", "run-c2"]]);
 
+// A round compared with the round before it: tests are paired by document, never by position,
+// and a test is compared once it has a result in this round; a test new in the suite is
+// said to be new at once. A test without a full result last
+// round is said to be so, never counted as fixed or as a new failure.
+const status = (sessionId, value, testRunId = `${sessionId}-run`) => ({ sessionId, status: value, testRunId });
+const before = { items: [status("a", "passed", "a1"), status("b", "failed"), status("c", "passed"),
+  status("d", "failed"), status("e", "in-progress"), status("f", "not-started"), status("g", "passed")] };
+const now = { items: [status("g", "missing"), status("f", "passed"), status("e", "failed"),
+  status("d", "failed"), status("c", "passed"), status("b", "passed"), status("a", "failed", "a2"),
+  status("h", "failed"), status("i", "in-progress")] };
+const compared = suites.compareRounds(now, before, { a2: { newFailures: [{ number: 4 }, { number: 7 }] } });
+assert.deepStrictEqual(Object.fromEntries(compared.items.map(item => [item.sessionId, item.change])),
+  { g: null, f: "passed-untested", e: "failed-untested", d: "still-failed", c: "still-passed",
+    b: "fixed", a: "new-failure", h: "new", i: "new" });
+assert.deepStrictEqual(compared.items.find(item => item.sessionId === "a").newFailureSteps, [4, 7]);
+assert.strictEqual(compared.items.find(item => item.sessionId === "a").previousTestRunId, "a1");
+assert.deepStrictEqual(compared.counts, { newFailure: 1, fixed: 1, unchanged: 2, untested: 2, new: 2 });
+assert.strictEqual(suites.compareRounds(now, null), null, "a suite without a previous round is not compared");
+assert.ok(compared.items.every(item => item.change === null || suites.CHANGES.includes(item.change)));
+
 // A run of a suite names it; a new run belongs to a suite only when made for one, and the
 // environment can be given.
 const run = script.normalize({ testRunId: "run-a", sessionId: "doc-a", suiteId: "suite-1",
@@ -108,6 +128,11 @@ assert.ok(read("src/ui/test-run.js").includes('suite.partOf'));
 // The suite's protocol: the protocol page with the suite, opened from the suite's page.
 assert.ok(read("src/ui/test-suite.js").includes("test-protocol.html?suiteId="));
 assert.ok(read("src/ui/test-protocol.js").includes('type: "T9_LOAD_TEST_SUITE"'));
+// Both the suite's page and its protocol show the comparison the background counts.
+assert.ok(background.includes("comparison: await testSuiteComparison(suite, progress)"));
+assert.ok(read("src/ui/test-suite.js").includes("response.comparison") &&
+  read("src/ui/test-suite.html").includes('id="suiteComparison"'));
+assert.ok(read("src/ui/test-protocol.js").includes('labels.push(d("suite.compare.label"))'));
 
 // Every suite text in every registered language, with the same placeholders.
 const vm = require("vm");
@@ -124,7 +149,8 @@ const used = new Set([page, dashboardPage, read("src/ui/test-suite.js"), dashboa
   read("src/ui/test-protocol.js")]
   .flatMap(source => [...source.matchAll(/["'`](suite\.[a-zA-Z.-]+)["'`]/gu)].map(match => match[1])));
 assert.ok(used.size >= 25, `suite texts found: ${used.size}`);
-for (const key of [...used, ...["not-started", "in-progress", "passed", "failed", "missing"].map(status => `suite.status.${status}`)]) {
+for (const key of [...used, ...["not-started", "in-progress", "passed", "failed", "missing"].map(value => `suite.status.${value}`),
+  ...suites.CHANGES.map(change => `suite.compare.${change}`)]) {
   const english = i18n.translate(key, "en-US");
   assert.notStrictEqual(english, key, `${key} in English`);
   const placeholders = value => [...value.matchAll(/\{(\w+)\}/gu)].map(match => match[1]).sort().join();

@@ -619,3 +619,85 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .home-views button[aria-current="page"],.settings-nav button[aria-current="true"],.library-quick-filters button[aria-pressed="true"]{outline:2px solid Highlight}
   .settings-segmented-options label:has(input:checked){outline:2px solid Highlight;outline-offset:-2px}
 }
+
+/* A document's test history (test-history-view.js) and its marker on the library row. The
+   result is said in words beside its symbol, so it never depends on colour alone. */
+.test-history-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space8); }
+.test-history-run { border: 1px solid var(--colorBorderSubtle); border-left: 3px solid var(--colorBorderDefault); border-radius: var(--radius4, 4px); padding: var(--space8) var(--space12); background: var(--colorBackgroundSurface); min-width: 0; }
+.test-history-run[data-state="passed"] { border-left-color: var(--colorStatusSuccess); }
+.test-history-run[data-state="failed"] { border-left-color: var(--colorStatusDanger); }
+.test-history-run[data-state="in-progress"] { border-left-color: var(--colorStatusWarning); }
+.test-history-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space4) var(--space8); min-width: 0; }
+.test-history-icon { font-weight: 700; }
+.test-history-run[data-state="passed"] .test-history-icon { color: var(--colorStatusSuccess); }
+.test-history-run[data-state="failed"] .test-history-icon { color: var(--colorStatusDanger); }
+.test-history-run[data-state="in-progress"] .test-history-icon { color: var(--colorStatusWarning); }
+.test-history-date { color: var(--colorTextSecondary); white-space: nowrap; }
+.test-history-result { overflow-wrap: anywhere; }
+.test-history-details { color: var(--colorTextSecondary); overflow-wrap: anywhere; }
+.test-history-actions { display: inline-flex; flex-wrap: wrap; gap: var(--space4) var(--space12); margin-left: auto; }
+.test-history-changes { margin: var(--space6) 0 0; padding-left: var(--space20); display: grid; gap: var(--space4); overflow-wrap: anywhere; }
+.test-history-changes [data-change="newFailure"], .test-history-changes [data-change="failedNewStep"] { font-weight: 600; }
+.test-history-changes [data-change="fixed"] { color: var(--colorStatusSuccess); }
+.test-history-note { color: var(--colorTextSecondary); list-style: none; margin-left: calc(-1 * var(--space20)); }
+.test-history-report { margin: 0 0 0 var(--space4); min-height: 28px; padding: 2px var(--space8); }
+.library-test-marker { display: inline-flex; align-items: center; gap: var(--space4); margin: 0; padding: 0 var(--space6); min-height: 22px; border: 1px solid var(--colorBorderSubtle); border-radius: 999px; background: var(--colorBackgroundSubtle); color: var(--colorTextPrimary); font: inherit; font-size: var(--fontSizeCaption); cursor: pointer; }
+.library-test-marker:hover { border-color: var(--colorBorderDefault); }
+.library-test-marker[data-state="passed"] [aria-hidden] { color: var(--colorStatusSuccess); }
+.library-test-marker[data-state="failed"] [aria-hidden] { color: var(--colorStatusDanger); }
+.library-test-marker[data-state="in-progress"] [aria-hidden] { color: var(--colorStatusWarning); }
+.library-test-marker[data-state="none"] { color: var(--colorTextSecondary); }
+.test-history-dialog { width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-sizing: border-box; }
+.test-history-dialog form { display: grid; gap: var(--space12); }
+.test-history-dialog h3 { margin: 0; overflow-wrap: anywhere; }
+.test-history-dialog .test-history-body { max-height: min(60vh, 560px); overflow: auto; }
+.test-history-dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space8); margin: 0; }
+.test-history-dialog footer button { margin: 0; }
+.test-history-dialog [role="status"]:empty { display: none; }
+
+/* The test overview: one row per process with its latest result, when and where it was
+   tested, and its last runs as dots, oldest first. The result is always said in words. */
+.tests-overview-tools { display: flex; flex-wrap: wrap; gap: var(--space8); align-items: center; margin: var(--space12) 0 var(--space8); }
+.tests-overview-tools label { flex: 1 1 240px; min-width: 0; margin: 0; }
+.tests-overview-tools input { width: 100%; margin: 0; box-sizing: border-box; }
+.tests-overview-tools button { margin: 0; }
+.tests-overview-status-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space8); margin: var(--space8) 0; min-height: 30px; }
+.tests-overview-status-row p { margin: 0; flex: 1 1 240px; min-width: 0; }
+.tests-overview-status-row button { margin: 0; min-height: 30px; padding: 3px 12px; }
+.tests-overview-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space6); }
+.tests-overview-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1.4fr) auto auto; gap: var(--space4) var(--space12); align-items: center; padding: var(--space8) var(--space12); border: 1px solid var(--colorBorderSubtle); border-left: 3px solid var(--colorBorderDefault); border-radius: 6px; background: var(--colorBackgroundSurface); min-width: 0; }
+.tests-overview-row[data-state="passed"] { border-left-color: var(--colorStatusSuccess); }
+.tests-overview-row[data-state="failed"] { border-left-color: var(--colorStatusDanger); }
+.tests-overview-row[data-state="in-progress"] { border-left-color: var(--colorStatusWarning); }
+.tests-overview-title { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.tests-overview-result { overflow-wrap: anywhere; }
+.tests-overview-result [aria-hidden] { font-weight: 700; margin-right: var(--space4); }
+.tests-overview-row[data-state="passed"] .tests-overview-result [aria-hidden] { color: var(--colorStatusSuccess); }
+.tests-overview-row[data-state="failed"] .tests-overview-result [aria-hidden] { color: var(--colorStatusDanger); }
+.tests-overview-row[data-state="in-progress"] .tests-overview-result [aria-hidden] { color: var(--colorStatusWarning); }
+.tests-overview-row[data-state="never"] .tests-overview-result { color: var(--colorTextSecondary); }
+.tests-overview-where { color: var(--colorTextSecondary); font-size: var(--fontSizeCaption); overflow-wrap: anywhere; }
+.tests-overview-stale { display: inline-block; margin-left: var(--space4); padding: 0 var(--space6); border: 1px solid var(--colorBorderDefault); border-radius: 999px; font-size: var(--fontSizeCaption); color: var(--colorTextPrimary); }
+.tests-overview-trend { display: inline-flex; gap: 3px; align-items: center; }
+.tests-overview-trend span { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--colorBorderDefault); box-sizing: border-box; }
+.tests-overview-trend [data-state="passed"] { background: var(--colorStatusSuccess); border-color: var(--colorStatusSuccess); }
+.tests-overview-trend [data-state="failed"] { background: var(--colorStatusDanger); border-color: var(--colorStatusDanger); }
+.tests-overview-trend [data-state="in-progress"] { border-color: var(--colorStatusWarning); background: linear-gradient(90deg, var(--colorStatusWarning) 50%, transparent 50%); }
+.tests-overview-row button { margin: 0; min-height: 30px; padding: 3px 12px; white-space: nowrap; }
+@media (max-width: 760px) {
+  .tests-overview-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .tests-overview-title, .tests-overview-result, .tests-overview-where { grid-column: 1; }
+  .tests-overview-trend { grid-column: 2; grid-row: 1; justify-self: end; }
+  .tests-overview-row button { grid-column: 2; grid-row: 2 / span 2; align-self: end; }
+}
+@media (forced-colors: active) {
+  .tests-overview-trend span { forced-color-adjust: none; border-color: CanvasText; }
+  .tests-overview-trend [data-state="passed"], .tests-overview-trend [data-state="failed"] { background: CanvasText; }
+}
+.tests-overview-scope { margin: var(--space8) 0 0; }
+.tests-overview-scope > summary { display: inline-flex; align-items: center; gap: var(--space8); min-height: 30px; padding: 3px 10px; border: 1px solid var(--colorBorderDefault); border-radius: var(--radiusMedium); background: var(--colorBackgroundSurface); font-weight: 600; cursor: pointer; }
+.tests-overview-scope-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space12); margin-top: var(--space8); padding: var(--space12); border: 1px solid var(--colorBorderDefault); background: var(--colorBackgroundSubtle); }
+.tests-overview-scope-panel p { grid-column: 1 / -1; margin: 0; }
+.tests-overview-scope-panel label { margin: 0; min-width: 0; }
+.tests-overview-scope-panel label[hidden] { display: none; }
+.tests-overview-scope-panel select { width: 100%; margin-top: var(--space4); }
