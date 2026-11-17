@@ -66,6 +66,12 @@
       `result-${total.outcome}`);
     if (run.tester) meta.row(d("test.tester"), run.tester);
     if (run.environment) meta.row(d("test.environment"), run.environment);
+    // Steps Page Scripting played back too fast for a screenshot are counted, not hidden.
+    const played = script.playedBack(run).length;
+    const withoutShot = script.playbackWithoutScreenshot(run);
+    if (withoutShot.length) {
+      meta.row(d("test.screenshots"), d("test.playbackNoShotMissing", { n: withoutShot.length, total: played }));
+    }
     meta.row(d("test.created"), date(run.createdAt));
     meta.row(d("test.updated"), date(run.updatedAt || run.createdAt));
     parts.push(meta.table);
@@ -102,9 +108,10 @@
       const instruction = element("td");
       if (step.heading) instruction.append(element("span", "section", step.heading));
       instruction.append(document.createTextNode(step.instruction));
+      const result = element("td", `result-${step.status}`, d(script.statusKey(step)));
+      if (withoutShot.includes(step.stepId)) result.append(element("span", "no-shot", d("test.playbackNoShot")));
       tr.append(element("td", "", String(step.number)), instruction,
-        element("td", "", script.resolveText(step.expected, run.testData)),
-        element("td", `result-${step.status}`, d(script.statusKey(step))),
+        element("td", "", script.resolveText(step.expected, run.testData)), result,
         element("td", "", step.comment));
       steps.append(tr);
     });

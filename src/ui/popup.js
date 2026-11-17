@@ -732,8 +732,18 @@ async function showActiveTest() {
     updateText($("activeTestTitle"), run.title);
     updateText($("activeTestProgress"), tf("test.stepsTested",
       { done: run.summary.total - run.summary.notRun, total: run.summary.total }));
+    // A test that can be recorded is started here: one click opens it beside Business Central,
+    // starts the recording and lets the extension take screenshots. Continue test only opens it.
+    const canStart = run.comparable === true;
+    card.classList.toggle("can-start", canStart);
+    $("startActiveTest").hidden = !canStart;
+    $("startActiveTest").disabled = false;
+    // Continue test steps back as the second choice, and the help goes with the first.
+    $("continueTest").classList.toggle("primary", !canStart);
+    $(canStart ? "startActiveTest" : "continueTest").after($("continueTestHelp"));
+    updateText($("continueTestHelp"), t(canStart ? "test.startHelp" : "test.continueHelp"));
     card.hidden = false;
-    $("continueTest").focus();
+    $(canStart ? "startActiveTest" : "continueTest").focus();
   } catch {
     card.hidden = true;
   }
@@ -748,6 +758,27 @@ function continueTest(testRunId) {
     () => showMessage(t("test.panelUnavailable"), true));
 }
 $("continueTest").addEventListener("click", () => continueTest(activeTestRunId));
+// The panel is opened first, straight from the click, and the recording is started meanwhile;
+// the panel follows the recording once it has started. The popup stays open on a failure.
+$("startActiveTest").addEventListener("click", () => {
+  const tab = testRunTab;
+  const button = $("startActiveTest");
+  if (!chrome.sidePanel?.open || !tab) { showMessage(t("test.panelUnavailable"), true); return; }
+  chrome.sidePanel.setOptions({ enabled: true,
+    path: `test-panel.html?testRunId=${encodeURIComponent(activeTestRunId)}` }).catch(() => {});
+  const opened = chrome.sidePanel.open({ windowId: tab.windowId }).then(() => true, () => false);
+  button.disabled = true;
+  showMessage(t("test.startingRecording"));
+  Promise.all([opened, send({ type: "T9_START_TEST_RECORDING", testRunId: activeTestRunId,
+    tabId: tab.id }, 15000)]).then(([panelOpen, response]) => {
+    if (!response?.ok) throw new Error(response?.error || "test.recordingStartFailed");
+    if (!panelOpen) { showMessage(t("test.startedWithoutPanel")); return; }
+    window.close();
+  }).catch(error => {
+    button.disabled = false;
+    showMessage(String(error?.message || "test.recordingStartFailed"), true);
+  });
+});
 // Ending the test here only stops offering it: its results are kept, and opening it again
 // from the document library makes it the active test again.
 $("endActiveTest").addEventListener("click", async () => {

@@ -302,7 +302,12 @@
       step.recordingSuggestion = { state: found.state,
         ...(["done", "failed"].includes(found.state)
           ? { instruction: text(found.instruction), at: text(found.at) } : {}),
-        ...(found.state === "failed" ? { error: text(found.error) } : {}) };
+        ...(found.state === "failed" ? { error: text(found.error) } : {}),
+        // Played back by Page Scripting, rather than done by hand; on the way to the next
+        // step, such as the menu an action is in, which has no screenshot of its own.
+        ...(["done", "failed"].includes(found.state) && found.playback ? { playback: true } : {}),
+        ...(["done", "failed"].includes(found.state) && found.playback && found.onTheWay
+          ? { onTheWay: true } : {}) };
     });
     result.recordingCheck = { checkedAt: now || new Date().toISOString(),
       // A check made while the test is still recorded; the last one is made when it stops.
@@ -377,6 +382,22 @@
       recordingId: String(recordingId || ""), failedAt: now || new Date().toISOString() };
     result.updatedAt = now || result.updatedAt;
     return normalize(result);
+  }
+
+  // The steps Page Scripting played back that have no screenshot, once the recording stopped:
+  // Edge allows only a few screenshots a second, and a played step whose screenshot came too
+  // late, after the next step, gets none. Stepping through the script gives each step one.
+  function playedBack(run) {
+    const value = normalize(run);
+    if (!value.recordingCheck?.checkedAt || value.recordingCheck.live) return [];
+    return value.steps.filter(step => {
+      const suggestion = step.recordingSuggestion;
+      return suggestion?.playback && !suggestion.onTheWay && ["done", "failed"].includes(suggestion.state);
+    }).map(step => step.stepId);
+  }
+  function playbackWithoutScreenshot(run) {
+    const steps = new Map(normalize(run).steps.map(step => [step.stepId, step]));
+    return playedBack(run).filter(stepId => !steps.get(stepId).screenshots.length);
   }
 
   // The steps the recording shows as done without an error that have no result yet. They
@@ -514,7 +535,7 @@
   return { SCHEMA_VERSION, STATUSES, MAX_SCREENSHOTS_PER_STEP, MAX_TEST_DATA, addScreenshot, outlinedImage,
     applyChanges, applyRecordingCheck, applyRecordingResults, bugReportContent, byRecording,
     cancel, withTester, failureFromSuggestion, liveCheckFailed, resume, statusKey,
-    recordingCheckFailed, suggestedPasses, carryOver, countsText, create, csv, markdown, normalize,
+    recordingCheckFailed, suggestedPasses, playedBack, playbackWithoutScreenshot, carryOver, countsText, create, csv, markdown, normalize,
     filledTestData, removeScreenshot, rerun, resolveText, screenshotIds, stepsFromDocument, summary, update,
     updateStep };
 });
