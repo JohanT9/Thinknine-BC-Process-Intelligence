@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Get started</title>
+  <link rel="icon" href="icons/icon32.png">
+  <style>
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    body{margin:0;font:15px "Segoe UI",system-ui,sans-serif;line-height:1.45;color:var(--c-fg-172b4d);background:var(--c-bg-eef2f6)}
+    button{font:inherit}
+    :focus-visible{outline:2px solid var(--c-ot-0f6cbd);outline-offset:2px}
+    main[data-loading]{visibility:hidden}
+    main{max-width:1120px;margin:0 auto;padding:28px 20px 40px;display:grid;gap:20px}
+    .wl-hero{display:grid;gap:6px}
+    .wl-brand{display:flex;align-items:center;gap:10px;margin:0;font-weight:700;color:var(--c-fg-005f65)}
+    .wl-brand img{width:30px;height:30px}
+    .wl-hero h1{margin:6px 0 0;font-size:clamp(1.5rem,3vw,2.1rem);line-height:1.2;outline:none}
+    .wl-hero p{margin:0;max-width:62ch;font-size:1.0625rem;color:var(--c-fg-526273)}
+    .wl-lang{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 14px;border:1px solid var(--c-bd-ccd5df);border-left:4px solid var(--c-bd-008489);border-radius:8px;background:var(--c-bg-ffffff)}
+    .wl-lang p{margin:0;flex:1 1 280px;overflow-wrap:anywhere}
+    .wl-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+    @media (max-width:860px){.wl-cols{grid-template-columns:1fr}}
+    .wl-card{display:grid;gap:14px;min-width:0;padding:18px;border:1px solid var(--c-bd-ccd5df);border-radius:12px;background:var(--c-bg-ffffff)}
+    .wl-card h2{margin:0;font-size:1.0625rem}
+    .wl-sub{margin:0;font-size:.875rem;color:var(--c-fg-526273)}
+    .wl-btn{min-height:38px;margin:0;padding:8px 16px;border:1px solid var(--c-bd-8392a5);border-radius:6px;background:var(--c-bg-ffffff);color:var(--c-fg-172b4d);font-weight:600;cursor:pointer}
+    .wl-btn:hover{background:var(--c-bg-f5f7fa)}
+    .wl-btn.primary{border-color:var(--c-bd-008489);background:var(--c-bg-008489);color:var(--c-fg-ffffff)}
+    .wl-btn.primary:hover{background:var(--c-bg-006f73)}
+    .wl-link{margin:0;padding:2px;border:0;background:none;color:var(--c-fg-005f65);font-size:.875rem;text-decoration:underline;cursor:pointer}
+    .wl-steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+    .wl-step{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 12px;align-items:start;padding:12px;border:1px solid var(--c-bd-ccd5df);border-radius:10px}
+    .wl-step[data-state=current]{border-color:var(--c-bd-008489);box-shadow:0 0 0 1px var(--c-bd-008489)}
+    .wl-step[data-state=done]{background:var(--c-bg-f5f7fa)}
+    .wl-num{grid-row:span 4;display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--c-bd-ccd5df);border-radius:50%;background:var(--c-bg-f5f7fa);font-size:.875rem;font-weight:700;color:var(--c-fg-526273)}
+    .wl-step[data-state=current] .wl-num{border-color:var(--c-bd-008489);background:var(--c-bg-008489);color:var(--c-fg-ffffff)}
+    .wl-step[data-state=done] .wl-num{border-color:var(--c-bd-15803d);background:var(--c-bg-e9f7ed);color:var(--c-fg-18713a);font-size:0}
+    .wl-step[data-state=done] .wl-num::after{content:"✓";font-size:1rem}
+    .wl-step h3{margin:3px 0 0;font-size:.9375rem}
+    .wl-step p{margin:0;font-size:.875rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .wl-step .wl-done{font-weight:600;color:var(--c-fg-18713a)}
+    .wl-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+    .wl-note{margin:0;padding:10px 12px;border-radius:8px;background:var(--c-bg-f5f7fa);font-size:.8125rem;color:var(--c-fg-526273)}
+    .wl-sample-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+    .wl-badge{padding:2px 9px;border-radius:10px;background:var(--c-bg-fff4ce);color:var(--c-fg-7c5800);font-size:.75rem;font-weight:700}
+    .wl-doc{border:1px solid var(--c-bd-ccd5df);border-radius:10px;overflow:hidden}
+    .wl-doc-title{padding:14px 16px;background:var(--c-bg-006f73);color:var(--c-fg-ffffff)}
+    .wl-doc-title strong{display:block;font-size:1.0625rem;overflow-wrap:anywhere}
+    .wl-doc-title span{font-size:.8125rem;opacity:.9}
+    .wl-doc-body{display:grid;gap:16px;padding:14px 16px}
+    .wl-more{display:grid;gap:16px}
+    .wl-sec{margin:0;padding:6px 10px;border-left:4px solid var(--c-bd-008489);background:var(--c-bg-eefafa);font-size:.875rem;font-weight:700;color:var(--c-fg-005f65)}
+    .wl-doc-step{display:grid;gap:8px}
+    .wl-doc-step p{margin:0;overflow-wrap:anywhere}
+    .wl-doc-step b{font-weight:600}
+    .wl-doc-step i{font-style:normal;font-weight:700}
+    .wl-n{margin-right:6px;font-weight:700;color:var(--c-fg-005f65)}
+    /* A picture of Business Central: it keeps Business Central's own light colours in every theme. */
+    .wl-shot{position:relative;overflow:hidden;border:1px solid #c8c6c4;border-radius:6px;background:#fff;color:#605e5c;font-size:11px}
+    .wl-shot-top{height:20px;background:#00475e}
+    .wl-shot-bar{display:flex;flex-wrap:wrap;gap:12px;padding:6px 10px;border-bottom:1px solid #edebe9;color:#323130}
+    .wl-shot-bar .wl-shot-new{color:#0078d4}
+    .wl-shot-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px;padding:8px 10px}
+    .wl-shot-body div{position:relative;display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-bottom:1px dotted #c8c6c4;min-width:0}
+    .wl-shot-body span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .wl-shot-body b{color:#201f1e;font-weight:600;white-space:nowrap}
+    .wl-mark{outline:2px solid #d13438;outline-offset:1px;border-radius:2px}
+    .wl-after{display:grid;gap:8px;padding-top:4px}
+    .wl-after p{margin:0;font-size:.875rem;font-weight:600}
+    .wl-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+    .wl-chips li{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--c-bd-ccd5df);border-radius:16px;background:var(--c-bg-ffffff);font-size:.8125rem}
+    .wl-chips svg{width:15px;height:15px;color:var(--c-fg-005f65)}
+    footer{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-size:.8125rem;color:var(--c-fg-526273);text-align:center}
+    @media (max-width:480px){main{padding:20px 16px 32px}.wl-card{padding:14px}}
+  </style>
+</head>
+<body>
+<main id="wlMain" data-loading>
+  <header class="wl-hero">
+    <p class="wl-brand"><img src="icons/icon48.png" alt="">BC Process Studio</p>
+    <h1 id="wlTitle" tabindex="-1" data-i18n="welcome.title">Work in Business Central as usual. We write the instructions.</h1>
+    <p data-i18n="welcome.lead">Every click and every value you enter becomes a step with a screenshot.</p>
+  </header>
+
+  <!-- Offered when the browser's language is a registered language other than the one in use.
+       Its words are in the offered language, so the person it is meant for can read it. -->
+  <section id="wlLang" class="wl-lang" hidden>
+    <p id="wlLangText"></p>
+    <button id="wlLangYes" class="wl-btn primary" type="button"></button>
+    <button id="wlLangNo" class="wl-link" type="button"></button>
+  </section>
+
+  <div class="wl-cols">
+    <section class="wl-card" aria-labelledby="wlStartTitle">
+      <div>
+        <h2 id="wlStartTitle" data-i18n="welcome.startTitle">Get started in a few minutes</h2>
+        <p id="wlProgress" class="wl-sub" role="status" aria-live="polite"></p>
+      </div>
+      <ol class="wl-steps">
+        <li id="wlPin" class="wl-step">
+          <span class="wl-num" aria-hidden="true">1</span>
+          <h3 data-i18n="welcome.pinTitle">Pin the button to the toolbar</h3>
+          <p class="wl-todo" data-i18n="welcome.pinHelp"></p>
+          <p class="wl-done" data-i18n="welcome.pinDone" hidden></p>
+        </li>
+        <li id="wlBc" class="wl-step">
+          <span class="wl-num" aria-hidden="true">2</span>
+          <h3 data-i18n="welcome.bcTitle">Open Business Central</h3>
+          <p class="wl-todo" data-i18n="welcome.bcHelp"></p>
+          <p class="wl-done" data-i18n="welcome.bcDone" hidden></p>
+          <div class="wl-actions wl-todo"><button id="wlOpenBc" class="wl-btn" type="button" data-i18n="welcome.bcAction">Open Business Central</button></div>
+        </li>
+        <li id="wlRecord" class="wl-step">
+          <span class="wl-num" aria-hidden="true">3</span>
+          <h3 data-i18n="welcome.recordTitle">Record your first process</h3>
+          <p id="wlRecordHelp" class="wl-todo"></p>
+          <p id="wlRecordDone" class="wl-done" hidden></p>
+          <div class="wl-actions">
+            <button id="wlGoBc" class="wl-btn" type="button" data-i18n="welcome.goBc" hidden>Go to Business Central</button>
+            <button id="wlOpenDocument" class="wl-btn primary" type="button" data-i18n="welcome.openDocument" hidden>Open the document</button>
+          </div>
+        </li>
+      </ol>
+      <p class="wl-note" data-i18n="welcome.licenseNote"></p>
+    </section>
+
+    <!-- What a recording becomes: an example, marked as one, written from the same sentence
+         templates as real documents in the document language. -->
+    <section class="wl-card" aria-labelledby="wlSampleTitle">
+      <div class="wl-sample-head">
+        <h2 id="wlSampleTitle" data-i18n="welcome.sampleTitle">What you get</h2>
+        <span class="wl-badge" data-i18n="welcome.sampleBadge">Example</span>
+      </div>
+      <article class="wl-doc" data-i18n-ignore>
+        <div class="wl-doc-title"><strong id="wlDocTitle"></strong><span id="wlDocMeta"></span></div>
+        <div class="wl-doc-body">
+          <p id="wlSec1" class="wl-sec"></p>
+          <div class="wl-doc-step">
+            <p id="wlStep1"></p>
+            <div id="wlShot1" class="wl-shot" role="img">
+              <div class="wl-shot-top"></div>
+              <div class="wl-shot-bar"><span id="wlShot1Page"></span><span id="wlShot1New" class="wl-shot-new wl-mark"></span></div>
+              <div class="wl-shot-body">
+                <div><span>106012</span><b>Fabrikam</b></div><div><span id="wlShot1Open"></span></div>
+                <div><span>106013</span><b>Litware</b></div><div><span id="wlShot1Released"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="wl-doc-step">
+            <p id="wlStep2"></p>
+            <div id="wlShot2" class="wl-shot" role="img">
+              <div class="wl-shot-top"></div>
+              <div class="wl-shot-bar"><span id="wlShot2Page"></span></div>
+              <div class="wl-shot-body">
+                <div class="wl-mark"><span id="wlShot2Vendor"></span><b>10000</b></div>
+                <div><span id="wlShot2Date"></span><b id="wlShot2DateValue"></b></div>
+                <div><span id="wlShot2Name"></span><b>Fabrikam</b></div>
+                <div><span id="wlShot2Status"></span><b id="wlShot2StatusValue"></b></div>
+              </div>
+            </div>
+          </div>
+          <div id="wlMore" class="wl-more" hidden>
+            <p id="wlSec2" class="wl-sec"></p>
+            <div class="wl-doc-step"><p id="wlStep3"></p></div>
+            <div class="wl-doc-step"><p id="wlStep4"></p></div>
+            <p id="wlSec3" class="wl-sec"></p>
+            <div class="wl-doc-step"><p id="wlStep5"></p></div>
+          </div>
+        </div>
+      </article>
+      <button id="wlMoreToggle" class="wl-link" type="button" aria-expanded="false" aria-controls="wlMore" data-i18n="welcome.moreSteps">Show more steps</button>
+      <div class="wl-after">
+        <p data-i18n="welcome.afterTitle">When you save, you can right away</p>
+        <ul class="wl-chips">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg><span data-i18n="welcome.afterWord"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/></svg><span data-i18n="welcome.afterTest"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/></svg><span data-i18n="welcome.afterList"></span></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span id="wlFooter"></span>
+    <button id="wlOpenLibrary" class="wl-link" type="button" data-i18n="recorder.openLibrary">Open the Document Library</button>
+  </footer>
+</main>
+<script src="engine/locale-catalogs.js"></script>
+<script src="engine/language-registry.js"></script>
+<script src="engine/storage-keys.js"></script>
+<script src="engine/step-text.js"></script>
+<script src="i18n.js"></script>
+<script src="welcome.js"></script>
+</body>
+</html>

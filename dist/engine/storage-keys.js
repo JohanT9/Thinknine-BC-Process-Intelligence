@@ -44,6 +44,9 @@
   const DOCUMENT_TEMPLATE_PREFIX = "t9_document_template_";
   // The template new documents get.
   const DEFAULT_DOCUMENT_TEMPLATE_KEY = "t9_default_document_template";
+  // The Get started page (ui/welcome.js): the answer to its language offer. Not part of any
+  // document, so never exported.
+  const WELCOME_KEY = "t9_welcome";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -71,6 +74,7 @@
     DOCUMENT_FOLDERS_KEY,
     DOCUMENT_TEMPLATE_PREFIX,
     DEFAULT_DOCUMENT_TEMPLATE_KEY,
+    WELCOME_KEY,
     LIBRARY_IMPORT_UNDO_KEY,
     LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
     LIBRARY_SYNC_STATE_KEY,

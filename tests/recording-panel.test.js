@@ -60,7 +60,9 @@ assert.equal(i18n.format("recPanel.counts", { events: 3, screenshots: 2 }, "fi-F
   "Tapahtumat: 3 · Kuvakaappaukset: 2");
 assert.equal(i18n.format("recPanel.toastSectionNamed", { name: "Auftrag" }, "de-DE"),
   "Der Abschnitt heißt jetzt „Auftrag“.");
-assert.equal(i18n.format("recPanel.outlineSteps", { count: 3 }, "fi-FI"), "3 vaihetta");
+assert.equal(i18n.format("recPanel.copied", { count: 3 }, "fi-FI"), "Kopioitu. Leikepöydällä on 3 vaihetta.");
+assert.equal(i18n.format("recPanel.savedFile", { fileName: "Order.docx" }, "de-DE"),
+  "In Ihren Downloads gespeichert: Order.docx.");
 
 // ---- The panel marks the latest step of the active recording ------------------------------
 const background = read("src/recorder/background.js");
@@ -315,6 +317,27 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
     assert.ok(panelJs.includes(`type: "${type}"`), `the panel sends ${type}`);
   }
   assert.doesNotMatch(panelJs, /confirm\(/, "deleting is confirmed in the panel, not in a browser dialog");
+
+  // ---- After saving, the document is used at once: Word, a test, a list to paste -------------
+  // Word export and test creation are the library's own, run out of sight for this one document.
+  const dashboardJs = read("src/ui/dashboard.js");
+  assert.match(dashboardJs, /\["export-word", "run-test"\]\.includes\(kind\) \|\| globalThis\.parent === globalThis/,
+    "the library does a panel job only when loaded inside the panel, and only these two");
+  assert.match(dashboardJs, /\.\.\.data \}, globalThis\.location\.origin\)/,
+    "the outcome goes only to the extension's own page");
+  assert.match(dashboardJs, /if \(!PANEL_JOB\) \{\s*renderLibraryImportNotice\(\)/,
+    "a job does not start a second library synchronisation");
+  assert.match(dashboardJs, /options\.suiteId \|\| options\.open === false \? \{ open: false \}/,
+    "a test made for the panel opens in the panel, not in a new tab");
+  assert.match(panelJs, /event\.origin !== location\.origin \|\| event\.data\?\.type !== "T9_PANEL_JOB"/,
+    "the panel listens only to its own extension");
+  // Saved is said only when the browser has the file.
+  const wordBody = panelJs.slice(panelJs.indexOf("async function exportWord("),
+    panelJs.indexOf("async function startTest("));
+  assert.ok(wordBody.indexOf("await downloadFinished(") < wordBody.indexOf('"recPanel.savedFile"'),
+    "the Word file is called saved after the download completed");
+  assert.match(panelJs, /item\.state === "interrupted"/, "a stopped download is reported, not saved");
+  assert.match(read("src/ui/manifest.json"), /"downloads"/);
   assert.match(panelHtml, /<form id="rpSaveForm"/);
   assert.match(panelHtml, /data-language-select="document"/, "the document language is chosen when saving");
   assert.doesNotMatch(panelHtml, /data-kind="important"/,
@@ -355,7 +378,7 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
       setTimeout: (fn, ms) => { timers.push({ fn, ms }); return timers.length; },
       clearTimeout: id => { if (timers[id - 1]) timers[id - 1].cleared = true; },
       setInterval: (fn, ms) => { timers.push({ fn, ms, interval: true }); return timers.length; },
-      window: { close() {} }
+      window: { close() {}, addEventListener() {} }
     };
     sandbox.globalThis = Object.assign(sandbox, { T9UiI18n: i18n,
       T9LanguageRegistry: context.globalThis.T9LanguageRegistry,

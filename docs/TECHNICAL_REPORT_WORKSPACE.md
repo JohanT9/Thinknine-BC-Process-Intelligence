@@ -1,6 +1,6 @@
 # Technical Report Workspace
 
-The default reading order prioritizes editable human context, reproduction, expected and actual results, captured BC errors, and evidence. Exact error text remains visible and copyable. Environment, diagnostics, structured/raw AL call stacks, objects, telemetry, timeline, and traceability are collapsed under **Technical details**. A newly created report focuses the first missing high-value human field.
+The default reading order prioritizes editable human context, reproduction, expected and actual results, captured BC errors, and evidence. Exact error text remains visible and copyable. Environment, diagnostics, structured/raw AL call stacks, objects, timeline, and traceability are collapsed under **Technical details**. A newly created report focuses the first missing high-value human field.
 
 `technical-report.html?bugReportId=<id>` is a dedicated local workspace. It
 loads through existing APIs, projects current domain state and saves through the

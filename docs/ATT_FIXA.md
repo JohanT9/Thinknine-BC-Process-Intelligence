@@ -2,6 +2,26 @@
 
 Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varje punkt beskriver vad som är fel, vad användaren märker och ett förslag. En punkt är bekräftad i koden eller i Business Central om inget annat sägs; det som bara är en misstanke står som **Att kontrollera**. När en punkt är åtgärdad flyttas den till CHANGELOG och tas bort här. Nya funktioner hör hemma i [FUTURE_FEATURES.md](FUTURE_FEATURES.md).
 
+## Exemplets Business Central-texter på Kom igång-sidan är inte kontrollerade mot klienten
+
+*Tillagd 2026-11-17.*
+
+**Vad är fel:** exemplet på Kom igång-sidan (`src/ui/welcome.js`, `SAMPLE`) visar Business Central-texter som Inköpsorder, Ny, Leverantörsnr, Antal och Släpp på alla åtta språk. Svenska och engelska är kända från inspelningar. Franska, tyska, spanska, danska, finska och norska är skrivna efter bästa kännedom och inte kontrollerade mot Business Central-klientens språkresurser eller en inspelning, eftersom kunskapskatalogen saknar de här fälten på de språken.
+
+**Vad användaren märker:** möjligen en text i exemplet som inte exakt motsvarar vad Business Central visar på användarens språk. Exemplet är märkt Exempel och påverkar inga dokument.
+
+**Förslag:** kontrollera texterna i en Business Central-miljö per språk, eller mot klientens språkresurser, och rätta `SAMPLE`.
+
+## Konsultregistreringens felmeddelande visas på svenska när tjänsten anger en orsak
+
+*Tillagd 2026-11-17.*
+
+**Vad är fel:** felmeddelandena i `src/engine/consultant-license.js` skrivs på svenska och översätts när de visas, genom paren i `src/ui/i18n.js` och `locale-catalogs.js`. Det fungerar för alla utom ett. När konsultregistreringen misslyckas och licenstjänsten skickar med en orsak blir texten `Konsultregistreringen kunde inte skapas (HTTP 500: orsak).`. Den matchar inte mallen `… (HTTP {status}).` och visas därför på svenska oavsett gränssnittsspråk. Två andra meddelanden i samma funktion vänder sig till den som driftar tjänsten och inte till användaren: "Distribuera den senaste tjänste-ZIP-filen" och "Kontrollera LICENSE_ENTRA_AUDIENCE och LICENSE_ENTRA_SCOPE i Azure".
+
+**Vad användaren märker:** en konsult som inte har svenska som gränssnittsspråk kan få ett svenskt felmeddelande vid registreringen. Vid de två andra felen får användaren instruktioner om Azure och ZIP-filer som hen inte kan göra något åt.
+
+**Förslag:** ge meddelandena nycklar i `i18n.js` med platshållare för status och orsak, som övriga `license.*`-texter. Skriv texterna för användaren, till exempel att licensen inte kunde registreras och att man kan försöka igen eller kontakta sin administratör. De tekniska detaljerna kan ligga kvar i diagnostiken.
+
 ## Markeringen "Viktigt steg" gör ingenting i dokumentet
 
 *Tillagd 2026-11-16.*
@@ -11,16 +31,6 @@ Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varj
 **Vad användaren märker:** man klickar på Viktigt steg och får bekräftelsen att steget markerats, men dokumentet ser likadant ut som utan markering.
 
 **Förslag:** bestäm vad ett viktigt steg ska innebära, till exempel en framhävd ruta i dokumentet och en markering i granskningen, och visa det. Tills dess finns knappen inte i den nya inspelningspanelen, bara i den flytande rutan.
-
-## Sekretesstexten för Edge-butiken stämmer inte längre
-
-*Tillagd 2026-11-13. Bör vara klar före nästa inlämning till Edge-butiken.*
-
-**Vad är fel:** [EDGE_ADDONS_SUBMISSION.md](EDGE_ADDONS_SUBMISSION.md) säger att integritetsmaskeringen döljer känsliga inmatningar. Sedan 4.7.258 sparas det användaren själv skriver i ett fält även omaskerat i inspelningen, bredvid det maskerade värdet, så att ett Page Scripting-test kan mata in samma sak (`typedValue`, se [PAGE_SCRIPTING.md](PAGE_SCRIPTING.md)). Lösenord, hemligheter, tokens och nycklar sparas aldrig.
-
-**Vad användaren märker:** inget i produkten, men butikstexten beskriver hanteringen av data fel.
-
-**Förslag:** skriv att maskeringen gäller det som visas i dokument, exporter och felrapporter, och att det användaren skriver sparas lokalt i inspelningen för testexporten och följer med när användaren själv exporterar eller synkroniserar biblioteket. Låt en människa granska formuleringen mot Edges gällande policy.
 
 ## Page Scripting-test som börjar på ett kort
 

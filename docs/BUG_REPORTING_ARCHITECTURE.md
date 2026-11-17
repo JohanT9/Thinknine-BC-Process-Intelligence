@@ -2,7 +2,7 @@
 
 ## End-to-end UX boundary
 
-Bug Reporting starts as a first-class popup action. Stop finalizes the existing recording, derives reproduction through the shared interpretation pipeline, creates the existing Bug Report model, and opens its workspace automatically. Silent problems remain valid reports. Error dialogs add evidence but are not required. Telemetry, AI, and issue submission remain optional explicit downstream actions.
+Bug Reporting starts as a first-class popup action. Stop finalizes the existing recording, derives reproduction through the shared interpretation pipeline, creates the existing Bug Report model, and opens its workspace automatically. Silent problems remain valid reports. Error dialogs add evidence but are not required. AI and issue submission remain optional explicit downstream actions; telemetry is not queried.
 
 Captured Business Central errors identify the affected reproduction step through
 stable Canonical Event references. An exact step reference wins. When a technical

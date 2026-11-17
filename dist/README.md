@@ -52,7 +52,7 @@ Broader **BC Process AI** capabilities are a future product area. They are not p
 
 ## Report a Business Central bug
 
-Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then email it as a PDF or export it locally. Telemetry is optional.
+Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then email it as a PDF or export it locally. The report stays in the extension until you email or export it.
 
 Both process and bug recording start immediately. When you select Stop, enter
 the final process or report name and confirm its document language in the naming

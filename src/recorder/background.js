@@ -2660,7 +2660,7 @@ async function cancelActiveSession() {
   return session;
 }
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async details => {
   const current = await chrome.storage.local.get(SETTINGS_KEY);
   if (!current[SETTINGS_KEY]) {
     await chrome.storage.local.set({ [SETTINGS_KEY]: INITIAL_SETTINGS });
@@ -2672,6 +2672,10 @@ chrome.runtime.onInstalled.addListener(async () => {
     connected: false,
     lastError: null
   });
+  // A new installation opens the Get started page; an update or a browser update does not.
+  if (details?.reason === "install") {
+    try { await chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") }); } catch {}
+  }
 });
 
 chrome.runtime.onStartup.addListener(async () => {

@@ -142,6 +142,38 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     });
   }
 
+  // The recording's events in the order they happened, worked out once per recording.
+  const eventsInOrder = new WeakMap();
+  function byNumber(eventsById) {
+    if (!eventsInOrder.has(eventsById)) {
+      eventsInOrder.set(eventsById, [...new Set(eventsById.values())]
+        .filter(event => Number.isSafeInteger(event?.eventNo))
+        .sort((a, b) => a.eventNo - b.eventNo));
+    }
+    return eventsInOrder.get(eventsById);
+  }
+
+  // A value typed in a field shows only once it is typed. The screenshot taken as the field was
+  // clicked shows the field empty, so a step without a screenshot taken after the value, for
+  // example because the queued one came too late, uses the next screenshot on the same page soon
+  // after: the one taken just before the next click, or of the next value typed. Both show the
+  // field with its value.
+  const VALUE_SCREENSHOT_EVENT_GAP = 10;
+  const pageOf = event => String(event?.pageId || event?.pageCaption || "");
+  function screenshotAfterValue(valueEvent, eventsById, screenshots) {
+    for (const event of byNumber(eventsById)) {
+      if (event.eventNo <= valueEvent.eventNo) continue;
+      if (event.eventNo - valueEvent.eventNo > VALUE_SCREENSHOT_EVENT_GAP) return null;
+      if (pageOf(event) && pageOf(valueEvent) && pageOf(event) !== pageOf(valueEvent)) return null;
+      if (!screenshots[event.eventNo]) continue;
+      if ((event.type === "click" && event.preActionCaptureId) || event.type === "field-change") {
+        return event;
+      }
+      return null;
+    }
+    return null;
+  }
+
   function task(action, index, eventsById, screenshots = {}) {
     const sourceEvents = (action.sourceEventIds || []).map(id =>
       eventsById.get(id)).filter(Boolean);
@@ -179,16 +211,25 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const listBeforeChoice = choiceByKey ? sourceEvents.filter(event =>
       event.eventNo < choiceByKey.eventNo && screenshots[event.eventNo] && event.uiState?.menuOpen &&
       Date.parse(choiceByKey.timestamp) - Date.parse(event.timestamp) <= 3000).at(-1) : null;
-    const screenshot = (choiceAtClick && screenshots[choiceAtClick.eventNo]) ||
+    const chosenScreenshot = (choiceAtClick && screenshots[choiceAtClick.eventNo]) ||
       (listBeforeChoice && screenshots[listBeforeChoice.eventNo]) ||
       screenshots[preferredEventNo] || action.preferredScreenshotRef ||
       [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||
       action.screenshotRefs?.at(-1) || null;
     // The control the user clicked, typed in or chose, as a share of the screenshot, from the
     // event the screenshot belongs to. A screenshot of another event shows another moment.
-    const screenshotEvent = listBeforeChoice && screenshot === screenshots[listBeforeChoice.eventNo]
-      ? choiceByKey : screenshot ? [...sourceEvents].reverse()
-        .find(event => screenshots[event.eventNo] === screenshot) : null;
+    const chosenEvent = listBeforeChoice && chosenScreenshot === screenshots[listBeforeChoice.eventNo]
+      ? choiceByKey : chosenScreenshot ? [...sourceEvents].reverse()
+        .find(event => screenshots[event.eventNo] === chosenScreenshot) : null;
+    const valueEvent = /^(?:EnterFieldValue|ChangeField)$/u.test(String(action.actionType || ""))
+      ? [...sourceEvents].reverse().find(event => event.type === "field-change" &&
+        String(event.value ?? "").trim()) : null;
+    const beforeValue = valueEvent && (!chosenScreenshot ||
+      (chosenEvent && chosenEvent.type !== "field-change" && chosenEvent.eventNo < valueEvent.eventNo));
+    const afterValue = beforeValue ? screenshotAfterValue(valueEvent, eventsById, screenshots) : null;
+    const screenshot = afterValue ? screenshots[afterValue.eventNo] : chosenScreenshot;
+    // The field is outlined where it was typed in; the next click is somewhere else.
+    const screenshotEvent = afterValue ? valueEvent : chosenEvent;
     const highlightBox = screenshotEvent?.topViewportBounds;
     const highlightable = ["click", "field-change"].includes(screenshotEvent?.type) ||
       (screenshotEvent?.type === "key" && Boolean(screenshotEvent.selectedCaption));
