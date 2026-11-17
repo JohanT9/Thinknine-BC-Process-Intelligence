@@ -58,6 +58,14 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
     if (!definition) return task;
     const language = text(task.language || task.locale || task.context?.language ||
       task.context?.locale || "en-US");
+    // A page ID that is not confirmed by the page's address can belong to the page the user came
+    // from. When the page Business Central showed is known as a page for another kind of record,
+    // such as Inköpsorder with the ID of the Customers page, the shown page is right.
+    const shownEntity = captionEntity(task.pageCaption, language, packs);
+    if (shownEntity && definition.entity && shownEntity !== text(definition.entity).toLowerCase()) {
+      const entity = Object.keys(createdEntityNames).find(id => id.toLowerCase() === shownEntity);
+      return entity && !task.entity ? { ...task, entity } : task;
+    }
     const definitions = packs.flatMap(pack => pack.pageDefinitions || [])
       .filter(item => String(item.pageObjectId || "") === String(pageObjectId) &&
         (!definition.entity || item.entity === definition.entity));
