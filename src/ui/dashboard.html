@@ -62,6 +62,13 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .review-toolbar-group:last-child{padding-right:0;border-right:0}
 .review-toolbar button{margin:0;min-height:38px}
 .review-toolbar button:disabled{cursor:not-allowed;opacity:.48}
+.review-language-switch{display:inline-flex;align-items:center;gap:6px}
+.review-language-switch label{font-weight:600;color:var(--c-fg-374151);white-space:nowrap}
+.review-language-switch select{min-height:38px;margin:0;width:auto;max-width:12em}
+.review-language-status{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px;padding:10px 12px;border-radius:6px;background:var(--c-bg-edf6f7);color:var(--c-fg-005f65)}
+.review-language-status[hidden]{display:none}
+.review-language-status button{margin:0;min-height:32px}
+.review-shell.document-workspace-mode .review-language-status,.review-shell.annotation-mode .review-language-status{display:none}
 .review-toolbar-secondary{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .review-toolbar-more{position:relative;margin-left:auto}
 .review-toolbar-more>summary{list-style:none;cursor:pointer;font-weight:600;padding:9px 13px;background:var(--c-bg-e5e7eb);border-radius:5px;color:var(--c-fg-374151)}
@@ -1217,6 +1224,14 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" data-icon="↷" title="Gör om" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
         </div>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
+        <span class="review-language-switch">
+          <label for="reviewLanguageSwitch" data-i18n="languageSwitch.label">Dokumentspråk</label>
+          <select id="reviewLanguageSwitch" data-language-select="document"
+            aria-describedby="reviewLanguageSwitchHelp">
+            <option value="sv-SE">Svenska</option>
+            <option value="en-US">English</option>
+          </select>
+        </span>
         <button id="openReviewDocumentFields" data-review-toolbar-item class="secondary" data-icon="ⓘ" title="Dokumentinformation">Dokumentinformation</button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
@@ -1247,6 +1262,11 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           <button id="moveDownReviewSteps" data-review-command="move-down" data-review-toolbar-item class="secondary" disabled>Flytta ned</button>
           <button id="regenerateSelectedReview" data-review-toolbar-item class="secondary" disabled>Regenerera valda steg</button>
         </div>
+      </div>
+      <p id="reviewLanguageSwitchHelp" class="sr-only" data-i18n="languageSwitch.help">Skriver om stegen på det valda språket.</p>
+      <div id="reviewLanguageStatus" class="review-language-status" role="status" aria-live="polite" hidden>
+        <span id="reviewLanguageStatusText"></span>
+        <button id="reviewLanguageUndo" type="button" class="secondary" data-i18n="languageSwitch.undo">Ångra</button>
       </div>
       <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="reviewProgressBar" class="review-progress-bar"></div>
@@ -1536,6 +1556,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="engine/process-quality-guard.js"></script>
 <script src="engine/process-contradiction-engine.js"></script>
 <script src="engine/process-analysis-model.js"></script>
+<script src="document/bc-caption-translation.js"></script>
 <script src="engine/session-interpretation-pipeline.js"></script>
 <script src="engine/canonical-process-schema.js"></script>
 <script src="engine/canonical-process-adapter.js"></script>

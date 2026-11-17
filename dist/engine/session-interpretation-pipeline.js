@@ -10,11 +10,13 @@
     ? require("../review/task-visibility") : root.T9ReviewTaskVisibility;
   const processAnalysis = typeof module === "object" && module.exports
     ? require("./process-analysis-model") : root.T9ProcessAnalysisModel;
-  const api = factory(semantic, knowledge, refs, taskVisibility, processAnalysis);
+  const captionTranslation = typeof module === "object" && module.exports
+    ? require("../document/bc-caption-translation") : root.T9BCCaptionTranslation;
+  const api = factory(semantic, knowledge, refs, taskVisibility, processAnalysis, captionTranslation);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SessionInterpretationPipeline = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
+function (semantic, knowledge, refs, taskVisibility, processAnalysis, captionTranslation) {
   "use strict";
   const VERSION = "1.3.0";
   const unique = values => [...new Set((values || []).filter(Boolean))];
@@ -252,9 +254,13 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const control = [...sourceEvents].reverse().map(event => event.controlIdentification ||
       event.identification?.controlIdentity || {}).find(value => value.controlId || value.fieldId ||
         value.automationId || value.alControlName) || {};
+    // The AL identity of the field, action and page, so a document in another language can name
+    // them as Business Central does in that language (document/bc-caption-translation.js).
+    const captionKeys = captionTranslation?.keysFromEvents(sourceEvents) || {};
+    const model = Object.keys(captionKeys).length ? { ...action, captionKeys } : action;
     return { taskId: `${action.actionType || "Task"}:${refs.stableIdentity(trace)}`,
       taskNo: index + 1, taskType: action.actionType || "Unclassified",
-      semanticAction: action.actionType || "", semanticActionModel: action,
+      semanticAction: action.actionType || "", semanticActionModel: model,
       ...(Array.isArray(action.actionPath)
         ? { actionPath: [...action.actionPath] } : {}),
       capturePackets: (action.capturePackets || []).map(value => ({ ...value })),

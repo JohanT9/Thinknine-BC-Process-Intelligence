@@ -4,10 +4,12 @@
     : root.T9DocumentModel;
   const stepText = typeof module === "object" && module.exports
     ? require("../engine/step-text") : root.T9StepText;
-  const api = factory(semantic, stepText);
+  const captionTranslation = typeof module === "object" && module.exports
+    ? require("./bc-caption-translation") : root.T9BCCaptionTranslation;
+  const api = factory(semantic, stepText, captionTranslation);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9PresentationGrammar = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic, stepText) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic, stepText, captionTranslation) {
   const GRAMMAR_VERSION = "1.4.0";
   const cache = new WeakMap();
   const DOCUMENT_LANGUAGES = new Set([
@@ -253,6 +255,28 @@
       ? quoted(item.text) : run(item.text, item.role)));
   }
 
+  // Business Central's own names in the document's language: a caption in the sentence that is
+  // the recorded field's, action's or page's caption in any language is written as Business
+  // Central shows it in the document's language (document/bc-caption-translation.js). Entered
+  // values, records and captions the step does not know stay as recorded.
+  function translateCaptions(paragraph, captionKeys, documentLanguage) {
+    if (!captionTranslation || !captionKeys || !Array.isArray(paragraph.presentationRuns)) return;
+    const keys = [captionKeys.field, captionKeys.action, captionKeys.page].filter(Boolean);
+    if (!keys.length) return;
+    let changed = false;
+    const runs = paragraph.presentationRuns.map(item => {
+      if (item?.role !== "interface" || typeof item.text !== "string") return item;
+      for (const key of keys) {
+        const text = captionTranslation.translate(item.text, key, documentLanguage);
+        if (text !== item.text) { changed = true; return { ...item, text }; }
+      }
+      return item;
+    });
+    if (!changed) return;
+    paragraph.presentationRuns = runs;
+    paragraph.text = runs.map(item => item.text).join("");
+  }
+
   function processBlock(block, action, documentLanguage, described = null) {
     const result = clone(block);
     const blockAction = result.kind === "step"
@@ -276,6 +300,9 @@
           documentLanguage);
         result.text = presentation.text;
         result.presentationRuns = presentation.runs;
+      }
+      if (!result.preserveUserText && result.provenance !== "user-edited") {
+        translateCaptions(result, blockAction?.captionKeys, documentLanguage);
       }
     }
     if (Array.isArray(result.blocks)) {

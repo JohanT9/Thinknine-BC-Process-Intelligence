@@ -78,10 +78,47 @@ Swedish sentence.
   its instruction still is the described sentence in some language, so merged
   or edited steps keep their text. Steps saved before descriptions existed are
   read from their saved sentence when shown.
-- Captured captions and values are never translated. `tests/step-text.test.js`
+- Values are never translated. Captured captions are translated only as
+  described under Business Central names below. `tests/step-text.test.js`
   checks every kind in every registered language; the capture-quality test
   checks that recordings interpreted in Swedish or English read the same in
   each document language.
+
+## Business Central names in the document language
+
+The document language can be changed directly in the review toolbar
+(Document language). The steps are then written again in that language, and
+Business Central's own field, action and page names are shown as Business
+Central shows them in that language, such as Kreditorennr. for Leverantörsnr.
+
+- Since 4.7.258 each recorded field and action keeps its AL identity
+  (`recorder/al-identity-capture.js`): the AL name of the page, the control and
+  the action, which is the same in every language. The interpretation pipeline
+  stores them as `captionKeys` on the step's semantic action model.
+- `src/document/bc-captions.json` holds Microsoft's captions for those AL names
+  in every registered language. `scripts/build-bc-captions.js` builds it from
+  the country packages of Microsoft's Base Application (`Microsoft_Base
+  Application_<version>.app` in the Business Central artifacts,
+  `Applications.<COUNTRY>/`), reading the AL source and each language's
+  translation file and resolving a caption the way the client does: the
+  control's own Caption, else the table field's Caption, else the field name.
+  To update it, download the eight packages (us, se, fr, de, es, dk, fi, no)
+  into a folder outside the repository and run
+  `node scripts/build-bc-captions.js <folder>`. The packages are not committed.
+- `src/document/bc-caption-translation.js` replaces a recorded caption only
+  when it is that exact control's caption in one of the languages. A
+  personalized caption, a caption changed by an extension and anything the
+  table does not know keep what Business Central showed. Text the user wrote is
+  never changed.
+- New, the client's own action on every page, is not in the Base Application.
+  Its caption comes from the web client's language resources (CreateActionCaption,
+  as in `engine/bc-client-captions.js`) and is kept in the translation module.
+- Limits: only Microsoft's Base Application and New are covered, not partner
+  apps or other client actions such as Delete. Steps recorded before 4.7.258 have no
+  AL identity and keep their recorded names; documents saved before this
+  change get the keys when generated again from the recording.
+  `tests/bc-caption-translation.test.js` covers the table, the matching rule and
+  every document language.
 
 ## Compatibility
 
