@@ -264,6 +264,8 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       } : {}),
       important: Boolean(action.captureGuidance?.important),
       sectionBoundaryAfter: Boolean(action.captureGuidance?.sectionBoundaryAfter),
+      ...(action.captureGuidance?.sectionBoundaryAfter && action.captureGuidance?.sectionTitle
+        ? { sectionTitle: String(action.captureGuidance.sectionTitle) } : {}),
       context: context(action, sourceEvents), automationId: "",
       reviewStatus: action.confidence < 0.85 ? "review-suggested" : "unreviewed",
       confidence: Number.isFinite(action.confidence)
@@ -503,6 +505,14 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     return { ...result, businessTasks, processAnalysis: analysis };
   }
 
+  // The latest name given to the first section while recording; an empty name removes it.
+  function firstSectionTitle(events = []) {
+    const latest = [...(Array.isArray(events) ? events : [])].reverse().find(event =>
+      (event?.raw || event)?.type === "capture-guidance" &&
+      (event?.raw || event)?.guidanceKind === "first-section-title");
+    return String((latest?.raw || latest)?.sectionTitle || "").replace(/\s+/gu, " ").trim().slice(0, 80);
+  }
+
   function interpret(input = {}, services = {}) {
     const groups = input.stepGroups || [];
     const activeGroups = groups.filter(group => !group.guidance?.ignored);
@@ -534,7 +544,11 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
           .some(id => evidence.has(id)) && candidate.screenshot);
         return source ? { screenshot: source.screenshot,
           screenshots: [...source.screenshots] } : {};
-      })() : {})
+      })() : {}),
+      // The name the user gave the first section in the recording panel, carried by the first
+      // step like the names of later sections are carried by the step before them.
+      ...(index === 0 && firstSectionTitle(input.events) ? {
+        firstSectionTitle: firstSectionTitle(input.events) } : {})
     }));
     const consolidationDecisions = (knowledgeResult.consolidationDecisions || [])
       .map(decision => ({ ...decision,

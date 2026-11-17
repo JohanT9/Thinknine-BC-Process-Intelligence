@@ -755,12 +755,33 @@
         const targetInteractionId = event.guidance?.targetInteractionId;
         return Boolean(targetInteractionId &&
           group.interactionIds?.includes(targetInteractionId)) ||
-          group.sourceEventIds.includes(event.guidance?.targetSourceEventId);
+          group.sourceEventIds.includes(event.guidance?.targetSourceEventId) ||
+          (event.guidance?.targetSourceEventIds || []).some(id => group.sourceEventIds.includes(id));
       });
       if (!directives.length) return group;
-      const kinds = new Set(directives.map(event => event.guidance?.kind));
-      const requestedImage = [...directives].reverse().map(event =>
-        event.guidance?.preferredScreenshotAssetId).find(Boolean);
+      // Markers apply in the order they were made, so a later one changes or undoes an earlier
+      // one: include after ignore, no-section after new-section, auto-image after use-image.
+      // Recordings with only the first four kinds read as before.
+      const marked = { important: false, ignored: false, section: false, sectionTitle: "",
+        image: undefined, chosen: null };
+      for (const directive of directives) {
+        const guidance = directive.guidance || {};
+        if (guidance.kind === "important") marked.important = true;
+        if (guidance.kind === "ignore") marked.ignored = true;
+        if (guidance.kind === "include") marked.ignored = false;
+        if (guidance.kind === "new-section") {
+          // Each new-section marker says the section's whole name; none leaves it unnamed.
+          marked.section = true;
+          marked.sectionTitle = guidance.sectionTitle || "";
+        }
+        if (guidance.kind === "no-section") { marked.section = false; marked.sectionTitle = ""; }
+        if (guidance.kind === "auto-image") { marked.image = null; marked.chosen = null; }
+        else if (guidance.preferredScreenshotAssetId) marked.image = guidance.preferredScreenshotAssetId;
+        if (guidance.kind === "use-image") marked.chosen = guidance.preferredScreenshotAssetId || null;
+      }
+      const kinds = new Set([marked.important && "important", marked.ignored && "ignore",
+        marked.section && "new-section"].filter(Boolean));
+      const requestedImage = marked.image;
       const preferredImage = group.screenshotAssetIds.includes(requestedImage)
         ? requestedImage : group.capturePacket?.preferredScreenshotAssetId;
       const preferredEvent = preferredImage ? group.normalizedEvents.find(event =>
@@ -773,6 +794,10 @@
         guidance: {
           important: kinds.has("important"), ignored: kinds.has("ignore"),
           sectionBoundaryAfter: kinds.has("new-section"),
+          ...(marked.section && marked.sectionTitle ? { sectionTitle: marked.sectionTitle } : {}),
+          // Only an image the user chose; the automatic choice stays the capture packet's own.
+          chosenScreenshotAssetId: group.screenshotAssetIds.includes(marked.chosen)
+            ? marked.chosen : null,
           preferredScreenshotAssetId: preferredImage || null,
           markerSourceEventIds: unique(directives.flatMap(event =>
             event.sourceEventIds || [event.sourceEventId]))
