@@ -768,8 +768,17 @@
         name: section.title || t("recPanel.sectionNumber", { number: index + 1 }),
         count: section.steps.length }));
     }
+    // The list to paste: the kept steps in their document words, under their section names when
+    // the document has sections.
+    const list = hasSections
+      ? sections(snapshot.steps).map((section, index) => ({
+        title: (index === 0 ? snapshot.firstTitle : section.title) ||
+          t("recPanel.sectionNumber", { number: index + 1 }),
+        steps: section.steps.filter(step => !step.ignored).map(plainText) }))
+        .filter(section => section.steps.length)
+      : [{ title: "", steps: kept.map(plainText) }];
     return { steps: kept.length, sections: outline, images: kept.filter(step => step.shownPath).length,
-      leftOut: snapshot.steps.length - kept.length, time: snapshot.time };
+      leftOut: snapshot.steps.length - kept.length, time: snapshot.time, list };
   }
 
   function renderSummary(summary) {
@@ -780,10 +789,6 @@
         summary.sections.length ? stat(t("recPanel.statSections"), summary.sections.length) : null,
         stat(t("recPanel.statImages"), summary.images),
         summary.time ? stat(t("recPanel.statTime"), summary.time) : null),
-      summary.sections.length ? el("ol", { class: "rp-outline", "aria-label": t("recPanel.outlineLabel") },
-        ...summary.sections.map(section => el("li", {}, el("span", { text: section.name }),
-          el("span", { text: section.count === 1 ? t("recPanel.outlineStepsOne")
-            : t("recPanel.outlineSteps", { count: section.count }) })))) : null,
       summary.leftOut ? el("p", { class: "rp-help", text: summary.leftOut === 1
         ? t("recPanel.leftOutOne") : t("recPanel.leftOut", { count: summary.leftOut }) }) : null
     ];
@@ -793,18 +798,248 @@
   function showDone({ titleKey, name = "", helpKey = "", recordingId = "", summary = null }) {
     busy = false;
     completedId = recordingId;
+    completedName = name;
     setView("done");
     setText($("rpDoneTitle"), t(titleKey));
     setText($("rpDoneName"), name);
     show($("rpDoneName"), Boolean(name));
     if (summary) renderSummary(summary);
     show($("rpSummary"), Boolean(summary));
-    show($("rpDoneCheck"), Boolean(summary));
-    setText($("rpDoneHelp"), helpKey ? t(helpKey) : "");
-    show($("rpDoneHelp"), Boolean(helpKey));
+    show($("rpDoneCheck"), Boolean(recordingId));
+    // A saved document can be used at once; the help says that it can still be changed first.
+    const help = recordingId ? "recPanel.footHelp" : helpKey;
+    setText($("rpDoneHelp"), help ? t(help) : "");
+    show($("rpDoneHelp"), Boolean(help));
     show($("rpOpenDocument"), Boolean(recordingId));
-    show($("rpDoneLibrary"), Boolean(summary));
+    resetResults(recordingId ? summary?.list || null : null);
+    show($("rpResults"), Boolean(recordingId));
     $("rpDoneTitle").focus();
+  }
+
+  // ---- Using the saved document at once -----------------------------------------------------
+  // Word export and making a test are the library's own: the library page is loaded out of sight
+  // to do that one job for the saved document, and it says how it went. It stays loaded until the
+  // browser has the file, which the page hands over.
+  const PREVIEW_STEPS = 4;
+  let completedName = "";
+  let copyList = null;
+  let copyExpanded = false;
+  const jobs = new Map();
+  window.addEventListener("message", event => {
+    if (event.origin !== location.origin || event.data?.type !== "T9_PANEL_JOB") return;
+    jobs.get(event.data.jobId)?.(event.data);
+  });
+
+  function libraryJob(kind, timeout) {
+    const jobId = crypto.randomUUID();
+    const frame = el("iframe", { class: "rp-job", "aria-hidden": "true", tabindex: "-1",
+      src: `dashboard.html?panelJob=${kind}&projectId=${encodeURIComponent(completedId)}&jobId=${jobId}` });
+    const done = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("technical.requestTimeout")), timeout);
+      jobs.set(jobId, data => {
+        clearTimeout(timer);
+        if (data.ok) resolve(data);
+        else reject(new Error(data.error || ""));
+      });
+    });
+    document.body.append(frame);
+    return { done, remove: () => { jobs.delete(jobId); frame.remove(); } };
+  }
+
+  // A file counts as saved only when the browser says so; the name is the one it was saved under.
+  const DOWNLOAD_STOPPED = "recPanel.downloadStopped";
+  function downloadFinished(downloadId) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const settle = item => {
+        if (settled || !item) return;
+        if (item.state === "complete") {
+          settled = true;
+          chrome.downloads.onChanged.removeListener(onChanged);
+          resolve(String(item.filename || "").split(/[\\/]/).pop());
+        } else if (item.state === "interrupted") {
+          settled = true;
+          chrome.downloads.onChanged.removeListener(onChanged);
+          reject(new Error(DOWNLOAD_STOPPED));
+        }
+      };
+      const check = () => chrome.downloads.search({ id: downloadId })
+        .then(([item]) => settle(item)).catch(() => {});
+      const onChanged = delta => { if (delta.id === downloadId && delta.state) void check(); };
+      chrome.downloads.onChanged.addListener(onChanged);
+      void check();
+    });
+  }
+
+  // What the error says, as a sentence, or that the cause is not known.
+  function causeOf(error) {
+    const text = errorText(error, "recPanel.noCause").trim();
+    return /[.!?…]$/.test(text) ? text : `${text}.`;
+  }
+
+  function setStatus(id, kind, text, action = null) {
+    const node = $(id);
+    node.dataset.kind = kind === "busy" ? "" : kind;
+    if (!text) { node.replaceChildren(); return; }
+    node.replaceChildren(...[kind === "busy" ? el("span", { class: "rp-spin", "aria-hidden": "true" }) : null,
+      el("span", {}, text, action)].filter(Boolean));
+  }
+
+  function showInFolder(downloadId) {
+    const button = el("button", { type: "button", text: t("recPanel.showInFolder") });
+    button.addEventListener("click", () => { try { chrome.downloads.show(downloadId); } catch {} });
+    return button;
+  }
+
+  function resetResults(list) {
+    copyList = list && list.some(section => section.steps.length) ? list : null;
+    copyExpanded = false;
+    for (const id of ["rpWordStatus", "rpTestStatus", "rpCopyStatus"]) setStatus(id, "", "");
+    for (const id of ["rpWord", "rpTest", "rpListCard"]) delete $(id).dataset.state;
+    const word = $("rpWordAction");
+    word.disabled = false;
+    word.classList.add("primary");
+    setText(word, t("recPanel.wordAction"));
+    $("rpTestAction").disabled = false;
+    $("rpScriptAction").disabled = false;
+    show($("rpListCard"), Boolean(copyList));
+    renderCopyList();
+  }
+
+  function renderCopyList() {
+    if (!copyList) return;
+    const total = copyList.reduce((sum, section) => sum + section.steps.length, 0);
+    const items = [];
+    let shown = 0;
+    for (const section of copyList) {
+      if (!copyExpanded && shown >= PREVIEW_STEPS) break;
+      if (section.title) items.push(el("li", { class: "rp-copy-sec", text: section.title }));
+      for (const text of section.steps) {
+        if (!copyExpanded && shown >= PREVIEW_STEPS) break;
+        items.push(el("li", {}, el("span", { text })));
+        shown++;
+      }
+    }
+    $("rpCopyList").replaceChildren(...items);
+    const more = $("rpCopyMore");
+    show(more, total > PREVIEW_STEPS);
+    setText(more, copyExpanded ? t("recPanel.showFewer") : t("recPanel.showAll", { count: total }));
+    more.setAttribute("aria-expanded", String(copyExpanded));
+  }
+
+  // Numbered through the whole document, a blank line between sections.
+  function copyText() {
+    let number = 0;
+    return copyList.map(section => [section.title,
+      ...section.steps.map(text => `${++number}. ${text}`)].filter(Boolean).join("\n")).join("\n\n");
+  }
+
+  // The clipboard can refuse a page that does not have the focus; copying a selection still works.
+  async function writeClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {}
+    const area = el("textarea", { class: "rp-job", "aria-hidden": "true", tabindex: "-1", readonly: true });
+    area.value = text;
+    document.body.append(area);
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    $("rpCopyAction").focus();
+    if (!copied) throw new Error("copy");
+  }
+
+  async function copySteps() {
+    const total = copyList.reduce((sum, section) => sum + section.steps.length, 0);
+    try {
+      await writeClipboard(copyText());
+      $("rpListCard").dataset.state = "done";
+      setStatus("rpCopyStatus", "ok", total === 1 ? t("recPanel.copiedOne") : t("recPanel.copied", { count: total }));
+    } catch {
+      // The whole list is shown so it can be selected and copied by hand.
+      copyExpanded = true;
+      renderCopyList();
+      setStatus("rpCopyStatus", "error", t("recPanel.copyFailed"));
+    }
+  }
+
+  async function exportWord() {
+    const button = $("rpWordAction");
+    button.disabled = true;
+    delete $("rpWord").dataset.state;
+    setStatus("rpWordStatus", "busy", t("recPanel.wordCreating"));
+    const job = libraryJob("export-word", 300000);
+    try {
+      const result = await job.done;
+      setStatus("rpWordStatus", "busy", t("recPanel.handedOver"));
+      const fileName = await downloadFinished(result.downloadId);
+      $("rpWord").dataset.state = "done";
+      button.classList.remove("primary");
+      setText(button, t("recPanel.downloadAgain"));
+      setStatus("rpWordStatus", "ok", t("recPanel.savedFile", { fileName }), showInFolder(result.downloadId));
+    } catch (error) {
+      setStatus("rpWordStatus", "error", error?.message === DOWNLOAD_STOPPED ? t(DOWNLOAD_STOPPED)
+        : t("recPanel.wordFailed", { detail: causeOf(error) }));
+      setText(button, t("recPanel.retry"));
+    } finally {
+      job.remove();
+      button.disabled = false;
+    }
+  }
+
+  // The test opens in this panel, beside Business Central, where it is recorded and checked.
+  async function startTest() {
+    const button = $("rpTestAction");
+    button.disabled = true;
+    setStatus("rpTestStatus", "busy", t("recPanel.testCreating"));
+    const job = libraryJob("run-test", 120000);
+    try {
+      const { testRunId } = await job.done;
+      const path = `test-panel.html?testRunId=${encodeURIComponent(testRunId)}`;
+      await chrome.sidePanel?.setOptions?.({ enabled: true, path }).catch(() => {});
+      location.href = path;
+    } catch (error) {
+      setStatus("rpTestStatus", "error", t("recPanel.testFailed", { detail: causeOf(error) }));
+      button.disabled = false;
+    } finally {
+      job.remove();
+    }
+  }
+
+  async function exportScript() {
+    const button = $("rpScriptAction");
+    button.disabled = true;
+    setStatus("rpTestStatus", "busy", t("pageScript.exportCreating", { title: completedName }));
+    let url = "";
+    try {
+      const response = await send({ type: "T9_BUILD_PAGE_SCRIPT", sessionId: completedId }, 60000);
+      if (!response?.ok) throw new Error(response?.error || "");
+      if (!response.stepCount) {
+        setStatus("rpTestStatus", "warn", t(response.recordedIdentity ? "pageScript.exportEmpty"
+          : "pageScript.exportNotRecorded", { title: completedName }));
+        return;
+      }
+      url = URL.createObjectURL(new Blob([response.content], { type: "text/yaml" }));
+      const download = await send({ type: "T9_DOWNLOAD_FILE", url, filename: response.fileName }, 30000);
+      if (!download?.ok) throw new Error(download?.error || "");
+      setStatus("rpTestStatus", "busy", t("recPanel.handedOver"));
+      const fileName = await downloadFinished(download.downloadId);
+      const skipped = response.skipped || [];
+      const names = skipped.slice(0, 5).map(item => item.label || "?").join("; ") +
+        (skipped.length > 5 ? "; …" : "");
+      const text = [t("recPanel.savedFile", { fileName }),
+        response.stepCount === 1 ? t("recPanel.scriptStepsOne") : t("recPanel.scriptSteps", { count: response.stepCount }),
+        skipped.length ? t("recPanel.scriptSkipped", { skipped: skipped.length, steps: names }) : ""]
+        .filter(Boolean).join(" ");
+      setStatus("rpTestStatus", skipped.length ? "warn" : "ok", text, showInFolder(download.downloadId));
+    } catch (error) {
+      setStatus("rpTestStatus", "error", error?.message === DOWNLOAD_STOPPED ? t(DOWNLOAD_STOPPED)
+        : t("pageScript.exportFailed", { detail: causeOf(error) }));
+    } finally {
+      if (url) setTimeout(() => URL.revokeObjectURL(url), 60000);
+      button.disabled = false;
+    }
   }
 
   async function stop() {
@@ -842,8 +1077,8 @@
       if (!response?.ok) throw new Error(response?.error || "recorder.stopFailed");
       const recordingId = response.session?.id || "";
       if (snapshot) {
-        showDone({ titleKey: "recPanel.summaryTitle", name: response.session?.name || name,
-          helpKey: "recPanel.summaryBasis", recordingId, summary: summaryOf(snapshot) });
+        showDone({ titleKey: "recPanel.doneTitle", name: response.session?.name || name,
+          recordingId, summary: summaryOf(snapshot) });
       } else {
         showDone({ titleKey: "recPanel.savedTitle", name: response.session?.name || name,
           helpKey: "recorder.completionHelp", recordingId });
@@ -954,7 +1189,11 @@
     $("rpOpenDocument").addEventListener("click", () =>
       openLibrary(`?openReview=${encodeURIComponent(completedId)}`));
     $("rpOpenLibrary").addEventListener("click", () => openLibrary());
-    $("rpDoneLibrary").addEventListener("click", () => openLibrary());
+    $("rpWordAction").addEventListener("click", () => { void exportWord(); });
+    $("rpTestAction").addEventListener("click", () => { void startTest(); });
+    $("rpScriptAction").addEventListener("click", () => { void exportScript(); });
+    $("rpCopyAction").addEventListener("click", () => { void copySteps(); });
+    $("rpCopyMore").addEventListener("click", () => { copyExpanded = !copyExpanded; renderCopyList(); });
     $("rpCloseInfo").addEventListener("click", () => window.close());
     $("rpRetry").addEventListener("click", () => { void runStart(); });
     $("rpCloseDone").addEventListener("click", () => window.close());

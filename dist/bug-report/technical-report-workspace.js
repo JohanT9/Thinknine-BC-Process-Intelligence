@@ -106,10 +106,7 @@
       async exportMarkdown(exportOptions = {}) { await api.flush(); return textExport.markdown(
         generator.project(report, { errorEvidence: evidence }), exportOptions); },
       async exportPlainText(exportOptions = {}) { await api.flush(); return textExport.plainText(
-        generator.project(report, { errorEvidence: evidence }), exportOptions); },
-      replaceTelemetry(errorEvidenceId, telemetry, now) {
-        return commit(model.attachTelemetry(report, errorEvidenceId, telemetry, now));
-      }
+        generator.project(report, { errorEvidence: evidence }), exportOptions); }
     };
     return api;
   }

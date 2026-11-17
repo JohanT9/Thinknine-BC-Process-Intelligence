@@ -2,9 +2,9 @@
 
 ## Automated representative coverage
 
-The UX regression checks cover mode discoverability, one-action bug start, distinct recording status, error-capture feedback, stop-to-open behavior, silent-bug fallback title, expected-result focus, visible/copyable captured error, collapsed technical details, optional telemetry, responsive layout, and preservation of normal documentation recording.
+The UX regression checks cover mode discoverability, one-action bug start, distinct recording status, error-capture feedback, stop-to-open behavior, silent-bug fallback title, expected-result focus, visible/copyable captured error, collapsed technical details, no telemetry settings, responsive layout, and preservation of normal documentation recording.
 
-Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, local issue packages, provider consent, saves, and exports.
+Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, local issue packages, provider consent, saves, and exports.
 
 The CI gate also runs a sanitized bug-report scenario corpus through the actual
 report service, issue-package projection, and Markdown formatter. Its 24 flows

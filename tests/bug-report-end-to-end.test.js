@@ -112,7 +112,7 @@ assert(alReport.technicalDiagnostics[0].callStack.frames.length > 0);
 assert.strictEqual(alReport.technicalDiagnostics[0].summary.callStackAvailable,
   true);
 const pkg = issuePackage.build(alReport, { errorEvidence: [alEvidence] }, {
-  generatedAt: "2026-09-08T08:02:00.000Z", includeTelemetry: false,
+  generatedAt: "2026-09-08T08:02:00.000Z",
   includeAiAnalysis: false
 });
 assert.deepStrictEqual(pkg.reproduction.map(step => step.instruction),

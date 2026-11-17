@@ -152,4 +152,62 @@ assert.ok(fallback.screenshot);
   assert.strictEqual(create.screenshot, "shot-6.png", "New shows the list as it was clicked");
   assert.deepStrictEqual({ ...create.screenshotHighlight }, { screenshotRef: "shot-6.png", sourceEventNo: 6, ...ny });
 }
+// A value typed in a line's field after clicking into it: the step shows the value entered, not
+// the screenshot taken as the field was clicked, when it was still empty.
+{
+  const { replay } = require("../scripts/capture-quality/replay");
+  const second = value => `2026-11-17T12:10:${String(value).padStart(2, "0")}.000Z`;
+  const cell = { sourceFrameId: "inner", frameDepth: 1, recordingId: "field-click", pageId: "50",
+    pageCaption: "Inköpsorder", role: "combobox", controlType: "input", inputType: "text",
+    fieldName: "Nr", label: "Nr", accessibleName: "Nr", gridLabel: "Rader", rowIndex: "2",
+    interactionId: "inner:line-no" };
+  const box = { x: 0.62, y: 0.55, width: 0.03, height: 0.02 };
+  const events = [
+    { ...cell, type: "click", category: "action", pointerTarget: true,
+      preActionCaptureId: "inner:line-no", timestamp: second(1), topViewportBounds: box },
+    { ...cell, type: "focus", category: "lifecycle", value: "", timestamp: second(1) },
+    { ...cell, type: "field-change", category: "field", inputSource: "input", value: "21036",
+      previousValue: "", timestamp: second(4), uiState: { resultVisible: true }, topViewportBounds: box },
+    { ...cell, type: "field-change", category: "field", inputSource: "change", value: "21036",
+      previousValue: "", timestamp: second(5), uiState: { resultVisible: true }, topViewportBounds: box }
+  ].map((event, index) => ({ ...event, sourceEventId: `field-click:${index + 1}`, sourceSequence: index + 1 }));
+  const tasks = replay(events, { documentLanguage: "sv-SE",
+    imagePaths: { 1: "before-click.png", 3: "typed.png", 4: "typed.png" } }).tasks;
+  const entry = tasks.find(task => /21036/u.test(task.instruction || ""));
+  assert.ok(entry, JSON.stringify(tasks.map(task => task.instruction)));
+  assert.strictEqual(entry.screenshot, "typed.png", "the step shows the value it enters");
+
+  // Clicked on the field's list button, with no screenshot after the value was typed: the
+  // screenshot taken as the button was clicked shows the field empty. The one taken just
+  // before the next click, in Antal, shows the value, outlined where it was typed.
+  const arrow = { ...cell, role: "button", controlType: "button", inputType: undefined };
+  const quantity = { ...cell, fieldName: "Antal", label: "Antal", accessibleName: "Antal",
+    interactionId: "inner:line-qty" };
+  const typedBox = { x: 0.6, y: 0.55, width: 0.05, height: 0.02 };
+  const withNext = [
+    { ...arrow, type: "click", category: "action", pointerTarget: true,
+      preActionCaptureId: "inner:line-no", timestamp: second(1), topViewportBounds: box },
+    { ...cell, type: "focus", category: "lifecycle", value: "", timestamp: second(1) },
+    { ...cell, type: "field-change", category: "field", inputSource: "change", value: "21036",
+      previousValue: "", timestamp: second(5), uiState: { resultVisible: true }, topViewportBounds: typedBox },
+    { ...quantity, type: "click", category: "action", pointerTarget: true,
+      preActionCaptureId: "inner:line-qty", timestamp: second(7), topViewportBounds: box },
+    { ...quantity, type: "field-change", category: "field", inputSource: "change", value: "150",
+      previousValue: "", timestamp: second(9), uiState: { resultVisible: true } }
+  ].map((event, index) => ({ ...event, sourceEventId: `field-arrow:${index + 1}`, sourceSequence: index + 1 }));
+  const images = { 1: "no-before-click.png", 4: "qty-before-click.png", 5: "qty-typed.png" };
+  const arrowTasks = replay(withNext, { documentLanguage: "sv-SE", imagePaths: images }).tasks;
+  const typed = arrowTasks.find(task => /21036/u.test(task.instruction || ""));
+  assert.ok(typed, JSON.stringify(arrowTasks.map(task => task.instruction)));
+  assert.strictEqual(typed.screenshot, "qty-before-click.png", "the next screenshot shows the value");
+  assert.deepStrictEqual({ ...typed.screenshotHighlight },
+    { screenshotRef: "qty-before-click.png", sourceEventNo: 3, ...typedBox });
+  const qty = arrowTasks.find(task => /150/u.test(task.instruction || ""));
+  assert.strictEqual(qty.screenshot, "qty-typed.png", "the next step keeps its own screenshot");
+  // On another page, or with nothing soon after, the step keeps what it had.
+  const elsewhere = withNext.map((event, index) => index >= 3
+    ? { ...event, pageId: "51", pageCaption: "Artikelkort" } : event);
+  assert.strictEqual(replay(elsewhere, { documentLanguage: "sv-SE", imagePaths: images }).tasks
+    .find(task => /21036/u.test(task.instruction || "")).screenshot, "no-before-click.png");
+}
 console.log("Selection screenshot tests passed.");

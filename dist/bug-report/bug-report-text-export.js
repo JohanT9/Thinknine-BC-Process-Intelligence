@@ -57,13 +57,6 @@
     const objects = byId.get("affected-objects").content;
     add(byId.get("affected-objects").title, objects.objects.map(item =>
       `- ${item.objectType} ${item.objectId} — ${item.objectName}`));
-    const telemetry = byId.get("telemetry")?.content;
-    add(byId.get("telemetry").title, !telemetry?.configured
-      ? [localized("Not configured or not fetched.",
-        "Inte konfigurerad eller inte hämtad.")] : telemetry.contexts.flatMap(context => [
-        `${localized("Error evidence", "Felbevis")}: ${context.errorEvidenceId}`,
-        `Status: ${context.status}`,
-        ...context.events.map(event => `- ${event.timestamp} [${event.category}] ${event.eventName || event.message} (correlation: ${(event.correlationReasons || []).join(", ")})`)]));
     add(byId.get("correlated-timeline").title,
       (byId.get("correlated-timeline")?.content || [])
       .map(item => `- ${item.timestamp} [${item.source}] ${item.label}`));

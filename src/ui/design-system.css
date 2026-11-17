@@ -379,6 +379,8 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .home-brand{margin:0;font-size:var(--fontSizeSubtitle);font-weight:700;white-space:nowrap}
 .home-brand small{color:var(--colorTextSecondary);font-size:var(--fontSizeCaption);font-weight:400}
 .home-views{display:flex;gap:var(--space4)}
+.home-getting-started{margin-left:auto;color:var(--colorTextSecondary);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.home-getting-started:hover{color:var(--colorTextPrimary)}
 .home-views button{margin:0;border-color:transparent!important;background:transparent;color:var(--colorTextSecondary);font-weight:600}
 .home-views button[aria-current="page"]{background:var(--colorBrandSubtle);color:var(--colorTextPrimary)}
 #message:empty{min-height:0;margin:0}

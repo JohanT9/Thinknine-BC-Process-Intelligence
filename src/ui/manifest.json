@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "BC Process Studio",
-  "version": "4.7.266",
+  "version": "4.7.267",
   "description": "Business Process Intelligence for Microsoft Dynamics 365 Business Central. Capture, review and document real processes.",
   "permissions": [
     "activeTab",
@@ -22,8 +22,7 @@
     "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/*",
     "https://businesscentral.dynamics.com/*",
     "https://*.businesscentral.dynamics.com/*",
-    "https://login.microsoftonline.com/*",
-    "https://api.applicationinsights.io/*"
+    "https://login.microsoftonline.com/*"
   ],
   "optional_host_permissions": [
     "https://graph.microsoft.com/*"

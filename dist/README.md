@@ -52,7 +52,7 @@ Broader **BC Process AI** capabilities are a future product area. They are not p
 
 ## Report a Business Central bug
 
-Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then email it as a PDF or export it locally. Telemetry is optional.
+Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then email it as a PDF or export it locally. The report stays in the extension until you email or export it.
 
 Both process and bug recording start immediately. When you select Stop, enter
 the final process or report name and confirm its document language in the naming
@@ -67,13 +67,11 @@ The same Canonical Recording evidence underpins structured technical Bug
 Reports. Bug Recording can passively capture supported Business Central modal
 errors, exact messages, visible diagnostic details, raw AL call-stack text and
 a dedicated screenshot. Versioned deterministic AL parsing organizes explicit
-frames and Technical Diagnostics while preserving unknown syntax. Evidence
-can optionally be enriched for one selected error with read-only Application
-Insights data. This requires explicit configuration and refresh, uses Microsoft
-Entra PKCE, persists no secret or token, and never affects recording/export when
-unavailable. See [telemetry enrichment](docs/APPLICATION_INSIGHTS_ENRICHMENT.md).
-Captured evidence stays local except for explicitly requested Microsoft
-telemetry queries; clipboard monitoring, AI calls, object/app guessing and
+frames and Technical Diagnostics while preserving unknown syntax. Identifiers
+that Business Central shows in the error details, such as the Application
+Insights session ID, are kept as captured evidence; the extension does not query
+Application Insights. Captured evidence stays local until the user emails or
+exports the report; clipboard monitoring, AI calls, object/app guessing and
 root-cause inference are absent.
 
 Saved Bug Reports can be reviewed in a dedicated Technical Report Workspace

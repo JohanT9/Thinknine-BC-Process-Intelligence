@@ -22,7 +22,7 @@ BugReport
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
-  enrichment: optional telemetry (external issue references from earlier versions are kept)
+  enrichment: kept for compatibility (telemetry and analysis from earlier versions are preserved, not shown)
 ```
 
 Statuses are deliberately limited to `draft`, `ready`, `resolved`, and
@@ -98,10 +98,11 @@ is stored in `businessCentralError.primaryErrorEvidenceId`; one error may be
 treated as primary for display without rewriting evidence. Existing Step
 Overrides may travel with reproduction and remain owned by Step architecture.
 
-Application Insights enrichment is additive schema-version-1 data under
-`enrichment.telemetry.byErrorEvidenceId`. It has separate query versions,
-provenance, correlation context, status, raw records, normalized events, and
-warnings. It is not Canonical evidence and never changes captured errors.
+`enrichment.telemetry` is kept for compatibility. Application Insights
+enrichment has been removed, so new reports leave it `null`. Telemetry stored
+by an earlier version under `enrichment.telemetry.byErrorEvidenceId` is
+preserved unchanged in the report, but it is no longer shown, exported or
+included in an Issue Package.
 
 `enrichment.analysis` is kept for compatibility. Bug Report AI analysis has
 been removed, so new reports leave it `null`. A value stored by an earlier

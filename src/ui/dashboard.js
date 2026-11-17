@@ -3522,8 +3522,8 @@ async function exportLibraryDocument(record, exportSettings) {
   const filename = globalThis.T9Engine.exportSettings.buildFileName(
     "docx", model.response.session, exportSettings
   );
-  await downloadBlob(result.blob, filename);
-  return result;
+  const downloadId = await downloadBlob(result.blob, filename);
+  return { ...result, downloadId, fileName: filename };
 }
 
 // A manual test from the document as it reads now: its steps in the document language,
@@ -3565,7 +3565,7 @@ async function createTestRun(record, options = {}) {
     run = { ...run, suiteId: options.suiteId, environment: String(options.environment || "") };
   }
   const response = await send({ type: "T9_CREATE_TEST_RUN", run,
-    ...(options.suiteId ? { open: false } : {}) });
+    ...(options.suiteId || options.open === false ? { open: false } : {}) });
   if (!response?.ok) throw new Error(uiT(response?.error || "test.runNotFound"));
   return response.run;
 }
@@ -12676,6 +12676,38 @@ document.addEventListener("keydown", event => {
 });
 
 
+// The recording panel uses the library's own Word export and test creation for a document it has
+// just saved, without opening the library: it loads this page out of sight with ?panelJob=…&
+// projectId=…&jobId=… and is told the outcome. The page then does only that job: no review is
+// opened and the library is not synchronised from here.
+const PANEL_JOB = (() => {
+  const params = new URLSearchParams(globalThis.location.search);
+  const kind = params.get("panelJob");
+  if (!["export-word", "run-test"].includes(kind) || globalThis.parent === globalThis) return null;
+  return { kind, projectId: params.get("projectId") || "", jobId: params.get("jobId") || "" };
+})();
+
+async function runPanelJob(job, sessionsLoaded) {
+  const reply = data => globalThis.parent.postMessage({ type: "T9_PANEL_JOB", jobId: job.jobId,
+    ...data }, globalThis.location.origin);
+  try {
+    if (!sessionsLoaded) throw new Error(uiT("Saved recordings could not be loaded. Reload the page and try again."));
+    const record = documentLibraryRecords.find(value => value.projectId === job.projectId);
+    if (!record) throw new Error(uiT("Den begärda dokumentationen kunde inte öppnas."));
+    if (job.kind === "export-word") {
+      const settingsResponse = await send({ type: "T9_GET_SETTINGS" });
+      const result = await exportLibraryDocument(record, { ...DEFAULTS,
+        ...(settingsResponse?.settings || {}) });
+      reply({ ok: true, downloadId: result.downloadId, fileName: result.fileName });
+    } else {
+      const run = await createTestRun(record, { open: false });
+      reply({ ok: true, testRunId: run.testRunId });
+    }
+  } catch (error) {
+    reply({ ok: false, error: String(error?.message || error || "") });
+  }
+}
+
 async function initializeDashboard() {
   initializeFilenameVariables();
   populateBatchMetadataOptions();
@@ -12720,13 +12752,19 @@ async function initializeDashboard() {
   try {
     await loadSessions(libraryRequest);
     sessionsLoaded = true;
-    renderLibraryImportNotice().catch(() => {}).then(() => startLibrarySync()).catch(() => {});
+    if (!PANEL_JOB) {
+      renderLibraryImportNotice().catch(() => {}).then(() => startLibrarySync()).catch(() => {});
+    }
   } catch (error) {
     console.error("BC Process Studio loadSessions failed", error);
     show(
       uiT("Saved recordings could not be loaded. Reload the page and try again."),
       true
     );
+  }
+  if (PANEL_JOB) {
+    await runPanelJob(PANEL_JOB, sessionsLoaded);
+    return;
   }
   if (sessionsLoaded) {
     try {

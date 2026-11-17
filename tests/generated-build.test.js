@@ -103,8 +103,11 @@ assert.ok(fs.existsSync(path.join(root, "dist/license-status.html")));
 assert.ok(fs.existsSync(path.join(root, "dist/license-status.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/technical-report.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/design-system.css")));
-assert.ok(fs.existsSync(path.join(root,
-  "dist/bug-report/application-insights-provider.js")));
+for (const removed of ["application-insights-auth", "application-insights-provider",
+  "application-insights-transport", "telemetry-enrichment", "telemetry-query-definitions"]) {
+  assert.ok(!fs.existsSync(path.join(root, `dist/bug-report/${removed}.js`)),
+    `removed Application Insights module ${removed} must not ship`);
+}
 for (const removed of ["ai-analysis-input", "ai-analysis-model", "ai-analysis-prompt",
   "ai-broker-auth", "ai-broker-transport", "ai-evidence-policy", "technical-analysis-provider"]) {
   assert.ok(!fs.existsSync(path.join(root, `dist/bug-report/${removed}.js`)),

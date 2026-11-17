@@ -46,8 +46,6 @@
   function build(report, context = {}, options = {}) {
     const document = generator.project(report, { errorEvidence: context.errorEvidence || [] });
     const sourceRevision = revision(report, document);
-    const telemetry = section(document, "telemetry");
-    const includeTelemetry = Boolean(options.includeTelemetry && telemetry?.configured);
     const callStack = clone(section(document, "al-call-stack") || []);
     const includeCallStack = Boolean((options.includeCallStack ||
       options.includeTechnicalDetails) && callStack.some(stack =>
@@ -69,18 +67,16 @@
       callStack,
       affectedObjects: clone(section(document, "affected-objects")),
       notes: clone(section(document, "notes") || []), attachments: attachments(document),
-      telemetry: includeTelemetry ? clone(telemetry) : null,
-      inclusion: { telemetry: includeTelemetry, callStack: includeCallStack,
+      inclusion: { callStack: includeCallStack,
         technicalDetails: Boolean(options.includeTechnicalDetails),
-        rawTelemetry: false, rawCanonicalEvents: false, rawDiagnostics: false,
+        rawCanonicalEvents: false, rawDiagnostics: false,
         screenshots: attachments(document).length > 0 },
       privacy: { requiresReview: true,
         classifierVersion: privacyClassifier.CLASSIFIER_VERSION,
         analysis: clone(report.errorAnalysis?.privacySummary || null),
         categories: ["business-central-error",
         "environment", "technical-identifiers", "human-notes",
-        ...(attachments(document).length ? ["screenshots"] : []),
-        ...(includeTelemetry ? ["telemetry-summary"] : [])] },
+        ...(attachments(document).length ? ["screenshots"] : [])] },
       provenance: { type: "derived-issue-package",
         technicalReportId: document.reportDocumentId } };
     return Object.freeze(privacyClassifier.safeProjection(result));

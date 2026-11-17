@@ -14,7 +14,7 @@
   const text = value => typeof value === "string" ? value : "";
   const SECTION_ORDER = Object.freeze(["summary", "environment", "reproduction",
     "expected-result", "actual-result", "bc-errors", "technical-diagnostics",
-    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline",
+    "al-call-stack", "affected-objects", "correlated-timeline",
     "evidence", "notes", "traceability"]);
   const LABELS = Object.freeze({ timestamp: "Timestamp",
     internalSessionId: "Internal Session ID",
@@ -34,14 +34,14 @@
       reproduction: "Steg för att återskapa", expected: "Förväntat resultat",
       actual: "Faktiskt resultat", errors: "Business Central-fel",
       diagnostics: "Teknisk diagnostik", objects: "Refererade AL-objekt",
-      telemetry: "Application Insights-telemetri", timeline: "Korrelerad tidslinje",
+      timeline: "Korrelerad tidslinje",
       evidence: "Skärmbilder och bevis",
       notes: "Ytterligare anteckningar", traceability: "Teknisk spårbarhet" }),
     "en-US": Object.freeze({ summary: "Summary", environment: "Environment",
       reproduction: "Steps to Reproduce", expected: "Expected Result",
       actual: "Actual Result", errors: "Business Central Error",
       diagnostics: "Technical Diagnostics", objects: "Referenced AL Objects",
-      telemetry: "Application Insights Telemetry", timeline: "Correlated Timeline",
+      timeline: "Correlated Timeline",
       evidence: "Screenshots and Evidence",
       notes: "Additional Notes", traceability: "Technical Traceability" })
   });
@@ -103,25 +103,9 @@
     const referencedApps = [...new Map(diagnostics.flatMap(item =>
       item.explicitExtensions || []).map(item => [JSON.stringify(item), clone(item)]
     )).values()];
-    const telemetryByError = clone(report.enrichment?.telemetry?.byErrorEvidenceId || {});
-    const telemetryContexts = Object.entries(telemetryByError).map(([errorEvidenceId, value]) => ({
-      errorEvidenceId, status: value.status || "not-configured",
-      queriedAt: value.queriedAt || "", connectionContext: clone(value.connectionContext || {}),
-      correlationContext: clone(value.correlationContext || {}),
-      eventCount: (value.events || []).length,
-      events: clone((value.events || []).filter(event =>
-        event.category !== "other-context").slice(0, 100)),
-      queries: clone(value.queries || []),
-      warnings: clone(value.warnings || []) }));
     const timeline = [...errors.map(item => ({ timestamp: item.capturedAt,
       source: "captured-error", label: localized("Business Central error captured", "Business Central-fel registrerat"),
-      referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" })),
-    ...telemetryContexts.flatMap(context => context.events.map(event => ({
-      timestamp: event.timestamp, source: "telemetry",
-      label: event.eventName || event.message || (localized("Telemetry event observed", "Telemetrihändelse observerad")),
-      referenceId: event.telemetryEventId,
-      correlationReasons: clone(event.correlationReasons || []),
-      provenance: "external-telemetry-evidence" })))]
+      referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" }))]
       .filter(item => item.timestamp).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
     const checks = completeness.evaluate(report, errors);
     const sections = [
@@ -151,10 +135,6 @@
       { id: "affected-objects", title: titles.objects,
         kind: "objects", provenance: "derived",
         content: { objects: affectedObjects, apps: referencedApps } },
-      { id: "telemetry", title: titles.telemetry,
-        kind: "telemetry", provenance: "external-telemetry",
-        content: { configured: telemetryContexts.length > 0,
-          contexts: telemetryContexts } },
       { id: "correlated-timeline", title: titles.timeline,
         kind: "timeline", provenance: "derived-correlation", content: timeline },
       { id: "evidence", title: titles.evidence, kind: "evidence",

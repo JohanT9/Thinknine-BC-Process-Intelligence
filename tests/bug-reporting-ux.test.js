@@ -82,9 +82,9 @@ assert.doesNotMatch(report, /id="includeAiExport"|id="includeTechnicalZip"/);
 assert.match(report, /id="emailReport"[^>]*>E-posta PDF<\/button>/);
 assert.match(report, /src="bug-report\/email-draft\.js"/);
 // PDF and email keep the former defaults: the AL call stack when Business Central exposed one,
-// no telemetry and no technical details.
+// and no technical details.
 assert.match(reportLogic, /const includeCallStack = \(session\.bcErrorEvidence \|\| \[\]\)\.some/);
-assert.match(reportLogic, /options: \{ includeTelemetry: false, includeCallStack,\s+includeTechnicalDetails: false \}/);
+assert.match(reportLogic, /options: \{ includeCallStack,\s+includeTechnicalDetails: false \}/);
 assert.match(reportView, /Technical details/);
 assert.match(reportView, /advancedKinds/);
 assert.match(reportView, /function hasSectionContent\(section\)/);

@@ -43,8 +43,7 @@ let report = model.normalize({ schemaVersion: 1, bugReportId: "bug-report:issue"
       category: "error", eventName: "AL runtime", correlationReasons: ["exact-session"]
     }] } } }, analysis: null } });
 
-const options = { generatedAt: "2026-08-24T12:00:00Z",
-  includeTelemetry: false };
+const options = { generatedAt: "2026-08-24T12:00:00Z" };
 const pkg = packages.build(report, { errorEvidence: evidence }, options);
 assert.deepStrictEqual(pkg, packages.build(report, { errorEvidence: evidence }, options));
 assert.strictEqual(pkg.provenance.type, "derived-issue-package");
@@ -55,7 +54,7 @@ assert.strictEqual(pkg.errorEvidence.primary.rawMessage, evidence[0].rawMessage)
 assert.deepStrictEqual(pkg.callStack[0].frames.map(item => item.objectId), [80, 42]);
 assert.deepStrictEqual(pkg.attachments.map(item => item.assetId),
   ["error-shot", "shot-1", "shot-2"]);
-assert.strictEqual(pkg.telemetry, null); assert.ok(!("aiAnalysis" in pkg));
+assert.ok(!("telemetry" in pkg)); assert.ok(!("aiAnalysis" in pkg));
 const markdown = formatter.markdown(pkg);
 assert(!markdown.includes("Obsolete event"));
 assert(markdown.includes(evidence[0].rawMessage));
@@ -77,10 +76,14 @@ assert(technicalMarkdown.includes("businessCentral.environment: BC-Sandbox"));
 assert(!technicalMarkdown.includes("recordingSchemaVersion"));
 assert(technicalMarkdown.includes("## AL Call Stack"));
 assert(formatter.code(evidence[0].rawMessage).includes(evidence[0].rawMessage));
+// Application Insights enrichment was removed; telemetry stored by an earlier version is kept
+// in the report but never shared, even when a caller still asks for it.
 const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {
   ...options, includeTelemetry: true });
-assert.strictEqual(telemetryPkg.telemetry.contexts[0].events[0].telemetryEventId,
-  "event-1");
+assert.ok(!("telemetry" in telemetryPkg));
+assert(!formatter.markdown(telemetryPkg).includes("AL runtime"));
+assert.strictEqual(model.normalize(report).enrichment.telemetry.byErrorEvidenceId["error-1"]
+  .events[0].telemetryEventId, "event-1");
 
 // AI analysis was removed; an analysis stored by an earlier version is kept but never shared.
 const legacyAnalysis = { schemaVersion: 1, analysisId: "analysis-1", status: "current",

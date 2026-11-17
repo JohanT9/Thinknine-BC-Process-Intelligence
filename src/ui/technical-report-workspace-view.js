@@ -51,8 +51,6 @@
       stack.rawCallStack || stack.frames?.length);
     if (section.kind === "objects") return Boolean(content?.objects?.length ||
       content?.apps?.length);
-    if (section.kind === "telemetry") return Boolean(content?.configured &&
-      content?.contexts?.length);
     if (section.kind === "timeline") return Boolean(Array.isArray(content) &&
       content.length > 1);
     if (section.kind === "traceability") return false;
@@ -230,7 +228,7 @@
     technicalDetails.appendChild(element(doc, "p",
       ui("Only technical information captured for this error is shown.", locale)));
     const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
-      "objects", "telemetry", "timeline", "traceability",
+      "objects", "timeline", "traceability",
       "errors"]);
     const editorDuplicateKinds = new Set(["summary", "text", "notes"]);
     let technicalSectionCount = 0;
@@ -503,19 +501,6 @@
       } else if (section.kind === "notes") {
         section.content.forEach(note => node.appendChild(element(doc, "p",
           note.text || note.content || "")));
-      } else if (section.kind === "telemetry") {
-        if (!section.content.configured) node.appendChild(element(doc, "p",
-          "Telemetry is optional and has not been fetched."));
-        section.content.contexts.forEach(context => {
-          node.appendChild(element(doc, "h3", `Error ${context.errorEvidenceId}`));
-          node.appendChild(element(doc, "p", `Status: ${context.status}`));
-          const list = doc.createElement("ul");
-          context.events.forEach(event => list.appendChild(element(doc, "li",
-            `${event.timestamp} — ${event.eventName || event.message} (${(event.correlationReasons || []).join(", ")})`)));
-          node.appendChild(list);
-          node.appendChild(details(doc, "Raw telemetry query results",
-            JSON.stringify(context.queries, null, 2), onCopy, locale));
-        });
       } else if (section.kind === "timeline") {
         const list = doc.createElement("ol");
         section.content.forEach(item => list.appendChild(element(doc, "li",
