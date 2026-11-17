@@ -324,6 +324,11 @@ function (sourceReference, captions, stepText) {
         Boolean(value.captureGuidance?.sectionBoundaryAfter),
       preferredScreenshotAssetId: value.captureGuidance
         ?.preferredScreenshotAssetId || result.preferredScreenshotAssetId || null,
+      // The name the user gave the section that follows this step, and an image they chose.
+      ...((value.captureGuidance?.sectionTitle || result.sectionTitle)
+        ? { sectionTitle: value.captureGuidance?.sectionTitle || result.sectionTitle } : {}),
+      chosenScreenshotAssetId: value.captureGuidance?.chosenScreenshotAssetId ||
+        result.chosenScreenshotAssetId || null,
       markerSourceEventIds: unique([...(result.markerSourceEventIds || []),
         ...(value.captureGuidance?.markerSourceEventIds || [])])
     }), {});
@@ -1958,6 +1963,9 @@ function (sourceReference, captions, stepText) {
       important: Boolean(value.captureGuidance?.important || first.important),
       sectionBoundaryAfter: Boolean(value.captureGuidance?.sectionBoundaryAfter ||
         first.sectionBoundaryAfter),
+      ...((value.captureGuidance?.sectionBoundaryAfter || first.sectionBoundaryAfter) &&
+        (value.captureGuidance?.sectionTitle || first.sectionTitle)
+        ? { sectionTitle: String(value.captureGuidance?.sectionTitle || first.sectionTitle) } : {}),
       fieldCaption: value.targetField || first.fieldCaption,
       ...(value.searchFieldCaption
         ? { searchFieldCaption: value.searchFieldCaption } : {}),

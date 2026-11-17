@@ -152,8 +152,12 @@
       guidance: kind === "capture-guidance" ? clone({
         kind: raw.guidanceKind,
         targetSourceEventId: raw.targetSourceEventId,
+        targetSourceEventIds: Array.isArray(raw.targetSourceEventIds)
+          ? raw.targetSourceEventIds.filter(id => typeof id === "string" && id) : undefined,
         targetInteractionId: raw.targetInteractionId || undefined,
-        preferredScreenshotAssetId: raw.preferredScreenshotAssetId || undefined
+        preferredScreenshotAssetId: raw.preferredScreenshotAssetId || undefined,
+        sectionTitle: typeof raw.sectionTitle === "string" && raw.sectionTitle.trim()
+          ? raw.sectionTitle.trim().slice(0, 80) : undefined
       }) : null,
       screenshotAssetIds: [...new Set(sources.map(item =>
         item.screenshotAssetId).filter(Boolean))],

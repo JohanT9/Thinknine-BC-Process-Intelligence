@@ -33,6 +33,9 @@ importScripts("engine/event-log-storage.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/bc-client-captions.js");
 importScripts("engine/step-text.js");
+// The document's sentences, for the steps the recording panel shows while recording.
+importScripts("document/semantic-document.js");
+importScripts("document/presentation-grammar.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/capture-packet-integrity.js");
 importScripts("engine/observed-state.js");
@@ -1073,9 +1076,17 @@ async function recordEvent(rawEvent, captureContext = {}) {
   return operation;
 }
 
+// A marker and its opposite: what the recording panel does when a choice is changed or undone.
+// The recording only grows; the latest marker for a step decides (see event-step-grouping.js).
 const CAPTURE_GUIDANCE_KINDS = new Set([
-  "important", "use-image", "new-section", "ignore"
+  "important", "use-image", "new-section", "ignore",
+  "include", "no-section", "auto-image", "first-section-title"
 ]);
+const SECTION_TITLE_MAX = 80;
+function sectionTitleText(value) {
+  return String(value ?? "").replace(/[\p{Cc}\p{Cf}]+/gu, " ").replace(/\s+/gu, " ").trim()
+    .slice(0, SECTION_TITLE_MAX);
+}
 
 // A refused marker carries a code as well as its message, so a page can explain it in the
 // interface language.
@@ -1083,17 +1094,27 @@ function guidanceError(message, code) {
   return Object.assign(new Error(message), { code });
 }
 
-async function recordCaptureGuidance(kind, sender = {}) {
+async function recordCaptureGuidance(kind, sender = {}, options = {}) {
   if (!CAPTURE_GUIDANCE_KINDS.has(kind)) {
     throw guidanceError("Ok\u00e4nd inspelningsmarkering.", "unknown-kind");
   }
   const state = await getState();
   // The recording panel beside Business Central is an extension page without a tab of its
-  // own; it marks the latest step of the active recording, wherever that recording runs.
+  // own; it marks a step of the active recording, wherever that recording runs.
   const fromPanel = !sender.tab && extensionPageSender(sender);
   if (!state.recording || !state.sessionId ||
       !(fromPanel || sender.tab?.id === state.tabId)) {
     throw guidanceError("Ingen aktiv inspelning hittades i den h\u00e4r fliken.", "no-recording");
+  }
+  // The first section's name belongs to the recording, not to a step; only the panel names it.
+  // An empty name returns it to its number.
+  if (kind === "first-section-title") {
+    if (!fromPanel) throw guidanceError("Okänd inspelningsmarkering.", "unknown-kind");
+    const sectionTitle = sectionTitleText(options.sectionTitle);
+    const recorded = await recordEvent({ type: "capture-guidance", category: "guidance",
+      guidanceKind: kind, sectionTitle, source: "recording-panel" },
+    { tabId: state.tabId, origin: sender.origin || sender.url });
+    return { sectionTitle, markerSourceEventId: recorded?.canonicalEvent?.id || "" };
   }
   await settleBounded(writeQueue, "accepted event writes before guidance");
   if (kind === "use-image") {
@@ -1103,23 +1124,52 @@ async function recordCaptureGuidance(kind, sender = {}) {
   const recording = await getCanonicalRecording(state.sessionId);
   const candidates = [...(recording.events || [])].reverse().filter(event =>
     event.raw?.type !== "capture-guidance");
-  // The latest step the user took, as the recording panel shows it: moving into a field is
-  // not a step, so a marker made before typing applies to the previous step.
-  const target = candidates.find(event => globalThis.T9RecordingLiveStatus.isUserStep({
-    interactionId: event.raw?.interactionId || event.interaction?.id,
-    category: event.raw?.category })) ||
-    candidates.find(event => event.raw?.interactionId || event.interaction?.id) || candidates[0];
+  // The panel names the step it marks by the recorded events it was made from: an earlier step,
+  // or a step made of several user actions. Only events of this recording can be marked.
+  const requested = fromPanel && Array.isArray(options.targetSourceEventIds)
+    ? [...new Set(options.targetSourceEventIds.filter(id => typeof id === "string" && id))]
+      .slice(0, 500) : [];
+  let targets;
+  if (requested.length) {
+    const byId = new Map(candidates.map(event => [event.id, event]));
+    targets = requested.map(id => byId.get(id));
+    if (targets.some(event => !event)) {
+      throw guidanceError("Steget finns inte i den h\u00e4r inspelningen.", "no-step");
+    }
+  } else {
+    // The latest step the user took, as the recording panel shows it: moving into a field is
+    // not a step, so a marker made before typing applies to the previous step.
+    const latest = candidates.find(event => globalThis.T9RecordingLiveStatus.isUserStep({
+      interactionId: event.raw?.interactionId || event.interaction?.id,
+      category: event.raw?.category })) ||
+      candidates.find(event => event.raw?.interactionId || event.interaction?.id) || candidates[0];
+    targets = latest ? [latest] : [];
+  }
+  const target = targets[0];
   if (!target) throw guidanceError("Registrera ett steg innan du markerar det.", "no-step");
   const targetInteractionId = target.raw?.interactionId || target.interaction?.id || "";
-  const preferredScreenshotAssetId = target.screenshotAssetId || "";
+  // An image chosen in the panel must be one of the step's own; otherwise the step's latest.
+  const stepImages = targets.map(event => event.screenshotAssetId).filter(Boolean);
+  const chosenImage = typeof options.preferredScreenshotAssetId === "string"
+    ? options.preferredScreenshotAssetId : "";
+  if (kind === "use-image" && chosenImage && !stepImages.includes(chosenImage)) {
+    throw guidanceError("Bilden h\u00f6r inte till steget.", "no-image");
+  }
+  // The floating box has always sent the step's image with every marker; the panel sends an
+  // image only when the user chose one, so a later marker never replaces that choice.
+  const preferredScreenshotAssetId = kind === "use-image"
+    ? chosenImage || stepImages.at(-1) || "" : fromPanel ? "" : target.screenshotAssetId || "";
   if (kind === "use-image" && !preferredScreenshotAssetId) {
     throw guidanceError("Det finns \u00e4nnu ingen bild f\u00f6r det senaste steget.", "no-image");
   }
+  const sectionTitle = kind === "new-section" ? sectionTitleText(options.sectionTitle) : "";
   const recorded = await recordEvent({
     type: "capture-guidance", category: "guidance", guidanceKind: kind,
     targetSourceEventId: target.id,
+    ...(targets.length > 1 ? { targetSourceEventIds: targets.map(event => event.id) } : {}),
     ...(targetInteractionId ? { targetInteractionId } : {}),
     ...(preferredScreenshotAssetId ? { preferredScreenshotAssetId } : {}),
+    ...(sectionTitle ? { sectionTitle } : {}),
     source: fromPanel ? "recording-panel" : "recording-indicator"
   }, fromPanel ? { tabId: state.tabId, origin: sender.origin || sender.url }
     : { tabId: sender.tab?.id, frameId: sender.frameId,
@@ -1730,6 +1780,113 @@ async function stopSession(finalName = "", documentLanguage = "") {
   tenantLicenseFailureNotifications.delete(String(state.sessionId));
 
   return session;
+}
+
+// ---- The document as it is recorded, for the recording panel --------------------------------
+// The panel shows the steps the document will have, in the document's words, while the user
+// works. They are interpreted as when the recording is saved; a step the user left out is still
+// shown (struck through) so it can be taken back. Interpreting takes a moment, so it is done
+// only when the recording changed and at most every LIVE_STEPS_MIN_MS.
+const LIVE_STEPS_MIN_MS = 1500;
+const LIVE_STEP_PREVIEW_KINDS = new Set(["ignore", "include"]);
+let liveStepsCache = { sessionId: "", signature: "", result: null, computedAt: 0, pending: null,
+  pendingSignature: "" };
+
+function guidanceTargets(raw = {}) {
+  return Array.isArray(raw.targetSourceEventIds) && raw.targetSourceEventIds.length
+    ? raw.targetSourceEventIds : [raw.targetSourceEventId].filter(Boolean);
+}
+
+function liveStepText(task, language) {
+  try {
+    const presentation = globalThis.T9PresentationGrammar.presentationFor(
+      task.semanticActionModel || task, String(task.instruction || ""), language);
+    const runs = (presentation?.runs || []).map(run => ({ text: String(run.text || ""),
+      ...(run.bold ? { bold: true } : {}), ...(run.italic ? { italic: true } : {}) }))
+      .filter(run => run.text);
+    if (runs.length) return runs;
+  } catch {}
+  return [{ text: String(task.instruction || "").replace(/\*\*|__/gu, "") }];
+}
+
+async function computeLiveSteps(sessionId, language) {
+  const recording = await getCanonicalRecording(sessionId);
+  if (!recording) return null;
+  const events = recording.events || [];
+  const raw = event => event.raw || {};
+  const isGuidance = event => raw(event).type === "capture-guidance";
+  // Leaving out and taking back are shown on the step rather than removing it.
+  const previewRecording = { ...recording, events: events.map(event =>
+    isGuidance(event) && LIVE_STEP_PREVIEW_KINDS.has(raw(event).guidanceKind)
+      ? { ...event, raw: { ...raw(event), guidanceKind: "panel-preview" } } : event) };
+  const manifest = await screenshotAssetStore.manifest(sessionId);
+  const tasks = await deriveBugReportTasks(previewRecording, manifest);
+  const leftOut = events.filter(event => isGuidance(event) &&
+    LIVE_STEP_PREVIEW_KINDS.has(raw(event).guidanceKind));
+  const paths = globalThis.T9ScreenshotAssetPaths.assetPathIndex(recording);
+  const firstTitle = [...events].reverse().find(event => isGuidance(event) &&
+    raw(event).guidanceKind === "first-section-title");
+  const steps = tasks.map(task => {
+    const sources = new Set(task.sourceEventIds || []);
+    const interactions = new Set(task.interactionIds || [task.interactionId].filter(Boolean));
+    let ignored = false;
+    for (const marker of leftOut) {
+      const markerRaw = raw(marker);
+      if (guidanceTargets(markerRaw).some(id => sources.has(id)) ||
+          (markerRaw.targetInteractionId && interactions.has(markerRaw.targetInteractionId))) {
+        ignored = markerRaw.guidanceKind === "ignore";
+      }
+    }
+    const images = (task.screenshotAssetIds || []).map(assetId =>
+      ({ assetId, path: paths.get(String(assetId)) || "" })).filter(image => image.path);
+    const chosen = task.captureGuidance?.chosenScreenshotAssetId || null;
+    return {
+      key: String(task.sourceEventIds?.[0] || task.taskId || ""),
+      sourceEventIds: [...sources],
+      runs: liveStepText(task, language),
+      pageCaption: globalThis.T9BCClientCaptions.pageName(String(task.pageCaption || "")),
+      images,
+      chosenAssetId: images.some(image => image.assetId === chosen) ? chosen : null,
+      shownPath: (chosen && images.find(image => image.assetId === chosen)?.path) ||
+        task.screenshot || images.at(-1)?.path || "",
+      ignored,
+      sectionAfter: Boolean(task.sectionBoundaryAfter),
+      sectionTitle: task.sectionBoundaryAfter ? String(task.sectionTitle || "") : ""
+    };
+  });
+  return { sessionId, language, steps,
+    firstSectionTitle: String(raw(firstTitle || {}).sectionTitle || ""),
+    screenshots: events.filter(event => event.screenshotAssetId).length };
+}
+
+async function liveDocumentSteps(sessionId, requestedLanguage) {
+  const recording = await getCanonicalRecording(sessionId);
+  if (!recording) return null;
+  const language = globalThis.T9LanguageRegistry.normalize(
+    requestedLanguage || recording.metadata?.documentLanguage, "document");
+  const events = recording.events || [];
+  const signature = [events.length, events.at(-1)?.id || "",
+    events.filter(event => event.screenshotAssetId).length, language].join("|");
+  const cache = liveStepsCache.sessionId === sessionId ? liveStepsCache
+    : { sessionId, signature: "", result: null, computedAt: 0, pending: null, pendingSignature: "" };
+  if (cache.signature === signature && cache.result) return cache.result;
+  if (cache.pending && cache.pendingSignature === signature) return cache.pending;
+  // While the recording changes quickly, or another reading is still under way, the panel keeps
+  // the steps it has and asks again a moment later.
+  if (cache.result && (cache.pending || Date.now() - cache.computedAt < LIVE_STEPS_MIN_MS)) {
+    return { ...cache.result, updating: true };
+  }
+  if (cache.pending) return cache.pending.then(() => liveDocumentSteps(sessionId, requestedLanguage));
+  const pending = computeLiveSteps(sessionId, language).then(result => {
+    liveStepsCache = { sessionId, signature, result, computedAt: Date.now(), pending: null,
+      pendingSignature: "" };
+    return result;
+  }, error => {
+    liveStepsCache = { ...liveStepsCache, pending: null, pendingSignature: "" };
+    throw error;
+  });
+  liveStepsCache = { ...cache, pending, pendingSignature: signature };
+  return pending;
 }
 
 // A test recording is compared with steps the document library interpreted with the
@@ -3393,11 +3550,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_CAPTURE_GUIDANCE": {
         try {
-          const guidance = await recordCaptureGuidance(message.kind, sender);
+          const guidance = await recordCaptureGuidance(message.kind, sender, {
+            targetSourceEventIds: message.targetSourceEventIds,
+            preferredScreenshotAssetId: message.preferredScreenshotAssetId,
+            sectionTitle: message.sectionTitle });
+          // The panel shows the change at once rather than after the usual pause.
+          liveStepsCache = { ...liveStepsCache, computedAt: 0 };
           sendResponse({ ok: true, guidance });
         } catch (error) {
           sendResponse({ ok: false, error: String(error?.message || error),
             ...(error?.code ? { code: error.code } : {}) });
+        }
+        break;
+      }
+
+      // The steps the recording panel shows: the active recording's document as it grows.
+      // Pictures of the active recording's steps, for the panel's thumbnails and image choice.
+      case "T9_GET_LIVE_STEP_IMAGES": {
+        const imageState = await getState();
+        if (!imageState.recording || !imageState.sessionId || imageState.testRunId) {
+          sendResponse({ ok: false, code: "no-recording" });
+          break;
+        }
+        const paths = [...new Set((Array.isArray(message.paths) ? message.paths : [])
+          .filter(value => typeof value === "string" &&
+            globalThis.T9ScreenshotAssetPaths.keyForPath(value)))].slice(0, 24);
+        const screenshots = await getScreenshotDataForPaths(imageState.sessionId, paths);
+        sendResponse({ ok: true, screenshots });
+        break;
+      }
+
+      case "T9_GET_LIVE_STEPS": {
+        const liveState = await getState();
+        if (!liveState.recording || !liveState.sessionId || liveState.testRunId) {
+          sendResponse({ ok: false, code: "no-recording" });
+          break;
+        }
+        try {
+          const live = await liveDocumentSteps(liveState.sessionId, message.language);
+          sendResponse(live ? { ok: true, live } : { ok: false, code: "no-recording" });
+        } catch (error) {
+          sendResponse({ ok: false, code: "live-steps-failed", error: String(error?.message || error) });
         }
         break;
       }

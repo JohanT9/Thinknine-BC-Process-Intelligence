@@ -23,9 +23,8 @@ const htmlKeys = [...panelHtml.matchAll(/data-i18n(?:-placeholder|-title|-aria-l
   .map(match => match[1]);
 const scriptKeys = [...panelJs.matchAll(/"((?:recPanel|recorder|settings)\.[A-Za-z.-]+)"/g)]
   .map(match => match[1]);
-// Keys built from a code: the marker confirmations without a step name and the warnings.
-const builtKeys = ["recPanel.confirmImageUnnamed", "recPanel.confirmSectionUnnamed",
-  "recPanel.confirmIgnoreUnnamed", "recorder.notIdentified", "recorder.eventCaptured",
+// Keys built from a code: the warnings.
+const builtKeys = ["recorder.notIdentified",
   ...["capture-write-error", "events-missing", "license-blocked", "recording-truncated",
     "screenshot-error", "screenshot-dropped", "bc-not-connected", "no-screenshots-yet"]
     .map(code => `recorder.warning.${code}`)];
@@ -35,7 +34,9 @@ assert.ok(usedKeys.length > 40, "the panel's keys are found");
 
 const placeholders = text => [...String(text).matchAll(/\{([a-z]+)\}/g)].map(match => match[1]).sort();
 // Words that are the same in English and the language itself.
-const sameAsEnglish = new Set(["de-DE:recPanel.nameLabel", "de-DE:recPanel.counts"]);
+const sameAsEnglish = new Set(["de-DE:recPanel.nameLabel", "de-DE:recPanel.counts",
+  "fr-FR:recPanel.sectionNumber", "fr-FR:recPanel.pickerImage", "fr-FR:recPanel.statSections",
+  "fr-FR:recPanel.statImages"]);
 for (const key of usedKeys) {
   const english = i18n.translate(key, "en-US");
   assert.notEqual(english, key, `${key} has an English text`);
@@ -50,15 +51,16 @@ for (const key of usedKeys) {
 }
 // The panel's own texts are written out for every language, not left to a fallback.
 for (const locale of locales) {
-  const key = "recPanel.ignoreHelp";
+  const key = "recPanel.intro";
   assert.match(i18n.translate(key, locale), /\S/, `${key} in ${locale}`);
 }
-assert.equal(i18n.format("recPanel.confirmIgnore", { step: "Bokför" }, "sv-SE"),
-  "”Bokför” tas inte med i dokumentet.");
+assert.equal(i18n.format("recPanel.toastIgnored", { number: 4 }, "sv-SE"),
+  "Steg 4 tas inte med i dokumentet. Det finns kvar i inspelningen.");
 assert.equal(i18n.format("recPanel.counts", { events: 3, screenshots: 2 }, "fi-FI"),
   "Tapahtumat: 3 · Kuvakaappaukset: 2");
-assert.equal(i18n.format("recPanel.confirmSection", { step: "Släpp" }, "de-DE"),
-  "Nach „Släpp“ beginnt ein neuer Abschnitt.");
+assert.equal(i18n.format("recPanel.toastSectionNamed", { name: "Auftrag" }, "de-DE"),
+  "Der Abschnitt heißt jetzt „Auftrag“.");
+assert.equal(i18n.format("recPanel.outlineSteps", { count: 3 }, "fi-FI"), "3 vaihetta");
 
 // ---- The panel marks the latest step of the active recording ------------------------------
 const background = read("src/recorder/background.js");
@@ -113,7 +115,8 @@ for (const [label, name, record] of [
 }
 assert.equal(liveStatus.addStep([], { type: "change", category: "field", interactionId: "f",
   label: "Beskrivning \"A\"" })[0].record, "", "a field is never a record choice");
-assert.match(panelJs, /step\.record\) return t\("recPanel\.stepRecord"/);
+// The panel shows the document's own steps, interpreted by the background worker.
+assert.match(panelJs, /type: "T9_GET_LIVE_STEPS", language: documentLanguage/);
 
 const derived = liveStatus.derive({ session: { id: "rec-1", eventCount: 3 },
   debug: { activeSessionId: "rec-1", recentSteps: steps }, connected: true });
@@ -123,14 +126,11 @@ assert.deepEqual(liveStatus.derive({ session: { id: "rec-2" },
 "steps belong to their own recording");
 assert.deepEqual(liveStatus.freshSessionDebug("rec-3").recentSteps, []);
 assert.match(background, /recentSteps: rawResult\.status === "duplicate"/);
-assert.equal(i18n.format("recPanel.stepEnter", { label: "Kundnr." }, "sv-SE"), "Ange Kundnr.");
-assert.equal(i18n.format("recPanel.stepChoose", { label: "Buchen" }, "de-DE"), "Buchen auswählen");
-const guidanceSource = background.slice(background.indexOf("function guidanceError"),
+const guidanceSource = background.slice(background.indexOf("const CAPTURE_GUIDANCE_KINDS"),
   background.indexOf("async function saveBcErrorEvidence"));
 function guidanceHarness({ state, events }) {
   const recorded = [];
   const sandbox = {
-    CAPTURE_GUIDANCE_KINDS: new Set(["important", "use-image", "new-section", "ignore"]),
     writeQueue: Promise.resolve(), screenshotWorkerPromise: Promise.resolve(),
     settleBounded: async () => {},
     globalThis: { T9RecordingLiveStatus: liveStatus },
@@ -193,6 +193,47 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   }
   assert.match(background, /\.\.\.\(error\?\.code \? \{ code: error\.code \} : \{\}\)/,
     "the refusal code reaches the panel");
+
+  // ---- The panel changes any step it shows, and only with that step's own events ----------
+  const threeSteps = [postEvent,
+    { id: "source:2", screenshotAssetId: "shot-2",
+      raw: { type: "click", category: "action", interactionId: "i:2", actionCaption: "OK" } },
+    { id: "source:3", screenshotAssetId: "shot-3",
+      raw: { type: "change", category: "field", interactionId: "i:3", fieldName: "Qty" } }];
+  const earlier = guidanceHarness({ state: recordingState, events: threeSteps });
+  assert.equal((await earlier.recordCaptureGuidance("ignore", panelSender,
+    { targetSourceEventIds: ["source:1"] })).targetSourceEventId, "source:1", "an earlier step is marked");
+  await earlier.recordCaptureGuidance("use-image", panelSender,
+    { targetSourceEventIds: ["source:1", "source:2"], preferredScreenshotAssetId: "shot-1" });
+  assert.deepEqual([...earlier.recorded[1].event.targetSourceEventIds], ["source:1", "source:2"],
+    "a step made of several events is marked as a whole");
+  assert.equal(earlier.recorded[1].event.preferredScreenshotAssetId, "shot-1", "the chosen image is kept");
+  await assert.rejects(earlier.recordCaptureGuidance("use-image", panelSender,
+    { targetSourceEventIds: ["source:1"], preferredScreenshotAssetId: "shot-3" }),
+  error => error.code === "no-image", "an image of another step cannot be chosen");
+  await assert.rejects(earlier.recordCaptureGuidance("ignore", panelSender,
+    { targetSourceEventIds: ["source:1", "other-recording:7"] }),
+  error => error.code === "no-step", "only events of this recording can be marked");
+  await earlier.recordCaptureGuidance("include", panelSender, { targetSourceEventIds: ["source:1"] });
+  assert.equal(earlier.recorded.at(-1).event.preferredScreenshotAssetId, undefined,
+    "a marker from the panel never replaces a chosen image");
+  await earlier.recordCaptureGuidance("new-section", panelSender, { targetSourceEventIds: ["source:2"],
+    sectionTitle: `  Skapa${String.fromCharCode(0x200b)}   order\n${"x".repeat(100)}` });
+  assert.equal(earlier.recorded.at(-1).event.sectionTitle.length, 80, "a section name is kept short");
+  assert.match(earlier.recorded.at(-1).event.sectionTitle, /^Skapa order x+$/u,
+    "a section name is one plain line");
+  const named = await earlier.recordCaptureGuidance("first-section-title", panelSender,
+    { sectionTitle: "Order" });
+  assert.equal(named.sectionTitle, "Order");
+  assert.equal(earlier.recorded.at(-1).event.targetSourceEventId, undefined,
+    "the first section's name belongs to no step");
+  // The page's own box keeps to the latest step and cannot name sections.
+  const boxSender = { id: "studio", tab: { id: 7 }, url: "https://businesscentral.dynamics.com/" };
+  const pageBox = guidanceHarness({ state: recordingState, events: threeSteps });
+  await pageBox.recordCaptureGuidance("ignore", boxSender, { targetSourceEventIds: ["source:1"] });
+  assert.equal(pageBox.recorded[0].event.targetSourceEventId, "source:3");
+  await assert.rejects(pageBox.recordCaptureGuidance("first-section-title", boxSender,
+    { sectionTitle: "X" }), error => error.code === "unknown-kind");
 
   // ---- The floating box steps aside while a panel is shown in the recording's window ------
   const panelSource = background.slice(background.indexOf("const RECORDING_PANEL_PORT"),
