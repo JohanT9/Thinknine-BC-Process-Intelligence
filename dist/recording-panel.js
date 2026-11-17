@@ -11,8 +11,13 @@
   const i18n = globalThis.T9UiI18n;
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
-  // Opened by a start button: the start is still being checked in the popup.
-  const startingUntil = params.get("starting") ? Date.now() + 180000 : 0;
+  // Opened by a start button. The panel carries out the start itself (start, tabId): Edge closes
+  // the toolbar popup as soon as the panel opens, so a start left there would never finish.
+  const startPurpose = params.get("start") === "bug-report" ? "bug-report"
+    : params.get("start") ? "documentation" : "";
+  const startTabId = Number(params.get("tabId")) || 0;
+  const startNonce = params.get("nonce") || "";
+  let startingUntil = params.get("starting") || startPurpose ? Date.now() + 180000 : 0;
   const REFRESH_MS = 1000;
   const TOAST_MS = 8000;
   const THUMB_WIDTH = 240;
@@ -35,6 +40,8 @@
   let busy = false;
   let refreshing = false;
   let completedId = "";
+  let startError = "";
+  let startRunning = false;
 
   // ---- The document as it is recorded ------------------------------------------------------
   let live = null;            // the steps as the background worker last interpreted them
@@ -137,7 +144,8 @@
     starting: ["recPanel.stateStarting", "recPanel.startingTitle", "recPanel.startingHelp"],
     idle: ["recPanel.stateNone", "recPanel.idleTitle", "recPanel.idleHelp"],
     ended: ["recPanel.stateNone", "recPanel.endedTitle", "recPanel.endedHelp"],
-    test: ["recPanel.stateTest", "recPanel.testTitle", "recPanel.testHelp"]
+    test: ["recPanel.stateTest", "recPanel.testTitle", "recPanel.testHelp"],
+    failed: ["recPanel.stateNone", "recPanel.startFailedTitle", ""]
   });
 
   // One view at a time: information, the live recording (with or without the save form),
@@ -167,8 +175,9 @@
     if (info) {
       setState(info[0], next === "test" ? "recording" : "idle");
       setText($("rpInfoTitle"), t(info[1]));
-      setText($("rpInfoHelp"), t(info[2]));
+      setText($("rpInfoHelp"), info[2] ? t(info[2]) : startError);
       show($("rpOpenLibrary"), next === "ended");
+      show($("rpRetry"), next === "failed");
     } else if (live) {
       setState(purpose === "bug" ? "recPanel.stateBug" : "recPanel.stateProcess", "recording");
     } else if (next === "done") {
@@ -671,7 +680,8 @@
       if (busy || view === "done") return;
       const state = response?.state || {};
       if (!state.recording) {
-        setView(recordingSeen ? "ended" : startingUntil > Date.now() ? "starting" : "idle");
+        setView(recordingSeen ? "ended" : startError ? "failed"
+          : startingUntil > Date.now() ? "starting" : "idle");
         return;
       }
       recordingSeen = true;
@@ -693,6 +703,46 @@
     } finally {
       refreshing = false;
     }
+  }
+
+  // ---- Starting the recording ---------------------------------------------------------------
+  const recordingStart = globalThis.T9RecordingStart.create({
+    send: (message, timeout) => send(message, timeout), t: key => t(key),
+    tf: (key, values) => t(key, values), withTimeout: globalThis.T9AsyncOperations.withTimeout,
+    licenseCheckTimeout: globalThis.T9TenantLicense.CHECK_TIMEOUT_MS + 5000 });
+
+  async function runStart() {
+    if (startRunning || !startPurpose || !startTabId) return;
+    startRunning = true;
+    startError = "";
+    startingUntil = Date.now() + 180000;
+    view = "";
+    setView("starting");
+    try {
+      const tab = await chrome.tabs.get(startTabId);
+      await recordingStart.startRecording({ purpose: startPurpose, tab,
+        progress: key => setText($("rpInfoHelp"), t(key)) });
+      void refresh();
+    } catch (error) {
+      // The panel says what went wrong and offers to try again; nothing was recorded yet.
+      startError = errorText(error, "recorder.startFailed");
+      view = "";
+      setView("failed");
+      $("rpRetry").focus();
+    } finally {
+      startRunning = false;
+    }
+  }
+
+  // A start is carried out once, also if the panel is loaded again while it runs.
+  function claimStart() {
+    if (!startPurpose || !startNonce) return false;
+    const key = `t9RecordingPanelStart:${startNonce}`;
+    try {
+      if (sessionStorage.getItem(key)) return false;
+      sessionStorage.setItem(key, "1");
+    } catch {}
+    return true;
   }
 
   function startBusy(textKey) {
@@ -906,6 +956,7 @@
     $("rpOpenLibrary").addEventListener("click", () => openLibrary());
     $("rpDoneLibrary").addEventListener("click", () => openLibrary());
     $("rpCloseInfo").addEventListener("click", () => window.close());
+    $("rpRetry").addEventListener("click", () => { void runStart(); });
     $("rpCloseDone").addEventListener("click", () => window.close());
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && view === "form") {
@@ -913,14 +964,11 @@
         else setView("recording");
       }
     });
-    // A start that failed in the popup closes the panel it opened for it.
-    chrome.runtime.onMessage.addListener(message => {
-      if (message?.type === "T9_RECORDING_PANEL_START_FAILED" && !recordingSeen) window.close();
-    });
     setView(startingUntil > Date.now() ? "starting" : "idle");
     // The updates run on their own timer, so one slow answer never stops the next.
     setInterval(() => { void refresh(); }, REFRESH_MS);
     await refresh();
+    if (!recordingSeen && claimStart()) void runStart();
   }
 
   // Connected before anything else, so the floating box steps aside even while the panel

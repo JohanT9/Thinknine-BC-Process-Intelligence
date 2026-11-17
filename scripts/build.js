@@ -179,7 +179,7 @@ for (const file of [
   "test-history-view.js",
   "technical-report.html", "technical-report.js",
   "technical-report-workspace-view.js", "test-run.html", "test-run.js", "test-run-client.js", "test-panel.html",
-  "test-panel.js", "recording-panel.html", "recording-panel.js", "test-protocol.html", "test-protocol.js", "test-suite.html", "test-suite.js", "knowledge-admin.html",
+  "test-panel.js", "recording-panel.html", "recording-panel.js", "recording-start.js", "test-protocol.html", "test-protocol.js", "test-suite.html", "test-suite.js", "knowledge-admin.html",
   "knowledge-admin.js", "knowledge-admin-policy.schema.json"
 ]) {
   copyFile(

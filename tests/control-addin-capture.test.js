@@ -11,7 +11,8 @@ const surfaceMode = require("../src/recorder/capture-surface-mode");
 
 const content = fs.readFileSync("src/recorder/content.js", "utf8");
 const background = fs.readFileSync("src/recorder/background.js", "utf8");
-const popup = fs.readFileSync("src/ui/popup.js", "utf8");
+// The popup's capture scripts are injected by the start it shares with the recording panel.
+const popup = fs.readFileSync("src/ui/recording-start.js", "utf8");
 const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 
 assert(content.includes("function getCompanyName()"));

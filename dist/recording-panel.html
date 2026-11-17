@@ -136,6 +136,7 @@
       <h1 id="rpInfoTitle" data-i18n-ignore></h1>
       <p id="rpInfoHelp" class="rp-help" data-i18n-ignore></p>
       <div class="rp-buttons">
+        <button id="rpRetry" type="button" class="primary" data-i18n="recPanel.retry" hidden>Try again</button>
         <button id="rpOpenLibrary" type="button" data-i18n="recorder.openLibrary" hidden>Open Document Library</button>
         <button id="rpCloseInfo" type="button" data-i18n="recPanel.close">Close panel</button>
       </div>
@@ -197,6 +198,9 @@
       </div>
     </footer>
   </main>
+  <script src="async-operations.js"></script>
+  <script src="engine/tenant-license.js"></script>
+  <script src="recording-start.js"></script>
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
   <script src="i18n.js"></script>

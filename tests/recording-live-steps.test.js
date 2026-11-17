@@ -133,5 +133,29 @@ const marker = (kind, targets, extra = {}) => add({ type: "capture-guidance", ca
   ["Skapa order"]);
 
   globalThis.__liveContext = { sandbox, recording: () => recording, add, field, button, marker, text };
+  // A step without words or a screenshot is left out of the document, and so of the panel; it
+  // showed as an empty numbered step whose changes landed on the step after it.
+  recording = canonical.create({ id: "live", name: "live" });
+  const before = button("Släpp", "inner:release");
+  const empty = add({ ...page, type: "click", category: "field", role: "gridcell", interactionId: "inner:qty2" });
+  const typed = field("Antal", "4500", "inner:qty2");
+  const pipeline = sandbox.T9SessionInterpretationPipeline;
+  const interpret = pipeline.interpret;
+  pipeline.interpret = input => {
+    const result = interpret(input);
+    const tasks = [...result.businessTasks];
+    tasks.splice(1, 0, { ...tasks[1], taskId: "Unclassified:empty", taskType: "Unclassified",
+      instruction: "", description: "", semanticActionModel: null, pageCaption: "",
+      sourceEventIds: [empty], screenshot: "" });
+    return { ...result, businessTasks: tasks };
+  };
+  try {
+    live = await computeLiveSteps("live", "sv-SE");
+  } finally { pipeline.interpret = interpret; }
+  assert.deepStrictEqual(live.steps.map(text), ["Välj Släpp på sidan Släppt produktionsorder.",
+    "Ange 4500 i Antal."], JSON.stringify(live.steps.map(text)));
+  assert.strictEqual(live.steps[0].key, before);
+  assert.ok(live.steps[1].sourceEventIds.includes(typed), "the value typed stays its own step");
+
   console.log("Recording live steps tests passed.");
 })().catch(error => { console.error(error); process.exit(1); });

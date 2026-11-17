@@ -202,89 +202,11 @@ async function updateLicenseCard() {
   renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent, lastKnown });
 }
 
-async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
-  const licenseInfo = await send({ type: "T9_LICENSE_INFORMATION" });
-  if (!licenseInfo?.ok) throw new Error(licenseInfo?.error || "License configuration unavailable");
-  if (licenseInfo.information.requiresAcceptance) {
-    const notice = tf("license.registrationNotice", { endpoint: licenseInfo.information.endpoint });
-    if (!globalThis.confirm(notice + "\n\n" + t("license.acceptPrompt"))) {
-      throw new Error(t("license.registrationCancelled"));
-    }
-    const accepted = await send({ type: "T9_ACCEPT_LICENSE_NOTICE" });
-    if (!accepted?.ok) throw new Error(accepted?.error || t("technical.requestFailed"));
-  }
-
-  let tenantResult = null;
-  let checkError = null;
-  try {
-    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck },
-      LICENSE_CHECK_TIMEOUT_MS);
-    if (!tenantResult?.ok) throw Object.assign(new Error(tenantResult?.error || t("technical.requestFailed")),
-      { status: tenantResult?.status });
-  } catch (error) { checkError = error; }
-
-  let account = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" }, 5000);
-  if (!account?.signedIn) {
-    account = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
-    if (!account?.ok) throw new Error(account?.code === "entra-signin-unreachable"
-      ? t("license.microsoftUnavailable") : account?.error || t("license.signInFailed"));
-    account = { ...account, signedIn: true };
-  }
-
-  if (tenantResult?.license?.allowed) {
-    // A license from the cache is being checked again while the service starts; the user is
-    // registered with the service then too, without holding up the recording.
-    if (tenantResult.license.stale) {
-      send({ type: "T9_TENANT_USER_REGISTER", tabId }, LICENSE_CHECK_TIMEOUT_MS).catch(() => {});
-    } else {
-      const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
-      if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
-    }
-    return { source: "tenant", license: tenantResult.license, tenantId: tenantResult.tenantId, account };
-  }
-
-  // A trial belongs to the organization that owns the environment. A consultant signed in from
-  // another organization cannot start it, and continues with the consultant license instead.
-  let otherOrganization = null;
-  if (tenantResult?.license?.trialAvailable || checkError) {
-    try {
-      let trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 45000);
-      if (!trial?.ok && trial.code === "entra-reauth-required") {
-        await send({ type: "T9_CONSULTANT_LICENSE_SIGN_OUT" });
-        account = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
-        if (!account?.ok) throw new Error(account?.code === "entra-signin-unreachable"
-          ? t("license.microsoftUnavailable") : account?.error || t("license.signInFailed"));
-        trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 45000);
-      }
-      if (!trial?.ok) {
-        const message = trial.code === "trial-service-timeout"
-          ? t("license.trialServiceTimeout")
-          : trial.code === "trial-service-unreachable"
-            ? t("license.trialServiceUnavailable") : trial.error || t("license.trialFailed");
-        throw Object.assign(new Error(message), { status: trial?.status, code: trial?.code });
-      }
-      return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
-    } catch (error) {
-      if (error.status === 409) {
-        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true },
-          LICENSE_CHECK_TIMEOUT_MS);
-        if (current?.ok && current.license?.allowed) {
-          const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
-          if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
-          return { source: "tenant", license: current.license, tenantId: current.tenantId, account };
-        }
-      }
-      if (error.code !== "trial-other-organization") throw error;
-      otherOrganization = error;
-    }
-  }
-
-  if (checkError) throw checkError;
-  const consultant = await send({ type: "T9_CONSULTANT_LICENSE_CHECK", tabId }, 10000);
-  if (consultant?.license?.allowed) {
-    return { source: "consultant", license: consultant.license, tenantId: tenantResult?.tenantId, account };
-  }
-  throw new Error(t(otherOrganization ? "license.trialOtherOrganization" : "license.noEligibleTrial"));
+// The license and the start are shared with the recording panel (recording-start.js).
+const recordingStart = globalThis.T9RecordingStart.create({ send: (...args) => send(...args),
+  t, tf, withTimeout, licenseCheckTimeout: LICENSE_CHECK_TIMEOUT_MS });
+function prepareTenantLicense(tabId, options) {
+  return recordingStart.prepareTenantLicense(tabId, options);
 }
 
 function displayLatestAction(action) {
@@ -317,39 +239,8 @@ function renderLiveStatus(liveStatus) {
   updateText(warning, messages.join(" "));
 }
 
-async function pingTab(tabId) {
-  try {
-    return await withTimeout(chrome.tabs.sendMessage(tabId, {
-      type: "T9_CONTENT_PING"
-    }), 1800, "Business Central tab check", {
-      errorMessage: t("technical.requestTimeout") });
-  } catch {
-    return null;
-  }
-}
-
-async function ensureContentScript(tab) {
-  let response = await pingTab(tab.id);
-  if (response?.ok) return response;
-
-  try {
-    await withTimeout(chrome.scripting.executeScript({
-      target: { tabId: tab.id, allFrames: true },
-      files: ["engine/business-central-version-capture.js", "capture-field-privacy.js", "capture-value-regions.js",
-        "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js",
-        "engine/bc-client-captions.js", "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"]
-    }), 4000, "Capture script injection", {
-      errorMessage: t("technical.requestTimeout") });
-  } catch (error) {
-    throw new Error(tf("recorder.injectFailed", { detail: error.message }));
-  }
-
-  await new Promise(resolve => setTimeout(resolve, 500));
-  response = await pingTab(tab.id);
-  if (!response?.ok) {
-    throw new Error(t("recorder.tabUnresponsive"));
-  }
-  return response;
+function ensureContentScript(tab) {
+  return recordingStart.ensureContentScript(tab);
 }
 
 const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
@@ -399,55 +290,46 @@ void currentTab().then(tab => { popupTab = tab || null; }, () => {});
 
 // Opens the recording beside Business Central in the side panel of the popup's window. It
 // resolves to whether the panel was opened; null when this browser has no side panel.
-function openRecordingPanel({ starting = false } = {}) {
+// The panel beside Business Central. Given a start, the panel carries it out: Edge closes this
+// popup as soon as the panel opens, which would end a start made here halfway.
+function openRecordingPanel({ start = "", tabId = 0 } = {}) {
   const tab = popupTab;
   if (!chrome.sidePanel?.open || !tab?.windowId) return null;
-  chrome.sidePanel.setOptions({ enabled: true,
-    path: starting ? "recording-panel.html?starting=1" : "recording-panel.html" }).catch(() => {});
+  const query = start ? `?start=${encodeURIComponent(start)}&tabId=${tabId}&nonce=${Date.now()}` : "";
+  chrome.sidePanel.setOptions({ enabled: true, path: `recording-panel.html${query}` }).catch(() => {});
   return chrome.sidePanel.open({ windowId: tab.windowId }).then(() => true, () => false);
 }
 
-async function startRecording(recordingPurpose) {
-  // The panel opens at once and waits there while the start is checked below.
+function startRecording(recordingPurpose) {
+  // Opened straight from the click, before anything is awaited, as Edge requires.
   const panelOpened = isBusinessCentralTab(popupTab)
-    ? openRecordingPanel({ starting: true }) : null;
+    ? openRecordingPanel({ start: recordingPurpose, tabId: popupTab.id }) : null;
+  if (!panelOpened) { void startRecordingHere(recordingPurpose); return; }
   setStarting(true);
   showMessage(t("recorder.checking"));
+  void panelOpened.then(opened => {
+    if (opened) { window.close(); return; }
+    setStarting(false);
+    void startRecordingHere(recordingPurpose);
+  });
+}
+
+// Without the panel the recording is started here, and this popup follows it.
+async function startRecordingHere(recordingPurpose) {
+  setStarting(true);
   try {
     const tab = await currentTab();
-    if (!tab?.url?.includes("businesscentral.dynamics.com")) {
-      throw new Error(t("recorder.openBcFirst"));
-    }
-    const authorization = await prepareTenantLicense(tab.id);
+    const authorization = await recordingStart.startRecording({ purpose: recordingPurpose, tab,
+      progress: key => showMessage(t(key)) });
     // A license from the cache is shown as last known until the service has confirmed it.
     renderLicenseCard(authorization.license, { tenantId: authorization.tenantId, signedIn: true,
       checking: authorization.license?.stale === true, lastKnown: authorization.license });
-    await ensureContentScript(tab);
-    showMessage(t("recorder.connectionWorks"));
-
-    const response = await send({
-      type: recordingPurpose === "bug-report" ? "T9_START_BUG_RECORDING" : "T9_START",
-      tabId: tab.id,
-      name: recordingPurpose === "bug-report"
-        ? "Business Central-fel"
-        : "Business Central-process",
-      purpose: ""
-    }, 15000);
-    if (!response?.ok) {
-      throw new Error(response?.error || t("recorder.startFailed"));
-    }
     showMessage(recordingPurpose === "bug-report"
       ? t("recorder.bugStarted") : t("recorder.processStarted"));
-    // The panel beside Business Central takes over from here.
-    if (await panelOpened) { window.close(); return; }
     await refresh();
     await updateLicenseCard();
   } catch (error) {
     showMessage(error.message, true);
-    // The panel opened for this start would otherwise wait for a recording that never comes.
-    if (panelOpened) {
-      void chrome.runtime.sendMessage({ type: "T9_RECORDING_PANEL_START_FAILED" }).catch(() => {});
-    }
   } finally {
     setStarting(false);
   }

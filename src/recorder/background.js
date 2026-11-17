@@ -1158,7 +1158,11 @@ async function recordCaptureGuidance(kind, sender = {}, options = {}) {
   }
   const target = targets[0];
   if (!target) throw guidanceError("Registrera ett steg innan du markerar det.", "no-step");
-  const targetInteractionId = target.raw?.interactionId || target.interaction?.id || "";
+  // A step the panel names is marked by its own events only. Several steps can come from one
+  // user interaction, such as an empty step before a value typed in the same field, so marking
+  // by the interaction would also change the step after it.
+  const targetInteractionId = requested.length ? ""
+    : target.raw?.interactionId || target.interaction?.id || "";
   // An image chosen in the panel must be one of the step's own; otherwise the step's latest.
   const stepImages = targets.map(event => event.screenshotAssetId).filter(Boolean);
   const chosenImage = typeof options.preferredScreenshotAssetId === "string"
@@ -1837,7 +1841,13 @@ async function computeLiveSteps(sessionId, language) {
   const paths = globalThis.T9ScreenshotAssetPaths.assetPathIndex(recording);
   const firstTitle = [...events].reverse().find(event => isGuidance(event) &&
     raw(event).guidanceKind === "first-section-title");
-  const steps = tasks.map(task => {
+  const steps = tasks.map(task => ({ task,
+    images: (task.screenshotAssetIds || []).map(assetId =>
+      ({ assetId, path: paths.get(String(assetId)) || "" })).filter(image => image.path) }))
+  // A step without words or a screenshot is left out of the document, so it is not shown here.
+    .filter(({ task, images }) => !globalThis.T9ReviewTaskVisibility.isGeneratedPlaceholder(
+      { ...task, screenshots: images.map(image => image.path) }))
+    .map(({ task, images }) => {
     const sources = new Set(task.sourceEventIds || []);
     const interactions = new Set(task.interactionIds || [task.interactionId].filter(Boolean));
     let ignored = false;
@@ -1848,8 +1858,6 @@ async function computeLiveSteps(sessionId, language) {
         ignored = markerRaw.guidanceKind === "ignore";
       }
     }
-    const images = (task.screenshotAssetIds || []).map(assetId =>
-      ({ assetId, path: paths.get(String(assetId)) || "" })).filter(image => image.path);
     const chosen = task.captureGuidance?.chosenScreenshotAssetId || null;
     return {
       key: String(task.sourceEventIds?.[0] || task.taskId || ""),
@@ -2751,6 +2759,14 @@ function openLinkSender(sender) {
     url.origin + url.pathname === page);
 }
 
+// The recording panel beside Business Central carries out a start begun from the toolbar popup
+// (Edge closes the popup when the panel opens), so it may run the license steps of a start.
+function fromRecordingPanel(sender) {
+  const page = chrome.runtime.getURL("recording-panel.html");
+  return sender?.id === chrome.runtime.id && !sender.tab &&
+    (sender.url === page || Boolean(sender.url?.startsWith(`${page}?`)));
+}
+
 function messageAllowed(message, sender) {
   return extensionPageSender(sender) || PAGE_MESSAGE_TYPES.has(message?.type) ||
     (message?.type === "T9_OPEN_LINK" && openLinkSender(sender));
@@ -2869,7 +2885,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
       case "T9_ACCEPT_LICENSE_NOTICE": {
-        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !fromRecordingPanel(sender)) {
           throw new Error("Licensregistrering måste bekräftas i tilläggets popup.");
         }
         await tenantLicense.acceptNotice();
@@ -2878,7 +2895,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case "T9_LICENSE_CHECK": {
         if (sender.url !== chrome.runtime.getURL("popup.html") &&
-            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html")) &&
+            !fromRecordingPanel(sender)) {
           throw new Error("Licenskontroll får bara startas från tilläggets licensvyer.");
         }
         const tab = await chrome.tabs.get(message.tabId);
@@ -2887,7 +2905,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
       case "T9_REQUEST_TRIAL": {
-        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !fromRecordingPanel(sender)) {
           throw new Error("Testlicens får bara begäras från tilläggets popup.");
         }
         const tab = await chrome.tabs.get(message.tabId);
@@ -2912,7 +2931,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case "T9_MICROSOFT_SIGN_IN": {
         if (sender.url !== chrome.runtime.getURL("popup.html") &&
-            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html")) &&
+            !fromRecordingPanel(sender)) {
           throw new Error("Microsoft-inloggning får bara startas från tilläggets licensvyer.");
         }
         const account = await consultantLicense.signIn();
@@ -2921,7 +2941,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case "T9_TENANT_USER_REGISTER": {
         if (sender.url !== chrome.runtime.getURL("popup.html") &&
-            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html")) &&
+            !fromRecordingPanel(sender)) {
           throw new Error("Användarregistrering får bara startas från tilläggets licensvyer.");
         }
         const tab = await chrome.tabs.get(message.tabId);
