@@ -14,9 +14,7 @@
     directLink: "Öppna i Business Central",
     technical: "Tekniska detaljer", environment: "Miljö",
     diagnostics: "Diagnostik", callStack: "AL-anropsstack",
-    telemetry: "Telemetri",
-    status: "Status", relatedEvents: "relaterade händelser",
-    relatedBy: "kopplad genom", notes: "Anteckningar" });
+    notes: "Anteckningar" });
   const ENGLISH = Object.freeze({ summary: "Summary",
     reproduction: "Steps to Reproduce", expected: "Expected Result",
     actual: "Actual Result", error: "Business Central Error",
@@ -24,8 +22,6 @@
     directLink: "Open in Business Central",
     technical: "Technical Details", environment: "Environment",
     diagnostics: "Diagnostics", callStack: "AL Call Stack",
-    telemetry: "Telemetry",
-    status: "Status", relatedEvents: "related events", relatedBy: "related by",
     notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
     .replace(/([*_[\]<>])/gu, "\\$1");
@@ -84,10 +80,6 @@
           ? [code(stack.rawCallStack)] : [])]);
       add(labels.callStack, callStack);
     }
-    if (pkg.telemetry) add(labels.telemetry, pkg.telemetry.contexts.flatMap(context => [
-      `- ${labels.status}: ${inline(context.status)}; ${labels.relatedEvents}: ${context.eventCount}`,
-      ...(context.events || []).map(event => `  - ${inline(event.timestamp)} ${
-        inline(event.eventName)} — ${labels.relatedBy} ${inline((event.correlationReasons || []).join(", "))}`)]));
     add(labels.notes, pkg.notes.map(item => `- ${inline(item.text || item.content)}`));
     return `${out.join("\n").trim()}\n`;
   }

@@ -1020,15 +1020,13 @@ deviation as failure. Namespaced extension libraries allow future Aptean and
 customer patterns without modifying the BC seed. See
 [REFERENCE_PROCESS_LIBRARY.md](REFERENCE_PROCESS_LIBRARY.md).
 
-## Application Insights enrichment boundary (4.6)
+## No external telemetry queries
 
-Optional external telemetry is queried by one provider through versioned query
-definitions after explicit user action. It is persisted per BC error under the
-Bug Report, never in Canonical Recording. The Technical Report projection joins
-local and external references into a derived timeline without merging stores or
-claiming causation. Authentication is Entra authorization code with PKCE; no
-confidential credential or token is persisted. See
-[APPLICATION_INSIGHTS_ENRICHMENT.md](APPLICATION_INSIGHTS_ENRICHMENT.md).
+The optional Application Insights enrichment added in 4.6 has been removed,
+together with its `api.applicationinsights.io` host permission. Bug Reports
+contain only locally captured evidence. Telemetry that an earlier version stored
+under `enrichment.telemetry` is preserved unchanged in the Bug Report but is no
+longer shown, exported or included in an Issue Package.
 Issue Package is a downstream, renderer-neutral projection of the same
 Technical Report, used by the PDF and email exports. It never changes the Bug
 Report.

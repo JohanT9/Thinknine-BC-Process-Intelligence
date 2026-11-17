@@ -80,9 +80,8 @@ Three origins stay explicit:
 - **Human-authored content:** title, summary, severity, category, expected
   result, actual-result explanation, notes and annotations.
 
-Bug Reports and optional enrichment remain local in `chrome.storage.local`.
-Application Insights is queried only after explicit opt-in through Microsoft
-Entra PKCE. Business values, company/user/session identifiers, errors, call
+Bug Reports remain local in `chrome.storage.local`; no external telemetry is
+queried. Business values, company/user/session identifiers, errors, call
 stacks and screenshots may be sensitive. The internal model is therefore not an
 external support package. A future sanitization/export policy must explicitly
 select and redact data before sharing.
@@ -119,8 +118,9 @@ unchanged in the report. See `ISSUE_PACKAGE.md`.
   surfaces and already-visible diagnostic DOM, without clipboard permission.
 - **AL call stack:** version 1 derives only explicitly present frame fields and
   preserves every unknown segment; it never invents object, app or line data.
-- **Application Insights:** optional external evidence is implemented; see
-  [Application Insights enrichment](APPLICATION_INSIGHTS_ENRICHMENT.md).
+- **Application Insights:** not queried. The optional enrichment was removed;
+  identifiers Business Central shows in the error details are kept as captured
+  evidence.
 - **Export:** Markdown, PDF and email consume derived report projections. Future Word/PDF support remains separate. The
   domain does not depend on DOCX or destination APIs.
 
@@ -133,5 +133,5 @@ unchanged in the report. See `ISSUE_PACKAGE.md`.
 - Error capture implemented? **Yes, for documented observable modal surfaces.**
 - AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
 - Root-cause assistance implemented? **No.**
-- Telemetry added? **Optional read enrichment.** AI added? **No.**
+- Telemetry added? **No** (Application Insights enrichment removed). AI added? **No.**
 - External creation added? **No.**

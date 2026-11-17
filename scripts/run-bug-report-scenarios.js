@@ -89,7 +89,7 @@ function run(scenario) {
     now: startedAt, documentLanguage: scenario.businessCentral.language,
     title: scenario.manualTitle, errorEvidence });
   const pkg = issuePackage.build(report, { errorEvidence }, {
-    generatedAt: startedAt, includeTelemetry: false, includeAiAnalysis: false,
+    generatedAt: startedAt, includeAiAnalysis: false,
     includeTechnicalDetails: Boolean(scenario.export?.includeTechnicalDetails) });
   const description = markdown.markdown(pkg);
   const failures = [];

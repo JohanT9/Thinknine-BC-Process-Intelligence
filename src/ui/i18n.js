@@ -1371,10 +1371,6 @@
       "review.flowReview": "Granska",
       "review.flowRecorded": "Spela in",
       "technical.regenerateConfirm": "Generera om hela rapporten från inspelningen? Manuella stegändringar och bildval ersätts. Titel, allvarlighetsgrad och förväntat resultat behålls.",
-      "technical.telemetrySaved": "Telemetriinställningen har sparats. Ingen hemlighet eller token lagrades.",
-      "technical.telemetryConnection": "Telemetrianslutning: {status}.",
-      "technical.selectPrimaryError": "Välj ett primärt fel innan telemetrin uppdateras.",
-      "technical.fetchingTelemetry": "Hämtar telemetri från den konfigurerade Microsoft-slutpunkten…",
       "technical.issueSubmissionTimeout": "Åtgärden tog för lång tid.",
       "debug.none": "Inget",
       "debug.noSession": "Ingen",
@@ -1668,10 +1664,6 @@
       "review.flowReview": "Review",
       "review.flowRecorded": "Record",
       "technical.regenerateConfirm": "Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.",
-      "technical.telemetrySaved": "Telemetry configuration saved. No secret or token was stored.",
-      "technical.telemetryConnection": "Telemetry connection: {status}.",
-      "technical.selectPrimaryError": "Select a primary error before telemetry refresh.",
-      "technical.fetchingTelemetry": "Fetching telemetry from the configured Microsoft endpoint…",
       "technical.issueSubmissionTimeout": "The operation timed out.",
       "debug.none": "None",
       "debug.noSession": "None",
@@ -2300,10 +2292,6 @@
     ,["Lägg till en rapporttitel.", "Add a report title."]
     ,["Lägg till minst ett synligt reproduktionssteg.", "Add at least one visible reproduction step."]
     ,["Beskriv det faktiska resultatet eller fånga ett BC-fel.", "Describe the actual result or capture a BC error."]
-    ,["Application Insights (valfritt)", "Application Insights (optional)"]
-    ,["Spara telemetriinställning", "Save telemetry configuration"]
-    ,["Testa telemetrianslutning", "Test telemetry connection"]
-    ,["Uppdatera telemetri för valt fel", "Refresh telemetry for selected error"]
     ,["Spara publik brokerinställning", "Save public broker configuration"]
     ,["Analysera tekniska bevis", "Analyze technical evidence"]
     ,["Förhandsgranska ärendepaket", "Issue Package Preview"]
@@ -2362,14 +2350,8 @@
     ,["Senast uppdaterad", "Last updated"], ["Inte bekräftad", "Not confirmed"]
     ,["Ångra", "Undo"], ["Gör om", "Redo"], ["Stäng", "Close"]
     ,["Tenant-ID", "Tenant ID"]
-    ,["Application Insights App-ID", "Application Insights App ID"]
-    ,["Förväntad miljö", "Expected environment"]
-    ,["Aktivera valfri berikning", "Enable optional enrichment"]
-    ,["Fönster (minuter)", "Window (minutes)"]
     ,["HTTPS-adress till broker", "HTTPS broker URL"]
     ,["Leverantörsmodell", "Provider model"]
-    ,["Inkludera filtrerade telemetrihändelser", "Include filtered telemetry events"]
-    ,["Inkludera maskerade telemetrimeddelanden", "Include redacted telemetry messages"]
     ,["Inkludera maskerade användaranteckningar", "Include redacted human notes"]
     ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
     ,["Endast teknisk information som fångats för detta fel visas.", "Only technical information captured for this error is shown."]

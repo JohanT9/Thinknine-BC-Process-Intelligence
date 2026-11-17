@@ -26,11 +26,9 @@ labels, status regions, table captions, keyboard-native controls and expandable
 details provide the accessibility baseline. Long evidence is wrapped, not
 truncated.
 
-The optional Application Insights panel stores public resource configuration,
-tests the connection, and refreshes one explicitly selected error. Telemetry
-and the derived timeline are read-only, escaped, and exported from the shared
-projection. Raw results are collapsed. No real
-BC/Application Insights pair was available locally; tests use synthetic data.
+The derived timeline is read-only, escaped, and exported from the shared
+projection. The workspace has no telemetry panel; Application Insights is not
+queried.
 
 Email PDF and Export PDF build the Issue Package locally and render it with the
 selected screenshots. Nothing is sent to an issue tracker.

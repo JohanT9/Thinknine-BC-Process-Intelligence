@@ -22,8 +22,7 @@
     "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/*",
     "https://businesscentral.dynamics.com/*",
     "https://*.businesscentral.dynamics.com/*",
-    "https://login.microsoftonline.com/*",
-    "https://api.applicationinsights.io/*"
+    "https://login.microsoftonline.com/*"
   ],
   "optional_host_permissions": [
     "https://graph.microsoft.com/*"

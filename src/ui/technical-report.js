@@ -334,7 +334,7 @@
         }
         const reportSnapshot = JSON.stringify(snapshot.report);
         const generated = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
-          options: { includeTelemetry: false, includeCallStack,
+          options: { includeCallStack,
             includeTechnicalDetails: false } });
         if (requestId !== issuePreviewRequestId) return null;
         if (JSON.stringify(workspace.state().report) !== reportSnapshot) {

@@ -97,8 +97,10 @@ assert.strictEqual(swedishDocument.documentLanguage, "sv-SE");
 assert.strictEqual(swedishDocument.sections[0].title, "Sammanfattning");
 const swedishMarkdown = exporter.markdown(swedishDocument);
 assert(swedishMarkdown.includes("## Steg för att återskapa"));
-assert(swedishMarkdown.includes("## Application Insights-telemetri"));
-assert(swedishMarkdown.includes("Inte konfigurerad eller inte hämtad."));
+// Application Insights enrichment was removed: no telemetry section in the report or its export.
+assert(!swedishDocument.sections.some(section => section.id === "telemetry"));
+assert(!swedishMarkdown.includes("telemetri"));
+assert(!markdown.includes("Application Insights Telemetry"));
 assert(swedishDocument.sections.find(section =>
   section.id === "technical-diagnostics").content.rows.some(row =>
   row.label === "Klientaktivitets-ID"));
