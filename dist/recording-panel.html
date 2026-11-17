@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="design-system.css">
   <style>
     [hidden]{display:none!important}
-    html{overflow-x:hidden}
-    body{font:15px "Segoe UI",system-ui,sans-serif;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-ffffff);overflow-x:hidden}
+    html{overflow-x:clip}
+    body{font:15px "Segoe UI",system-ui,sans-serif;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-ffffff);overflow-x:clip}
     main{box-sizing:border-box;min-height:100vh;display:flex;flex-direction:column;min-width:0}
     .rp-head{display:grid;gap:4px;padding:12px 14px 10px;border-bottom:1px solid var(--c-bd-ccd5df)}
     .rp-state{display:flex;align-items:center;gap:8px;margin:0;font-size:.875rem;font-weight:700;color:var(--c-fg-526273)}
@@ -27,27 +27,73 @@
     .rp-body h2{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c-fg-526273)}
     .rp-body p{margin:0;line-height:1.45;overflow-wrap:anywhere}
     .rp-help{font-size:.875rem;color:var(--c-fg-526273)}
-    .rp-earlier{margin:-4px 0 0;padding:0;list-style:none;display:grid;gap:2px}
-    .rp-earlier li{display:grid;gap:0;padding:5px 10px;border-left:3px solid var(--c-bd-ccd5df);font-size:.875rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
-    .rp-earlier li span{font-size:.75rem}
-    .rp-latest{display:grid;gap:2px;padding:10px 12px;border:2px solid var(--c-bd-008489);border-radius:8px;min-width:0}
-    .rp-latest-text{font-weight:600}
-    .rp-latest-page{font-size:.8125rem;color:var(--c-fg-526273)}
-    .rp-latest[data-empty]{border-style:dashed;border-color:var(--c-bd-ccd5df)}
-    .rp-latest[data-empty] .rp-latest-text{font-weight:400;color:var(--c-fg-526273)}
-    .rp-actions{display:grid;gap:6px}
-    .rp-action{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:start;gap:10px;width:100%;margin:0;padding:9px 10px;border:1px solid var(--c-bd-8392a5);border-radius:8px;background:var(--c-bg-ffffff);color:var(--c-fg-172b4d);font:inherit;text-align:left;cursor:pointer}
-    .rp-action:hover:not(:disabled){background:var(--c-bg-eefafa);border-color:var(--c-bd-008489)}
-    .rp-action:focus-visible{outline:var(--focusWidth, 2px) solid var(--colorFocusIndicator, var(--c-bd-008489));outline-offset:2px}
-    .rp-action:disabled{cursor:default;opacity:.6}
-    .rp-action[data-applied],.rp-action[data-applied]:hover{border-color:var(--c-bd-15803d);background:var(--c-bg-e9f7ed);cursor:default}
-    .rp-action svg{width:20px;height:20px;margin-top:1px}
-    .rp-action-copy{display:grid;gap:2px;min-width:0}
-    .rp-action-copy strong{font-size:.9375rem}
-    .rp-action-copy span{font-size:.8125rem;line-height:1.4;color:var(--c-fg-526273)}
-    .rp-done{align-self:center;font-size:.75rem;font-weight:700;color:var(--c-fg-18713a);white-space:nowrap}
-    .rp-feedback{min-height:1.3em;font-size:.875rem;color:var(--c-fg-166534)}
-    .rp-feedback[data-error]{color:var(--c-fg-8a1c14);font-weight:600}
+    .rp-intro{font-size:.8125rem;color:var(--c-fg-526273)}
+    .rp-list{display:grid;align-content:start;gap:6px;min-width:0}
+    .rp-sec{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin:8px 0 0;min-width:0}
+    .rp-sec:first-child{margin-top:0}
+    .rp-sec-name{flex:1 1 120px;min-width:0;margin:0;font-size:.875rem;font-weight:700;color:var(--c-fg-005f65);overflow-wrap:anywhere}
+    .rp-sec-name[data-unnamed]{color:var(--c-fg-526273);font-weight:600}
+    .rp-sec .rp-textbtn{font-size:.8125rem}
+    .rp-sec-edit{display:flex;gap:6px;flex:1 1 100%;min-width:0;margin:0}
+    .rp-sec-edit input{flex:1;min-width:0;box-sizing:border-box;padding:6px 8px;border:1px solid var(--c-bd-008489);border-radius:5px;font:inherit;font-size:.875rem;background:var(--c-bg-ffffff);color:inherit}
+    .rp-sec-edit button{flex:none;margin:0;padding:5px 10px;border:1px solid var(--c-bd-008489);border-radius:5px;background:var(--c-bg-008489);color:var(--c-fg-ffffff);font:inherit;font-size:.8125rem;font-weight:600;cursor:pointer}
+    .rp-sec-rule{height:0;margin:0;border:0;border-top:2px solid var(--c-bd-008489)}
+    .rp-textbtn{flex:none;margin:0;min-height:0;padding:2px;border-color:transparent!important;background:none;color:var(--c-fg-005f65);font:inherit;text-decoration:underline;cursor:pointer}
+    .rp-step{border:1px solid var(--c-bd-ccd5df);border-radius:8px;background:var(--c-bg-ffffff);min-width:0}
+    .rp-step[data-latest]{border-color:var(--c-bd-008489);box-shadow:0 0 0 1px var(--c-bd-008489)}
+    .rp-step[data-arrived]{animation:rp-arrive .9s ease-out}
+    .rp-step[data-updated] .rp-text{animation:rp-flash 1.6s ease-out}
+    @keyframes rp-arrive{from{background:var(--c-bg-eefafa)}}
+    @keyframes rp-flash{0%,40%{background:var(--c-bg-fff4ce)}100%{background:transparent}}
+    @media (prefers-reduced-motion:reduce){.rp-step[data-arrived],.rp-step[data-updated] .rp-text{animation:none}}
+    .rp-step-main{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;padding:9px 10px;align-items:start}
+    .rp-num{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--c-bg-f5f7fa);font-size:.75rem;font-weight:700;color:var(--c-fg-526273)}
+    .rp-step[data-latest] .rp-num{background:var(--c-bg-008489);color:var(--c-fg-ffffff)}
+    .rp-step-copy{min-width:0}
+    .rp-text{margin:0;line-height:1.4;overflow-wrap:anywhere;border-radius:3px}
+    .rp-text strong{font-weight:600}
+    .rp-where{margin:2px 0 0;font-size:.75rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .rp-merged{margin:3px 0 0;font-size:.75rem;color:var(--c-fg-7c5800)}
+    .rp-badge{display:inline-block;margin-top:5px;padding:1px 7px;border:1px solid var(--c-bd-9bc4e2);border-radius:10px;background:var(--c-bg-eef6ff);color:var(--c-fg-1e3a8a);font-size:.6875rem;font-weight:600}
+    .rp-thumb{position:relative;display:block;width:64px;aspect-ratio:16/10;margin:0;min-height:0;padding:0;border:1px solid var(--c-bd-ccd5df);border-radius:4px;overflow:hidden;background:var(--c-bg-f5f7fa);cursor:pointer}
+    .rp-thumb img,.rp-pick img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left}
+    .rp-thumb[data-chosen]{outline:2px solid var(--c-bd-0f6cbd);outline-offset:1px}
+    .rp-count{position:absolute;right:2px;bottom:2px;padding:0 4px;border-radius:3px;background:var(--c-bg-1e293b);color:var(--c-fg-ffffff);font-size:.625rem;font-weight:700}
+    .rp-step[data-ignored]{background:var(--c-bg-f5f7fa)}
+    .rp-step[data-ignored] .rp-text,.rp-step[data-ignored] .rp-where{color:var(--c-fg-526273)}
+    .rp-step[data-ignored] .rp-text{text-decoration:line-through;text-decoration-color:var(--c-bd-8392a5)}
+    .rp-step[data-ignored] .rp-thumb{opacity:.45}
+    .rp-tools{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:0 10px 9px 42px}
+    .rp-chip{display:inline-flex;align-items:center;gap:5px;margin:0;min-height:30px;padding:4px 9px;border:1px solid var(--c-bd-8392a5)!important;background:var(--c-bg-ffffff);color:var(--c-fg-172b4d);font:inherit;font-size:.75rem;cursor:pointer}
+    .rp-chip:hover{background:var(--c-bg-f5f7fa);border-color:var(--c-bd-008489)!important}
+    .rp-chip svg{width:14px;height:14px;flex:none}
+    .rp-chip[aria-pressed=true]{background:var(--c-bg-e9f7ed);border-color:var(--c-bd-15803d)!important;color:var(--c-fg-18713a);font-weight:600}
+    .rp-tools .rp-textbtn{font-size:.75rem}
+    .rp-ignored-note{margin:0;font-size:.75rem;color:var(--c-fg-526273)}
+    .rp-picker{display:grid;gap:6px;padding:0 10px 10px 42px}
+    .rp-picker p{margin:0;font-size:.75rem;color:var(--c-fg-526273)}
+    .rp-picks{display:flex;flex-wrap:wrap;gap:6px}
+    .rp-pick{width:84px;aspect-ratio:16/10;margin:0;min-height:0;padding:0;border:2px solid var(--c-bd-ccd5df)!important;border-radius:5px;overflow:hidden;background:var(--c-bg-f5f7fa);cursor:pointer}
+    .rp-pick[aria-pressed=true]{border-color:var(--c-bd-0f6cbd)!important}
+    .rp-picker .rp-textbtn{justify-self:start;font-size:.75rem}
+    .rp-waiting{display:flex;align-items:center;gap:8px;margin:0;padding:10px;border:1px dashed var(--c-bd-ccd5df);border-radius:8px;font-size:.8125rem;color:var(--c-fg-526273)}
+    .rp-dots{display:inline-flex;gap:3px}.rp-dots span{width:5px;height:5px;border-radius:50%;background:var(--c-bd-8392a5);animation:rp-pulse 1.2s infinite}
+    .rp-dots span:nth-child(2){animation-delay:.2s}.rp-dots span:nth-child(3){animation-delay:.4s}
+    @media (prefers-reduced-motion:reduce){.rp-dots span{animation:none}}
+    .rp-toast{display:flex;align-items:center;gap:10px;margin:0;padding:8px 10px;border-radius:6px;background:var(--c-bg-1e293b);color:var(--c-fg-ffffff);font-size:.8125rem}
+    .rp-toast[data-error]{background:var(--c-bg-fff4f2);color:var(--c-fg-8a1c14);font-weight:600;border-left:4px solid var(--c-bd-b42318)}
+    .rp-toast span{flex:1;min-width:0;overflow-wrap:anywhere}
+    .rp-foot .rp-toast button{flex:none;min-height:0;margin:0;padding:2px 4px;border-color:transparent!important;background:none;color:var(--c-fg-ffffff);font-weight:700;text-decoration:underline}
+    .rp-summary{display:grid;gap:12px}
+    .rp-check{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--c-bg-e9f7ed);color:var(--c-fg-18713a)}
+    .rp-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+    .rp-stats div{padding:8px 10px;border:1px solid var(--c-bd-ccd5df);border-radius:8px;min-width:0}
+    .rp-stats dt{font-size:.75rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .rp-stats dd{margin:0;font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .rp-outline{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+    .rp-outline li{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:6px;background:var(--c-bg-f5f7fa);font-size:.8125rem}
+    .rp-outline li span:first-child{min-width:0;overflow-wrap:anywhere}
+    .rp-outline li span:last-child{color:var(--c-fg-526273);white-space:nowrap}
     .rp-foot{display:grid;gap:10px;padding:12px 14px 14px;border-top:1px solid var(--c-bd-ccd5df);background:var(--c-bg-ffffff);position:sticky;bottom:0}
     .rp-foot form{display:grid;gap:10px;margin:0}
     main[data-view=form] .rp-foot,main[data-view=busy] .rp-foot,main[data-view=done] .rp-foot{flex:1;align-content:start;border-top:0;position:static}
@@ -67,7 +113,7 @@
     .rp-error{margin:0;font-size:.875rem;font-weight:600;color:var(--c-fg-8a1c14);overflow-wrap:anywhere}
     .rp-error:empty{display:none}
     .rp-busy{margin:0;font-size:.9375rem;font-weight:600}
-    .rp-done-box{display:grid;gap:10px}.rp-done-box h2{margin:0;font-size:1rem}.rp-done-box h2:focus{outline:none}
+    .rp-done-box{display:grid;gap:10px}.rp-done-box h2{margin:0;font-size:1rem}.rp-done-box h2:focus{outline:none!important;box-shadow:none!important}
     .rp-done-box p{margin:0;line-height:1.45;overflow-wrap:anywhere}
     .rp-done-name{padding:8px 10px;border-left:4px solid var(--c-bd-008489);background:var(--c-bg-eefafa);font-weight:600}
   </style>
@@ -95,41 +141,15 @@
       </div>
     </section>
 
-    <!-- The latest step and what can be marked on it. -->
-    <section id="rpLive" class="rp-body" aria-labelledby="rpLatestHeading" hidden>
-      <h2 id="rpEarlierHeading" data-i18n="recPanel.earlierHeading" hidden>Earlier steps</h2>
-      <ol id="rpEarlier" class="rp-earlier" aria-labelledby="rpEarlierHeading" data-i18n-ignore hidden></ol>
-      <h2 id="rpLatestHeading" data-i18n="recPanel.latestHeading">Latest step</h2>
-      <div id="rpLatest" class="rp-latest" data-empty>
-        <p id="rpLatestText" class="rp-latest-text" data-i18n-ignore></p>
-        <p id="rpLatestPage" class="rp-latest-page" data-i18n-ignore hidden></p>
-      </div>
-      <h2 id="rpActionsHeading" data-i18n="recPanel.actionsHeading">Change how the step appears in the document</h2>
-      <div class="rp-actions" role="group" aria-labelledby="rpActionsHeading">
-        <button class="rp-action" type="button" data-kind="use-image" aria-describedby="rpHelpImage">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="16" height="12" rx="1.5"/><circle cx="7" cy="8.5" r="1.5"/><path d="M17.5 13.5l-4-4L6 16"/></svg>
-          <span class="rp-action-copy"><strong data-i18n="recPanel.useImage">Use this screenshot</strong>
-            <span id="rpHelpImage" data-i18n="recPanel.useImageHelp"></span></span>
-          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
-        </button>
-        <button class="rp-action" type="button" data-kind="new-section" aria-describedby="rpHelpSection">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M3 9h9M3 14h14" /><path d="M3 11.5h14" stroke-dasharray="2 2"/></svg>
-          <span class="rp-action-copy"><strong data-i18n="recPanel.newSection">New section after this step</strong>
-            <span id="rpHelpSection" data-i18n="recPanel.newSectionHelp"></span></span>
-          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
-        </button>
-        <button class="rp-action" type="button" data-kind="ignore" aria-describedby="rpHelpIgnore">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z"/><circle cx="10" cy="10" r="2.3"/><path d="M3 17L17 3"/></svg>
-          <span class="rp-action-copy"><strong data-i18n="recPanel.ignore">Leave out of the document</strong>
-            <span id="rpHelpIgnore" data-i18n="recPanel.ignoreHelp"></span></span>
-          <span class="rp-done" data-i18n="recPanel.applied" hidden>Marked</span>
-        </button>
-      </div>
-      <p class="rp-help" data-i18n="recPanel.reviewLater">You can change everything when you review the document.</p>
-      <p id="rpFeedback" class="rp-feedback" role="status" aria-live="polite" data-i18n-ignore></p>
+    <!-- The document as it is recorded: its sections and steps, and what can be changed on them. -->
+    <section id="rpLive" class="rp-body" aria-labelledby="rpStateText" hidden>
+      <p class="rp-intro" data-i18n="recPanel.intro">This is how the document will look.</p>
+      <div id="rpList" class="rp-list" data-i18n-ignore></div>
+      <p id="rpWaiting" class="rp-waiting" data-i18n-ignore><span class="rp-dots" aria-hidden="true"><span></span><span></span><span></span></span><span id="rpWaitingText"></span></p>
     </section>
 
     <footer id="rpFoot" class="rp-foot" hidden>
+      <p id="rpToast" class="rp-toast" role="status" aria-live="polite" data-i18n-ignore hidden><span id="rpToastText"></span><button id="rpUndo" type="button" data-i18n="recPanel.undo" hidden>Undo</button></p>
       <div id="rpRecordingActions" class="rp-buttons">
         <button id="rpStop" type="button" class="primary" data-i18n-ignore></button>
       </div>
@@ -164,11 +184,14 @@
       <p id="rpBusy" class="rp-busy" role="status" aria-live="polite" data-i18n-ignore hidden></p>
 
       <div id="rpDone" class="rp-done-box" hidden>
+        <div id="rpDoneCheck" class="rp-check" hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
         <h2 id="rpDoneTitle" data-i18n-ignore tabindex="-1"></h2>
         <p id="rpDoneName" class="rp-done-name" data-i18n-ignore hidden></p>
+        <div id="rpSummary" class="rp-summary" data-i18n-ignore hidden></div>
         <p id="rpDoneHelp" class="rp-help" data-i18n-ignore></p>
         <div class="rp-buttons">
           <button id="rpOpenDocument" type="button" class="primary" data-i18n="recorder.openDocumentation" hidden>Open documentation</button>
+          <button id="rpDoneLibrary" type="button" data-i18n="recorder.openLibrary" hidden>Open Document Library</button>
           <button id="rpCloseDone" type="button" data-i18n="recPanel.close">Close panel</button>
         </div>
       </div>

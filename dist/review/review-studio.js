@@ -227,16 +227,25 @@
         ownerType: "step", ownerId: task.stepId || task.taskId,
         content: task.userComment, now }));
     let guidedHierarchy = hierarchy.empty(session.id);
-    if (normalizedTasks.some(task => task.sectionBoundaryAfter)) {
-      const chunks = []; let chunk = [];
+    // Sections made while recording keep the names given in the recording panel; a section
+    // without a name is numbered in the document's language.
+    const firstSectionTitle = String(normalizedTasks[0]?.firstSectionTitle || "").trim();
+    if (normalizedTasks.some(task => task.sectionBoundaryAfter) || firstSectionTitle) {
+      const chunks = []; const titles = [firstSectionTitle]; let chunk = [];
       normalizedTasks.forEach(task => {
         chunk.push(task.taskId);
-        if (task.sectionBoundaryAfter) { chunks.push(chunk); chunk = []; }
+        if (task.sectionBoundaryAfter) {
+          chunks.push(chunk); chunk = [];
+          titles.push(String(task.sectionTitle || "").trim());
+        }
       });
       if (chunk.length) chunks.push(chunk);
+      const documentLanguage = languages.normalize(session.settings?.documentLanguage, "document");
+      const numbered = number => languages.translate("Section {number}", documentLanguage,
+        "Sektion {number}").replace("{number}", String(number));
       chunks.forEach((stepIds, index) => {
         guidedHierarchy = hierarchy.createSection(guidedHierarchy,
-          `Sektion ${index + 1}`, stepIds, { recordingId: session.id,
+          titles[index] || numbered(index + 1), stepIds, { recordingId: session.id,
             now, nonce: index, provenance: "recording-guidance",
             recordedOrders: Object.fromEntries(stepIds.map((id, position) =>
               [id, position + 1])) }).state;

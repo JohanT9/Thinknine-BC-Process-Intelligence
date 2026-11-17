@@ -1,23 +1,29 @@
 (() => {
   "use strict";
-  // The recording shown beside Business Central: its status, the latest step and what can be
-  // marked on it, and saving it. It reads and changes the same recording as the toolbar popup
+  // The recording shown beside Business Central: the document as it is recorded, in the
+  // document's own words, and the changes the user can make to it while working; then saving it
+  // and a summary of what was saved. It reads and changes the same recording as the toolbar popup
   // and the floating box in the page; the background worker owns the recording.
+  //
+  // Every change is a marker added to the recording (append-only), so nothing recorded is lost and
+  // a change is undone by the opposite marker: include after ignore, no-section after new-section,
+  // automatic image after a chosen one.
   const i18n = globalThis.T9UiI18n;
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   // Opened by a start button: the start is still being checked in the popup.
   const startingUntil = params.get("starting") ? Date.now() + 180000 : 0;
   const REFRESH_MS = 1000;
-  const MARK_CONFIRMATIONS = Object.freeze({
-    "use-image": "recPanel.confirmImage",
-    "new-section": "recPanel.confirmSection",
-    ignore: "recPanel.confirmIgnore"
-  });
+  const TOAST_MS = 8000;
+  const THUMB_WIDTH = 240;
   const MARK_ERRORS = Object.freeze({
     "no-image": "recPanel.noImageYet",
     "no-step": "recPanel.noStepYet",
     "no-recording": "recPanel.noRecording"
+  });
+  const ICONS = Object.freeze({
+    section: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h7"/></svg>',
+    ignore: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8s2.2-4.5 6-4.5S14 8 14 8s-2.2 4.5-6 4.5S2 8 2 8z"/><circle cx="8" cy="8" r="1.8"/><path d="M2.5 13.5l11-11"/></svg>'
   });
 
   let locale = i18n.DEFAULT_LOCALE;
@@ -26,14 +32,31 @@
   let recordingSeen = false;
   let purpose = "process";
   let startedAt = 0;
-  let latestKey = "";
-  let latestLabel = "";
-  let hasLatest = false;
-  let marking = false;
   let busy = false;
   let refreshing = false;
   let completedId = "";
-  const applied = new Set();
+
+  // ---- The document as it is recorded ------------------------------------------------------
+  let live = null;            // the steps as the background worker last interpreted them
+  let liveFailed = false;
+  let liveLoading = false;
+  let liveSeq = 0;            // each request for the steps is numbered
+  let settledAfter = 0;       // a request numbered above this shows every saved change
+  let changesInFlight = 0;
+  // A change shows at once; it is kept over the worker's steps until they include it.
+  const overrides = new Map();
+  let firstTitleOverride = null;
+  let editing = null;         // the section being named: "first" or the key of the step before it
+  let editingValue = null;
+  let openTools = null;       // an earlier step whose tools are open; the latest step's always are
+  let openPicker = null;      // the step whose images are shown to choose from
+  const seenRuns = new Map();
+  let arrivedKey = "";
+  let updatedKey = "";
+  let mergedKey = "";
+  let renderedSignature = "";
+  let rebuilding = false;     // the list is being replaced, which moves focus by itself
+  const images = new Map();   // screenshot path → { state, url, at }
 
   const t = (key, values = {}) => i18n.format(key, values, locale);
   const show = (element, visible) => { element.hidden = !visible; };
@@ -134,6 +157,7 @@
     show($("rpSaveForm"), next === "form");
     show($("rpBusy"), next === "busy");
     show($("rpDone"), next === "done");
+    if (next !== "recording") hideToast();
     // The status line is shown while a recording runs; other views say it in their heading.
     show(document.querySelector(".rp-head"), live || next === "test");
     show($("rpTime"), live);
@@ -155,13 +179,16 @@
       show($("rpConfirm"), false);
       $("rpDiscard").setAttribute("aria-expanded", "false");
       $("rpDocumentLanguage").value = documentLanguage;
+      // The first section's name is usually what the whole document is about.
+      if (!$("rpName").value.trim() && firstTitle()) $("rpName").value = firstTitle();
       $("rpName").focus();
+      $("rpName").select();
     }
     if (next === "recording" && previous === "form") $("rpStop").focus();
   }
 
   function renderWarnings(liveStatus) {
-    // The empty step card already says that no step has been recorded yet.
+    // The waiting line already says that no step has been recorded yet.
     const messages = (liveStatus?.warnings || []).filter(item => item.code !== "no-events-yet")
       .map(item => {
         const key = `recorder.warning.${item.code}`;
@@ -172,54 +199,7 @@
     setText($("rpWarning"), messages.join(" "));
   }
 
-  // A step in the words of a document: "Choose Post", "Enter Customer No.".
-  function stepText(step) {
-    // A row of a list: the record chosen, as in the document ("Choose record 3").
-    if (step.record) return t("recPanel.stepRecord", { value: step.record });
-    if (!step.label) return t("recorder.eventCaptured");
-    const key = step.category === "field" ? "recPanel.stepEnter" : "recPanel.stepChoose";
-    // A name that already says what to do, such as "Choose a value for Source No.", is shown
-    // as it is rather than as "Choose Choose a value …".
-    const [before, after] = t(key).split("{label}").map(part => part.trim().toLocaleLowerCase(locale));
-    const name = step.label.toLocaleLowerCase(locale);
-    if ((before && name.startsWith(`${before} `)) || (after && name.endsWith(` ${after}`))) {
-      return step.label;
-    }
-    return t(key, { label: step.label });
-  }
-
-  let earlierSignature = "";
-  function renderEarlier(steps) {
-    const signature = JSON.stringify([locale, steps.map(step => [stepText(step), step.pageCaption])]);
-    if (signature === earlierSignature) return;
-    earlierSignature = signature;
-    const items = steps.map(step => {
-      const item = document.createElement("li");
-      item.append(document.createTextNode(stepText(step)));
-      if (step.pageCaption) {
-        const page = document.createElement("span");
-        page.textContent = step.pageCaption;
-        item.append(page);
-      }
-      return item;
-    });
-    $("rpEarlier").replaceChildren(...items);
-    show($("rpEarlier"), items.length > 0);
-    show($("rpEarlierHeading"), items.length > 0);
-  }
-
-  function renderActions() {
-    for (const button of document.querySelectorAll(".rp-action")) {
-      const done = applied.has(button.dataset.kind);
-      // A mark already made stays readable as done rather than greyed out as unavailable.
-      button.disabled = !done && (marking || !hasLatest);
-      button.setAttribute("aria-disabled", String(done));
-      button.toggleAttribute("data-applied", done);
-      show(button.querySelector(".rp-done"), done);
-    }
-  }
-
-  function renderLive(response) {
+  function renderStatus(response) {
     const liveStatus = response.liveStatus || {};
     const context = [liveStatus.context?.environmentName, liveStatus.context?.companyName]
       .filter(Boolean).join(" · ");
@@ -229,25 +209,460 @@
       screenshots: screenshots.captured || 0 }) + (screenshots.pending
       ? t("recorder.pendingCount", { count: screenshots.pending }) : ""));
     renderWarnings(liveStatus);
-    // Steps the user took; focus changes, page loads and messages in between are not shown.
-    const steps = Array.isArray(liveStatus.steps) ? liveStatus.steps : [];
-    const action = steps.at(-1) || null;
-    const key = action ? action.interactionId || [action.type, action.label].join("|") : "";
-    if (key !== latestKey) {
-      // A new step: the marks made on the previous one stay with that step.
-      latestKey = key;
-      applied.clear();
-    }
-    hasLatest = Boolean(action);
-    latestLabel = action ? action.label || "" : "";
-    $("rpLatest").toggleAttribute("data-empty", !action);
-    setText($("rpLatestText"), action ? stepText(action) : t("recPanel.waitingStep"));
-    setText($("rpLatestPage"), action?.pageCaption || "");
-    show($("rpLatestPage"), Boolean(action?.pageCaption));
-    renderEarlier(steps.slice(0, -1));
-    renderActions();
   }
 
+  // ---- Steps and sections as they stand, with changes not yet interpreted ------------------
+  function currentSteps() {
+    return (live?.steps || []).map(step => ({ ...step, ...(overrides.get(step.key) || {}) }));
+  }
+  function firstTitle() {
+    return firstTitleOverride ?? String(live?.firstSectionTitle || "");
+  }
+  const plainText = step => (step.runs || []).map(run => run.text).join("");
+  function numbering(steps) {
+    const numbers = new Map();
+    let number = 0;
+    for (const step of steps) if (!step.ignored) numbers.set(step.key, ++number);
+    return numbers;
+  }
+  function sections(steps) {
+    const list = [{ key: "first", title: firstTitle(), steps: [] }];
+    for (const step of steps) {
+      list.at(-1).steps.push(step);
+      if (step.sectionAfter) list.push({ key: step.key, title: step.sectionTitle || "", steps: [] });
+    }
+    return list;
+  }
+
+  function acceptLive(next) {
+    const known = new Set((live?.steps || []).map(step => step.key));
+    // Steps written in another document language are not steps that changed.
+    if (live && next.language !== live.language) seenRuns.clear();
+    let arrived = "";
+    for (const step of next.steps || []) {
+      const runs = JSON.stringify(step.runs || []);
+      const before = seenRuns.get(step.key);
+      // The same step written differently: more events made it one step with what came before.
+      if (before !== undefined && before !== runs) { updatedKey = step.key; mergedKey = step.key; }
+      seenRuns.set(step.key, runs);
+      if (!known.has(step.key)) arrived = step.key;
+    }
+    if (arrived && live) {
+      arrivedKey = arrived;
+      if (mergedKey !== updatedKey) mergedKey = "";
+      if (openTools && !document.activeElement?.closest?.(`[data-key="${CSS.escape(openTools)}"]`)) {
+        openTools = null;
+      }
+    }
+    live = next;
+  }
+
+  async function loadLive() {
+    if (liveLoading || view !== "recording" && view !== "form") return;
+    liveLoading = true;
+    const seq = ++liveSeq;
+    try {
+      const response = await send({ type: "T9_GET_LIVE_STEPS", language: documentLanguage }, 20000);
+      if (!response?.ok) {
+        liveFailed = response?.code === "live-steps-failed";
+        return;
+      }
+      liveFailed = false;
+      // A reading requested after the last change was saved includes it.
+      if (!response.live.updating && seq > settledAfter && !changesInFlight) {
+        overrides.clear();
+        firstTitleOverride = null;
+      }
+      acceptLive(response.live);
+    } catch {
+      // The worker may be restarting; the next refresh tries again.
+    } finally {
+      liveLoading = false;
+      render();
+    }
+  }
+
+  // ---- Screenshots, made small for the panel ------------------------------------------------
+  let imageTimer = 0;
+  const imageQueue = new Set();
+  function imageUrl(path) {
+    if (!path) return "";
+    const entry = images.get(path);
+    // A screenshot still being saved is asked for again a moment later.
+    if (!entry || entry.state === "missing" && Date.now() - entry.at > 3000) {
+      images.set(path, { state: "loading" });
+      imageQueue.add(path);
+      clearTimeout(imageTimer);
+      imageTimer = setTimeout(() => { void loadImages(); }, 50);
+      return "";
+    }
+    return entry.url || "";
+  }
+  function shrink(dataUrl) {
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const scale = Math.min(1, THUMB_WIDTH / (image.naturalWidth || THUMB_WIDTH));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        } catch { resolve(dataUrl); }
+      };
+      image.onerror = () => resolve("");
+      image.src = dataUrl;
+    });
+  }
+  async function loadImages() {
+    const batch = [...imageQueue].slice(0, 12);
+    batch.forEach(path => imageQueue.delete(path));
+    if (!batch.length) return;
+    try {
+      const response = await send({ type: "T9_GET_LIVE_STEP_IMAGES", paths: batch }, 20000);
+      for (const path of batch) {
+        const data = response?.screenshots?.[path];
+        const url = data ? await shrink(data) : "";
+        images.set(path, url ? { state: "ready", url } : { state: "missing", at: Date.now() });
+      }
+    } catch {
+      for (const path of batch) images.set(path, { state: "missing", at: Date.now() });
+    }
+    render();
+    if (imageQueue.size) imageTimer = setTimeout(() => { void loadImages(); }, 50);
+  }
+
+  // ---- Rendering ----------------------------------------------------------------------------
+  function el(tag, attributes = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(attributes)) {
+      if (value === null || value === undefined || value === false) continue;
+      if (name === "class") node.className = value;
+      else if (name === "text") node.textContent = value;
+      else if (name === "html") node.innerHTML = value; // only the fixed icons above
+      else node.setAttribute(name, value === true ? "" : String(value));
+    }
+    node.append(...children.filter(child => child !== null && child !== undefined && child !== false));
+    return node;
+  }
+
+  function runsNode(runs) {
+    return el("p", { class: "rp-text" }, ...(runs || []).map(run => {
+      const text = document.createTextNode(run.text);
+      if (run.bold && run.italic) return el("strong", {}, el("em", {}, text));
+      if (run.bold) return el("strong", {}, text);
+      if (run.italic) return el("em", {}, text);
+      return text;
+    }));
+  }
+
+  function sectionRow(section, number, removable) {
+    const name = section.title || t("recPanel.sectionNumber", { number });
+    if (editing === section.key) {
+      const input = el("input", { id: "rpSecInput", maxlength: 80, autocomplete: "off",
+        "aria-label": t("recPanel.sectionInputLabel", { number }),
+        placeholder: t("recPanel.sectionPlaceholder") });
+      input.value = editingValue ?? section.title;
+      return el("div", { class: "rp-sec" }, el("form", { class: "rp-sec-edit", "data-section": section.key },
+        input, el("button", { type: "submit", text: t("recPanel.sectionDone") })));
+    }
+    return el("div", { class: "rp-sec" },
+      el("p", { class: "rp-sec-name", "data-unnamed": !section.title, text: name }),
+      el("button", { type: "button", class: "rp-textbtn", "data-act": "rename", "data-key": section.key,
+        "aria-label": section.title ? t("recPanel.sectionRenameLabel", { name })
+          : t("recPanel.sectionInputLabel", { number }),
+        text: t(section.title ? "recPanel.sectionRename" : "recPanel.sectionName") }),
+      removable ? el("button", { type: "button", class: "rp-textbtn", "data-act": "remove-section",
+        "data-key": section.key, "aria-label": t("recPanel.sectionRemoveLabel", { name }),
+        text: t("recPanel.sectionRemove") }) : null);
+  }
+
+  function thumbnail(step, number) {
+    const count = step.images.length;
+    if (!count) return null;
+    const url = imageUrl(step.shownPath);
+    return el("button", { type: "button", class: "rp-thumb", "data-act": "picker", "data-key": step.key,
+      "data-chosen": Boolean(step.chosenAssetId),
+      "aria-label": count > 1 ? t("recPanel.thumbChooseLabel", { number, count })
+        : t("recPanel.thumbLabel", { number }),
+      "aria-expanded": count > 1 ? String(openPicker === step.key) : null },
+    url ? el("img", { src: url, alt: "" }) : null,
+    count > 1 ? el("span", { class: "rp-count", "aria-hidden": "true", text: count }) : null);
+  }
+
+  function picker(step) {
+    if (openPicker !== step.key || step.images.length < 2 || step.ignored) return null;
+    const shown = step.chosenAssetId || step.images.find(image => image.path === step.shownPath)?.assetId;
+    return el("div", { class: "rp-picker" },
+      el("p", { text: t("recPanel.pickerHelp", { count: step.images.length }) }),
+      el("div", { class: "rp-picks" }, ...step.images.map((image, index) => {
+        const url = imageUrl(image.path);
+        return el("button", { type: "button", class: "rp-pick", "data-act": "pick", "data-key": step.key,
+          "data-asset": image.assetId, "aria-pressed": String(image.assetId === shown),
+          "aria-label": t("recPanel.pickerImage", { number: index + 1 }) },
+        url ? el("img", { src: url, alt: "" }) : null);
+      })),
+      step.chosenAssetId ? el("button", { type: "button", class: "rp-textbtn", "data-act": "pick-auto",
+        "data-key": step.key, text: t("recPanel.pickerAuto") }) : null);
+  }
+
+  function tools(step, number, latest) {
+    if (step.ignored) {
+      return el("div", { class: "rp-tools" },
+        el("p", { class: "rp-ignored-note", text: t("recPanel.ignoredNote") }),
+        el("button", { type: "button", class: "rp-chip", "data-act": "include", "data-key": step.key,
+          "aria-label": t("recPanel.includeLabel", { step: plainText(step) }),
+          text: t("recPanel.include") }));
+    }
+    if (!latest && openTools !== step.key) {
+      return el("div", { class: "rp-tools" }, el("button", { type: "button", class: "rp-textbtn",
+        "data-act": "open", "data-key": step.key, "aria-label": t("recPanel.changeLabel", { number }),
+        text: t("recPanel.change") }));
+    }
+    return el("div", { class: "rp-tools", role: "group", "aria-label": t("recPanel.toolsLabel", { number }) },
+      el("button", { type: "button", class: "rp-chip", "data-act": "section", "data-key": step.key,
+        "aria-pressed": String(Boolean(step.sectionAfter)),
+        "aria-label": t("recPanel.chipSectionLabel", { number }) },
+      el("span", { html: ICONS.section }), t("recPanel.chipSection")),
+      el("button", { type: "button", class: "rp-chip", "data-act": "ignore", "data-key": step.key,
+        "aria-label": t("recPanel.chipIgnoreLabel", { number }) },
+      el("span", { html: ICONS.ignore }), t("recPanel.chipIgnore")),
+      latest ? null : el("button", { type: "button", class: "rp-textbtn", "data-act": "close",
+        "data-key": step.key, text: t("recPanel.closeTools") }));
+  }
+
+  function stepCard(step, number, latest) {
+    return el("article", { class: "rp-step", "data-key": step.key, "data-latest": latest,
+      "data-ignored": Boolean(step.ignored), "data-arrived": arrivedKey === step.key,
+      "data-updated": updatedKey === step.key,
+      "aria-label": step.ignored ? t("recPanel.stepIgnoredLabel") : t("recPanel.stepLabel", { number }) },
+    el("div", { class: "rp-step-main" },
+      el("span", { class: "rp-num", "aria-hidden": "true", text: step.ignored ? "–" : number }),
+      el("div", { class: "rp-step-copy" }, runsNode(step.runs),
+        step.pageCaption ? el("p", { class: "rp-where", text: step.pageCaption }) : null,
+        mergedKey === step.key ? el("p", { class: "rp-merged", text: t("recPanel.merged") }) : null,
+        step.chosenAssetId ? el("span", { class: "rp-badge", text: t("recPanel.chosenBadge") }) : null),
+      thumbnail(step, number)),
+    picker(step), tools(step, number, latest));
+  }
+
+  function focusedControl() {
+    const active = document.activeElement;
+    if (!active || !$("rpList").contains(active)) return null;
+    return { act: active.dataset.act, key: active.dataset.key, asset: active.dataset.asset };
+  }
+  function restoreFocus(target) {
+    const input = $("rpSecInput");
+    if (input) {
+      if (document.activeElement !== input) input.focus();
+      return;
+    }
+    if (!target?.key) return;
+    const key = CSS.escape(target.key);
+    const selector = target.asset ? `[data-asset="${CSS.escape(target.asset)}"][data-key="${key}"]`
+      : `[data-act="${target.act}"][data-key="${key}"]`;
+    ($("rpList").querySelector(selector) ||
+      $("rpList").querySelector(`[data-key="${key}"] button`))?.focus();
+  }
+
+  function render() {
+    if (view !== "recording" && view !== "form") return;
+    const steps = currentSteps();
+    const imageStates = steps.flatMap(step => [step.shownPath,
+      ...(openPicker === step.key ? step.images.map(image => image.path) : [])])
+      .map(path => images.get(path)?.state || "");
+    const signature = JSON.stringify([locale, steps, firstTitle(), editing, openTools, openPicker,
+      arrivedKey, updatedKey, mergedKey, imageStates, liveFailed, Boolean(live)]);
+    if (signature === renderedSignature) return;
+    renderedSignature = signature;
+    // A name being typed is kept while new steps come in.
+    if ($("rpSecInput")) editingValue = $("rpSecInput").value;
+    const focus = focusedControl();
+    const nearEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120;
+    const numbers = numbering(steps);
+    const nodes = [];
+    if (steps.length) {
+      sections(steps).forEach((section, index) => {
+        nodes.push(sectionRow(section, index + 1, index > 0));
+        for (const step of section.steps) {
+          nodes.push(stepCard(step, numbers.get(step.key) || 0, step === steps.at(-1)));
+        }
+      });
+    }
+    rebuilding = true;
+    try { $("rpList").replaceChildren(...nodes); } finally { rebuilding = false; }
+    setText($("rpWaitingText"), liveFailed && !steps.length ? t("recPanel.liveFailed")
+      : t(steps.length ? "recPanel.waitingNext" : "recPanel.waitingFirst"));
+    restoreFocus(focus);
+    if (arrivedKey && nearEnd && !$("rpSecInput")) $("rpWaiting").scrollIntoView({ block: "end" });
+    arrivedKey = "";
+    updatedKey = "";
+  }
+
+  // ---- Changes, and taking them back -------------------------------------------------------
+  let toastTimer = 0;
+  let undoAction = null;
+  function hideToast() {
+    clearTimeout(toastTimer);
+    undoAction = null;
+    show($("rpToast"), false);
+  }
+  // A change can be undone until the next change: the user's attention is in Business Central.
+  // A message without undo goes away by itself.
+  function toast(text, undo = null, error = false) {
+    clearTimeout(toastTimer);
+    undoAction = undo;
+    setText($("rpToastText"), text);
+    $("rpToast").toggleAttribute("data-error", error);
+    show($("rpUndo"), Boolean(undo));
+    show($("rpToast"), true);
+    if (!undo) toastTimer = setTimeout(() => show($("rpToast"), false), TOAST_MS);
+  }
+
+  // Shows a change at once and saves it as a marker; a change that cannot be saved is taken back.
+  async function apply({ kind, step = null, override, sectionTitle, imageId }) {
+    const first = kind === "first-section-title";
+    const before = first ? firstTitleOverride : overrides.get(step.key);
+    if (first) firstTitleOverride = override;
+    else overrides.set(step.key, { ...(before || {}), ...override });
+    render();
+    changesInFlight += 1;
+    try {
+      const response = await send({ type: "T9_CAPTURE_GUIDANCE", kind,
+        ...(step ? { targetSourceEventIds: step.sourceEventIds } : {}),
+        ...(imageId ? { preferredScreenshotAssetId: imageId } : {}),
+        ...(sectionTitle !== undefined ? { sectionTitle } : {}) });
+      if (!response?.ok) throw Object.assign(new Error("not-saved"), { code: response?.code });
+      settledAfter = liveSeq;
+      return true;
+    } catch (error) {
+      if (first) firstTitleOverride = before;
+      else if (before) overrides.set(step.key, before);
+      else overrides.delete(step.key);
+      toast(t(MARK_ERRORS[error?.code] || "recPanel.markFailed"), null, true);
+      return false;
+    } finally {
+      changesInFlight -= 1;
+      render();
+      void loadLive();
+    }
+  }
+
+  const stepByKey = key => currentSteps().find(step => step.key === key);
+  const numberOf = step => numbering(currentSteps()).get(step.key) || 0;
+
+  async function setIgnored(step, ignored) {
+    const number = numberOf(step);
+    if (ignored && openTools === step.key) openTools = null;
+    const saved = await apply({ kind: ignored ? "ignore" : "include", step, override: { ignored } });
+    if (!saved) return;
+    const message = ignored ? t("recPanel.toastIgnored", { number })
+      : t("recPanel.toastIncluded", { number: numberOf(stepByKey(step.key) || step) });
+    toast(message, () => apply({ kind: ignored ? "include" : "ignore", step,
+      override: { ignored: !ignored } }));
+  }
+
+  async function addSection(step) {
+    editing = step.key;
+    editingValue = "";
+    const saved = await apply({ kind: "new-section", step, sectionTitle: "",
+      override: { sectionAfter: true, sectionTitle: "" } });
+    if (!saved) { editing = null; render(); return; }
+    toast(t("recPanel.toastSection", { number: numberOf(step) }), () => {
+      if (editing === step.key) editing = null;
+      return apply({ kind: "no-section", step, override: { sectionAfter: false, sectionTitle: "" } });
+    });
+  }
+
+  async function removeSection(step) {
+    const title = step.sectionTitle || "";
+    if (editing === step.key) editing = null;
+    const saved = await apply({ kind: "no-section", step,
+      override: { sectionAfter: false, sectionTitle: "" } });
+    if (!saved) return;
+    toast(t("recPanel.toastSectionRemoved"), () => apply({ kind: "new-section", step,
+      sectionTitle: title, override: { sectionAfter: true, sectionTitle: title } }));
+  }
+
+  function nameSection(key) {
+    const step = key === "first" ? null : stepByKey(key);
+    const before = key === "first" ? firstTitle() : step?.sectionTitle || "";
+    const change = name => key === "first"
+      ? apply({ kind: "first-section-title", sectionTitle: name, override: name })
+      : apply({ kind: "new-section", step, sectionTitle: name,
+        override: { sectionAfter: true, sectionTitle: name } });
+    return { before, step, change };
+  }
+
+  async function saveSectionName(key, value, quiet = false) {
+    const title = String(value || "").replace(/\s+/gu, " ").trim().slice(0, 80);
+    editing = null;
+    editingValue = null;
+    const { before, step, change } = nameSection(key);
+    if (key !== "first" && !step) { render(); return; }
+    if (title === before) { render(); restoreFocusTo(key); return; }
+    const saved = await change(title);
+    restoreFocusTo(key);
+    if (!saved) return;
+    if (quiet) return;
+    toast(title ? t("recPanel.toastSectionNamed", { name: title }) : t("recPanel.toastSectionUnnamed"),
+      () => change(before));
+  }
+  function restoreFocusTo(key) {
+    $("rpList").querySelector(`[data-act="rename"][data-key="${CSS.escape(key)}"]`)?.focus();
+  }
+
+  async function chooseImage(step, assetId) {
+    const before = step.chosenAssetId || null;
+    if ((assetId || null) === before) { openPicker = null; render(); return; }
+    const number = numberOf(step);
+    const pathOf = id => step.images.find(image => image.assetId === id)?.path || "";
+    const autoPath = step.images.at(-1)?.path || "";
+    const pick = id => apply({ kind: id ? "use-image" : "auto-image", step, imageId: id || undefined,
+      override: { chosenAssetId: id || null, shownPath: id ? pathOf(id) : autoPath } });
+    openPicker = null;
+    const saved = await pick(assetId);
+    if (!saved) return;
+    const index = step.images.findIndex(image => image.assetId === assetId);
+    toast(assetId ? t("recPanel.toastImage", { number, image: index + 1 })
+      : t("recPanel.toastImageAuto", { number }), () => pick(before));
+  }
+
+  function onListClick(event) {
+    const button = event.target.closest("[data-act]");
+    if (!button || !$("rpList").contains(button)) return;
+    const key = button.dataset.key;
+    const step = key === "first" ? null : stepByKey(key);
+    const act = button.dataset.act;
+    if (act === "rename") { editing = key; editingValue = null; render(); $("rpSecInput")?.select(); return; }
+    if (!step) return;
+    if (act === "remove-section") { void removeSection(step); return; }
+    if (act === "open") { openTools = key; render(); return; }
+    if (act === "close") { openTools = null; render(); return; }
+    if (act === "picker") {
+      if (step.images.length < 2) { toast(t("recPanel.oneImage", { number: numberOf(step) })); return; }
+      openPicker = openPicker === key ? null : key;
+      render();
+      return;
+    }
+    if (act === "pick") { void chooseImage(step, button.dataset.asset); return; }
+    if (act === "pick-auto") { void chooseImage(step, null); return; }
+    if (act === "section") { void (step.sectionAfter ? removeSection(step) : addSection(step)); return; }
+    if (act === "ignore") { void setIgnored(step, true); return; }
+    if (act === "include") void setIgnored(step, false);
+  }
+
+  async function undo() {
+    const action = undoAction;
+    if (!action) return;
+    hideToast();
+    const saved = await action();
+    if (saved) toast(t("recPanel.undone"));
+    else toast(t("recPanel.undoFailed"), null, true);
+  }
+
+  // ---- Updates ------------------------------------------------------------------------------
   async function refresh() {
     if (busy || refreshing || view === "done") return;
     refreshing = true;
@@ -270,39 +685,13 @@
       else setState(purpose === "bug" ? "recPanel.stateBug" : "recPanel.stateProcess", "recording");
       setText($("rpTime"), formatElapsed());
       $("rpTime").setAttribute("aria-label", t("recPanel.elapsed", { time: formatElapsed() }));
-      renderLive(response);
+      renderStatus(response);
+      render();
+      void loadLive();
     } catch {
       // The worker may be restarting; the next refresh tries again.
     } finally {
       refreshing = false;
-    }
-  }
-
-  function feedback(text, error = false) {
-    setText($("rpFeedback"), text);
-    $("rpFeedback").toggleAttribute("data-error", error);
-  }
-
-  async function mark(kind) {
-    if (marking || applied.has(kind)) return;
-    marking = true;
-    renderActions();
-    feedback("");
-    try {
-      const response = await send({ type: "T9_CAPTURE_GUIDANCE", kind });
-      if (!response?.ok) {
-        feedback(t(MARK_ERRORS[response?.code] || "recPanel.markFailed"), true);
-        return;
-      }
-      applied.add(kind);
-      const step = response.guidance?.targetLabel || latestLabel;
-      feedback(step ? t(MARK_CONFIRMATIONS[kind], { step })
-        : t(`${MARK_CONFIRMATIONS[kind]}Unnamed`));
-    } catch {
-      feedback(t("recPanel.markFailed"), true);
-    } finally {
-      marking = false;
-      renderActions();
     }
   }
 
@@ -313,16 +702,58 @@
     setView("busy");
   }
 
-  function showDone({ titleKey, name = "", helpKey = "", recordingId = "" }) {
+  // What was saved, as the panel last showed it.
+  function summaryOf(snapshot) {
+    const kept = snapshot.steps.filter(step => !step.ignored);
+    const boundaries = snapshot.steps.filter(step => step.sectionAfter);
+    const hasSections = boundaries.length > 0 || Boolean(snapshot.firstTitle);
+    const outline = [];
+    if (hasSections) {
+      const list = [{ title: snapshot.firstTitle, steps: [] }];
+      for (const step of snapshot.steps) {
+        if (!step.ignored) list.at(-1).steps.push(step);
+        if (step.sectionAfter) list.push({ title: step.sectionTitle || "", steps: [] });
+      }
+      list.forEach((section, index) => outline.push({
+        name: section.title || t("recPanel.sectionNumber", { number: index + 1 }),
+        count: section.steps.length }));
+    }
+    return { steps: kept.length, sections: outline, images: kept.filter(step => step.shownPath).length,
+      leftOut: snapshot.steps.length - kept.length, time: snapshot.time };
+  }
+
+  function renderSummary(summary) {
+    const stat = (label, value) => el("div", {}, el("dt", { text: label }), el("dd", { text: value }));
+    const nodes = [
+      el("dl", { class: "rp-stats" },
+        stat(t("recPanel.statSteps"), summary.steps),
+        summary.sections.length ? stat(t("recPanel.statSections"), summary.sections.length) : null,
+        stat(t("recPanel.statImages"), summary.images),
+        summary.time ? stat(t("recPanel.statTime"), summary.time) : null),
+      summary.sections.length ? el("ol", { class: "rp-outline", "aria-label": t("recPanel.outlineLabel") },
+        ...summary.sections.map(section => el("li", {}, el("span", { text: section.name }),
+          el("span", { text: section.count === 1 ? t("recPanel.outlineStepsOne")
+            : t("recPanel.outlineSteps", { count: section.count }) })))) : null,
+      summary.leftOut ? el("p", { class: "rp-help", text: summary.leftOut === 1
+        ? t("recPanel.leftOutOne") : t("recPanel.leftOut", { count: summary.leftOut }) }) : null
+    ];
+    $("rpSummary").replaceChildren(...nodes.filter(Boolean));
+  }
+
+  function showDone({ titleKey, name = "", helpKey = "", recordingId = "", summary = null }) {
     busy = false;
     completedId = recordingId;
     setView("done");
     setText($("rpDoneTitle"), t(titleKey));
     setText($("rpDoneName"), name);
     show($("rpDoneName"), Boolean(name));
+    if (summary) renderSummary(summary);
+    show($("rpSummary"), Boolean(summary));
+    show($("rpDoneCheck"), Boolean(summary));
     setText($("rpDoneHelp"), helpKey ? t(helpKey) : "");
     show($("rpDoneHelp"), Boolean(helpKey));
     show($("rpOpenDocument"), Boolean(recordingId));
+    show($("rpDoneLibrary"), Boolean(summary));
     $("rpDoneTitle").focus();
   }
 
@@ -339,7 +770,7 @@
     } catch (error) {
       busy = false;
       setView("recording");
-      feedback(errorText(error, "recorder.stopFailed"), true);
+      toast(errorText(error, "recorder.stopFailed"), null, true);
     }
   }
 
@@ -354,12 +785,19 @@
     }
     $("rpName").removeAttribute("aria-invalid");
     const language = globalThis.T9LanguageRegistry.normalize($("rpDocumentLanguage").value, "document");
+    const snapshot = live ? { steps: currentSteps(), firstTitle: firstTitle(), time: formatElapsed() } : null;
     startBusy("recorder.stopping");
     try {
       const response = await send({ type: "T9_STOP", name, documentLanguage: language }, 240000);
       if (!response?.ok) throw new Error(response?.error || "recorder.stopFailed");
-      showDone({ titleKey: "recPanel.savedTitle", name: response.session?.name || name,
-        helpKey: "recorder.completionHelp", recordingId: response.session?.id || "" });
+      const recordingId = response.session?.id || "";
+      if (snapshot) {
+        showDone({ titleKey: "recPanel.summaryTitle", name: response.session?.name || name,
+          helpKey: "recPanel.summaryBasis", recordingId, summary: summaryOf(snapshot) });
+      } else {
+        showDone({ titleKey: "recPanel.savedTitle", name: response.session?.name || name,
+          helpKey: "recorder.completionHelp", recordingId });
+      }
     } catch (error) {
       // The recording is still running, so nothing is lost: the form is shown again.
       busy = false;
@@ -393,6 +831,37 @@
     void chrome.tabs.create({ url: chrome.runtime.getURL(`dashboard.html${query}`) });
   }
 
+  function bindList() {
+    const list = $("rpList");
+    list.addEventListener("click", onListClick);
+    list.addEventListener("submit", event => {
+      const form = event.target.closest("[data-section]");
+      if (!form) return;
+      event.preventDefault();
+      void saveSectionName(form.dataset.section, $("rpSecInput")?.value);
+    });
+    list.addEventListener("input", event => {
+      if (event.target.id === "rpSecInput") editingValue = event.target.value;
+    });
+    list.addEventListener("keydown", event => {
+      if (event.key !== "Escape" || !editing) return;
+      event.stopPropagation();
+      const key = editing;
+      editing = null;
+      editingValue = null;
+      render();
+      restoreFocusTo(key);
+    });
+    // Leaving the name field keeps what was written; an empty name keeps the numbered name.
+    list.addEventListener("focusout", event => {
+      if (event.target.id !== "rpSecInput" || !editing) return;
+      if (event.relatedTarget && event.target.form?.contains(event.relatedTarget)) return;
+      // Rebuilding the list moves focus too; only the user leaving the field saves it.
+      if (rebuilding || !document.hasFocus()) return;
+      void saveSectionName(editing, event.target.value, true);
+    });
+  }
+
   async function start() {
     try {
       const response = await send({ type: "T9_GET_SETTINGS" });
@@ -401,13 +870,17 @@
         response?.settings?.documentLanguage, "document");
     } catch { locale = i18n.apply(locale); }
     document.title = t("recPanel.pageTitle");
-    // The panel's own words follow a change of interface language made elsewhere.
+    // The panel's own words follow a change of interface language made elsewhere, and its
+    // steps a change of document language.
     chrome.storage.onChanged.addListener(async (changes, area) => {
       if (area !== "local" || !Object.keys(changes).some(key => /setting/i.test(key))) return;
       try {
         const response = await send({ type: "T9_GET_SETTINGS" });
         const next = i18n.normalizeLocale(response?.settings?.uiLocale);
-        if (next === locale) return;
+        const nextDocument = globalThis.T9LanguageRegistry.normalize(
+          response?.settings?.documentLanguage, "document");
+        if (next === locale && nextDocument === documentLanguage) return;
+        documentLanguage = nextDocument;
         locale = i18n.apply(next);
         document.title = t("recPanel.pageTitle");
         const current = view;
@@ -416,9 +889,8 @@
         void refresh();
       } catch {}
     });
-    for (const button of document.querySelectorAll(".rp-action")) {
-      button.addEventListener("click", () => { void mark(button.dataset.kind); });
-    }
+    bindList();
+    $("rpUndo").addEventListener("click", () => { void undo(); });
     $("rpStop").addEventListener("click", () => { void stop(); });
     $("rpContinue").addEventListener("click", () => setView("recording"));
     $("rpSaveForm").addEventListener("submit", event => { void save(event); });
@@ -432,6 +904,7 @@
     $("rpOpenDocument").addEventListener("click", () =>
       openLibrary(`?openReview=${encodeURIComponent(completedId)}`));
     $("rpOpenLibrary").addEventListener("click", () => openLibrary());
+    $("rpDoneLibrary").addEventListener("click", () => openLibrary());
     $("rpCloseInfo").addEventListener("click", () => window.close());
     $("rpCloseDone").addEventListener("click", () => window.close());
     document.addEventListener("keydown", event => {

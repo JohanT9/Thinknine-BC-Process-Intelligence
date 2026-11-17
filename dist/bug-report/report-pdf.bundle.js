@@ -37,6 +37,7 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "Section {number}": "Section {number}",
             "No license checked yet": "Aucune licence v\xE9rifi\xE9e pour l\u2019instant",
             "Open Business Central to check the license for the first time.": "Ouvrez Business Central pour v\xE9rifier la licence une premi\xE8re fois.",
             "Reset zoom to 100%": "R\xE9tablir le zoom \xE0 100 %",
@@ -1119,6 +1120,7 @@
             "[ID]": "[ID]"
           },
           "de-DE": {
+            "Section {number}": "Abschnitt {number}",
             "No license checked yet": "Noch keine Lizenz gepr\xFCft",
             "Open Business Central to check the license for the first time.": "\xD6ffnen Sie Business Central, um die Lizenz zum ersten Mal zu pr\xFCfen.",
             "Reset zoom to 100%": "Zoom auf 100 % zur\xFCcksetzen",
@@ -2201,6 +2203,7 @@
             "[ID]": "[ID]"
           },
           "es-ES": {
+            "Section {number}": "Secci\xF3n {number}",
             "No license checked yet": "Todav\xEDa no se ha comprobado ninguna licencia",
             "Open Business Central to check the license for the first time.": "Abra Business Central para comprobar la licencia por primera vez.",
             "Reset zoom to 100%": "Restablecer el zoom al 100 %",
@@ -3283,6 +3286,7 @@
             "[ID]": "[ID]"
           },
           "da-DK": {
+            "Section {number}": "Afsnit {number}",
             "No license checked yet": "Ingen licens kontrolleret endnu",
             "Open Business Central to check the license for the first time.": "\xC5bn Business Central for at kontrollere licensen f\xF8rste gang.",
             "Reset zoom to 100%": "Nulstil zoom til 100 %",
@@ -4365,6 +4369,7 @@
             "[ID]": "[id]"
           },
           "fi-FI": {
+            "Section {number}": "Osio {number}",
             "No license checked yet": "Lisenssi\xE4 ei ole viel\xE4 tarkistettu",
             "Open Business Central to check the license for the first time.": "Avaa Business Central tarkistaaksesi lisenssin ensimm\xE4isen kerran.",
             "Reset zoom to 100%": "Palauta zoomaus 100 %:iin",
@@ -5447,6 +5452,7 @@
             "[ID]": "[tunnus]"
           },
           "nb-NO": {
+            "Section {number}": "Avsnitt {number}",
             "No license checked yet": "Ingen lisens kontrollert enn\xE5",
             "Open Business Central to check the license for the first time.": "\xC5pne Business Central for \xE5 kontrollere lisensen f\xF8rste gang.",
             "Reset zoom to 100%": "Tilbakestill zoom til 100 %",
