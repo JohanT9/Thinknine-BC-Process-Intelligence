@@ -3975,7 +3975,7 @@ function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
   $("libraryBatchMove").hidden = !documentFoldersEditable;
-  for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchAddSuite", "libraryBatchFavourite", "libraryBatchArchive", "libraryBatchMove",
+  for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchAddSuite", "libraryBatchArchive", "libraryBatchMove",
     "libraryBatchTags", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
@@ -12324,10 +12324,14 @@ async function exportPageScript(record) {
   const skipped = response.skipped || [];
   const names = skipped.slice(0, 5).map(item => item.label || "?").join("; ") +
     (skipped.length > 5 ? "; …" : "");
-  show(skipped.length
+  const outcome = skipped.length
     ? uiTf("pageScript.exportPartial", { fileName: response.fileName, count: response.stepCount,
       skipped: skipped.length, steps: names })
-    : uiTf("pageScript.exportDone", { fileName: response.fileName, count: response.stepCount }));
+    : uiTf("pageScript.exportDone", { fileName: response.fileName, count: response.stepCount });
+  // A test that starts on a card replays on whichever record is open; say so with the outcome.
+  show(response.startsOnRecord
+    ? `${outcome} ${uiTf("pageScript.startsOnCard", { page: response.startCaption })}`
+    : outcome);
 }
 
 async function runLibraryMenuAction(action, projectId, card) {
@@ -12571,16 +12575,6 @@ $("libraryBatchExport").addEventListener("click", async () => {
     controls.forEach(button => { button.disabled = false; });
     progress.hidden = true;
     $("libraryBatchToolbar").setAttribute("aria-busy", "false");
-  }
-});
-$("libraryBatchFavourite").addEventListener("click", async () => {
-  try {
-    const result = globalThis.T9DocumentBatchOperations.favourite(
-      documentLibraryRecords, documentLibrarySelection, true
-    );
-    await commitLibraryBatch(result, "library.batchFavourited");
-  } catch (error) {
-    show(error.message, true);
   }
 });
 for (const [id, mode] of [["libraryBatchTags", "tags"],

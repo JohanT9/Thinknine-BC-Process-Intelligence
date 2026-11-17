@@ -44,6 +44,32 @@ async function main() {
   assert.deepEqual(diagnostics.at(-1).details, { name: "TypeError", message: "Failed to fetch" });
   assert.ok(!JSON.stringify(diagnostics.at(-1)).includes("signed-token"),
     "network diagnostics never contain the Entra access token");
+  // A failed consultant registration shows a plain, translatable message; the status and the
+  // service's reason go to the diagnostics only.
+  failFetchUrl = "";
+  responseStatus = 500;
+  await assert.rejects(client.register(installationId), error =>
+    error.message === "license.consultantRegistrationFailed" && error.status === 500);
+  assert.equal(diagnostics.at(-1).message, "BC Process Studio: consultant registration failed.");
+  assert.deepEqual(diagnostics.at(-1).details, { status: 500, reason: "trial-already-used" });
+  assert.ok(!JSON.stringify(diagnostics.at(-1)).includes("signed-token"));
+  responseStatus = 404;
+  await assert.rejects(client.register(installationId),
+    error => error.message === "license.consultantRegistrationFailed");
+  responseStatus = 401;
+  await assert.rejects(client.register(installationId),
+    error => error.message === "license.consultantSignInRejected");
+  globalThis.T9LanguageRegistry = require("../src/engine/language-registry.js");
+  globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs.js");
+  require("../src/ui/i18n.js");
+  for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+    for (const key of ["license.consultantRegistrationFailed", "license.consultantSignInRejected"]) {
+      const text = globalThis.T9UiI18n.translate(key, locale);
+      assert.ok(text && text !== key && !/HTTP|Azure|ZIP|LICENSE_/u.test(text),
+        `${key} is a plain message in ${locale}`);
+    }
+  }
+  responseStatus = 200;
   failFetchUrl = "https://login.microsoftonline.com/organizations/oauth2/v2.0/token";
   data.t9ConsultantLicenseV1.expiresAt = Date.now() - 1000;
   await assert.rejects(client.requestTenantTrial(tenantId, installationId),
