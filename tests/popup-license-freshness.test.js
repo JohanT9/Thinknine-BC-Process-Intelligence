@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const source = fs.readFileSync("src/ui/popup.js", "utf8");
 const start = source.indexOf("function renderLicenseCard(");
-const end = source.indexOf("async function prepareTenantLicense(", start);
+const end = source.indexOf("// The license and the start are shared with the recording panel", start);
 assert.ok(start >= 0 && end > start, "popup license functions are present");
 const functions = source.slice(start, end);
 
@@ -147,9 +147,8 @@ async function main() {
 
   // Starting a recording on a license from the cache does not wait for the user registration,
   // which needs the license service that is still starting; a confirmed license does.
-  const prepareStart = source.indexOf("async function prepareTenantLicense(");
-  const prepareEnd = source.indexOf("function displayLatestAction(", prepareStart);
-  assert.ok(prepareStart >= 0 && prepareEnd > prepareStart);
+  // The license step is shared by the popup and the recording panel (recording-start.js).
+  const recordingStart = require("../src/ui/recording-start.js");
   const prepare = license => {
     const sent = [];
     const send = async (message, timeout) => {
@@ -160,10 +159,9 @@ async function main() {
       if (message.type === "T9_TENANT_USER_REGISTER") return new Promise(() => {});
       throw new Error(message.type);
     };
-    const run = new Function("send", "t", "tf", "LICENSE_CHECK_TIMEOUT_MS",
-      `${source.slice(prepareStart, prepareEnd)}; return prepareTenantLicense;`)(send,
-      key => key, key => key, 35000);
-    return { sent, result: run(17) };
+    const shared = recordingStart.create({ send, t: key => key, tf: key => key,
+      withTimeout: promise => promise, licenseCheckTimeout: 35000 });
+    return { sent, result: shared.prepareTenantLicense(17) };
   };
   const cachedStart = prepare({ allowed: true, stale: true, licenseType: "standard" });
   const cachedResult = await Promise.race([cachedStart.result,

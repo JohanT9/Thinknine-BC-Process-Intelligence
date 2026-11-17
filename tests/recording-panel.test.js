@@ -208,6 +208,9 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   assert.deepEqual([...earlier.recorded[1].event.targetSourceEventIds], ["source:1", "source:2"],
     "a step made of several events is marked as a whole");
   assert.equal(earlier.recorded[1].event.preferredScreenshotAssetId, "shot-1", "the chosen image is kept");
+  // Only the step's own events: never the interaction, which a step after it can share.
+  assert.equal(earlier.recorded[0].event.targetInteractionId, undefined,
+    "a step named by the panel is not marked by its interaction");
   await assert.rejects(earlier.recordCaptureGuidance("use-image", panelSender,
     { targetSourceEventIds: ["source:1"], preferredScreenshotAssetId: "shot-3" }),
   error => error.code === "no-image", "an image of another step cannot be chosen");
@@ -232,6 +235,8 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   const pageBox = guidanceHarness({ state: recordingState, events: threeSteps });
   await pageBox.recordCaptureGuidance("ignore", boxSender, { targetSourceEventIds: ["source:1"] });
   assert.equal(pageBox.recorded[0].event.targetSourceEventId, "source:3");
+  assert.equal(pageBox.recorded[0].event.targetInteractionId, "i:3",
+    "the page's box still marks the latest step by its interaction");
   await assert.rejects(pageBox.recordCaptureGuidance("first-section-title", boxSender,
     { sectionTitle: "X" }), error => error.code === "unknown-kind");
 
@@ -290,12 +295,16 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
 
   // ---- The popup opens the panel straight from the click ----------------------------------
   const popup = read("src/ui/popup.js");
-  const startBody = popup.slice(popup.indexOf("async function startRecording("),
-    popup.indexOf("// Creates a bug report from the Business Central error dialog"));
-  assert.ok(startBody.indexOf("openRecordingPanel({ starting: true })") < startBody.indexOf("await"),
-    "the panel is opened before anything is awaited");
-  assert.match(startBody, /T9_RECORDING_PANEL_START_FAILED/, "a failed start closes the panel it opened");
-  assert.match(panelJs, /T9_RECORDING_PANEL_START_FAILED" && !recordingSeen\) window\.close\(\)/);
+  const startBody = popup.slice(popup.indexOf("function startRecording("),
+    popup.indexOf("// Without the panel the recording is started here"));
+  assert.ok(startBody.includes("openRecordingPanel({ start: recordingPurpose, tabId: popupTab.id })"),
+    "the popup hands the start to the panel");
+  assert.doesNotMatch(startBody, /\bawait\b/, "the panel is opened before anything is awaited");
+  // Edge closes the popup when the panel opens, so the panel carries out the start, once.
+  assert.match(panelJs, /if \(!recordingSeen && claimStart\(\)\) void runStart\(\);/);
+  assert.match(panelJs, /recordingStart\.startRecording\(\{ purpose: startPurpose, tab,/);
+  assert.match(panelHtml, /<script src="recording-start\.js"><\/script>/);
+  assert.match(read("src/ui/popup.html"), /<script src="recording-start\.js"><\/script>/);
   assert.match(popup, /\$\("showRecordingPanel"\)\.hidden = testRecording;/,
     "a test recording is followed in the test panel");
   assert.match(read("src/ui/popup.html"), /id="showRecordingPanel"[^>]*data-i18n="recPanel\.show"/);
@@ -319,7 +328,7 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
     return new Proxy(target, { get: (object, key) => key in object ? object[key] :
       (key === "querySelectorAll" ? () => [] : () => element()) });
   }
-  function runPanel({ runtimeId = "studio", answer, search = "?starting=1" } = {}) {
+  function runPanel({ runtimeId = "studio", answer, search = "?starting=1", tabs = {} } = {}) {
     const timers = []; const sent = []; const events = { reloads: 0, connects: 0 };
     const chrome = {
       runtime: { id: runtimeId, lastError: null,
@@ -331,7 +340,8 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
         },
         onMessage: { addListener() {} } },
       windows: { getCurrent: () => Promise.resolve({ id: 1 }) },
-      storage: { onChanged: { addListener() {} } }
+      storage: { onChanged: { addListener() {} } },
+      tabs
     };
     const store = new Map();
     const sandbox = {
@@ -348,8 +358,12 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
       window: { close() {} }
     };
     sandbox.globalThis = Object.assign(sandbox, { T9UiI18n: i18n,
-      T9LanguageRegistry: context.globalThis.T9LanguageRegistry });
-    vm.runInNewContext(read("src/ui/recording-panel.js"), sandbox);
+      T9LanguageRegistry: context.globalThis.T9LanguageRegistry,
+      T9AsyncOperations: { withTimeout: promise => promise },
+      T9TenantLicense: { CHECK_TIMEOUT_MS: 30000 } });
+    vm.createContext(sandbox);
+    vm.runInContext(read("src/ui/recording-start.js"), sandbox);
+    vm.runInContext(read("src/ui/recording-panel.js"), sandbox);
     return { timers, sent, events, chrome };
   }
   const flush = () => new Promise(resolve => setImmediate(resolve));
@@ -380,6 +394,60 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   const orphan = runPanel({ runtimeId: null });
   assert.equal(orphan.events.reloads, 1, "a panel opened without the extension reloads");
   assert.equal(orphan.sent.length, 0);
+
+  // ---- The panel carries out a start the popup handed to it ------------------------------
+  // Edge closes the popup as soon as the panel opens, so a start left there never finished.
+  const bcTab = { id: 7, windowId: 1, url: "https://businesscentral.dynamics.com/tenant/Production" };
+  const startAnswers = (startResult) => (message, callback) => {
+    const answers = {
+      T9_GET_SETTINGS: { ok: true, settings: { uiLocale: "sv-SE" } },
+      T9_GET_STATE: { ok: true, state: { recording: false } },
+      T9_LICENSE_INFORMATION: { ok: true, information: {} },
+      T9_LICENSE_CHECK: { ok: true, tenantId: "tenant", license: { allowed: true, stale: true } },
+      T9_CONSULTANT_LICENSE_STATUS: { ok: true, signedIn: true },
+      T9_TENANT_USER_REGISTER: { ok: true },
+      T9_START: startResult
+    };
+    callback(answers[message.type] || { ok: false });
+  };
+  const bcTabs = { get: async id => (id === 7 ? bcTab : null),
+    sendMessage: async () => ({ ok: true }) };
+  const handed = runPanel({ search: "?start=documentation&tabId=7&nonce=n1", tabs: bcTabs,
+    answer: startAnswers({ ok: true }) });
+  for (let i = 0; i < 20; i += 1) await flush();
+  assert.equal(handed.sent.filter(type => type === "T9_START").length, 1,
+    "the panel starts the recording the popup asked for");
+  assert.ok(handed.sent.indexOf("T9_LICENSE_CHECK") < handed.sent.indexOf("T9_START"),
+    "the license is checked first");
+  const failing = runPanel({ search: "?start=bug-report&tabId=7&nonce=n2", tabs: bcTabs,
+    answer: startAnswers({ ok: false, error: "recorder.startFailed" }) });
+  for (let i = 0; i < 20; i += 1) await flush();
+  assert.equal(failing.sent.filter(type => type === "T9_START").length, 0);
+  assert.ok(!failing.sent.includes("T9_START_BUG_RECORDING") ||
+    failing.sent.filter(type => type === "T9_START_BUG_RECORDING").length === 1,
+  "a failed start is not repeated by itself");
+  assert.match(panelJs, /\$\("rpRetry"\)\.addEventListener\("click", \(\) => \{ void runStart\(\); \}\);/,
+    "a failed start can be tried again");
+
+  // The background accepts the license steps of a start from the panel, not only the popup;
+  // before, a start from the panel stopped at "Testlicens får bara begäras från tilläggets popup".
+  for (const type of ["T9_ACCEPT_LICENSE_NOTICE", "T9_LICENSE_CHECK", "T9_REQUEST_TRIAL",
+    "T9_MICROSOFT_SIGN_IN", "T9_TENANT_USER_REGISTER"]) {
+    const body = background.slice(background.indexOf(`case "${type}": {`));
+    assert.match(body.slice(0, 400), /!fromRecordingPanel\(sender\)\)/,
+      `${type} is allowed from the recording panel`);
+  }
+  const helperSource = background.slice(background.indexOf("function fromRecordingPanel("),
+    background.indexOf("function messageAllowed("));
+  const fromRecordingPanel = new Function("chrome", `${helperSource}; return fromRecordingPanel;`)({
+    runtime: { id: "ext", getURL: path => `chrome-extension://ext/${path}` } });
+  const page = "chrome-extension://ext/recording-panel.html";
+  assert.equal(fromRecordingPanel({ id: "ext", url: page }), true);
+  assert.equal(fromRecordingPanel({ id: "ext", url: `${page}?start=documentation&tabId=7` }), true);
+  assert.equal(fromRecordingPanel({ id: "ext", url: `${page}x` }), false);
+  assert.equal(fromRecordingPanel({ id: "other", url: page }), false);
+  assert.equal(fromRecordingPanel({ id: "ext", url: page, tab: { id: 3 } }), false,
+    "a content script is never the panel");
 
   console.log("Recording panel tests passed.");
 })().catch(error => { console.error(error); process.exit(1); });

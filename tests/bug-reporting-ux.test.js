@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const read = file => fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 const popup = read("src/ui/popup.html");
-const popupLogic = read("src/ui/popup.js");
+const popupLogic = read("src/ui/popup.js") + read("src/ui/recording-start.js");
 const uiTranslations = read("src/ui/i18n.js");
 const background = read("src/recorder/background.js");
 const reportService = read("src/bug-report/bug-report-service.js");
@@ -143,7 +143,7 @@ assert.match(dashboard, /recordingPurpose:\s*session\.recordingPurpose/);
 assert.match(dashboard, /T9_OPEN_TECHNICAL_REPORT/);
 assert.match(dashboard, /bugReportId:\s*`bug-report:\$\{session\.id\}`/);
 assert.match(report, /@media\(max-width:700px\)/);
-assert.match(popupLogic, /recordingPurpose === "bug-report" \? "T9_START_BUG_RECORDING" : "T9_START"/);
+assert.match(popupLogic, /purpose === "bug-report" \? "T9_START_BUG_RECORDING" : "T9_START"/);
 
 // Every element the report script looks up, directly or through an id list, exists in the page.
 const reportIds = new Set([...report.matchAll(/\sid="([^"]+)"/gu)].map(match => match[1]));
