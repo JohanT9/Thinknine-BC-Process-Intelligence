@@ -232,6 +232,9 @@
         });
         note.append(fail);
       }
+      if (script.playbackWithoutScreenshot(current).includes(step.stepId)) {
+        note.append(element("span", "run-no-shot", t("test.playbackNoShot")));
+      }
       item.append(note);
     }
     const grid = element("div", "run-step-grid");

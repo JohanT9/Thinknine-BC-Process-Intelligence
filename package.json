@@ -1,6 +1,6 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "4.7.262",
+  "version": "4.7.263",
   "private": true,
   "description": "BC Process Studio – Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
   "scripts": {
@@ -42,7 +42,7 @@
     "test:bug-report-masking": "node tests/bug-report-value-masking.test.js",
     "test:screenshot-masking": "node tests/screenshot-value-masking.test.js",
     "test:bug-report-delivery": "node tests/bug-report-delivery-history.test.js",
-    "test:test-script": "node tests/test-script.test.js",
+    "test:test-script": "node tests/test-script.test.js && node tests/playback-screenshot.test.js",
     "test:test-recording-match": "node tests/test-recording-match.test.js",
     "test:test-suite": "node tests/test-suite.test.js",
     "test:bug-report-visible-error": "node tests/bug-report-visible-error.test.js",

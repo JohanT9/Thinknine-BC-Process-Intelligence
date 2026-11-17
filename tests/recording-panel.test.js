@@ -225,6 +225,17 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   assert.equal(await shown({ ...recordingState, tabId: 99 }), false, "a closed tab is handled");
   panel.disconnect();
   assert.equal(await shown(recordingState), false, "closing the panel brings the box back");
+  // The test panel steps the box aside only while its own test is recorded.
+  const testPanel = port("T9_RECORDING_PANEL", panelSender);
+  connectListener(testPanel);
+  testPanel.post({ windowId: 1, testRunId: "run-1" });
+  assert.equal(await shown({ ...recordingState, testRunId: "run-1" }), true, "its test is recorded");
+  assert.equal(await shown({ ...recordingState, testRunId: "run-2" }), false, "another test keeps the box");
+  assert.equal(await shown(recordingState), false, "a process recording keeps the box");
+  testPanel.disconnect();
+  const testPanelJs = read("src/ui/test-panel.js");
+  assert.match(testPanelJs, /chrome\.runtime\.connect\(\{ name: "T9_RECORDING_PANEL" \}\)/);
+  assert.match(testPanelJs, /port\.postMessage\(\{ windowId: window\.id, testRunId \}\)/);
   const fake = port("T9_RECORDING_PANEL", { id: "studio", url: "https://example.com/" });
   connectListener(fake);
   fake.post({ windowId: 1 });

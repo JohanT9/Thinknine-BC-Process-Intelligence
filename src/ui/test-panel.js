@@ -126,6 +126,9 @@
         });
         note.append(fail);
       }
+      if (script.playbackWithoutScreenshot(value).includes(step.stepId)) {
+        note.append(element("span", "panel-no-shot", t("test.playbackNoShot")));
+      }
       parts.push(note);
     }
 
@@ -227,6 +230,7 @@
       recorder = { recording: Boolean(state.recording), testRunId: String(state.testRunId || "") };
     } catch { recorder = { recording: false, testRunId: "" }; }
     showRecording();
+    void showAccess();
   }
 
   function showRecording(focusId = "") {
@@ -253,6 +257,8 @@
       const text = element("p");
       text.append(element("span", "rec-dot"), document.createTextNode(t("test.recordingActive")));
       parts.push(text);
+      // Page Scripting plays faster than Edge allows screenshots; stepping gives each step one.
+      parts.push(element("p", "panel-hint", t("test.playbackTip")));
       // How far the recording has come, as the latest check while recording found.
       if (check.live && check.liveFailed) parts.push(element("p", "", t("test.liveCheckFailed")));
       else if (check.live) {
@@ -270,6 +276,8 @@
       parts.push(element("p", "", finishedText(value)));
       const failed = value.steps.filter(step => step.recordingSuggestion?.state === "failed").length;
       if (failed) parts.push(element("p", "", t("test.recordingFailedCount", { n: failed })));
+      const withoutShot = script.playbackWithoutScreenshot(value).length;
+      if (withoutShot) parts.push(element("p", "", t("test.playbackNoShotCount", { n: withoutShot })));
       if (check.additional?.length) {
         parts.push(element("p", "", t("test.recordingAdditional", { n: check.additional.length })));
       }
@@ -419,7 +427,11 @@
       // mark on it is not seen either.
       const pinned = notice.hidden ? true : await chrome.action.getUserSettings?.()
         .then(settings => settings.isOnToolbar !== false).catch(() => true) ?? true;
-      notice.textContent = notice.hidden ? "" : t(pinned ? "test.accessNotice" : "test.accessNoticeUnpinned");
+      // A test not started yet is started from the toolbar button, which also allows screenshots.
+      const start = !recorder.recording && comparable(run());
+      notice.textContent = notice.hidden ? "" : t(start
+        ? (pinned ? "test.accessNoticeStart" : "test.accessNoticeStartUnpinned")
+        : (pinned ? "test.accessNotice" : "test.accessNoticeUnpinned"));
       if (!notice.hidden && !markedTabs.has(tab.id)) {
         markedTabs.add(tab.id);
         void send({ type: "T9_MARK_TEST_TAB", tabId: tab.id, title: t("test.badgeTitle") }).catch(() => {});
@@ -533,6 +545,22 @@
     showRecording();
   }
 
+  // While this test is recorded, the floating box in the Business Central page steps aside:
+  // this panel shows the recording and ends it. A port that drops, as when the service
+  // worker restarts, is connected again; closing the panel drops it for good.
+  function connectAsPanel() {
+    if (!chrome.runtime?.id) return; // the extension was updated or removed: this page is left over
+    let port;
+    try { port = chrome.runtime.connect({ name: "T9_RECORDING_PANEL" }); }
+    catch { setTimeout(connectAsPanel, 2000); return; }
+    chrome.windows.getCurrent().then(window => port.postMessage({ windowId: window.id, testRunId }))
+      .catch(() => {});
+    port.onDisconnect.addListener(() => {
+      void chrome.runtime.lastError;
+      setTimeout(connectAsPanel, 1000);
+    });
+  }
+
   async function start() {
     try {
       const response = await send({ type: "T9_GET_SETTINGS" });
@@ -557,6 +585,7 @@
     showStep();
     void loadRecorderState();
     void send({ type: "T9_SET_ACTIVE_TEST_RUN", testRunId }).catch(() => {});
+    connectAsPanel();
     void showAccess();
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === "session" && changes[globalThis.T9StorageKeys.TEST_ACCESS_TABS_KEY]) void showAccess();

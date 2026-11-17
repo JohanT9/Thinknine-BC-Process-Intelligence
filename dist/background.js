@@ -828,6 +828,10 @@ async function processScreenshotQueue() {
 const PLAYBACK_TARGET_TIMEOUT_MS = 2500;
 const PLAYBACK_CAPTURE_ATTEMPTS = 3;
 let playbackScreenshots = Promise.resolve();
+// How many steps Page Scripting has announced in this service worker. A screenshot taken after
+// a later step was announced, in which the step's own control is no longer shown, most likely
+// shows that later step and is left out: no screenshot is better than one of another step.
+let playbackAnnounced = 0;
 function schedulePlaybackScreenshot(item) {
   screenshotStats.requested += 1;
   playbackPending += 1;
@@ -836,7 +840,7 @@ function schedulePlaybackScreenshot(item) {
     lastScreenshotError = String(error?.message || error);
   }).finally(() => { playbackPending -= 1; });
 }
-async function takePlaybackScreenshot({ recordingId, eventNo, eventId, tabId, frameId, step }) {
+async function takePlaybackScreenshot({ recordingId, eventNo, eventId, tabId, frameId, step, order = 0 }) {
   const state = await getState();
   if (!state.recording || state.sessionId !== recordingId || !tabId) return;
   await Promise.race([
@@ -856,8 +860,13 @@ async function takePlaybackScreenshot({ recordingId, eventNo, eventId, tabId, fr
       : SCREENSHOT_MIN_INTERVAL_MS - (Date.now() - Math.max(lastScreenshotAt, lastCaptureCallAt));
     if (waitMs > 0) await new Promise(resolve => setTimeout(resolve, waitMs));
     if (!(await getState()).recording) return;
+    const overtaken = order > 0 && playbackAnnounced > order;
     image = await capture(tabId, { playbackTarget });
     lastScreenshotAt = Date.now();
+    if (image && overtaken && !playbackTarget.bounds) {
+      screenshotStats.dropped += 1;
+      return;
+    }
   }
   if (!image) { screenshotStats.dropped += 1; return; }
   await saveScreenshot(recordingId, String(eventNo), image);
@@ -988,8 +997,10 @@ async function recordEvent(rawEvent, captureContext = {}) {
     const playedStep = session.testRunId && event.type === "status-message" &&
       settings.captureScreenshots !== false && settings.screenshotMode !== "none"
       ? globalThis.T9TestRecordingMatch.playbackStep(event.label) : null;
+    if (playedStep) playbackAnnounced += 1;
     if (playedStep && playedStep.kind !== "open") {
       schedulePlaybackScreenshot({ recordingId, eventNo: event.eventNo, eventId: canonicalEvent.id,
+        order: playbackAnnounced,
         tabId: captureContext.tabId || acceptedState.tabId, frameId: captureContext.frameId ?? 0,
         step: { ...playedStep, label: String(event.label || "") } });
     } else if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
@@ -2536,13 +2547,18 @@ chrome.runtime.onStartup.addListener(async () => {
 // Recording panels open beside Business Central, by the window they are shown in. While one is
 // shown in the recording tab's window, the floating box in the page steps aside for it; the
 // frame around the page stays. A panel that closes, or a worker that restarts, drops its port.
+// The test panel connects too, naming its test: it shows that test's recording and ends it, so
+// the box steps aside for it only while that test is recorded.
 const RECORDING_PANEL_PORT = "T9_RECORDING_PANEL";
 const recordingPanels = new Map();
 chrome.runtime.onConnect.addListener(port => {
   if (port.name !== RECORDING_PANEL_PORT || !extensionPageSender(port.sender)) return;
   recordingPanels.set(port, null);
   port.onMessage.addListener(message => {
-    if (Number.isInteger(message?.windowId)) recordingPanels.set(port, message.windowId);
+    if (Number.isInteger(message?.windowId)) {
+      recordingPanels.set(port, { windowId: message.windowId,
+        testRunId: typeof message.testRunId === "string" ? message.testRunId : "" });
+    }
   });
   port.onDisconnect.addListener(() => recordingPanels.delete(port));
 });
@@ -2551,7 +2567,8 @@ async function recordingPanelShown(state) {
   if (!state?.recording || !state.tabId || !recordingPanels.size) return false;
   try {
     const tab = await chrome.tabs.get(state.tabId);
-    return [...recordingPanels.values()].includes(tab.windowId);
+    return [...recordingPanels.values()].some(panel => panel?.windowId === tab.windowId &&
+      (!panel.testRunId || panel.testRunId === state.testRunId));
   } catch { return false; }
 }
 
@@ -3093,8 +3110,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_GET_ACTIVE_TEST_RUN": {
         const run = await activeTestRun();
+        // Comparable: its steps can be recognised in a recording, so it can be started from the
+        // toolbar button, which also lets the extension take screenshots of the tab.
         sendResponse({ ok: true, run: run ? { testRunId: run.testRunId, title: run.title,
-          summary: globalThis.T9TestScript.summary(run) } : null });
+          summary: globalThis.T9TestScript.summary(run),
+          comparable: run.steps.some(step => globalThis.T9TestRecordingMatch.hasSignature(step.signature)) } : null });
         break;
       }
 

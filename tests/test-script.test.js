@@ -277,8 +277,20 @@ for (const file of [pageScript, panelScript]) {
   assert.ok(file.includes('send({ type: "T9_SET_ACTIVE_TEST_RUN", testRunId })'), "the open test is the active one");
 }
 assert.ok(panel.includes('id="panelAccess"'), "the panel says how to allow screenshots");
-assert.ok(panelScript.includes('t(pinned ? "test.accessNotice" : "test.accessNoticeUnpinned")'),
+assert.ok(panelScript.includes('(pinned ? "test.accessNotice" : "test.accessNoticeUnpinned")'),
   "an unpinned button is found through the Extensions menu");
+// A test not started yet is started from the toolbar button: one click opens the panel, starts
+// the recording and allows screenshots, so the panel points there until the test is started.
+assert.ok(panelScript.includes('(pinned ? "test.accessNoticeStart" : "test.accessNoticeStartUnpinned")'));
+assert.match(panelScript, /const start = !recorder\.recording && comparable\(run\(\)\);/u);
+assert.ok(popup.includes('id="startActiveTest"') && popup.indexOf('id="startActiveTest"') < popup.indexOf('id="continueTest"'),
+  "Start the test comes before Continue test");
+const startTest = /\$\("startActiveTest"\)\.addEventListener\("click", \(\) => \{[\s\S]*?chrome\.sidePanel\.open\(\{ windowId: tab\.windowId \}\)/u
+  .exec(popupScript)[0];
+assert.doesNotMatch(startTest, /await /u, "the panel opens straight from the click");
+assert.match(popupScript, /send\(\{ type: "T9_START_TEST_RECORDING", testRunId: activeTestRunId,\s*tabId: tab\.id \}/u);
+assert.match(popupScript, /const canStart = run\.comparable === true;/u, "only a test that can be recorded is started");
+assert.match(background, /comparable: run\.steps\.some\(step => globalThis\.T9TestRecordingMatch\.hasSignature\(step\.signature\)\)/u);
 for (const type of ["T9_SET_ACTIVE_TEST_RUN", "T9_GET_ACTIVE_TEST_RUN", "T9_MARK_TEST_TAB", "T9_TEST_TAB_OPENED"]) {
   assert.ok(background.includes(`case "${type}"`), type);
   assert.ok(!pageTypes.includes(type), `${type} is taken only from the extension's pages`);
@@ -383,7 +395,7 @@ const keys = [...new Set([...pageScript.matchAll(/t\("(test\.[\w.-]+)"/gu), ...p
   "test.errorNoMessage",
   "test.section", "test.screenshots", "test.prerequisites", "test.testData", "test.testedBy",
   "test.approvedBy", "test.signName", "test.signDate", "test.signature",
-  "test.screenshotLimit", "test.screenshotFailed", "test.screenshotNeedsAccess", "test.activeTest", "test.continueTest", "test.continueHelp", "test.stepsTested", "test.badgeTitle", "test.accessNotice", "test.accessNoticeUnpinned", "test.noBusinessCentral","test.scriptTitle",
+  "test.screenshotLimit", "test.screenshotFailed", "test.screenshotNeedsAccess", "test.activeTest", "test.continueTest", "test.continueHelp", "test.stepsTested", "test.badgeTitle", "test.accessNotice", "test.accessNoticeUnpinned", "test.accessNoticeStart", "test.accessNoticeStartUnpinned", "test.startHelp", "test.recordingStartFailed", "test.startedWithoutPanel", "test.recordTest", "test.noBusinessCentral","test.scriptTitle",
   "test.updated", "test.step", "test.result", "test.noSteps", "test.runNotFound",
   "test.describeFailure", "test.reportOnlyFailed", "test.creatingRun", "test.saveFailed",
   ...["passed", "failed", "in-progress", "cancelled"].map(value => `test.outcome.${value}`),
@@ -550,5 +562,43 @@ assert.ok(!card("bug-report").includes("run-test"));
   assert.strictEqual(script.withTester(fresh, { runs: earlier }).tester, "Bo");
   assert.strictEqual(script.withTester({ ...fresh, tester: "Cia" }, { signedIn: "Dana", runs: earlier }).tester, "Cia");
   assert.strictEqual(script.withTester(fresh).tester, "", "with nobody to name it stays empty");
+}
+// A step Page Scripting played back is marked so; once the recording stopped, a played step
+// without a screenshot is named, in every language, and a step on the way to another (its
+// menu) is not, since it never has one of its own.
+{
+  const base = script.normalize({ ...run, steps: [...run.steps, { ...run.steps[0], stepId: "step-four" }] });
+  const ids = base.steps.map(step => step.stepId);
+  const played = { recordedSteps: 3, steps: [
+    { stepId: ids[0], state: "done", playback: true, instruction: "Ny" },
+    { stepId: ids[1], state: "done", playback: true, onTheWay: true, instruction: "Ny" },
+    { stepId: ids[2], state: "failed", playback: true, instruction: "Släpp", error: "Fel" }] };
+  const live = script.applyRecordingResults(base, { ...played, live: true }, NOW);
+  assert.strictEqual(live.steps[0].recordingSuggestion.playback, true);
+  assert.deepStrictEqual(script.playbackWithoutScreenshot(live), [],
+    "while the recording goes on, screenshots are still being taken");
+  const done = script.applyRecordingResults(live, played, NOW);
+  assert.deepStrictEqual(script.playedBack(done), [ids[0], ids[2]]);
+  assert.deepStrictEqual(script.playbackWithoutScreenshot(done), [ids[0], ids[2]]);
+  const shot = script.addScreenshot(done, ids[0], { screenshotId: "shot-abc", capturedAt: NOW, source: "recording" }, NOW);
+  assert.deepStrictEqual(script.playbackWithoutScreenshot(shot), [ids[2]]);
+  const byHand = script.applyRecordingResults(base, { recordedSteps: 1,
+    steps: [{ stepId: ids[0], state: "done", instruction: "Ny" }] }, NOW);
+  assert.deepStrictEqual(script.playbackWithoutScreenshot(byHand), [], "a step done by hand is not played back");
+  const locales = languages.languages.map(item => item.locale);
+  assert.ok(locales.length >= 8);
+  for (const locale of locales) {
+    for (const key of ["test.playbackTip", "test.playbackNoShotCount", "test.playbackNoShot", "test.playbackNoShotMissing"]) {
+      const value = ui.T9UiI18n.translate(key, locale);
+      assert.ok(value && value !== key, `${locale} ${key}`);
+      if (locale !== "en-US") assert.notStrictEqual(value, ui.T9UiI18n.translate(key, "en-US"), `${locale} ${key} translated`);
+    }
+  }
+  assert.strictEqual(ui.T9UiI18n.format("test.playbackNoShotMissing", { n: 2, total: 5 }, "sv-SE"),
+    "2 av 5 uppspelade steg saknar skärmbild");
+  // The panel and the protocol name them.
+  assert.match(read("src/ui/test-panel.js"), /t\("test\.playbackTip"\)/u);
+  assert.match(read("src/ui/test-panel.js"), /playbackWithoutScreenshot\(value\)\.length/u);
+  assert.match(read("src/ui/test-protocol.js"), /d\("test\.playbackNoShotMissing"/u);
 }
 console.log("Test script tests passed.");
