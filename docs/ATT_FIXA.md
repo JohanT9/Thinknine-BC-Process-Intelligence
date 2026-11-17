@@ -2,16 +2,6 @@
 
 Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varje punkt beskriver vad som är fel, vad användaren märker och ett förslag. En punkt är bekräftad i koden eller i Business Central om inget annat sägs; det som bara är en misstanke står som **Att kontrollera**. När en punkt är åtgärdad flyttas den till CHANGELOG och tas bort här. Nya funktioner hör hemma i [FUTURE_FEATURES.md](FUTURE_FEATURES.md).
 
-## Exemplets Business Central-texter på Kom igång-sidan är inte kontrollerade mot klienten
-
-*Tillagd 2026-11-17.*
-
-**Vad är fel:** exemplet på Kom igång-sidan (`src/ui/welcome.js`, `SAMPLE`) visar Business Central-texter som Inköpsorder, Ny, Leverantörsnr, Antal och Släpp på alla åtta språk. Svenska och engelska är kända från inspelningar. Franska, tyska, spanska, danska, finska och norska är skrivna efter bästa kännedom och inte kontrollerade mot Business Central-klientens språkresurser eller en inspelning, eftersom kunskapskatalogen saknar de här fälten på de språken.
-
-**Vad användaren märker:** möjligen en text i exemplet som inte exakt motsvarar vad Business Central visar på användarens språk. Exemplet är märkt Exempel och påverkar inga dokument.
-
-**Förslag:** kontrollera texterna i en Business Central-miljö per språk, eller mot klientens språkresurser, och rätta `SAMPLE`.
-
 ## Kontroll av Page Scripting-exporten vid varje ny Business Central-version
 
 *Tillagd 2026-11-13. Återkommande, i april och oktober.*

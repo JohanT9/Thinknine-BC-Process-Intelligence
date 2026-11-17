@@ -16,15 +16,18 @@
 
   // The example's Business Central captions, as the client shows them in each language. They
   // only illustrate the example; captured documents always keep the captions that were recorded.
+  // Business Central's own captions for the example, checked against Microsoft's Base Application
+  // (src/document/bc-captions.json and its translation files); New from the web client's language
+  // resources (CreateActionCaption, engine/bc-client-captions.js).
   const SAMPLE = Object.freeze({
     "sv-SE": { list: "Inköpsorder", page: "Inköpsorder", new: "Ny", vendorNo: "Leverantörsnr", vendorName: "Leverantörsnamn", postingDate: "Bokföringsdatum", status: "Status", open: "Öppen", released: "Släppt", no: "Nr", quantity: "Antal", release: "Släpp" },
     "en-US": { list: "Purchase Orders", page: "Purchase Order", new: "New", vendorNo: "Vendor No.", vendorName: "Vendor Name", postingDate: "Posting Date", status: "Status", open: "Open", released: "Released", no: "No.", quantity: "Quantity", release: "Release" },
-    "fr-FR": { list: "Commandes achat", page: "Commande achat", new: "Nouveau", vendorNo: "N° fournisseur", vendorName: "Nom fournisseur", postingDate: "Date comptabilisation", status: "Statut", open: "Ouvert", released: "Lancé", no: "N°", quantity: "Quantité", release: "Lancer" },
+    "fr-FR": { list: "Commandes achat", page: "Commande achat", new: "Créer", vendorNo: "N° fournisseur", vendorName: "Nom fournisseur", postingDate: "Date comptabilisation", status: "Statut", open: "Ouvert", released: "Lancé", no: "N°", quantity: "Quantité", release: "Lancer" },
     "de-DE": { list: "Einkaufsbestellungen", page: "Einkaufsbestellung", new: "Neu", vendorNo: "Kreditorennr.", vendorName: "Kreditorenname", postingDate: "Buchungsdatum", status: "Status", open: "Offen", released: "Freigegeben", no: "Nr.", quantity: "Menge", release: "Freigeben" },
-    "es-ES": { list: "Pedidos compra", page: "Pedido compra", new: "Nuevo", vendorNo: "Nº proveedor", vendorName: "Nombre proveedor", postingDate: "Fecha registro", status: "Estado", open: "Abierto", released: "Lanzado", no: "Nº", quantity: "Cantidad", release: "Lanzar" },
-    "da-DK": { list: "Købsordrer", page: "Købsordre", new: "Ny", vendorNo: "Kreditornr.", vendorName: "Kreditornavn", postingDate: "Bogføringsdato", status: "Status", open: "Åben", released: "Frigivet", no: "Nr.", quantity: "Antal", release: "Frigiv" },
-    "fi-FI": { list: "Ostotilaukset", page: "Ostotilaus", new: "Uusi", vendorNo: "Toimittajan nro", vendorName: "Toimittajan nimi", postingDate: "Kirjauspäivämäärä", status: "Tila", open: "Avoin", released: "Vapautettu", no: "Nro", quantity: "Määrä", release: "Vapauta" },
-    "nb-NO": { list: "Innkjøpsordrer", page: "Innkjøpsordre", new: "Ny", vendorNo: "Leverandørnr.", vendorName: "Leverandørnavn", postingDate: "Posteringsdato", status: "Status", open: "Åpen", released: "Frigitt", no: "Nr.", quantity: "Antall", release: "Frigi" }
+    "es-ES": { list: "Pedidos compra", page: "Pedido compra", new: "Nuevo", vendorNo: "N.º de proveedor", vendorName: "Nombre del proveedor", postingDate: "Fecha registro", status: "Estado", open: "Abierto", released: "Lanzado", no: "Nº", quantity: "Cantidad", release: "Lanzar" },
+    "da-DK": { list: "Købsordrer", page: "Købsordre", new: "Ny", vendorNo: "Kreditornr.", vendorName: "Kreditornavn", postingDate: "Bogføringsdato", status: "Status", open: "Åben", released: "Frigivet", no: "Nummer", quantity: "Antal", release: "Frigiv" },
+    "fi-FI": { list: "Ostotilaukset", page: "Ostotilaus", new: "Uusi", vendorNo: "Toimittajan nro", vendorName: "Toimittajan nimi", postingDate: "Kirjauspvm", status: "Tila", open: "Avoin", released: "Vapautettu", no: "Nro", quantity: "Määrä", release: "Vapauta" },
+    "nb-NO": { list: "Bestillinger", page: "Bestilling", new: "Ny", vendorNo: "Leverandørnr.", vendorName: "Leverandørnavn", postingDate: "Bokføringsdato", status: "Status", open: "Åpen", released: "Frigitt", no: "Nr.", quantity: "Antall", release: "Frigi" }
   });
 
   let locale = i18n.DEFAULT_LOCALE;

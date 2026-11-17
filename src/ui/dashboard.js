@@ -10177,6 +10177,11 @@ function renderReviewContent() {
     expectedResultEditor.value = displayedExpectedResult();
   }
   $("reviewDocumentLanguage").value = activeDocumentLanguage();
+  $("reviewLanguageSwitch").value = activeDocumentLanguage();
+  // The language message belongs to the document it was shown for.
+  if ($("reviewLanguageStatus").dataset.reviewId !== (activeReviewSession?.id || "")) {
+    $("reviewLanguageStatus").hidden = true;
+  }
 
   const displayTasks = reviewTasksForDisplay(activeReview);
   const tasks = globalThis.T9ProcessTaskContext.enrichForDisplay(
@@ -11875,10 +11880,12 @@ $("expectedResultEditor").addEventListener("input", event => {
 });
 
 
-$("reviewDocumentLanguage").addEventListener("change", event => {
-  const documentLanguage = globalThis.T9LanguageRegistry.normalize(
-    event.currentTarget.value, "document"
-  );
+// The document language, chosen directly in the review toolbar or in Document information. The
+// steps are written again in that language and Business Central's own field, action and page names
+// are shown as Business Central shows them there; text the user wrote stays as it is.
+function setActiveDocumentLanguage(value) {
+  const documentLanguage = globalThis.T9LanguageRegistry.normalize(value, "document");
+  if (!activeReview || documentLanguage === activeDocumentLanguage()) return false;
   globalThis.T9Review.setDocumentField(
     activeReview,
     "documentLanguage",
@@ -11891,11 +11898,53 @@ $("reviewDocumentLanguage").addEventListener("change", event => {
   invalidateDocumentWorkspace();
   renderReviewContent();
   applyReviewToolbarState();
-  if (activeReviewSession?.id) {
-    updateDocumentLibraryRecord(activeReviewSession.id, {
-      documentLanguage
-    }).catch(error => show(error.message, true));
-  }
+  syncDocumentLanguageRecord();
+  return true;
+}
+
+function syncDocumentLanguageRecord() {
+  if (!activeReviewSession?.id) return;
+  updateDocumentLibraryRecord(activeReviewSession.id, {
+    documentLanguage: activeDocumentLanguage()
+  }).catch(error => show(error.message, true));
+}
+
+// Steps whose Business Central names cannot be translated: they were recorded before the field's
+// and action's identity was kept, so their names stay as recorded.
+function stepsWithoutCaptionIdentity() {
+  return reviewTasksForDisplay(activeReview).tasks.filter(task =>
+    task.semanticActionModel && !task.semanticActionModel.captionKeys &&
+    !task.manualStepId && task.provenance !== "manual"
+  ).length;
+}
+
+function showDocumentLanguageStatus() {
+  const language = globalThis.T9LanguageRegistry.supported("document")
+    .find(entry => entry.locale === activeDocumentLanguage());
+  const parts = [uiTf("languageSwitch.done", { language: language?.nativeName || activeDocumentLanguage() })];
+  const untranslated = stepsWithoutCaptionIdentity();
+  if (untranslated === 1) parts.push(uiT("languageSwitch.olderOne"));
+  else if (untranslated) parts.push(uiTf("languageSwitch.older", { n: untranslated }));
+  $("reviewLanguageStatusText").textContent = parts.join(" ");
+  $("reviewLanguageStatus").dataset.reviewId = activeReviewSession?.id || "";
+  $("reviewLanguageStatus").hidden = false;
+}
+
+function hideDocumentLanguageStatus() {
+  $("reviewLanguageStatus").hidden = true;
+}
+
+$("reviewDocumentLanguage").addEventListener("change", event => {
+  if (setActiveDocumentLanguage(event.currentTarget.value)) showDocumentLanguageStatus();
+});
+$("reviewLanguageSwitch").addEventListener("change", event => {
+  if (setActiveDocumentLanguage(event.currentTarget.value)) showDocumentLanguageStatus();
+});
+$("reviewLanguageUndo").addEventListener("click", () => {
+  hideDocumentLanguageStatus();
+  restoreReviewHistory("undo");
+  syncDocumentLanguageRecord();
+  $("reviewLanguageSwitch").focus();
 });
 $("resetExpectedResult").addEventListener("click", () => {
   globalThis.T9Review.setDocumentField(
@@ -12708,9 +12757,23 @@ async function runPanelJob(job, sessionsLoaded) {
   }
 }
 
+// Business Central's own names of fields, actions and pages in every document language
+// (document/bc-caption-translation.js). Loaded before any document is shown or exported; without
+// it, documents keep the captions as recorded.
+async function loadBusinessCentralCaptions() {
+  try {
+    const response = await fetch(globalThis.chrome?.runtime?.getURL?.("document/bc-captions.json") ||
+      "document/bc-captions.json");
+    if (response.ok) globalThis.T9BCCaptionTranslation?.load(await response.json());
+  } catch (error) {
+    console.warn("BC Process Studio could not load Business Central captions", error);
+  }
+}
+
 async function initializeDashboard() {
   initializeFilenameVariables();
   populateBatchMetadataOptions();
+  const captionsLoaded = loadBusinessCentralCaptions();
   // The library is requested while the settings load; it is shown once both are there.
   const libraryRequest = send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
   libraryRequest.catch(() => {});
@@ -12747,6 +12810,7 @@ async function initializeDashboard() {
 
   let sessionsLoaded = false;
   await templatesLoaded;
+  await captionsLoaded;
   renderDocumentTemplateSettings();
   populateBatchMetadataOptions();
   try {

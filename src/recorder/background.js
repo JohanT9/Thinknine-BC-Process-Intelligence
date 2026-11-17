@@ -50,6 +50,7 @@ importScripts("review/task-visibility.js");
 importScripts("engine/process-quality-guard.js");
 importScripts("engine/process-contradiction-engine.js");
 importScripts("engine/process-analysis-model.js");
+importScripts("document/bc-caption-translation.js");
 importScripts("engine/session-interpretation-pipeline.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/recording-derived-cache.js");
