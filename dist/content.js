@@ -327,7 +327,6 @@
         <p id="indicatorCounts" class="counts">0 ${uiText("händelser", "events")} · 0 ${uiText("bilder", "screenshots")}</p>
         <p id="indicatorWarning" class="warning" hidden></p></div>
       <div class="guidance" aria-label="${uiText("Markera senaste steget", "Mark the latest step")}">
-        <button id="indicatorImportant" type="button" title="${uiText("Markera senaste steget som viktigt", "Mark the latest step as important")}">${uiText("Viktigt steg", "Important step")}</button>
         <button id="indicatorUseImage" type="button" title="${uiText("Använd senaste stegets bild", "Use the latest step screenshot")}">${uiText("Använd denna bild", "Use this screenshot")}</button>
         <button id="indicatorSection" type="button" title="${uiText("Skapa en ny sektion efter senaste steget", "Create a new section after the latest step")}">${uiText("Ny sektion", "New section")}</button>
         <button id="indicatorIgnore" type="button" title="${uiText("Ignorera senaste steget i dokumentet", "Ignore the latest step in the document")}">${uiText("Ignorera", "Ignore")}</button>
@@ -368,8 +367,6 @@
         shadow.getElementById("indicatorLatest").textContent = confirmation;
       });
     };
-    shadow.getElementById("indicatorImportant").addEventListener("click",
-      sendGuidance("important", uiText("Senaste steget markerades som viktigt", "The latest step was marked as important")));
     shadow.getElementById("indicatorUseImage").addEventListener("click",
       sendGuidance("use-image", uiText("Senaste bilden har valts", "The latest screenshot was selected")));
     shadow.getElementById("indicatorSection").addEventListener("click",

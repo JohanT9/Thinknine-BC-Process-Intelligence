@@ -100,8 +100,12 @@ assert.strictEqual(interactionGuidedEvents[2].raw.targetInteractionId,
 
 const content = read("src/recorder/content.js");
 const background = read("src/recorder/background.js");
-for (const id of ["indicatorImportant", "indicatorUseImage", "indicatorSection",
+for (const id of ["indicatorUseImage", "indicatorSection",
   "indicatorIgnore"]) assert.match(content, new RegExp(id));
+// Important step was removed: it marked a step that no document showed. Recordings that
+// already carry the marker are still read above, but no new marker can be made.
+assert.doesNotMatch(content, /indicatorImportant/);
+assert.doesNotMatch(background.match(/const CAPTURE_GUIDANCE_KINDS[^;]*/u)[0], /"important"/u);
 assert.ok(content.includes('aria-label="${uiText("Markera senaste steget", "Mark the latest step")}"'));
 assert.match(content, /T9_CAPTURE_GUIDANCE/);
 assert.match(background, /case "T9_CAPTURE_GUIDANCE"/);

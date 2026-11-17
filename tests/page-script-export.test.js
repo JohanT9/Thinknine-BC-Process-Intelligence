@@ -52,6 +52,24 @@ const events = [
 const result = exporter.build({ name: "IO systemknappar", description: "BC Process Studio", events });
 assert.strictEqual(result.startPage, "Purchase Order List");
 assert.strictEqual(result.recordedIdentity, true);
+assert.strictEqual(result.startsOnRecord, false, "without a page type nothing is guessed");
+
+// A test that starts on a card or document page replays on whichever record is open, so the
+// result says so; a test that starts in a list does not. The type comes from the caller.
+{
+  const types = { "Purchase Order List": "list", "Purchase Order": "document" };
+  const pageTypeOf = event => types[event.alIdentity?.path?.[0]?.page] || null;
+  const fromList = exporter.build({ events, pageTypeOf });
+  assert.strictEqual(fromList.startsOnRecord, false);
+  assert.strictEqual(fromList.startCaption, "");
+  const fromCard = exporter.build({ events: events.slice(2).map(event => event.raw ? event : { ...event,
+    pageCaption: event.alIdentity?.path?.[0]?.page === "Purchase Order" ? "Inköpsorder" : undefined }), pageTypeOf });
+  assert.strictEqual(fromCard.startPage, "Purchase Order");
+  assert.strictEqual(fromCard.startsOnRecord, true);
+  assert.strictEqual(fromCard.startCaption, "Inköpsorder", "the caption shown in Business Central is named");
+  assert.strictEqual(exporter.build({ events: events.slice(2), pageTypeOf: () => null }).startsOnRecord, false,
+    "an unknown page is not guessed to be a card");
+}
 assert.deepStrictEqual(result.steps.map(step => [step.type, step.invokeType || "",
   step.target.map(entry => Object.values(entry)[0]).join(" › ")]), [
   ["navigate", "", "Purchase Order List"],

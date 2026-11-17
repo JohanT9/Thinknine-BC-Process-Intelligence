@@ -1,12 +1,15 @@
 # Recording Guidance
 
-The in-page recording panel offers four optional commands for the most recently
+The in-page recording panel offers three optional commands for the most recently
 captured interaction:
 
-- **Important step** preserves explicit importance metadata.
 - **Use this image** selects the screenshot already captured for that interaction.
 - **New section** records a section boundary after the interaction.
 - **Ignore** keeps the evidence but excludes the interaction from generated steps.
+
+An **Important step** command existed until 4.7.266. It was removed because no
+document showed the marker. Recordings that carry it are still read, and the
+background service no longer accepts new `important` markers.
 
 Automatic capture remains the default. A consultant does not need to use any of
 these commands for an ordinary recording.
