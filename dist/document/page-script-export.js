@@ -16,6 +16,7 @@
   const MASKED = /^\[[^\]]{1,40}\]$/u; // privacy placeholders such as [belopp] or [maskerat]
   const LOOKUP_WINDOW_MS = 120000;
   const REPEAT_CLICK_MS = 1000;
+  const RECORD_PAGE_TYPES = new Set(["card", "document"]); // pages that show one record
   // Business Central's own line actions carry a fixed id instead of an AL name. The same id is
   // used on every page (seen on sales and purchase orders, in the action bar and the line menu).
   const SYSTEM_ACTIONS = Object.freeze([
@@ -134,7 +135,7 @@
       "steps:", ...steps.flatMap(stepLines)].join("\n") + "\n";
   }
 
-  function build({ name = "", description = "", events = [], locale = "en-US" } = {}) {
+  function build({ name = "", description = "", events = [], locale = "en-US", pageTypeOf = null } = {}) {
     const words = phrasesFor(locale);
     const say = (kind, values) => phrase(words, kind, values);
     const steps = [];
@@ -343,10 +344,20 @@
     if (rowClick) skip(rowClick, "rowSelection");
 
     const startPage = rootPage(steps[0]?.target);
+    // A test that starts on a card or document page replays on whichever record is open, not on
+    // the recorded one, so the result says so. The page type comes from the caller (the knowledge
+    // catalog); a page it does not know is not guessed.
+    const startEvent = startPage ? events.map(eventOf).find(event =>
+      clean(rootPage(event?.alIdentity?.path)) === startPage) : null;
+    const startPageType = startEvent && typeof pageTypeOf === "function"
+      ? String(pageTypeOf(startEvent) || "") : "";
+    const startsOnRecord = RECORD_PAGE_TYPES.has(startPageType);
+    const startCaption = clean(startEvent?.pageCaption || startEvent?.pageName || "") || startPage;
     const all = startPage && !startPage.startsWith("lookup:")
       ? [{ type: "navigate", target: [{ page: startPage }], description: say("open", { page: startPage }) }, ...steps] : steps;
     return { content: steps.length ? toYaml({ name, description, steps: all }) : "",
-      steps: all, stepCount: steps.length, skipped, startPage, recordedIdentity };
+      steps: all, stepCount: steps.length, skipped, startPage, recordedIdentity,
+      startsOnRecord, startCaption: startsOnRecord ? startCaption : "" };
   }
 
   // A file name from the document's title, safe on every system.

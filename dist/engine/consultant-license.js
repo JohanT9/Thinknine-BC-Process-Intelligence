@@ -110,12 +110,15 @@
       if (!response.ok) {
         let detail = "";
         try { detail = String((await response.json())?.error || ""); } catch { /* Ignore non-JSON errors. */ }
-        if (response.status === 404) throw new Error("Licenstjänsten saknar stöd för konsultregistrering. Distribuera den senaste tjänste-ZIP-filen.");
-        if (response.status === 401) throw new Error("Licenstjänsten avvisade Microsoft-inloggningen. Kontrollera LICENSE_ENTRA_AUDIENCE och LICENSE_ENTRA_SCOPE i Azure.");
-        if (response.status === 503 && detail === "consultant-auth-not-configured") {
-          throw new Error("Microsoft-autentisering är inte konfigurerad i licenstjänsten.");
-        }
-        throw new Error(`Konsultregistreringen kunde inte skapas (HTTP ${response.status}${detail ? `: ${detail}` : ""}).`);
+        // The user cannot act on service configuration, so the message stays plain and the
+        // status and reason go to the diagnostics instead.
+        logger.warn("BC Process Studio: consultant registration failed.",
+          { status: response.status, reason: detail.slice(0, 120) });
+        const error = new Error(response.status === 401
+          ? "license.consultantSignInRejected" : "license.consultantRegistrationFailed");
+        error.status = response.status;
+        error.code = "consultant-registration-failed";
+        throw error;
       }
       const license = await response.json();
       const value = await state(); await storage.set({ [KEY]: { ...value, license } });

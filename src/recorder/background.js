@@ -1090,7 +1090,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
 // A marker and its opposite: what the recording panel does when a choice is changed or undone.
 // The recording only grows; the latest marker for a step decides (see event-step-grouping.js).
 const CAPTURE_GUIDANCE_KINDS = new Set([
-  "important", "use-image", "new-section", "ignore",
+  "use-image", "new-section", "ignore",
   "include", "no-section", "auto-image", "first-section-title"
 ]);
 const SECTION_TITLE_MAX = 80;
@@ -3521,12 +3521,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const session = await getSession(message.sessionId);
         if (!session) throw new Error("The recording was not found.");
         const raw = await getRawRecording(session.id).catch(() => null);
+        // The knowledge catalog says whether the test's first page is a card or a list.
+        await pageKnowledgePacksReady;
+        const pageTypeOf = event => globalThis.T9PageIdentificationEngine.getPageDefinition(
+          globalThis.T9PageIdentity.observedPageObjectId(event))?.pageType || null;
         const result = globalThis.T9PageScriptExport.build({ name: session.name,
-          locale: session.settings?.documentLanguage || "en-US",
+          locale: session.settings?.documentLanguage || "en-US", pageTypeOf,
           description: "BC Process Studio", events: raw?.events || [] });
         sendResponse({ ok: true, content: result.content, stepCount: result.stepCount,
           skipped: result.skipped, startPage: result.startPage,
-          recordedIdentity: result.recordedIdentity,
+          recordedIdentity: result.recordedIdentity, startsOnRecord: result.startsOnRecord,
+          startCaption: result.startCaption,
           fileName: globalThis.T9PageScriptExport.fileName(session.name) });
         break;
       }

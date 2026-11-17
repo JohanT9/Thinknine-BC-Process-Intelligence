@@ -2,16 +2,6 @@
 
 Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varje punkt beskriver vad som är fel, vad användaren märker och ett förslag. En punkt är bekräftad i koden eller i Business Central om inget annat sägs; det som bara är en misstanke står som **Att kontrollera**. När en punkt är åtgärdad flyttas den till CHANGELOG och tas bort här. Nya funktioner hör hemma i [FUTURE_FEATURES.md](FUTURE_FEATURES.md).
 
-## Markeringen "Viktigt steg" gör ingenting i dokumentet
-
-*Tillagd 2026-11-16.*
-
-**Vad är fel:** knappen Viktigt steg i den flytande inspelningsrutan sparar en markering (`guidanceKind: "important"`). Den förs vidare till stegets `important` i `session-interpretation-pipeline.js`, men ingen granskningsvy, förhandsvisning eller export läser den.
-
-**Vad användaren märker:** man klickar på Viktigt steg och får bekräftelsen att steget markerats, men dokumentet ser likadant ut som utan markering.
-
-**Förslag:** bestäm vad ett viktigt steg ska innebära, till exempel en framhävd ruta i dokumentet och en markering i granskningen, och visa det. Tills dess finns knappen inte i den nya inspelningspanelen, bara i den flytande rutan.
-
 ## Sekretesstexten för Edge-butiken stämmer inte längre
 
 *Tillagd 2026-11-13. Bör vara klar före nästa inlämning till Edge-butiken.*
@@ -21,16 +11,6 @@ Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varj
 **Vad användaren märker:** inget i produkten, men butikstexten beskriver hanteringen av data fel.
 
 **Förslag:** skriv att maskeringen gäller det som visas i dokument, exporter och felrapporter, och att det användaren skriver sparas lokalt i inspelningen för testexporten och följer med när användaren själv exporterar eller synkroniserar biblioteket. Låt en människa granska formuleringen mot Edges gällande policy.
-
-## Page Scripting-test som börjar på ett kort
-
-*Tillagd 2026-11-13.*
-
-**Vad är fel:** börjar inspelningen på ett kort, till exempel en öppen inköpsorder, blir testets första steg "Öppna Purchase Order". Testet spelas då upp på den post som råkar vara öppen, inte på den som spelades in. Ett test som börjar i en lista (till exempel inköpsorderlistan) är förutsägbart.
-
-**Vad användaren märker:** testet kan ändra eller ta bort rader på fel order utan att säga till.
-
-**Förslag:** säg till i meddelandet efter exporten när testet börjar på ett kort, och föreslå att spela in från listan. Undersök om Page Scripting kan öppna ett kort på en viss post innan exporten själv försöker göra det.
 
 ## Kontroll av Page Scripting-exporten vid varje ny Business Central-version
 
@@ -51,16 +31,6 @@ Kända fel, brister och kontroller som behöver göras i BC Process Studio. Varj
 **Vad användaren märker:** meddelandet efter exporten säger att steget saknas.
 
 **Att kontrollera:** om det händer i verkliga sidor, till exempel med appar från andra leverantörer. Hittas ett fall kan valet knytas till raden som klickades strax före, i stället för till texten.
-
-## Ta bort Favoritmarkera ur verktygsraden för valda dokument
-
-*Tillagd 2026-11-14.*
-
-**Vad är fel:** när dokument är valda i biblioteket visar verktygsraden knappen **Favoritmarkera** (`libraryBatchFavourite` i `src/ui/dashboard.html`/`dashboard.js`). Den gör samma sak som stjärnan på varje dokument, kan bara sätta favorit och tar plats i en redan full rad.
-
-**Vad användaren märker:** ett extra val som inte behövs; stjärnan räcker för att markera och avmarkera favoriter.
-
-**Förslag:** ta bort knappen och dess klickhanterare och oanvända texter i alla språk (till exempel `library.batchFavourited`). Behåll stjärnan på varje dokument och filtret Favoriter. Kontrollera om `T9DocumentBatchOperations.favourite` och dess test då blir oanvända.
 
 ## Värde som väljs i ett namnfält
 

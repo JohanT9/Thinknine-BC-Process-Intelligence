@@ -80,8 +80,8 @@ for (const file of ["src/recorder/background.js", "src/engine/consultant-license
 // Messages carrying values are translated through templates; page text is matched exactly only.
 assert.strictEqual(i18n.translate("Användaren kunde inte registreras (HTTP 503).", "de-DE"),
   "Der Benutzer konnte nicht registriert werden (HTTP 503).");
-assert.strictEqual(i18n.translate("Konsultregistreringen kunde inte skapas (HTTP 400: tenant $&).", "en-US"),
-  "The consultant registration could not be created (HTTP 400: tenant $&).");
+assert.strictEqual(i18n.translate("Användaren kunde inte registreras (HTTP 400: tenant $&).", "en-US"),
+  "The user could not be registered (HTTP 400: tenant $&).");
 assert.strictEqual(i18n.translateStaticText("Steg för steg", "en-US"), "Steg för steg",
   "a template never rewrites ordinary page text");
 for (const source of [read("src/engine/consultant-license.js"), read("src/recorder/background.js")]) {
