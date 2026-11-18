@@ -266,7 +266,9 @@
         request.reportKey + ":" + request.email?.to);
       return locks.request(lockKey, () => createDraft(request));
     }
-    return { draft, send, people, clearToken };
+    // A token for another Graph permission, such as sharing a document to OneDrive.
+    const authorize = scope => authenticate(scope);
+    return { draft, send, people, clearToken, authorize };
   }
   return { create, safeLink, addresses, SCOPE, SEND_SCOPE, PEOPLE_SCOPE };
 });

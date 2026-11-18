@@ -109,14 +109,59 @@
     return patch;
   }
 
+  function tagList(value) {
+    return Array.isArray(value)
+      ? value.map(tag => String(tag || "").trim()).filter(Boolean) : [];
+  }
+
+  // Tags added or removed for many documents at once change only those tags; each
+  // document keeps its other tags. Tags are compared without regard to case, so removing
+  // "uat" also removes "UAT", and adding "UAT" to a document that has "uat" adds nothing.
+  function changedTags(current, operation) {
+    const fields = operation.fields || {};
+    const add = fields.addTags?.selected ? tagList(fields.addTags.value) : [];
+    const remove = new Set((fields.removeTags?.selected ? tagList(fields.removeTags.value) : [])
+      .map(tag => tag.toLocaleLowerCase()));
+    if (!add.length && !remove.size) return null;
+    const kept = tagList(current).filter(tag => !remove.has(tag.toLocaleLowerCase()));
+    const seen = new Set(kept.map(tag => tag.toLocaleLowerCase()));
+    for (const tag of add) {
+      if (seen.has(tag.toLocaleLowerCase())) continue;
+      seen.add(tag.toLocaleLowerCase());
+      kept.push(tag);
+    }
+    return kept;
+  }
+
+  // The tags the selected documents have, with how many of them have each one.
+  function selectedTags(records, state) {
+    const counts = new Map();
+    for (const record of selected(records, state)) {
+      const own = new Set();
+      for (const tag of tagList(record.tags)) {
+        const key = tag.toLocaleLowerCase();
+        if (own.has(key)) continue;
+        own.add(key);
+        const entry = counts.get(key) || { tag, count: 0 };
+        entry.count += 1;
+        counts.set(key, entry);
+      }
+    }
+    return freeze([...counts.values()].sort((a, b) => a.tag.localeCompare(b.tag)));
+  }
+
   function apply(records, state, operation = {}) {
     const ids = new Set(selection(state).selectedIds);
     const patch = patchFor(operation);
-    const hasChanges = Object.keys(patch).length > 0;
+    const fields = operation.fields || {};
+    const tagsChange = Boolean((fields.addTags?.selected && tagList(fields.addTags.value).length) ||
+      (fields.removeTags?.selected && tagList(fields.removeTags.value).length));
+    const hasChanges = Object.keys(patch).length > 0 || tagsChange;
     let affected = 0;
     const next = records.map(record => {
       if (!ids.has(record.projectId) || !hasChanges) return library.normalize(record);
-      const updated = library.merge(record, patch);
+      const tags = tagsChange ? changedTags(record.tags, operation) : null;
+      const updated = library.merge(record, tags ? { ...patch, tags } : patch);
       if (JSON.stringify(updated) === JSON.stringify(record)) return updated;
       affected += 1;
       return updated;
@@ -173,5 +218,5 @@
 
   return { BATCH_SCHEMA_VERSION, apply, clear, execute, exportPlan, focus,
     favourite, reconcile, remove, select, selectAll,
-    selected, selection };
+    selected, selectedTags, selection };
 });

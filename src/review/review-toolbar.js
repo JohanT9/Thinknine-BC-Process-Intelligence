@@ -4,7 +4,7 @@
   root.T9ReviewToolbar = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const COMMANDS = Object.freeze([
-    "undo", "redo", "merge", "split", "move-up", "move-down", "export"
+    "undo", "redo", "merge", "split", "move-up", "move-down", "export", "share"
   ]);
 
   function derive(context) {
@@ -21,7 +21,9 @@
       split: count === 1,
       "move-up": count >= 1 && selectedIndexes[0] > 0,
       "move-down": count >= 1 && selectedIndexes.at(-1) < taskIds.length - 1,
-      export: Boolean(context.canExport) && taskIds.length > 0
+      export: Boolean(context.canExport) && taskIds.length > 0,
+      // Share link makes the same Word file as Export Word.
+      share: Boolean(context.canExport) && taskIds.length > 0
     };
   }
 

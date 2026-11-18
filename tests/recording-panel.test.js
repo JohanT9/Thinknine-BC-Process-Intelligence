@@ -321,8 +321,11 @@ const panelSender = { id: "studio", url: "chrome-extension://studio/recording-pa
   // ---- After saving, the document is used at once: Word, a test, a list to paste -------------
   // Word export and test creation are the library's own, run out of sight for this one document.
   const dashboardJs = read("src/ui/dashboard.js");
-  assert.match(dashboardJs, /\["export-word", "run-test"\]\.includes\(kind\) \|\| globalThis\.parent === globalThis/,
-    "the library does a panel job only when loaded inside the panel, and only these two");
+  assert.match(dashboardJs, /\["export-word", "run-test", "share-link"\]\.includes\(kind\) \|\| globalThis\.parent === globalThis/,
+    "the library does a panel job only when loaded inside the panel, and only these three");
+  // Share link asks for the Graph permission from the panel's own click before the job starts.
+  assert.match(panelJs, /chrome\.permissions\.request\(GRAPH\)\) throw[^\n]*\n\s*job = libraryJob\("share-link"/u,
+    "the panel asks for Graph access before the library shares");
   assert.match(dashboardJs, /\.\.\.data \}, globalThis\.location\.origin\)/,
     "the outcome goes only to the extension's own page");
   assert.match(dashboardJs, /if \(!PANEL_JOB\) \{\s*renderLibraryImportNotice\(\)/,

@@ -47,8 +47,8 @@
   --space20: 20px;
   --space24: 24px;
   --radiusSmall: 2px;
-  --radiusMedium: 4px;
-  --radiusLarge: 6px;
+  --radiusMedium: 6px;
+  --radiusLarge: 8px;
   --shadow2: 0 1px 2px rgb(0 0 0 / 14%);
   --shadow8: 0 4px 8px rgb(0 0 0 / 14%);
   --controlHeight: 32px;
@@ -106,7 +106,7 @@ button:disabled { color: var(--colorTextDisabled) !important; background: var(--
 input:not([type="checkbox"]):not([type="radio"]), textarea, select {
   min-height: var(--controlHeight);
   border: 1px solid var(--colorBorderDefault);
-  border-radius: var(--radiusSmall);
+  border-radius: var(--radiusMedium);
   background: var(--colorBackgroundSurface);
   color: var(--colorTextPrimary);
   padding: var(--space6) var(--space8);
@@ -146,7 +146,7 @@ th { height: 36px; color: var(--colorTextSecondary); font-weight: 600; backgroun
 td { height: 40px; border-bottom-color: var(--colorBorderSubtle) !important; }
 tbody tr:hover { background: var(--colorBrandSubtle); }
 
-.library-card { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
+.library-card { border-radius: var(--radiusLarge) !important; box-shadow: none !important; }
 .library-card:hover { background: var(--colorBrandSubtle); }
 .library-card[data-selected="true"], .library-card:focus-visible,
 .review-card.selected { outline-color: var(--colorFocusIndicator) !important; }
@@ -423,6 +423,14 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-transfer-conflicts{margin:0;padding-left:20px;max-height:180px;overflow:auto;font-size:13px}
 .library-transfer-conflicts li{overflow-wrap:anywhere}
 .library-transfer-dialog{max-height:calc(100vh - 32px);overflow:auto}
+.document-share-dialog{width:min(560px,calc(100vw - 32px))}
+.document-share-dialog form,.document-share-result{grid-template-columns:minmax(0,1fr)}
+.document-share-result{display:grid;gap:var(--space8)}
+.document-share-result[hidden],.document-share-stop[hidden],.document-share-outdated[hidden]{display:none}
+.document-share-link-row{display:flex;flex-wrap:wrap;gap:var(--space8);align-items:center}
+.document-share-link-row input{flex:1 1 220px;min-width:0}
+.document-share-outdated{margin:0;padding:var(--space8) var(--space12);border-left:3px solid var(--colorStatusWarning);background:var(--colorBackgroundSurface);font-size:13px}
+.document-share-stop p{margin:0;font-weight:600}
 .library-continue-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:var(--space12)}
 .library-continue-card{display:grid!important;gap:var(--space8);margin:0;padding:var(--space12) 14px;border-radius:var(--radiusLarge)!important;text-align:left;font-weight:400}
 .library-continue-card:hover:not(:disabled){border-color:var(--colorBrandPrimary)!important;background:var(--colorBackgroundSurface)}
@@ -540,19 +548,34 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-card-footer{display:flex;align-items:center;gap:var(--space6)}
 .library-card-footer button{margin:0}
 .library-card-menu{position:relative}
+/* A document's review status and test status stand side by side in the same form. The test
+   status is a button: it opens the test history, so it shows a border on hover and focus. */
+.library-statuses{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space6)}
+/* Both statuses have the same box: the same border (clear until the test status is pointed
+   at), padding, line height and font, so they are equally tall. */
+.library-statuses>.library-state,.library-statuses>.library-test-marker{box-sizing:border-box;min-height:0;padding:2px 10px;border:1px solid transparent;line-height:18px;font-size:var(--fontSizeCaption);font-weight:600}
+.library-statuses .library-test-marker{display:inline-flex;align-items:center;justify-content:center;gap:var(--space4);min-height:0;margin:0;padding:2px 10px;border:1px solid transparent!important;border-radius:999px!important;background:color-mix(in srgb,var(--colorStatusDraft) 16%,transparent)!important;color:var(--colorTextSecondary);font-size:var(--fontSizeCaption);font-weight:600;white-space:nowrap;box-sizing:border-box;cursor:pointer}
+.library-statuses .library-test-marker:hover{border-color:var(--colorBorderDefault)!important}
+.library-statuses .library-test-marker[data-state="passed"]{background:color-mix(in srgb,var(--colorStatusSuccess) 16%,transparent)!important;color:var(--colorStatusSuccess)}
+.library-statuses .library-test-marker[data-state="failed"]{background:color-mix(in srgb,var(--colorStatusDanger) 16%,transparent)!important;color:var(--colorStatusDanger)}
+.library-statuses .library-test-marker[data-state="in-progress"]{background:color-mix(in srgb,var(--colorStatusWarning) 16%,transparent)!important;color:var(--colorStatusWarning)}
+/* The language badge has one width for every language, so NB and SV start the details alike. */
+.library-card-meta .library-language{display:inline-block;box-sizing:border-box;min-width:26px;text-align:center}
 /* All document rows share their columns, so status, star and buttons line up from row to row and
    each status and button is as wide as the widest one in its column, whatever the language. */
 @media (min-width: 761px){
-  .library-results{grid-template-columns:minmax(0,1fr) repeat(5,auto);column-gap:var(--space6)}
+  .library-results{grid-template-columns:minmax(0,1fr) repeat(6,auto);column-gap:var(--space6)}
   .library-results>*{grid-column:1/-1}
   .library-results>.library-card{grid-template-columns:subgrid;column-gap:var(--space6)}
   .library-results>.library-card>.library-card-footer{display:contents}
-  .library-results>.library-card>.library-state{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center;margin-inline-end:var(--space8)}
-  .library-results .library-favourite{grid-column:3}
+  .library-results>.library-card>.library-statuses{display:contents}
+  .library-results>.library-card>.library-statuses>.library-state{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center}
+  .library-results>.library-card>.library-statuses>.library-test-marker,.library-results>.library-card>.library-statuses>span:last-child{grid-column:3;justify-self:stretch;margin-inline-end:var(--space8)}
+  .library-results .library-favourite{grid-column:4}
   /* Only the row's own buttons: the same actions in the card's menu stay in the menu's column. */
-  .library-results .library-card-footer>[data-library-action="run-test"]{grid-column:4}
-  .library-results .library-card-footer>[data-library-action="open"]{grid-column:5;justify-self:stretch}
-  .library-results .library-card-menu{grid-column:6}
+  .library-results .library-card-footer>[data-library-action="run-test"]{grid-column:5}
+  .library-results .library-card-footer>[data-library-action="open"]{grid-column:6;justify-self:stretch}
+  .library-results .library-card-menu{grid-column:7}
 }
 .library-card-menu>summary{display:grid;place-items:center;min-width:36px;min-height:var(--controlHeight);border:1px solid transparent;border-radius:var(--radiusMedium);color:var(--colorTextSecondary);font-size:18px;line-height:1;list-style:none;cursor:pointer}
 .library-card-menu>summary::-webkit-details-marker{display:none}
@@ -573,7 +596,14 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .library-batch-toolbar:not([hidden]){position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;min-height:34px;margin:0;padding:0 0 0 12px;border:0;outline:1px solid var(--colorBorderDefault);outline-offset:-1px;background:var(--colorBackgroundSurface)!important}
 .library-batch-toolbar .library-batch-count{margin-right:auto}
 .library-batch-toolbar .library-batch-more{margin:0;padding:0;border:0}
-.library-batch-toolbar .library-batch-more>summary{box-sizing:border-box;padding-block:6px;line-height:20px}
+/* "More actions" opens a menu but should look like the buttons beside it, with a chevron
+   instead of the browser's disclosure triangle. */
+.library-batch-toolbar .library-batch-more>summary{box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;list-style:none;padding:6px var(--space12);line-height:20px;border:1px solid var(--colorBorderDefault);border-radius:var(--radiusMedium);background:var(--colorBackgroundSurface);color:var(--colorTextPrimary);font-weight:inherit;cursor:pointer;user-select:none}
+.library-batch-toolbar .library-batch-more>summary::-webkit-details-marker{display:none}
+.library-batch-toolbar .library-batch-more>summary::after{content:"";width:6px;height:6px;margin-top:-3px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg)}
+.library-batch-toolbar .library-batch-more[open]>summary::after{margin-top:3px;transform:rotate(-135deg)}
+.library-batch-toolbar .library-batch-more>summary:hover{background:var(--colorBackgroundSubtle)}
+.library-batch-toolbar .library-batch-more[open]>summary{background:var(--colorBackgroundSubtle)}
 .library-batch-toolbar button,.library-batch-more>summary{min-height:34px;margin:0}
 .library-batch-toolbar .library-batch-more[open]{width:auto;padding-top:0}
 .library-batch-toolbar .library-batch-more[open]>summary{margin-bottom:0}
@@ -588,6 +618,40 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-batch-toolbar .library-batch-more[open]{order:1;flex-basis:100%}
   .library-results[data-has-selection="true"],.library-results[data-select-mode="true"]{padding-bottom:calc(var(--library-batch-height,72px) + 24px)}
 }
+/* A document's details line up in columns from row to row in a wide window. Each column is
+   as wide as its widest value in the list (set by the library view); a long company or
+   template name ends in … and is shown whole on hover. In a narrow window the details
+   follow one another and empty columns take no room. */
+.library-card-meta .library-col{flex:none;box-sizing:border-box;min-width:0;white-space:nowrap}
+.library-card-meta .library-col-company,.library-card-meta .library-col-template{overflow:hidden;text-overflow:ellipsis}
+@media (min-width:900px){
+  .library-card-meta .library-col-kind{width:var(--library-col-kind,auto)}
+  .library-card-meta .library-col-date{width:var(--library-col-date,auto)}
+  .library-card-meta .library-col-company{width:var(--library-col-company,auto);max-width:160px}
+  .library-card-meta .library-col-template{width:var(--library-col-template,auto);max-width:280px}
+}
+@media (max-width:899px){
+  .library-card-meta .library-col:empty{display:none}
+  .library-card-meta .library-col-company,.library-card-meta .library-col-template{max-width:100%}
+}
+/* Changing tags, template and author for the selected documents: one field per row. */
+#libraryBatchMetadataDialog{width:min(520px,calc(100vw - 32px));min-width:0;box-sizing:border-box}
+#libraryBatchMetadataDialog h3{margin:0 0 var(--space4)}
+#libraryBatchMetadataDescription{margin:0 0 var(--space16)}
+.library-batch-edit{display:grid;gap:var(--space16)}
+#libraryBatchMetadataDialog .library-batch-edit-field{display:grid;gap:var(--space4);margin:0;min-width:0}
+.library-batch-edit-field>span,.library-batch-remove-tags>legend{font-weight:600}
+.library-batch-edit-field input[type=text],.library-batch-edit-field select{width:100%;box-sizing:border-box}
+.library-batch-edit-field small{font-size:var(--fontSizeCaption)}
+#libraryBatchMetadataDialog .library-batch-remove-tags{padding:0;border:0;background:transparent}
+.library-batch-remove-tags>legend{padding:0;margin-bottom:var(--space4)}
+.library-batch-remove-tags>p{margin:0}
+.library-batch-tag-list{display:flex;flex-wrap:wrap;gap:var(--space6);max-height:150px;overflow:auto}
+#libraryBatchMetadataDialog .library-batch-tag{margin:0;display:inline-flex;align-items:center;gap:var(--space6);padding:3px 10px 3px 6px;border:1px solid var(--colorBorderDefault);border-radius:999px;cursor:pointer;max-width:100%}
+.library-batch-tag>span{overflow-wrap:anywhere}
+.library-batch-tag input{width:auto;margin:0}
+.library-batch-tag:has(input:checked){border-color:var(--colorStatusDanger);color:var(--colorStatusDanger)}
+.library-batch-tag:has(input:checked)>span{text-decoration:line-through}
 .library-batch-more-panel{display:flex;flex-wrap:wrap;gap:var(--space6)}
 .library-batch-more-panel button{margin:0!important}
 .settings-view-heading{margin:var(--space16) 0}
@@ -622,7 +686,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-card{grid-template-columns:minmax(0,1fr) auto}
   .library-card-heading{grid-column:1/-1;align-items:flex-start}
   .library-card-title h4{white-space:normal;overflow-wrap:anywhere}
-  .library-state{grid-column:1;justify-self:start}
+  .library-statuses{grid-column:1;justify-self:start}
   .library-card-footer{grid-column:2}
   .settings-layout{grid-template-columns:minmax(0,1fr)}
   .settings-nav{position:static;display:flex;overflow-x:auto}
@@ -631,6 +695,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 }
 @media (forced-colors: active) {
   .library-state,.library-kind{border:1px solid CanvasText}
+  .library-statuses .library-test-marker{border-color:ButtonText!important}
   .home-views button[aria-current="page"],.settings-nav button[aria-current="true"],.library-quick-filters button[aria-pressed="true"]{outline:2px solid Highlight}
   .settings-segmented-options label:has(input:checked){outline:2px solid Highlight;outline-offset:-2px}
 }
@@ -661,6 +726,10 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 [data-state="cancelled"] > .tests-overview-icon, [data-state="cancelled"] .tests-overview-result .tests-overview-icon { color: var(--colorTextSecondary); }
 
 .library-test-marker { display: inline-flex; align-items: center; gap: var(--space4); margin: 0; padding: 0 var(--space6); min-height: 22px; border: 1px solid var(--colorBorderSubtle); border-radius: 999px; background: var(--colorBackgroundSubtle); color: var(--colorTextPrimary); font: inherit; font-size: var(--fontSizeCaption); cursor: pointer; }
+.library-share-marker { display: inline-flex; align-items: center; gap: var(--space4); margin: 0; padding: 0 var(--space6); min-height: 22px; border: 1px solid var(--colorBorderSubtle); border-radius: 999px; background: var(--colorBackgroundSubtle); color: var(--colorTextPrimary); font: inherit; font-size: var(--fontSizeCaption); cursor: pointer; }
+.library-share-marker:hover { border-color: var(--colorBorderDefault); }
+.library-share-marker [aria-hidden] { color: var(--colorBrandPrimary); }
+.library-share-marker[data-outdated="true"] [aria-hidden] { color: var(--colorStatusWarning); }
 .library-test-marker:hover { border-color: var(--colorBorderDefault); }
 .library-test-marker[data-state="passed"] [aria-hidden] { color: var(--colorStatusSuccess); }
 .library-test-marker[data-state="failed"] [aria-hidden] { color: var(--colorStatusDanger); }

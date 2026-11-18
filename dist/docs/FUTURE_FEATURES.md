@@ -161,36 +161,48 @@ Dagens dokument passar den som ska lära sig processen, men är tunga för den s
 
 ## Dela ett dokument som en länk som bara går att läsa
 
-*Sparat 2026-11-15. Förslag, inte beslut. Idé från jämförelsen med Worksnip.*
+*Sparat 2026-11-15, omarbetat 2026-11-18. Byggs från 2026-11-18.*
 
 ### Vad användaren ska kunna
 
-Skicka en adress i stället för en fil. Mottagaren klickar och läser dokumentet i webbläsaren, med steg, skärmbilder och markeringar, utan tillägget, licens eller Business Central. Mottagaren kan inte ändra något. När dokumentet uppdateras ser alla med länken den nya versionen, och avsändaren kan stänga av länken.
+Skicka en länk i stället för en fil. Mottagaren klickar och läser dokumentet i webbläsaren, med steg, skärmbilder och markeringar, utan tillägget, licens eller Business Central. Mottagaren kan inte ändra något. När dokumentet uppdateras ser alla med länken den nya versionen, och avsändaren kan sluta dela.
 
 ### Varför
 
-Så sprids processdokumentation i praktiken, till kollegor, nyanställda, kunder och revisorer. I dag får mottagaren en kopia av Word- eller PDF-filen, som blir inaktuell när dokumentet ändras, och ingen vet vilken version som gäller.
+Så sprids processdokumentation i praktiken: till kollegor, nyanställda, kunder och revisorer. I dag får mottagaren en kopia av Word-filen. Kopian blir inaktuell när dokumentet ändras, och ingen vet vilken version som gäller.
 
-### Haken
+### Vald väg: Word-filen i användarens OneDrive, med en länk som bara går att läsa
 
-Allt ligger i dag lokalt i användarens webbläsare, och det är en styrka. En länk kräver att dokumentet lagras där andra kommer åt det. Det är ny dataöverföring: dokument kan innehålla värden och skärmbilder från Business Central.
+- BC Process Studio skapar redan Word-dokumentet med steg, skärmbilder och markeringar. Den filen laddas upp till användarens OneDrive, i mappen *BC Process Studio*.
+- En länk för personer i organisationen, som bara går att läsa, skapas med Microsoft Graph (`createLink`, typ `view`, omfång `organization`). Mottagaren öppnar filen i Word för webben.
+- Uppdatera skriver över samma fil. Länken är densamma, och OneDrive sparar versionshistoriken.
+- Sluta dela tar bort länken.
+- Inget lagras hos BC Process Studio. Kundens egna delningsregler i Microsoft 365 gäller.
+- Behörigheten är Files.ReadWrite, delegerad. Den är den minsta som räcker och frågas bara efter när någon delar första gången, på samma sätt som Mail.Send. Inloggningen och appregistreringen är desamma som för Outlook-sändningen.
 
-### Tre vägar
+### Förkastade vägar
 
-1. **I kundens egen Microsoft 365 (SharePoint eller OneDrive). Rekommenderas.** Dokumentet läggs som en läsbar webbsida i kundens eget utrymme, och behörigheten styrs av kundens vanliga delning. Inget hamnar hos oss. Passar BC-kunder, som nästan alltid har Microsoft 365, och kan bygga vidare på den Microsoft-inloggning som licensen redan använder. Kräver behörighet till Microsoft Graph, som användaren godkänner.
-2. **En fristående HTML-fil.** Allt i en fil som öppnas i vilken webbläsare som helst. Ingen server och enkelt att bygga, men i praktiken ett nytt filformat: ingen äkta länk och ingen automatisk uppdatering. Kan vara ett första steg, och samma sida kan senare läggas i SharePoint i väg 1.
-3. **Lagring hos oss i molnet (som Worksnip).** Enklast för användaren, men vi blir ansvariga för kunddata. Kräver samtycke, personuppgiftsbiträdesavtal, ny integritetstext (även i Edge Store), drift och säkerhetsarbete. Bryter mot den lokala profilen och är ett separat beslut.
+- **HTML-sida i SharePoint eller OneDrive:** SharePoint Online visar inte uppladdade HTML-filer i webbläsaren, utan laddar ner dem, och det finns ingen inställning för att ändra det.
+- **Fristående HTML-fil:** ger ingen äkta länk och ingen automatisk uppdatering. Den är i praktiken bara ett nytt filformat.
+- **Lagring hos oss i molnet:** gör oss ansvariga för kunddata och bryter mot att allt ligger lokalt.
 
 ### Principer
 
-- Inget delas utan att användaren uttryckligen väljer det för det dokumentet, och dialogen säger var dokumentet hamnar och vem som kan se det.
-- Maskerade värden förblir maskerade i den delade versionen. Typade värden för Page Scripting följer aldrig med.
-- Användaren ser vilka dokument som är delade och kan sluta dela.
+- Inget delas utan att användaren uttryckligen väljer det för det dokumentet. Dialogen säger var filen hamnar och vem som kan se den.
+- "Länken är kopierad" visas först när uppladdningen och länken har bekräftats.
+- Maskerade värden förblir maskerade, eftersom det är samma Word-fil som vid nedladdning. Typade värden för Page Scripting följer aldrig med.
+- Biblioteket visar vilka dokument som är delade, och om den delade versionen är äldre än dokumentet.
+- Integritetstexten, även den i Edge Store, uppdateras: dokumentet skickas till användarens egen OneDrive.
+
+### Begränsningar
+
+- Företag som kräver att en administratör godkänner nya behörigheter stoppar delningen första gången. Dialogen förklarar vad man gör då.
+- Länkar till personer utanför organisationen ingår inte i första versionen. Ett personligt Microsoft-konto (OneDrive personal) saknar omfånget organisation.
 
 ### Öppna frågor
 
-- Ska en delad länk uppdateras automatiskt när dokumentet sparas, eller först när användaren väljer Uppdatera delning?
-- Ska den delade sidan följa dokumentets mall (logga, färg) och dokumentspråk?
+- Ska ett delat dokument uppdateras automatiskt när det sparas, eller först när användaren väljer Uppdatera? Första versionen frågar.
+- Ska man kunna välja en SharePoint-plats i stället för den egna OneDrive?
 
 ## Påminnelse om tester att göra
 
@@ -223,7 +235,7 @@ Tilldelningen skickar redan ett e-postmeddelande när testerna delas ut, men det
 
 ## Skärmbilder på dokumentspråket
 
-*Sparad 2026-11-18.*
+*Sparad 2026-11-18. Beslut samma dag: byggs inte nu. Idén sparas som underlag.*
 
 ### Vad användaren ska kunna
 

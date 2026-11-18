@@ -125,6 +125,11 @@
     .rp-result h3{margin:0;font-size:.9375rem;line-height:1.3;overflow-wrap:anywhere}
     .rp-done-box .rp-r-help{margin:0;font-size:.8125rem;line-height:1.45;color:var(--c-fg-526273)}
     .rp-r-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+    .rp-share{display:grid;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--c-bd-ccd5df)}
+    .rp-share[hidden]{display:none}
+    .rp-share p{margin:0;font-size:.8125rem}
+    .rp-share-link{display:flex;flex-wrap:wrap;gap:6px}
+    .rp-share-link input{flex:1 1 160px;min-width:0;font:inherit;font-size:.8125rem;padding:5px 8px}
     .rp-foot .rp-r-actions button:not(.rp-textbtn){min-height:36px;margin:0;padding:7px 14px;font:inherit;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid var(--c-bd-8392a5);background:var(--c-bg-ffffff);color:var(--c-fg-172b4d)}
     .rp-foot .rp-r-actions button.primary{background:var(--c-bg-008489);border-color:var(--c-bd-008489);color:var(--c-fg-ffffff)}
     .rp-foot .rp-r-actions button.primary:hover:not(:disabled){background:var(--c-bg-006f73)}
@@ -229,8 +234,11 @@
               <h3 id="rpWordTitle" data-i18n="recPanel.wordTitle">A document to share</h3>
               <p class="rp-r-help" data-i18n="recPanel.wordHelp">A Word file with every step, screenshot and highlight.</p>
             </div>
-            <div class="rp-r-actions"><button id="rpWordAction" type="button" class="primary" data-i18n-ignore></button></div>
+            <div class="rp-r-actions"><button id="rpWordAction" type="button" class="primary" data-i18n-ignore></button>
+              <button id="rpShareAction" type="button" class="rp-textbtn" aria-expanded="false" aria-controls="rpShare" data-i18n="share.action">Share link</button></div>
             <div id="rpWordStatus" class="rp-r-status" role="status" aria-live="polite" data-i18n-ignore></div>
+            <!-- Share link: where the file goes and who can read it, then the link once OneDrive has it. -->
+            <div id="rpShare" class="rp-share" data-i18n-ignore hidden></div>
           </article>
           <article class="rp-result" id="rpTest" aria-labelledby="rpTestTitle">
             <div class="rp-r-head">
