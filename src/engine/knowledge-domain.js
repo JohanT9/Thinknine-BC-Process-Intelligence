@@ -61,10 +61,17 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
     // A page ID that is not confirmed by the page's address can belong to the page the user came
     // from. When the page Business Central showed is known as a page for another kind of record,
     // such as Inköpsorder with the ID of the Customers page, the shown page is right.
-    const shownEntity = captionEntity(task.pageCaption, language, packs);
+    // The page's name without the browser title after it ("Inköpsorder - Dynamics 365 Business
+    // Central") or the list view after it ("Inköpsorder: Alla").
+    const shownPage = text(clientCaptions?.pageName?.(text(task.pageCaption)) ?? task.pageCaption);
+    const shownEntity = captionEntity(shownPage, language, packs) ||
+      captionEntity(shownPage.replace(/\s*:\s*[^:]+$/u, ""), language, packs);
     if (shownEntity && definition.entity && shownEntity !== text(definition.entity).toLowerCase()) {
       const entity = Object.keys(createdEntityNames).find(id => id.toLowerCase() === shownEntity);
-      return entity && !task.entity ? { ...task, entity } : task;
+      // A record type that came from the same page number is replaced too.
+      const fromPageNumber = !task.entity ||
+        text(task.entity).toLowerCase() === text(definition.entity).toLowerCase();
+      return entity && fromPageNumber ? { ...task, entity } : task;
     }
     const definitions = packs.flatMap(pack => pack.pageDefinitions || [])
       .filter(item => String(item.pageObjectId || "") === String(pageObjectId) &&

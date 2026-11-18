@@ -22,20 +22,33 @@
   });
   let table = null;
   let localeIndex = new Map();
+  // The rows of a field's or action's AL name on any page ("f|Direct Unit Cost"), for a control on
+  // a page the table does not have, such as a partner app's dialog showing a standard field.
+  let byName = new Map();
 
   function load(data) {
     if (!data || data.schema !== 1 || !Array.isArray(data.locales) || !Array.isArray(data.rows) ||
         !data.keys || typeof data.keys !== "object") {
-      table = null; localeIndex = new Map();
+      table = null; localeIndex = new Map(); byName = new Map();
       return false;
     }
     table = data;
     localeIndex = new Map(data.locales.map((locale, index) => [locale, index]));
+    byName = new Map();
+    for (const [key, row] of Object.entries(data.keys)) {
+      const match = /^([fa])\|[^|]*\|(.+)$/u.exec(key);
+      if (!match) continue;
+      const name = `${match[1]}|${match[2]}`;
+      if (!byName.has(name)) byName.set(name, new Set());
+      byName.get(name).add(row);
+    }
     return true;
   }
 
   const loaded = () => Boolean(table);
-  const comparable = value => String(value ?? "").replace(/\s+/gu, " ").trim().toLocaleLowerCase();
+  // Captions are compared as Business Central shows them, letter case included: the record type
+  // inköpsorder in a sentence is not the page Inköpsorder.
+  const comparable = value => String(value ?? "").replace(/\s+/gu, " ").trim();
 
   // The AL identity of a recorded event as caption keys: the page the control is on (the
   // innermost page of its path), and the field or action.
@@ -45,8 +58,14 @@
       .find(value => typeof value === "string" && value && !value.startsWith("lookup:"));
     if (!page) return {};
     const result = { page: `p|${page}` };
-    if (identity.kind === "field" && identity.field) result.field = `f|${page}|${identity.field}`;
-    if (identity.kind === "action" && identity.action) result.action = `a|${page}|${identity.action}`;
+    // A field: focused or changed, its lookup button, or a row of its lines.
+    if (["field", "control", "row"].includes(identity.kind) && identity.field) {
+      result.field = `f|${page}|${identity.field}`;
+    }
+    // An action, or a group of actions such as a promoted category or a menu.
+    if (["action", "menu"].includes(identity.kind) && identity.action) {
+      result.action = `a|${page}|${identity.action}`;
+    }
     // New is the client's own action on every page (Control_New, or a system action).
     if (["action", "system"].includes(identity.kind) && CLIENT_ACTIONS[identity.operation]) {
       result.action = `c|${identity.operation}`;
@@ -58,12 +77,20 @@
   // last action named, and the page of the last of them.
   function keysFromEvents(events = []) {
     const result = {};
+    const actions = [];
     for (const event of events) {
-      const keys = keysFromIdentity(event?.alIdentity || event?.raw?.alIdentity);
+      const identity = event?.alIdentity || event?.raw?.alIdentity;
+      const keys = keysFromIdentity(identity);
+      // A value chosen in a field's lookup list ("lookup:Buy-from Vendor No.") is that field's, on
+      // the page the field is on.
+      const lookup = Array.isArray(identity?.path) && /^lookup:(.+)$/u.exec(identity.path[0]?.page || "");
+      if (lookup && result.page) result.field = `f|${result.page.slice(2)}|${lookup[1]}`;
       if (keys.field) result.field = keys.field;
-      if (keys.action) result.action = keys.action;
+      if (keys.action) { result.action = keys.action; if (!actions.includes(keys.action)) actions.push(keys.action); }
       if (keys.page) result.page = keys.page;
     }
+    // Every action of a step that went through a menu (Line, then Manual Price).
+    if (actions.length > 1) result.actions = actions;
     return result;
   }
 
@@ -79,10 +106,20 @@
         ? client[locale] : text;
     }
     if (!table) return text;
-    const row = table.rows[table.keys[key]];
     const target = localeIndex.get(locale);
-    if (!row || target === undefined || !row[target]) return text;
-    return row.some(caption => caption && comparable(caption) === wanted) ? row[target] : text;
+    if (target === undefined) return text;
+    const known = table.keys[key];
+    if (known !== undefined) {
+      const row = table.rows[known];
+      return row[target] && row.some(caption => caption && comparable(caption) === wanted) ? row[target] : text;
+    }
+    // A control the table does not have on this page: the same AL name on Microsoft's pages, when
+    // every one of them that shows this caption names it the same way in the language.
+    const name = /^([fa])\|[^|]*\|(.+)$/u.exec(key);
+    const rows = name ? [...(byName.get(`${name[1]}|${name[2]}`) || [])].map(index => table.rows[index])
+      .filter(row => row[target] && row.some(caption => caption && comparable(caption) === wanted)) : [];
+    const targets = new Set(rows.map(row => row[target]));
+    return targets.size === 1 ? [...targets][0] : text;
   }
 
   // A described step (engine/step-text.js) with its captions in the language. Only the slots

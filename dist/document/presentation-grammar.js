@@ -192,6 +192,12 @@
             quoted(result), run("."));
       }
     }
+    // A selection rule's own Swedish word for the field (engine: targetField "Artikelnummer") is
+    // not what Business Central showed: the label in the document's language names the field.
+    const ruleWords = { SelectItem: "Artikelnummer", SelectCustomer: "Kund", SelectVendor: "Leverantör" };
+    if (field && ruleWords[actionType] === field && locale !== "sv-SE") {
+      return structuredPresentation({ ...action, targetField: "", fieldCaption: "" }, documentLanguage);
+    }
     if (selectLabels[actionType] && value && String(action?.typedValue || "").trim()) {
       return enterAndChoose(String(action.typedValue).trim(), field || selectLabels[actionType]);
     }
@@ -241,14 +247,20 @@
   function describedSentence(step, documentLanguage) {
     const action = step.semanticAction || step.interaction?.semanticActionModel;
     if (!stepText || !action) return null;
-    // A step saved before steps were described is read from its sentence.
-    const descriptor = action.stepText || stepText.LOCALES.map(locale =>
-      stepText.parse(action.displayText, locale)).find(Boolean);
-    if (!descriptor) return null;
     const instruction = String(step.interaction?.instruction ?? action.displayText ?? "").trim()
       .replace(/\.\*\*\.$/u, ".**");
-    if (!instruction || !stepText.LOCALES.some(locale =>
-      stepText.markdown(descriptor, locale) === instruction)) return null;
+    if (!instruction) return null;
+    // The step's description, or, for a step saved before steps were described or whose saved
+    // description no longer matches its sentence, the sentence itself read in any language.
+    const parsed = text => stepText.LOCALES.map(locale => stepText.parse(text, locale)).find(Boolean);
+    // Review saves a sentence with its captions in quotation marks and its values unmarked
+    // (Välj "Ny"), the step's own text marks them (Välj **Ny**): the words are compared.
+    const plain = text => String(text ?? "").replace(/\*\*|__|["“”]/gu, "").replace(/\s+/gu, " ").trim();
+    const shown = plain(instruction);
+    const descriptor = [action.stepText, parsed(instruction), parsed(action.displayText)]
+      .find(candidate => candidate && stepText.LOCALES.some(locale =>
+        plain(stepText.markdown(candidate, locale)) === shown));
+    if (!descriptor) return null;
     const rendered = stepText.render(descriptor, documentLanguage);
     if (!rendered) return null;
     return sentence(rendered.runs.map(item => item.role === "interface"
@@ -261,7 +273,8 @@
   // values, records and captions the step does not know stay as recorded.
   function translateCaptions(paragraph, captionKeys, documentLanguage) {
     if (!captionTranslation || !captionKeys || !Array.isArray(paragraph.presentationRuns)) return;
-    const keys = [captionKeys.field, captionKeys.action, captionKeys.page].filter(Boolean);
+    const keys = [captionKeys.field, ...(Array.isArray(captionKeys.actions) ? captionKeys.actions : []),
+      captionKeys.action, captionKeys.page].filter(Boolean);
     if (!keys.length) return;
     let changed = false;
     const runs = paragraph.presentationRuns.map(item => {

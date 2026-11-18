@@ -220,3 +220,39 @@ Tilldelningen skickar redan ett e-postmeddelande när testerna delas ut, men det
 
 - Ska påminnelser kunna schemaläggas (till exempel ett datum då sviten ska vara klar), eller räcker en knapp?
 - Ska sviten få ett slutdatum som syns för den som testar och i påminnelsen?
+
+## Skärmbilder på dokumentspråket
+
+*Sparad 2026-11-18.*
+
+### Vad användaren ska kunna
+
+När dokumentspråket byts, till exempel från svenska till engelska, ska även skärmbilderna kunna visa Business Central på det nya språket, utan att processen spelas in igen för hand.
+
+### Varför
+
+Sedan 4.7.268 följer stegens text och Business Centrals namn dokumentspråket, men skärmbilderna visar fortfarande sidorna på inspelningsspråket. Ett engelskt dokument med svenska bilder ser halvfärdigt ut för den som ska läsa det.
+
+### Vad som finns att bygga på
+
+- Export som Page Scripting-fil (4.7.258).
+- Testkörning med skärmbilder vid uppspelning steg för steg med ▷| (4.7.263), och matchning av uppspelade steg mot dokumentets steg.
+- Byte av skärmbild per steg i granskningen.
+
+### Möjlig utformning
+
+1. Exportera dokumentet som Page Scripting-fil.
+2. Byt språk i Business Central (Mina inställningar → Språk).
+3. Spela upp skriptet som ett test steg för steg, så att varje steg får en ny bild på det nya språket.
+4. En ny åtgärd, till exempel **Använd skärmbilderna från testkörningen för English**, lägger bilderna i dokumentet för det språket och behåller originalen, så att man kan växla tillbaka. Markeringar flyttas med där fältet går att hitta igen.
+
+### Principer
+
+- Bilderna är bevis på vad Business Central visade. Text i befintliga bilder ändras aldrig med bildbehandling.
+- Originalbilderna och inspelningen behålls alltid.
+- Steg som inte kunde spelas upp, till exempel partnerdialoger, behåller sin bild och märks.
+
+### Öppna frågor
+
+- Uppspelningen skapar riktiga poster. Ska funktionen varna och föreslå en sandbox eller testmiljö?
+- Ska dokumentet kunna ha bilder för flera språk samtidigt och välja bilder efter dokumentspråket?
