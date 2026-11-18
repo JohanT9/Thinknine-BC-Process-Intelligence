@@ -51,9 +51,11 @@ function readXliff(text, useSource) {
     const hint = /LookupHint=([^)]*)\)/u.exec(body)?.[1] ??
       /<note from="Xliff Generator"[^>]*>([^<]+)<\/note>/u.exec(body)?.[1];
     if (!hint || !/ - Property (?:Caption)$/u.test(hint)) continue;
+    // The hint is escaped like the rest of the file ("Action &amp;Line").
+    const name = decode(hint);
     const value = useSource ? /<source>([\s\S]*?)<\/source>/u.exec(body)?.[1]
       : /<target[^>]*>([\s\S]*?)<\/target>/u.exec(body)?.[1];
-    if (value !== undefined) result.set(hint, shown(decode(value)));
+    if (value !== undefined) result.set(name, shown(decode(value)));
   }
   return result;
 }
@@ -88,7 +90,9 @@ function readSource(files) {
       entry.fields.set(control, match[2].trim());
       entry.owners.set(`Control ${control}`, owner);
     }
-    const action = new RegExp(String.raw`\baction\s*\(\s*${NAME}\s*\)\s*$`, "gimu");
+    // Actions and action groups (a promoted category such as Release, a menu such as Line): the
+    // translation file names both as actions. Layout groups have no action captions.
+    const action = new RegExp(String.raw`\b(?:action|group)\s*\(\s*${NAME}\s*\)\s*$`, "gimu");
     while ((match = action.exec(source))) {
       const name = unquote(match[1]);
       entry.actions.add(name);

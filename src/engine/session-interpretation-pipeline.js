@@ -257,6 +257,14 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis, captionTra
     // The AL identity of the field, action and page, so a document in another language can name
     // them as Business Central does in that language (document/bc-caption-translation.js).
     const captionKeys = captionTranslation?.keysFromEvents(sourceEvents) || {};
+    // A page found by searching names no control: it is the page that opens next.
+    if (captionTranslation && !captionKeys.page && action.stepText?.kind === "searchOpenList") {
+      const last = Math.max(0, ...sourceEvents.map(event => Number(event.eventNo) || 0));
+      const opened = [...eventsById.values()].find(event => Number(event.eventNo) > last &&
+        captionTranslation.keysFromIdentity(event.alIdentity || event.raw?.alIdentity).page);
+      const page = opened && captionTranslation.keysFromIdentity(opened.alIdentity || opened.raw?.alIdentity).page;
+      if (page) captionKeys.page = page;
+    }
     const model = Object.keys(captionKeys).length ? { ...action, captionKeys } : action;
     return { taskId: `${action.actionType || "Task"}:${refs.stableIdentity(trace)}`,
       taskNo: index + 1, taskType: action.actionType || "Unclassified",

@@ -177,4 +177,69 @@ for (const { locale } of languages.supported("ui")) {
   assert.match(ui.format("languageSwitch.older", { n: 3 }, locale), /3/u);
 }
 
+// A step whose saved description no longer matches its sentence is read from the sentence, so it
+// is written in the document language like every other step.
+const savedSentence = "Börja skapa en ny **kund** genom att välja **Ny** på sidan **Inköpsorder**.";
+const mismatched = grammar.process({ schemaVersion: 1, documentId: "mismatch",
+  metadata: { title: "Mismatch", documentLanguage: "en-US" }, sections: [{ sectionId: "workflow",
+    kind: "workflow", title: "Workflow", blocks: [{ blockId: "step:2", kind: "step", stepNumber: 2,
+      interaction: { taskId: "mismatch", instruction: savedSentence, semanticActionModel: {
+        actionType: "CreateNewRecord", displayText: savedSentence,
+        stepText: { kind: "create", entity: "PurchaseOrder", action: "Ny", page: "Inköpsorder" } } },
+      blocks: [{ blockId: "block:instruction:mismatch:1", kind: "paragraph", text: savedSentence }] }] }] })
+  .sections[0].blocks[0].blocks[0];
+assert.strictEqual(mismatched.text, "Start creating a new customer by selecting Ny on the Inköpsorder page.");
+
+// Captions are compared with their letter case: the record type inköpsorder is not the page.
+assert.strictEqual(translation.translate("inköpsorder", "p|Purchase Order List", "en-US"), "inköpsorder");
+assert.strictEqual(translation.translate("Inköpsorder", "p|Purchase Order List", "en-US"), "Purchase Orders");
+// Action groups: a promoted category (Släpp) and a menu (Rad).
+assert.strictEqual(translation.translate("Släpp", "a|Purchase Order|Category_Category5", "en-US"), "Release");
+assert.strictEqual(translation.translate("Rad", "a|Purchase Order Subform|&Line", "de-DE"), "Zeile");
+// A standard field on a page the table does not have, such as a partner app's dialog.
+assert.strictEqual(translation.translate("Direkt styckkostnad", "f|ChangeApplPurchDirUnitCostFDW|Direct Unit Cost",
+  "en-US"), "Direct Unit Cost");
+assert.strictEqual(translation.translate("Något annat", "f|ChangeApplPurchDirUnitCostFDW|Direct Unit Cost",
+  "en-US"), "Något annat");
+assert.strictEqual(translation.translate("Tillämpat inköpspris och rabatt",
+  "a|Purchase Order Subform|AppliedPurchasePriceAndDiscountFDW", "en-US"), "Tillämpat inköpspris och rabatt");
+// The field of a lookup button, a value chosen in its lookup list, a row of lines and a menu.
+assert.deepStrictEqual(translation.keysFromEvents([
+  { alIdentity: { kind: "control", path: [{ page: "Purchase Order" }], field: "Buy-from Vendor No." } },
+  { alIdentity: { kind: "row", path: [{ page: "lookup:Buy-from Vendor No." }, { repeater: "repeater" }] } }
+]), { page: "p|Purchase Order", field: "f|Purchase Order|Buy-from Vendor No." });
+assert.deepStrictEqual(translation.keysFromEvents([
+  { alIdentity: { kind: "row", path: [{ page: "Purchase Order" }, { part: "PurchLines", page: "Purchase Order Subform" }],
+    field: "No." } }]), { page: "p|Purchase Order Subform", field: "f|Purchase Order Subform|No." });
+assert.deepStrictEqual(translation.keysFromEvents([
+  { alIdentity: { kind: "menu", path: [{ page: "Purchase Order Subform" }], action: "&Line" } },
+  { alIdentity: { kind: "action", path: [{ page: "Purchase Order Subform" }], action: "Reserve" } }
+]).actions, ["a|Purchase Order Subform|&Line", "a|Purchase Order Subform|Reserve"]);
+
+// A sentence that Review saved with its captions in quotation marks is written in the document
+// language like the step's own text, and Business Central's names follow.
+const quotedSentence = "Börja skapa en ny \"inköpsorder\" genom att välja \"Ny\" på sidan \"Inköpsorder\".";
+const quotedStep = grammar.process({ schemaVersion: 1, documentId: "quoted",
+  metadata: { title: "Quoted", documentLanguage: "en-US" }, sections: [{ sectionId: "workflow",
+    kind: "workflow", title: "Workflow", blocks: [{ blockId: "step:2", kind: "step", stepNumber: 2,
+      interaction: { taskId: "quoted", instruction: quotedSentence, semanticActionModel: {
+        actionType: "CreateNewRecord", displayText: "Börja skapa en ny **inköpsorder** genom att välja **Ny** på sidan **Inköpsorder**.",
+        stepText: { kind: "create", entity: "PurchaseOrder", action: "Ny", page: "Inköpsorder" },
+        captionKeys: { action: "c|New", page: "p|Purchase Order List" } } },
+      blocks: [{ blockId: "block:instruction:quoted:1", kind: "paragraph", text: quotedSentence }] }] }] })
+  .sections[0].blocks[0].blocks[0];
+assert.strictEqual(quotedStep.text, "Start creating a new purchase order by selecting New on the Purchase Orders page.");
+
+// A selection rule's own Swedish word for the field is not Business Central's: the document
+// language's label names it.
+const itemStep = grammar.process({ schemaVersion: 1, documentId: "item",
+  metadata: { title: "Item", documentLanguage: "en-US" }, sections: [{ sectionId: "workflow",
+    kind: "workflow", title: "Workflow", blocks: [{ blockId: "step:4", kind: "step", stepNumber: 4,
+      interaction: { taskId: "item", instruction: "Välj artikel \"21036\".", semanticActionModel: {
+        actionType: "SelectItem", displayText: "Välj artikel **21036**.", targetField: "Artikelnummer",
+        selectedValue: "21036" } },
+      blocks: [{ blockId: "block:instruction:item:1", kind: "paragraph", text: "Välj artikel \"21036\"." }] }] }] })
+  .sections[0].blocks[0].blocks[0];
+assert.strictEqual(itemStep.text, "Choose Item No. 21036.");
+
 console.log("Business Central caption translation tests passed");

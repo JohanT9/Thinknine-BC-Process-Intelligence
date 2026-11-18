@@ -105,8 +105,15 @@ Central shows them in that language, such as Kreditorennr. for Leverantörsnr.
   To update it, download the eight packages (us, se, fr, de, es, dk, fi, no)
   into a folder outside the repository and run
   `node scripts/build-bc-captions.js <folder>`. The packages are not committed.
+- Action groups (a promoted category such as Release, a menu such as Line)
+  are in the table as actions. A field is taken from the field itself, its
+  lookup button, a value chosen in its lookup list or a row of its lines; a
+  page found by searching is the page that opens next.
 - `src/document/bc-caption-translation.js` replaces a recorded caption only
-  when it is that exact control's caption in one of the languages. A
+  when it is that exact control's caption in one of the languages, letter case
+  included. A field or action on a page the table does not have, such as a
+  partner app's dialog showing a standard field, is translated by its AL name
+  when every Microsoft page with that name and caption agrees. A
   personalized caption, a caption changed by an extension and anything the
   table does not know keep what Business Central showed. Text the user wrote is
   never changed.

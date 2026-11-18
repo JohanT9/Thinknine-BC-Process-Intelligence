@@ -35,6 +35,11 @@
     if (!text(raw.pageId)) return null;
     const legacyPageId = normalizeNumericId(raw.pageId);
     if (!legacyPageId) return null;
+    // The address of the window shows the page the user sees. Business Central's inner frame keeps
+    // the address it was opened with (page=21 while the window shows page=9307), so a page number
+    // that only the frame confirms is not the page's when the window names another page.
+    const shownId = routePageObjectId(raw.topUrl);
+    if (shownId && shownId !== legacyPageId) return null;
     for (const url of [raw.frameUrl, raw.topUrl]) {
       const routeId = routePageObjectId(url);
       if (routeId === legacyPageId) return routeId;
