@@ -98,7 +98,7 @@ The phase 4 AI fallback and confidence limits are described in
 [`KNOWLEDGE_AI_FALLBACK.md`](KNOWLEDGE_AI_FALLBACK.md). It follows the local
 resolver, requires explicit consent, and returns only unselected suggestions.
 
-The phase 5 local learning proposal contract is described in
-[`KNOWLEDGE_FEEDBACK_LEARNING.md`](KNOWLEDGE_FEEDBACK_LEARNING.md). Proposals are
-derived from active review history and remain separate from downloadable aggregate
-improvement data and active knowledge releases.
+Phase 5, local knowledge-rule proposals derived from review history, was removed
+after 4.7.270. Review offers no way to change a step's classification, so the only
+signal it received was merged steps, which produced no useful rules. Knowledge rules
+are added to the packs directly.

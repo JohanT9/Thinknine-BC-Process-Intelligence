@@ -32,7 +32,7 @@ assert.strictEqual(changed.storage.get("t9.appearance"), "system");
 assert.strictEqual(changed.attributes["data-theme"], undefined);
 
 // Every page applies the appearance before painting and loads the colour variables.
-const pages = ["dashboard", "popup", "technical-report", "license-status", "knowledge-admin", "debug"];
+const pages = ["dashboard", "popup", "technical-report", "license-status", "debug"];
 for (const page of pages) {
   const html = read(`src/ui/${page}.html`);
   assert.match(html, /<meta charset="utf-8">\s*<script src="appearance\.js"><\/script>\s*<link rel="stylesheet" href="theme\.css">/u,

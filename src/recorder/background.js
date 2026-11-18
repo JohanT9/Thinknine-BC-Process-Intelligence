@@ -88,7 +88,6 @@ importScripts("document/test-history.js");
 importScripts("document/test-suite.js");
 importScripts("document/page-script-export.js");
 importScripts("review/process-improvement-dataset.js");
-importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
 
 const VERSION = chrome.runtime.getManifest().version;
@@ -162,34 +161,6 @@ const pageKnowledgePacksReady = globalThis.BCKnowledgeRepository.load({
     code: "knowledge-release-load-failed"
   }] } };
 });
-async function validateKnowledgeDraft(draft) {
-  const { snapshot } = await pageKnowledgePacksReady;
-  if (!snapshot) return { status: "unavailable", releaseId: null,
-    diagnostics: [{ code: "knowledge-release-unavailable", severity: "error" }] };
-  try {
-  if (typeof draft?.targetPackId !== "string" ||
-      !/^[a-z0-9][a-z0-9._-]*$/.test(draft.targetPackId)) {
-    return { status: "blocked", releaseId: snapshot.release.releaseId,
-      diagnostics: [{ code: "knowledge-target-pack-required", severity: "error" }] };
-  }
-  const packs = snapshot.packs.map(pack => JSON.parse(JSON.stringify(pack)));
-  const target = packs.find(pack => pack.packId === draft.targetPackId);
-  if (!target) return { status: "blocked", releaseId: snapshot.release.releaseId,
-    diagnostics: [{ code: "knowledge-target-pack-unavailable", severity: "error" }] };
-  target.rules.push(JSON.parse(JSON.stringify(draft.rule)));
-  const result = globalThis.BCKnowledgeRepository.importRelease(snapshot.manifest,
-    packs.map(pack => ({ packId: pack.packId, pack })));
-  const diagnostics = result.diagnostics.map(item => ({ code: item.code,
-    severity: item.severity, subjectRef: item.subjectRef }));
-  const hasErrors = diagnostics.some(item => item.severity === "error");
-  const hasWarnings = diagnostics.some(item => item.severity === "warning");
-  return { status: hasErrors ? "blocked" : hasWarnings ? "warnings" : "valid",
-    releaseId: snapshot.release.releaseId, diagnostics };
-  } catch {
-    return { status: "blocked", releaseId: snapshot.release.releaseId,
-      diagnostics: [{ code: "knowledge-candidate-invalid", severity: "error" }] };
-  }
-}
 const DEFAULT_SETTINGS = {
   uiLocale: "sv-SE",
   documentLanguage: "sv-SE",
@@ -282,8 +253,7 @@ const reviewProgressStore = globalThis.T9ReviewProgressStore.create({
   isVisible: (task, review) => globalThis.T9ReviewTaskVisibility.isVisible(task, review)
 });
 const processImprovement = globalThis.T9ProcessImprovementService.create({
-  storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX,
-  validateDraft: validateKnowledgeDraft
+  storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX
 });
 const DEBUG_KEY = "t9_debug";
 
@@ -3805,53 +3775,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         const result = await processImprovement.read();
         sendResponse({ ok: true, ...result });
-        break;
-      }
-
-      case "T9_GET_KNOWLEDGE_ADMIN_ACCESS": {
-        if (sender.url !== chrome.runtime.getURL("popup.html")) {
-          sendResponse({ ok: false, reason: "invalid-admin-access-check-origin" });
-          break;
-        }
-        const authorized = await consultantLicense.hasApplicationAdminRole();
-        sendResponse({ ok: true, authorized });
-        break;
-      }
-
-      case "T9_GET_KNOWLEDGE_ADMIN_DATA": {
-        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
-            !(await consultantLicense.hasApplicationAdminRole())) {
-          sendResponse({ ok: false, reason: "application-admin-role-required" });
-          break;
-        }
-        const knowledgeReady = await pageKnowledgePacksReady;
-        const result = await processImprovement.read({ includeKnowledgeFeedback: true,
-          knowledgePacks: knowledgeReady.packs });
-        sendResponse({ ok: true, ...result });
-        break;
-      }
-
-      case "T9_CREATE_KNOWLEDGE_RULE_DRAFT": {
-        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
-            !(await consultantLicense.hasApplicationAdminRole())) {
-          sendResponse({ ok: false, reason: "application-admin-role-required" });
-          break;
-        }
-        const result = await processImprovement.createDraft(message.proposalId,
-          message.targetPackId);
-        sendResponse(result);
-        break;
-      }
-
-      case "T9_SET_KNOWLEDGE_DRAFT_TARGET": {
-        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
-            !(await consultantLicense.hasApplicationAdminRole())) {
-          sendResponse({ ok: false, reason: "application-admin-role-required" });
-          break;
-        }
-        const result = await processImprovement.setDraftTarget(message.draftId,
-          message.targetPackId);
-        sendResponse(result);
         break;
       }
 
