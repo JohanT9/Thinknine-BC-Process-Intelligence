@@ -3480,7 +3480,8 @@ async function prepareDocumentMedia(pipeline) {
   );
 }
 
-async function exportLibraryDocument(record, exportSettings) {
+// The Word file of a document in the library, as Exportera Word makes it, without opening it.
+async function buildLibraryDocumentWord(record, exportSettings) {
   const session = documentLibrarySessions.get(record.projectId);
   if (!session || session.status === "recording") {
     throw new Error(uiTf("Dokumentet \"{title}\" kan inte exporteras.", { title: record.title }));
@@ -3522,6 +3523,11 @@ async function exportLibraryDocument(record, exportSettings) {
   const filename = globalThis.T9Engine.exportSettings.buildFileName(
     "docx", model.response.session, exportSettings
   );
+  return { result, filename, revision: review.updatedAt || "" };
+}
+
+async function exportLibraryDocument(record, exportSettings) {
+  const { result, filename } = await buildLibraryDocumentWord(record, exportSettings);
   const downloadId = await downloadBlob(result.blob, filename);
   return { ...result, downloadId, fileName: filename };
 }
@@ -3570,7 +3576,8 @@ async function createTestRun(record, options = {}) {
   return response.run;
 }
 
-async function exportActiveReviewToWord() {
+// The Word file of the open document, as Exportera Word downloads it and Dela länk shares it.
+async function buildActiveReviewWord() {
   if (!activeReviewSession || !activeReview) {
     throw new Error(uiT("Ingen granskning är öppen."));
   }
@@ -3612,7 +3619,11 @@ async function exportActiveReviewToWord() {
     activeReviewModel.response.session,
     exportSettings
   );
+  return { result, filename };
+}
 
+async function exportActiveReviewToWord() {
+  const { result, filename } = await buildActiveReviewWord();
   await downloadBlob(result.blob, filename);
 
   show(
@@ -3898,6 +3909,8 @@ function renderDocumentLibrary() {
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
     templateLabel: libraryCardTemplate,
     testMarker: libraryCardTest,
+    shareMarker: libraryCardShare,
+    shareLabel: uiT("share.action"),
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
     pageScriptLabel: uiT("pageScript.exportAction"),
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
@@ -3976,10 +3989,12 @@ function renderLibraryBatchToolbar(message = "") {
   $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
   $("libraryBatchMove").hidden = !documentFoldersEditable;
   for (const id of ["libraryBatchExport", "libraryBatchSuite", "libraryBatchAddSuite", "libraryBatchArchive", "libraryBatchMove",
-    "libraryBatchTags", "libraryBatchTheme",
     "libraryBatchMetadata", "libraryBatchDelete"]) {
     $(id).disabled = count === 0;
   }
+  // When every marked document is archived, the same button takes them out of the archive.
+  $("libraryBatchArchive").textContent = uiT(libraryBatchRestores()
+    ? "library.batchRestore" : "Arkivera");
   $("libraryBatchCount").textContent = count === 1
     ? uiT("library.oneSelected")
     : uiTf("library.manySelected", { count });
@@ -6827,6 +6842,11 @@ async function updateDocumentLibraryRecord(projectId, patch, options = {}) {
   }
 }
 
+function libraryBatchRestores() {
+  const records = selectedLibraryRecords();
+  return records.length > 0 && records.every(record => record.archived);
+}
+
 function selectedLibraryRecords() {
   return globalThis.T9DocumentBatchOperations.selected(
     documentLibraryRecords, documentLibrarySelection
@@ -6865,50 +6885,74 @@ function allDocumentTemplates() {
     globalThis.T9DocumentTemplate.builtIn(item.templateId)), ...documentTemplates];
 }
 
+// The template choice starts with "Keep current template", so opening the dialog and
+// applying something else never changes the documents' templates by accident.
 function populateBatchMetadataOptions() {
   const select = $("libraryBatchThemeValue");
-  const selected = select.value || defaultDocumentTemplateId;
-  select.innerHTML = allDocumentTemplates().map(template =>
-    `<option value="${escapeHtml(template.templateId)}">` +
-      `${escapeHtml(documentTemplateName(template))}</option>`
-  ).join("");
+  const selected = select.value;
+  select.innerHTML = `<option value="">${escapeHtml(uiT("library.batchKeepTemplate"))}</option>` +
+    allDocumentTemplates().map(template =>
+      `<option value="${escapeHtml(template.templateId)}">` +
+        `${escapeHtml(documentTemplateName(template))}</option>`
+    ).join("");
   select.value = allDocumentTemplates().some(template => template.templateId === selected)
-    ? selected : defaultDocumentTemplateId;
+    ? selected : "";
 }
 
-function openBatchMetadataDialog(mode = "metadata") {
+// One dialog changes tags, template and author for every marked document. Only what the
+// user fills in or ticks changes; tags are added and removed, never replaced wholesale.
+function openBatchMetadataDialog() {
   const count = documentLibrarySelection.selectedIds.length;
   if (!count) return;
-  for (const id of ["Tags", "Theme", "Author", "Status", "Archived"]) {
-    $("libraryBatchUse" + id).checked = false;
-  }
-  const modeField = { tags: "Tags", theme: "Theme" }[mode];
-  if (modeField) $("libraryBatchUse" + modeField).checked = true;
+  populateBatchMetadataOptions();
+  $("libraryBatchAddTagsValue").value = "";
+  $("libraryBatchThemeValue").value = "";
+  $("libraryBatchAuthorValue").value = "";
+  const tags = globalThis.T9DocumentBatchOperations.selectedTags(
+    documentLibraryRecords, documentLibrarySelection);
+  const list = $("libraryBatchRemoveTagsList");
+  list.replaceChildren(...tags.map(({ tag, count: used }) => {
+    const label = document.createElement("label");
+    label.className = "library-batch-tag";
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.value = tag;
+    const name = document.createElement("span");
+    name.textContent = tag;
+    label.append(box, name);
+    if (count > 1) {
+      const usage = document.createElement("small");
+      usage.className = "muted";
+      usage.textContent = uiTf("library.batchTagUsage", { count: used, total: count });
+      label.append(usage);
+    }
+    return label;
+  }));
+  list.hidden = tags.length === 0;
+  $("libraryBatchNoTags").hidden = tags.length > 0;
   $("libraryBatchMetadataDescription").textContent =
-    uiTf("Endast markerade fält ändras för {count} dokument.", { count });
+    uiTf("library.batchEditDescription", { count });
   $("libraryBatchMetadataDialog").returnValue = "";
   $("libraryBatchMetadataDialog").showModal();
-  $(modeField ? "libraryBatch" + modeField + "Value" :
-    "libraryBatchUseTags").focus();
+  $("libraryBatchAddTagsValue").focus();
 }
 
 function batchMetadataOperation() {
   const themeSelect = $("libraryBatchThemeValue");
+  const author = $("libraryBatchAuthorValue").value.trim();
   return {
     type: "metadata",
     fields: {
-      tags: { selected: $("libraryBatchUseTags").checked,
-        value: $("libraryBatchTagsValue").value.split(",")
+      addTags: { selected: true,
+        value: $("libraryBatchAddTagsValue").value.split(",")
           .map(value => value.trim()).filter(Boolean) },
-      theme: { selected: $("libraryBatchUseTheme").checked,
+      removeTags: { selected: true,
+        value: [...$("libraryBatchRemoveTagsList")
+          .querySelectorAll("input[type=checkbox]:checked")].map(box => box.value) },
+      theme: { selected: Boolean(themeSelect.value),
         value: { themeId: themeSelect.value,
           displayName: themeSelect.selectedOptions[0]?.textContent || "" } },
-      author: { selected: $("libraryBatchUseAuthor").checked,
-        value: $("libraryBatchAuthorValue").value.trim() },
-      status: { selected: $("libraryBatchUseStatus").checked,
-        value: $("libraryBatchStatusValue").value.trim() },
-      archived: { selected: $("libraryBatchUseArchived").checked,
-        value: $("libraryBatchArchivedValue").value === "true" }
+      author: { selected: Boolean(author), value: author }
     }
   };
 }
@@ -8350,6 +8394,7 @@ function applyReviewToolbarState() {
     canExport: activeReview && activeReviewSession && activeReviewModel
   });
   globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
+  renderDocumentShareButton();
   const selectionBar = $("reviewSelectionActions");
   const selectedCount = activeReviewSelection.selectedIds.filter(id => reviewTaskIds().includes(id)).length;
   if (selectedCount <= 1 && !selectionBar.hidden &&
@@ -8418,6 +8463,246 @@ $("documentCheckNext").addEventListener("click", async () => {
 $("documentExportWord").addEventListener("click", event => {
   exportReviewFromToolbar(event.currentTarget);
 });
+
+// Dela länk: the Word file in the user's own OneDrive with a view-only link for people in the
+// organization (document/onedrive-share.js). It starts from the review toolbar, from a document
+// in the library and from the recording panel's done view. The dialog says where the file goes
+// and who can read it before anything is sent, and says the link is copied only once OneDrive
+// has confirmed the upload and the link.
+const documentShare = (() => {
+  const GRAPH = { origins: ["https://graph.microsoft.com/*"] };
+  const KEY = globalThis.T9StorageKeys.DOCUMENT_SHARES_KEY;
+  const dialog = $("documentShareDialog");
+  let shareClient = null;
+  let authClient = null;
+  let working = false;
+  let current = null;
+  let owner = "";
+  // The document the dialog is for: { projectId, changedAt(), build() }.
+  let target = null;
+  let opener = null;
+  async function account() {
+    try {
+      const status = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" });
+      return status?.signedIn ? status.profile || {} : {};
+    } catch { return {}; }
+  }
+  async function accountOwner() {
+    const profile = await account();
+    return `${profile.tenantId || ""}:${profile.objectId || ""}`;
+  }
+  // The Microsoft sign-in of the Outlook email, with its own permission for files.
+  const auth = () => authClient ||= globalThis.T9OutlookDraft.create({
+    identity: chrome.identity, sessionStorage: chrome.storage.session, fetcher: fetch,
+    getAccount: account, clientId: globalThis.T9TenantLicenseConfig.consultant.clientId });
+  const client = () => shareClient ||= globalThis.T9OneDriveShare.create({
+    authenticate: scope => auth().authorize(scope), fetcher: fetch });
+  async function shares() {
+    try { return (await chrome.storage.local.get(KEY))[KEY] || {}; } catch { return {}; }
+  }
+  async function keep(id, value) {
+    const all = await shares();
+    if (value) all[id] = value; else delete all[id];
+    await chrome.storage.local.set({ [KEY]: all });
+  }
+  const errorText = code => uiT(({ consent: "share.errorConsent", denied: "share.errorDenied",
+    policy: "share.errorPolicy", quota: "share.errorQuota", size: "share.errorSize",
+    network: "share.errorNetwork", busyService: "share.errorNetwork",
+    permission: "share.errorPermission" })[code] || "share.errorFailed");
+  // A failure in the interface language: what went wrong with OneDrive, or why the Word file
+  // could not be made.
+  const failureText = error => {
+    const code = error?.shareCode || error?.outlookCode;
+    return code ? errorText(code) : uiTf("share.errorWord", { error: error?.message || String(error) });
+  };
+  const progressText = step => uiT({ creating: "share.creating", signin: "share.signingIn",
+    upload: "share.uploading", link: "share.linking" }[step] || "share.creating");
+
+  // Shares a document, or replaces the file of its earlier share, and keeps the share. The
+  // Graph permission must already be granted: it is asked for from the user's click.
+  async function run({ projectId, build, onProgress = () => {} }) {
+    const who = await accountOwner();
+    const previous = globalThis.T9OneDriveShare.ownShare((await shares())[projectId], who);
+    onProgress("creating");
+    const word = await build();
+    const made = await client().share({ blob: word.result.blob, name: word.filename,
+      owner: who, revision: String(word.revision || ""), previous, onProgress });
+    await keep(projectId, made);
+    return { share: made, wasShared: Boolean(previous) };
+  }
+
+  function date(value) {
+    try {
+      return new Intl.DateTimeFormat(applicationSettings.uiLocale,
+        { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+    } catch { return String(value || ""); }
+  }
+  function render({ status = "", error = "", confirmStop = false } = {}) {
+    const shared = Boolean(current);
+    $("documentShareIntro").hidden = shared;
+    $("documentShareFirstTime").hidden = shared;
+    $("documentShareResult").hidden = !shared;
+    if (shared) {
+      $("documentShareLinkField").value = current.link;
+      $("documentShareMeta").textContent = uiTf("share.meta",
+        { date: date(current.sharedAt), file: `OneDrive › ${current.folder} › ${current.fileName}` });
+      $("documentShareOutdated").hidden =
+        !globalThis.T9OneDriveShare.isOutdated(current, target?.changedAt?.());
+    }
+    $("documentShareTitle").textContent = uiT(shared ? "share.titleShared" : "share.title");
+    $("documentShareStopConfirm").hidden = !confirmStop;
+    $("documentShareStop").hidden = !shared || confirmStop;
+    $("documentShareStopCancel").hidden = !confirmStop;
+    $("documentShareStopSubmit").hidden = !confirmStop;
+    $("documentShareClose").hidden = confirmStop;
+    $("documentShareClose").textContent = uiT(shared ? "share.close" : "folder.cancel");
+    $("documentShareSubmit").hidden = confirmStop;
+    $("documentShareSubmit").textContent = uiT(error && !confirmStop ? "share.retry"
+      : shared ? "share.update" : "share.submit");
+    $("documentShareStatus").textContent = status;
+    $("documentShareError").textContent = error;
+    dialog.querySelectorAll("button").forEach(button => { button.disabled = working; });
+    $("documentShareClose").disabled = false;
+    dialog.toggleAttribute("aria-busy", working);
+  }
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(current.link);
+      return true;
+    } catch {
+      $("documentShareLinkField").select();
+      return false;
+    }
+  }
+  async function open(next, from) {
+    if (dialog.open || working) return;
+    target = next;
+    opener = from || null;
+    owner = await accountOwner();
+    current = globalThis.T9OneDriveShare.ownShare((await shares())[target.projectId], owner);
+    render();
+    dialog.showModal();
+    (current ? $("documentShareCopy") : $("documentShareSubmit")).focus();
+  }
+  async function share() {
+    if (working || !target) return;
+    working = true;
+    render({ status: progressText("creating") });
+    try {
+      // Asked for directly from the click, before anything else, as for Outlook.
+      if (!await chrome.permissions.request(GRAPH)) throw { shareCode: "permission" };
+      const result = await run({ projectId: target.projectId, build: target.build,
+        onProgress: step => render({ status: progressText(step) }) });
+      current = result.share;
+      working = false;
+      const copied = await copy();
+      render({ status: [uiT(result.wasShared ? "share.updated" : "share.shared"),
+        uiT(copied ? "share.copied" : "share.copyManual"),
+        result.share.linkChanged ? uiT("share.linkChanged") : ""].filter(Boolean).join(" ") });
+      $("documentShareCopy").focus();
+    } catch (error) {
+      working = false;
+      render({ error: failureText(error) });
+    }
+  }
+  async function stop() {
+    if (working || !current) return;
+    working = true;
+    render({ status: uiT("share.stopping"), confirmStop: true });
+    try {
+      if (!await chrome.permissions.request(GRAPH)) throw { shareCode: "permission" };
+      await client().stop({ previous: current, owner });
+      await keep(target.projectId, null);
+      current = null;
+      working = false;
+      render({ status: uiT("share.stopped") });
+      $("documentShareSubmit").focus();
+    } catch (error) {
+      working = false;
+      render({ error: errorText(error?.shareCode || error?.outlookCode), confirmStop: true });
+    }
+  }
+  // The document open in the review: saved first, then made as Exportera Word makes it.
+  function openActive(from) {
+    if (!activeReviewSession || !activeReview) return;
+    void open({ projectId: activeReviewSession.id,
+      changedAt: () => activeReview?.updatedAt || "",
+      build: async () => {
+        try { await reviewPersistence.saveExplicitly({ render: false }); }
+        catch { /* The Word file is made from what is shown, as Exportera Word does. */ }
+        return { ...await buildActiveReviewWord(), revision: activeReview?.updatedAt || "" };
+      } }, from);
+  }
+  // A document in the library, made as the library's Exportera Word makes it.
+  function openRecord(record, from) {
+    void open({ projectId: record.projectId,
+      changedAt: () => documentLibraryRecords.find(item => item.projectId === record.projectId)?.modifiedAt || "",
+      build: async () => {
+        const settings = await send({ type: "T9_GET_SETTINGS" });
+        return buildLibraryDocumentWord(record, { ...DEFAULTS, ...(settings?.settings || {}) });
+      } }, from);
+  }
+  $("documentShareForm").addEventListener("submit", event => { event.preventDefault(); void share(); });
+  $("documentShareClose").addEventListener("click", () => dialog.close());
+  $("documentShareCopy").addEventListener("click", async () => {
+    render({ status: uiT(await copy() ? "share.copied" : "share.copyManual") });
+  });
+  $("documentShareOpen").addEventListener("click", () => {
+    const link = globalThis.T9OneDriveShare.safeLink(current?.link);
+    if (link) window.open(link, "_blank", "noopener");
+  });
+  $("documentShareStop").addEventListener("click", () => {
+    render({ confirmStop: true });
+    $("documentShareStopCancel").focus();
+  });
+  $("documentShareStopCancel").addEventListener("click", () => {
+    render();
+    $("documentShareStop").focus();
+  });
+  $("documentShareStopSubmit").addEventListener("click", () => { void stop(); });
+  // A share in progress finishes even if the dialog is closed; closing never cancels it.
+  dialog.addEventListener("close", () => {
+    if (opener?.isConnected) opener.focus();
+    opener = null;
+  });
+  return { shares, accountOwner, run, openActive, openRecord, failureText, progressText, GRAPH };
+})();
+
+// Which documents are shared, for the library's markers and the review's Share button. Kept up to
+// date when a share is made or stopped on any page.
+let documentShareIndex = { owner: "", shares: {} };
+async function loadDocumentShares() {
+  try {
+    documentShareIndex = { owner: await documentShare.accountOwner(), shares: await documentShare.shares() };
+  } catch { documentShareIndex = { owner: "", shares: {} }; }
+}
+function documentShareFor(projectId) {
+  return globalThis.T9OneDriveShare.ownShare(documentShareIndex.shares[projectId], documentShareIndex.owner);
+}
+// The marker on a library row: Shared, or Shared · update when the document changed since.
+function libraryCardShare(record) {
+  const shared = documentShareFor(record.projectId);
+  if (!shared) return null;
+  const outdated = globalThis.T9OneDriveShare.isOutdated(shared, record.modifiedAt);
+  return { outdated, text: uiT(outdated ? "share.markerOutdated" : "share.marker"),
+    label: uiT(outdated ? "share.markerOutdatedLabel" : "share.markerLabel") };
+}
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes[globalThis.T9StorageKeys.DOCUMENT_SHARES_KEY]) return;
+  void loadDocumentShares().then(() => {
+    if (!PANEL_JOB) renderDocumentLibrary();
+    renderDocumentShareButton();
+  });
+});
+
+// The review's button says whether the open document is shared, and whether the shared version
+// is older.
+function renderDocumentShareButton() {
+  const shared = activeReviewSession ? documentShareFor(activeReviewSession.id) : null;
+  $("reviewShareLink").textContent = uiT(!shared ? "share.action"
+    : globalThis.T9OneDriveShare.isOutdated(shared, activeReview?.updatedAt) ? "share.actionOutdated"
+      : "share.actionShared");
+}
 
 function renderReviewAttention(tasks) {
   renderDocumentExportCheck();
@@ -11844,6 +12129,8 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
     );
   } else if (command === "export") {
     exportReviewFromToolbar(button);
+  } else if (command === "share") {
+    documentShare.openActive(button);
   }
 });
 
@@ -12245,6 +12532,8 @@ function showHomeView(view, focus = false) {
   $("testsView").hidden = view !== "tests";
   $("settingsPanel").hidden = view !== "settings";
   if (view === "tests") void loadTestsOverview();
+  // A list drawn while Documents was hidden could not be measured; line its columns up now.
+  if (view === "documents") globalThis.T9DocumentLibraryView.alignColumns($("libraryResults"));
   if (focus) (view === "settings" ? $("settingsTitle") : view === "tests" ? $("testsOverviewTitle")
     : $("documentLibraryTitle")).scrollIntoView({ block: "nearest" });
 }
@@ -12319,6 +12608,13 @@ $("libraryResults").addEventListener("click", async event => {
   }
   if (event.target.closest?.('[data-library-action="test-history"]')) {
     await openTestHistory(projectId, event.target.closest('[data-library-action="test-history"]'));
+    return;
+  }
+  // The Shared marker opens the share: its link, Update and Stop sharing.
+  const shareMarker = event.target.closest?.(".library-share-marker");
+  if (shareMarker) {
+    const record = documentLibraryRecords.find(value => value.projectId === projectId);
+    if (record) documentShare.openRecord(record, shareMarker);
     return;
   }
   if (event.target.closest?.('[data-library-action="favourite"]')) {
@@ -12404,6 +12700,9 @@ async function runLibraryMenuAction(action, projectId, card) {
       await exportSession(session);
     } else if (action === "export-page-script") {
       await exportPageScript(record);
+    } else if (action === "share-link") {
+      documentShare.openRecord(record, card?.querySelector(".library-card-menu summary"));
+      return;
     } else if (action === "move-folder") {
       openLibraryMoveDialog([projectId], card.querySelector(".library-card-menu summary"));
       return;
@@ -12626,11 +12925,10 @@ $("libraryBatchExport").addEventListener("click", async () => {
     $("libraryBatchToolbar").setAttribute("aria-busy", "false");
   }
 });
-for (const [id, mode] of [["libraryBatchTags", "tags"],
-  ["libraryBatchTheme", "theme"],
-  ["libraryBatchMetadata", "metadata"]]) {
-  $(id).addEventListener("click", () => openBatchMetadataDialog(mode));
-}
+$("libraryBatchMetadata").addEventListener("click", () => {
+  $("libraryBatchMetadata").closest("details")?.removeAttribute("open");
+  openBatchMetadataDialog();
+});
 $("libraryBatchMetadataDialog").addEventListener("close", async event => {
   if (event.target.returnValue !== "apply") return;
   try {
@@ -12645,13 +12943,15 @@ $("libraryBatchMetadataDialog").addEventListener("close", async event => {
 });
 $("libraryBatchArchive").addEventListener("click", async () => {
   const count = documentLibrarySelection.selectedIds.length;
-  if (!confirm(uiTf("library.archiveCountConfirm", { count }))) return;
+  // Restoring from the archive needs no confirmation; it is undone by archiving again.
+  const restore = libraryBatchRestores();
+  if (!restore && !confirm(uiTf("library.archiveCountConfirm", { count }))) return;
   try {
     const result = globalThis.T9DocumentBatchOperations.apply(
       documentLibraryRecords, documentLibrarySelection, { type: "archive",
-        fields: { archived: { selected: true, value: true } } }
+        fields: { archived: { selected: true, value: !restore } } }
     );
-    await commitLibraryBatch(result, "library.batchArchived");
+    await commitLibraryBatch(result, restore ? "library.batchRestored" : "library.batchArchived");
   } catch (error) {
     show(error.message, true);
   }
@@ -12732,7 +13032,7 @@ document.addEventListener("keydown", event => {
 const PANEL_JOB = (() => {
   const params = new URLSearchParams(globalThis.location.search);
   const kind = params.get("panelJob");
-  if (!["export-word", "run-test"].includes(kind) || globalThis.parent === globalThis) return null;
+  if (!["export-word", "run-test", "share-link"].includes(kind) || globalThis.parent === globalThis) return null;
   return { kind, projectId: params.get("projectId") || "", jobId: params.get("jobId") || "" };
 })();
 
@@ -12748,12 +13048,23 @@ async function runPanelJob(job, sessionsLoaded) {
       const result = await exportLibraryDocument(record, { ...DEFAULTS,
         ...(settingsResponse?.settings || {}) });
       reply({ ok: true, downloadId: result.downloadId, fileName: result.fileName });
+    } else if (job.kind === "share-link") {
+      // The panel has asked for the Graph permission from the user's click; each step is
+      // reported as it starts, and the panel copies the link.
+      const settingsResponse = await send({ type: "T9_GET_SETTINGS" });
+      const result = await documentShare.run({ projectId: record.projectId,
+        build: () => buildLibraryDocumentWord(record, { ...DEFAULTS, ...(settingsResponse?.settings || {}) }),
+        onProgress: step => reply({ progress: step, text: documentShare.progressText(step) }) });
+      reply({ ok: true, link: result.share.link, wasShared: result.wasShared,
+        linkChanged: Boolean(result.share.linkChanged),
+        file: `OneDrive › ${result.share.folder} › ${result.share.fileName}` });
     } else {
       const run = await createTestRun(record, { open: false });
       reply({ ok: true, testRunId: run.testRunId });
     }
   } catch (error) {
-    reply({ ok: false, error: String(error?.message || error || "") });
+    reply({ ok: false, error: job.kind === "share-link" ? documentShare.failureText(error)
+      : String(error?.message || error || ""), shareCode: error?.shareCode || error?.outlookCode || "" });
   }
 }
 
@@ -12774,6 +13085,10 @@ async function initializeDashboard() {
   initializeFilenameVariables();
   populateBatchMetadataOptions();
   const captionsLoaded = loadBusinessCentralCaptions();
+  // Which documents are shared, for the library's markers; drawn again once known.
+  void loadDocumentShares().then(() => {
+    if (!PANEL_JOB && documentLibraryRecords.length) renderDocumentLibrary();
+  });
   // The library is requested while the settings load; it is shown once both are there.
   const libraryRequest = send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
   libraryRequest.catch(() => {});

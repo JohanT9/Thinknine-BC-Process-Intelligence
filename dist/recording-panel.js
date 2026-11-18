@@ -830,13 +830,15 @@
     jobs.get(event.data.jobId)?.(event.data);
   });
 
-  function libraryJob(kind, timeout) {
+  // onProgress gets each step a job reports before it is done, such as uploading a shared file.
+  function libraryJob(kind, timeout, onProgress = () => {}) {
     const jobId = crypto.randomUUID();
     const frame = el("iframe", { class: "rp-job", "aria-hidden": "true", tabindex: "-1",
       src: `dashboard.html?panelJob=${kind}&projectId=${encodeURIComponent(completedId)}&jobId=${jobId}` });
     const done = new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error("technical.requestTimeout")), timeout);
       jobs.set(jobId, data => {
+        if (data.progress) { onProgress(data); return; }
         clearTimeout(timer);
         if (data.ok) resolve(data);
         else reject(new Error(data.error || ""));
@@ -895,6 +897,9 @@
     copyList = list && list.some(section => section.steps.length) ? list : null;
     copyExpanded = false;
     for (const id of ["rpWordStatus", "rpTestStatus", "rpCopyStatus"]) setStatus(id, "", "");
+    $("rpShare").hidden = true;
+    $("rpShare").replaceChildren();
+    $("rpShareAction").setAttribute("aria-expanded", "false");
     for (const id of ["rpWord", "rpTest", "rpListCard"]) delete $(id).dataset.state;
     const word = $("rpWordAction");
     word.disabled = false;
@@ -985,6 +990,80 @@
     } finally {
       job.remove();
       button.disabled = false;
+    }
+  }
+
+  // Share link: the Word file in the user's own OneDrive and a link people in the organization
+  // can read. The first click says where the file goes and who can read it; Share sends it. The
+  // library page does the work out of sight, as for the Word file, and the link is shown and
+  // copied only once OneDrive has confirmed it.
+  const GRAPH = { origins: ["https://graph.microsoft.com/*"] };
+  let shareBusy = false;
+  function shareButton(text, onClick, primary = false) {
+    const button = el("button", { type: "button", class: primary ? "primary" : "rp-textbtn", text });
+    button.addEventListener("click", onClick);
+    return button;
+  }
+  function closeShare() {
+    $("rpShare").hidden = true;
+    $("rpShare").replaceChildren();
+    $("rpShareAction").setAttribute("aria-expanded", "false");
+    $("rpShareAction").focus();
+  }
+  function showShareIntro() {
+    if (shareBusy) return;
+    const status = el("div", { id: "rpShareStatus", class: "rp-r-status", role: "status", "aria-live": "polite" });
+    const go = shareButton(t("share.submit"), () => { void shareLink(go, status); }, true);
+    $("rpShare").replaceChildren(el("p", { text: t("share.intro") }),
+      el("p", { class: "rp-r-help", text: t("share.firstTime") }),
+      el("div", { class: "rp-r-actions" }, go, shareButton(t("folder.cancel"), closeShare)), status);
+    $("rpShare").hidden = false;
+    $("rpShareAction").setAttribute("aria-expanded", "true");
+    go.focus();
+  }
+  function showShareLink(result) {
+    const field = el("input", { type: "text", readonly: true, value: result.link,
+      "aria-label": t("share.linkLabel") });
+    const status = el("div", { class: "rp-r-status", role: "status", "aria-live": "polite" });
+    const copy = async () => {
+      try { await navigator.clipboard.writeText(result.link); return true; }
+      catch { field.select(); return false; }
+    };
+    const copyButton = shareButton(t("share.copy"), async () => {
+      setStatusNode(status, "ok", t(await copy() ? "share.copied" : "share.copyManual"));
+    }, true);
+    $("rpShare").replaceChildren(el("p", { text: t(result.wasShared ? "share.updated" : "share.shared") }),
+      el("div", { class: "rp-share-link" }, field, copyButton,
+        shareButton(t("share.open"), () => { window.open(result.link, "_blank", "noopener"); })),
+      el("p", { class: "rp-r-help", text: t("share.meta", { date: new Intl.DateTimeFormat(locale,
+        { dateStyle: "medium", timeStyle: "short" }).format(new Date()), file: result.file }) }), status);
+    void copy().then(copied => setStatusNode(status, "ok", [t(copied ? "share.copied" : "share.copyManual"),
+      result.linkChanged ? t("share.linkChanged") : ""].filter(Boolean).join(" ")));
+    copyButton.focus();
+  }
+  function setStatusNode(node, kind, text) {
+    node.dataset.kind = kind === "busy" ? "" : kind;
+    node.replaceChildren(...[kind === "busy" ? el("span", { class: "rp-spin", "aria-hidden": "true" }) : null,
+      el("span", {}, text)].filter(Boolean));
+  }
+  async function shareLink(button, status) {
+    if (shareBusy) return;
+    shareBusy = true;
+    button.disabled = true;
+    setStatusNode(status, "busy", t("share.creating"));
+    let job = null;
+    try {
+      // Asked for directly from the click, before anything else, as for Outlook.
+      if (!await chrome.permissions.request(GRAPH)) throw new Error(t("share.errorPermission"));
+      job = libraryJob("share-link", 300000, data => setStatusNode(status, "busy", data.text || t("share.creating")));
+      showShareLink(await job.done);
+    } catch (error) {
+      setStatusNode(status, "error", error?.message || t("share.errorFailed"));
+      setText(button, t("share.retry"));
+      button.disabled = false;
+    } finally {
+      job?.remove();
+      shareBusy = false;
     }
   }
 
@@ -1190,6 +1269,9 @@
       openLibrary(`?openReview=${encodeURIComponent(completedId)}`));
     $("rpOpenLibrary").addEventListener("click", () => openLibrary());
     $("rpWordAction").addEventListener("click", () => { void exportWord(); });
+    $("rpShareAction").addEventListener("click", () => {
+      if ($("rpShare").hidden) showShareIntro(); else if (!shareBusy) closeShare();
+    });
     $("rpTestAction").addEventListener("click", () => { void startTest(); });
     $("rpScriptAction").addEventListener("click", () => { void exportScript(); });
     $("rpCopyAction").addEventListener("click", () => { void copySteps(); });

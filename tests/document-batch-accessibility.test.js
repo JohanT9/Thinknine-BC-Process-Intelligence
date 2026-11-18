@@ -40,6 +40,51 @@ assert(dashboard.includes('await confirmLibraryDelete(selectedLibraryRecords())'
     }
   }
 }
+// Tags, template and author are changed in one dialog, from one menu entry. Tags are added
+// and removed rather than replaced; status and archive state are not edited there (the
+// Archive button restores when every selected document is archived).
+for (const id of ["libraryBatchTags", "libraryBatchTheme", "libraryBatchUseTags",
+  "libraryBatchTagsValue", "libraryBatchUseStatus", "libraryBatchStatusValue",
+  "libraryBatchUseArchived", "libraryBatchArchivedValue", "libraryBatchUseTheme",
+  "libraryBatchUseAuthor"]) {
+  assert(!html.includes(`id="${id}"`), `${id} is gone`);
+  assert(!dashboard.includes(`"${id}"`), `${id} is not used`);
+}
+assert(html.includes('id="libraryBatchMetadata" class="secondary" data-i18n="library.batchEdit"'));
+for (const id of ["libraryBatchAddTagsValue", "libraryBatchRemoveTagsList",
+  "libraryBatchNoTags", "libraryBatchThemeValue", "libraryBatchAuthorValue"]) {
+  assert(html.includes(`id="${id}"`), `${id} is in the dialog`);
+}
+assert(html.includes('aria-describedby="libraryBatchAddTagsHint"'));
+// Tags and template names are the user's own words; the interface must not translate them.
+assert(html.includes('id="libraryBatchRemoveTagsList" class="library-batch-tag-list" data-i18n-ignore') &&
+  html.includes('id="libraryBatchThemeValue" data-i18n-ignore'));
+assert(dashboard.includes('uiT("library.batchKeepTemplate")'),
+  "the template choice starts with keeping the current template");
+assert(dashboard.includes('"library.batchRestore" : "Arkivera"') &&
+  dashboard.includes('restore ? "library.batchRestored" : "library.batchArchived"'));
+{
+  const keys = ["library.batchEdit", "library.batchEditDescription", "library.batchAddTags",
+    "library.batchAddTagsPlaceholder", "library.batchAddTagsHint", "library.batchRemoveTags",
+    "library.batchNoTags", "library.batchTagUsage", "library.batchAuthor",
+    "library.batchKeepAuthor", "library.batchKeepTemplate", "library.batchRestore",
+    "library.batchRestored", "library.noMetadataChanges", "library.batchMetadataUpdated"];
+  const english = Object.fromEntries(keys.map(key =>
+    [key, globalThis.T9UiI18n.translate(key, "en-US")]));
+  for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+    for (const key of keys) {
+      const text = globalThis.T9UiI18n.translate(key, locale);
+      assert.notEqual(text, key, `${key} ${locale}`);
+      if (locale !== "en-US") assert.notEqual(text, english[key], `${key} is translated for ${locale}`);
+    }
+    for (const key of ["library.batchEditDescription", "library.batchRestored",
+      "library.batchMetadataUpdated"]) {
+      assert(globalThis.T9UiI18n.format(key, { count: 3 }, locale).includes("3"), `${key} ${locale}`);
+    }
+    assert.match(globalThis.T9UiI18n.format("library.batchTagUsage",
+      { count: 2, total: 5 }, locale), /2.*5/u, `usage ${locale}`);
+  }
+}
 assert(dashboard.includes("async function exportLibraryDocument") &&
   dashboard.includes("T9WordExportPipeline.create") &&
   dashboard.includes("T9DocumentBatchOperations.execute"));

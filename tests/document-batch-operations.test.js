@@ -47,6 +47,34 @@ assert.strictEqual(metadata.records[2].author, "Consultant");
 assert.strictEqual(metadata.records[2].status, undefined);
 assert.strictEqual(metadata.records[2].archived, true);
 
+// Adding and removing tags changes only those tags; each document keeps its others.
+{
+  const tagged = [
+    library.normalize({ projectId: "t-1", tags: ["UAT", "Sales"] }),
+    library.normalize({ projectId: "t-2", tags: ["Old"] }),
+    library.normalize({ projectId: "t-3", tags: ["Untouched"] })
+  ];
+  const both = batch.selection({ selectedIds: ["t-1", "t-2"] });
+  assert.deepStrictEqual(batch.selectedTags(tagged, both).map(item => [item.tag, item.count]),
+    [["Old", 1], ["Sales", 1], ["UAT", 1]]);
+  const changed = batch.apply(tagged, both, { type: "metadata", fields: {
+    addTags: { selected: true, value: ["Release 2", "uat"] },
+    removeTags: { selected: true, value: ["old"] }
+  } });
+  assert.strictEqual(changed.affected, 2);
+  assert.deepStrictEqual(changed.records[0].tags, ["UAT", "Sales", "Release 2"],
+    "an existing tag is not added twice, whatever its case");
+  assert.deepStrictEqual(changed.records[1].tags, ["Release 2", "uat"]);
+  assert.deepStrictEqual(changed.records[2].tags, ["Untouched"]);
+  const nothing = batch.apply(tagged, both, { type: "metadata", fields: {
+    addTags: { selected: true, value: [] }, removeTags: { selected: true, value: [" "] }
+  } });
+  assert.strictEqual(nothing.affected, 0);
+  const already = batch.apply(tagged, both, { type: "metadata", fields: {
+    addTags: { selected: true, value: ["sales"] } } });
+  assert.strictEqual(already.affected, 1, "only the document without the tag changes");
+}
+
 const profiled = batch.apply(records, selected, { type: "profile", fields: {
   profile: { selected: true, value: { profileId: "sop", displayName: "SOP" } }
 } });

@@ -47,6 +47,10 @@
   // The Get started page (ui/welcome.js): the answer to its language offer. Not part of any
   // document, so never exported.
   const WELCOME_KEY = "t9_welcome";
+  // Documents shared as a link from the user's OneDrive (document/onedrive-share.js), by
+  // document id: which file and link this computer made. Not part of any document, so never
+  // exported.
+  const DOCUMENT_SHARES_KEY = "t9_document_shares";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -75,6 +79,7 @@
     DOCUMENT_TEMPLATE_PREFIX,
     DEFAULT_DOCUMENT_TEMPLATE_KEY,
     WELCOME_KEY,
+    DOCUMENT_SHARES_KEY,
     LIBRARY_IMPORT_UNDO_KEY,
     LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
     LIBRARY_SYNC_STATE_KEY,

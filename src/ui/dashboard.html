@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BC Process Studio</title>
 <style>
-body{font-family:"Segoe UI",Arial,sans-serif;max-width:1120px;margin:0 auto 40px;padding:0 20px;color:var(--c-fg-1f2933)}
+body{font-family:"Segoe UI",Arial,sans-serif;max-width:1440px;margin:0 auto 40px;padding:0 20px;color:var(--c-fg-1f2933)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 h1{margin-bottom:5px}.muted{color:var(--c-fg-52606d)}
 fieldset{border:1px solid var(--c-bd-d8dee5);border-radius:8px;padding:18px;margin:20px 0}
@@ -548,9 +548,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <details class="library-batch-more">
         <summary>Fler åtgärder</summary>
         <div class="library-batch-more-panel">
-          <button id="libraryBatchTags" class="secondary">Taggar</button>
-          <button id="libraryBatchTheme" class="secondary" data-i18n="template.label">Mall</button>
-          <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
+          <button id="libraryBatchMetadata" class="secondary" data-i18n="library.batchEdit">Ändra taggar, mall och författare</button>
           <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
         </div>
       </details>
@@ -942,20 +940,27 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <dialog id="libraryBatchMetadataDialog" class="library-batch-dialog"
   aria-labelledby="libraryBatchMetadataTitle">
   <form method="dialog">
-    <h3 id="libraryBatchMetadataTitle">Redigera metadata</h3>
-    <p id="libraryBatchMetadataDescription"></p>
-    <div class="library-batch-fields">
-      <label><input id="libraryBatchUseTags" type="checkbox"> Ändra taggar
-        <input id="libraryBatchTagsValue" type="text" placeholder="Tagg 1, Tagg 2"></label>
-      <label><input id="libraryBatchUseTheme" type="checkbox"> <span data-i18n="template.change">Ändra mall</span>
-        <select id="libraryBatchThemeValue"></select></label>
-      <label><input id="libraryBatchUseAuthor" type="checkbox"> Ändra författare
-        <input id="libraryBatchAuthorValue" type="text"></label>
-      <label><input id="libraryBatchUseStatus" type="checkbox"> Ändra status
-        <input id="libraryBatchStatusValue" type="text"></label>
-      <label><input id="libraryBatchUseArchived" type="checkbox"> Ändra arkivstatus
-        <select id="libraryBatchArchivedValue"><option value="true">Arkiverad</option>
-          <option value="false">Aktiv</option></select></label>
+    <h3 id="libraryBatchMetadataTitle" data-i18n="library.batchEdit">Ändra taggar, mall och författare</h3>
+    <p id="libraryBatchMetadataDescription" class="muted"></p>
+    <!-- Only what the user fills in or ticks changes; everything left empty stays as it is.
+      Archiving and restoring is the toolbar's Archive button. -->
+    <div class="library-batch-edit">
+      <label class="library-batch-edit-field"><span data-i18n="library.batchAddTags">Lägg till taggar</span>
+        <input id="libraryBatchAddTagsValue" type="text" autocomplete="off"
+          aria-describedby="libraryBatchAddTagsHint"
+          data-i18n-placeholder="library.batchAddTagsPlaceholder" placeholder="Till exempel UAT, Försäljning">
+        <small id="libraryBatchAddTagsHint" class="muted" data-i18n="library.batchAddTagsHint">Skilj flera taggar åt med kommatecken.</small></label>
+      <fieldset class="library-batch-edit-field library-batch-remove-tags">
+        <legend data-i18n="library.batchRemoveTags">Ta bort taggar</legend>
+        <!-- The tags are the user's own words, so the interface never translates them. -->
+        <div id="libraryBatchRemoveTagsList" class="library-batch-tag-list" data-i18n-ignore></div>
+        <p id="libraryBatchNoTags" class="muted" data-i18n="library.batchNoTags" hidden>De valda dokumenten har inga taggar.</p>
+      </fieldset>
+      <label class="library-batch-edit-field"><span data-i18n="template.label">Mall</span>
+        <select id="libraryBatchThemeValue" data-i18n-ignore></select></label>
+      <label class="library-batch-edit-field"><span data-i18n="library.batchAuthor">Författare</span>
+        <input id="libraryBatchAuthorValue" type="text" autocomplete="off"
+          data-i18n-placeholder="library.batchKeepAuthor" placeholder="Behåll nuvarande författare"></label>
     </div>
     <footer><button value="cancel" class="debug">Avbryt</button>
       <button id="libraryBatchMetadataApply" value="apply" class="primary">Tillämpa</button></footer>
@@ -1101,6 +1106,35 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
     </footer>
   </form>
 </dialog>
+<dialog id="documentShareDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog library-transfer-dialog document-share-dialog" aria-labelledby="documentShareTitle" aria-describedby="documentShareIntro">
+  <form id="documentShareForm" method="dialog">
+    <h3 id="documentShareTitle" data-i18n="share.title">Dela som länk</h3>
+    <p id="documentShareIntro" data-i18n="share.intro">Word-dokumentet läggs i din OneDrive, i mappen BC Process Studio. Du får en länk som personer i din organisation kan öppna och läsa i webbläsaren. De kan inte ändra något.</p>
+    <p id="documentShareFirstTime" class="library-transfer-note" data-i18n="share.firstTime">Första gången frågar Microsoft om BC Process Studio får spara filer i din OneDrive. Om ditt företag kräver att en administratör godkänner det, får du veta det här.</p>
+    <div id="documentShareResult" class="document-share-result" hidden>
+      <label for="documentShareLinkField" data-i18n="share.linkLabel">Länk</label>
+      <div class="document-share-link-row">
+        <input id="documentShareLinkField" type="text" readonly>
+        <button id="documentShareCopy" type="button" class="secondary" data-i18n="share.copy">Kopiera länk</button>
+        <button id="documentShareOpen" type="button" class="secondary" data-i18n="share.open">Öppna</button>
+      </div>
+      <p id="documentShareMeta" class="library-transfer-note"></p>
+      <p id="documentShareOutdated" class="document-share-outdated" hidden data-i18n="share.outdated">Dokumentet har ändrats sedan det delades. Uppdatera, så visar länken den senaste versionen.</p>
+    </div>
+    <div id="documentShareStopConfirm" class="document-share-stop" hidden>
+      <p data-i18n="share.stopConfirm">Personer med länken kan inte längre öppna dokumentet. Filen ligger kvar i din OneDrive.</p>
+    </div>
+    <p id="documentShareStatus" class="library-transfer-status" role="status" aria-live="polite"></p>
+    <p id="documentShareError" class="library-folder-error" role="alert"></p>
+    <footer>
+      <button id="documentShareStop" type="button" class="secondary" hidden data-i18n="share.stop">Sluta dela</button>
+      <button id="documentShareStopCancel" type="button" class="secondary" hidden data-i18n="folder.cancel">Avbryt</button>
+      <button id="documentShareStopSubmit" type="button" class="danger" hidden data-i18n="share.stop">Sluta dela</button>
+      <button id="documentShareClose" type="button" class="secondary" data-i18n="folder.cancel">Avbryt</button>
+      <button id="documentShareSubmit" type="submit" class="primary" data-i18n="share.submit">Dela</button>
+    </footer>
+  </form>
+</dialog>
 <dialog id="libraryImportUndoDialog" data-no-tooltip class="library-batch-dialog library-folder-dialog" aria-labelledby="libraryImportUndoTitle" aria-describedby="libraryImportUndoBody">
   <form id="libraryImportUndoForm" method="dialog">
     <h3 id="libraryImportUndoTitle" data-i18n="transfer.undoTitle">Ångra importen?</h3>
@@ -1225,6 +1259,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" data-icon="↷" title="Gör om" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
         </div>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
+        <button id="reviewShareLink" data-review-command="share" data-review-toolbar-item class="secondary" aria-haspopup="dialog" data-i18n="share.action" disabled>Dela länk</button>
         <span class="review-language-switch">
           <label for="reviewLanguageSwitch" data-i18n="languageSwitch.label">Dokumentspråk</label>
           <select id="reviewLanguageSwitch" data-language-select="document"
@@ -1606,6 +1641,9 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/library-transfer.js"></script>
 <script src="document/library-sync.js"></script>
 <script src="document/test-recording-match.js"></script>
+<script src="engine/tenant-license-config.js"></script>
+<script src="bug-report/outlook-draft.js"></script>
+<script src="document/onedrive-share.js"></script>
 <script src="document/test-suite.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/test-history.js"></script>

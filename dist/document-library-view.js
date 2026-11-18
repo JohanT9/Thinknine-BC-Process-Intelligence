@@ -83,7 +83,13 @@
     const hiddenTagCount = Math.max(0, tags.length - visibleTags.length);
     const label = stateLabel(state, locale);
     // The status chip says whether a document is reviewed, so its button always names what it opens.
-    // The language badge comes first in the details, so it lines up from row to row.
+    // The review status and the test status stand side by side on the right, in the same form,
+    // so both are read in one place; the test status is a button that opens the test history.
+    // The details sit in columns that line up from row to row: language, kind, date changed,
+    // company and template (a bug report's delivery). Each column is in every row, empty
+    // when the document has no value, and alignColumns sizes it to its widest value; a long
+    // company or template name is shortened with … and shown whole on hover. The share
+    // marker, folder and other details follow.
     const openLabel = bugReport ? localized("Open bug report", locale, "Öppna felrapport")
       : localized("Open documentation", locale, "Öppna dokumentation");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
@@ -101,17 +107,20 @@
         <div class="library-card-title"><h4 title="${safeTitle}">${safeTitle}</h4>
           <div class="library-card-meta">
             <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
-            <span>${escape(bugReport ? localized("Bug report", locale, "Felrapport")
+            <span class="library-col library-col-kind">${escape(bugReport ? localized("Bug report", locale, "Felrapport")
               : localized("Documentation", locale, "Dokumentation"))}</span>
-            ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
-            ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
-            ${!bugReport && view.templateLabel?.(record) ? `<span class="library-template">${escape(view.templateLabel(record))}</span>` : ""}
-            ${(test => test ? `<button type="button" class="library-test-marker" data-library-action="test-history"
-              data-state="${escape(test.state)}" aria-label="${escape(test.label)}"><span aria-hidden="true">${escape(test.icon)}</span> ${escape(test.text)}</button>` : "")(!bugReport && view.testMarker?.(record))}
-            <span>${escape(localized("Changed {date}", locale,
+            <span class="library-modified library-col library-col-date">${escape(localized("Changed {date}", locale,
               "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
-            ${bugReport && deliveryLabel(delivery, locale) ? `<span class="library-delivery"
-              data-outcome="${escape(delivery.outcome)}">${escape(deliveryLabel(delivery, locale))}</span>` : ""}
+            ${(company => `<span class="library-col library-col-company"${company ? ` title="${escape(company)}"` : ""}>${escape(company)}</span>`)(record.metadata?.company || "")}
+            ${(templateText => bugReport
+              ? (deliveryLabel(delivery, locale) ? `<span class="library-delivery library-col library-col-template"
+              data-outcome="${escape(delivery.outcome)}" title="${escape(deliveryLabel(delivery, locale))}">${escape(deliveryLabel(delivery, locale))}</span>`
+                : `<span class="library-col library-col-template"></span>`)
+              : templateText ? `<span class="library-template library-col library-col-template" title="${escape(templateText)}">${escape(templateText)}</span>`
+                : `<span class="library-col library-col-template"></span>`)(!bugReport && view.templateLabel?.(record))}
+            ${(shared => shared ? `<button type="button" class="library-share-marker" data-library-action="share-link"
+              data-outdated="${shared.outdated ? "true" : "false"}" aria-label="${escape(shared.label)}"><span aria-hidden="true">↗</span> ${escape(shared.text)}</button>` : "")(!bugReport && view.shareMarker?.(record))}
+            ${folder ? `<span class="library-folder-badge" title="${escape(folder.label)}"><span class="sr-only">${escape(folder.label)}</span><span aria-hidden="true">▸ ${escape(folder.path)}</span></span>` : ""}
             ${record.archived ? `<span class="library-card-status">${escape(localized(
               "Archived", locale, "Arkiverad"))}</span>` : ""}
             ${record.status ? `<span>${escape(record.status)}</span>` : ""}
@@ -123,7 +132,8 @@
             ? `<span aria-label="${escape(localized("Additional tags: {count}",
               locale, "Ytterligare taggar: {count}", { count: hiddenTagCount }))}">+${hiddenTagCount}</span>` : ""}</div>` : ""}
         </div></div>
-      ${label ? `<span class="library-state" data-state="${state.state}">${escape(label)}</span>` : "<span></span>"}
+      <div class="library-statuses">${label ? `<span class="library-state" data-state="${state.state}">${escape(label)}</span>` : "<span></span>"}${(test => test ? `<button type="button" class="library-test-marker" data-library-action="test-history"
+        data-state="${escape(test.state)}" aria-label="${escape(test.label)}"><span aria-hidden="true">${escape(test.icon)}</span> ${escape(test.text)}</button>` : "<span></span>")(!bugReport && view.testMarker?.(record))}</div>
       <div class="library-card-footer">
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${escape(localized(
@@ -144,6 +154,7 @@
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
             ${recording || bugReport || !view.pageScriptLabel ? "" : `<button type="button" data-library-action="export-page-script">${escape(view.pageScriptLabel)}</button>`}
+            ${recording || bugReport || !view.shareLabel ? "" : `<button type="button" data-library-action="share-link">${escape(view.shareLabel)}</button>`}
             ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
             <button type="button" data-library-action="archive">${escape(record.archived
               ? localized("Restore from archive", locale, "Återställ från arkivet")
@@ -221,7 +232,30 @@
       selectedIds.has(record.projectId), record.projectId === activeId, locale,
       state.progress?.get(record.projectId), state.deliveries?.get(record.projectId), state
     )).join("");
+    alignColumns(container);
     return activeId;
+  }
+
+  // Each detail column gets the width of its widest value in the list shown, so the columns
+  // line up in every language without a fixed width. The stylesheet uses these widths only
+  // in a wide window and caps company and template, which then end in …. While the list is
+  // not shown nothing can be measured, and the details simply follow one another.
+  const COLUMNS = ["kind", "date", "company", "template"];
+  function alignColumns(container) {
+    if (!container?.style?.setProperty || typeof container.querySelectorAll !== "function") return;
+    for (const name of COLUMNS) container.style.removeProperty(`--library-col-${name}`);
+    for (const name of COLUMNS) {
+      // scrollWidth is rounded to whole pixels and can be a fraction narrower than the text,
+      // which would shorten a name that fits, such as "Salico UAT" ending in "…". The exact
+      // width, rounded up, with a little room to spare, never shortens a name that fits.
+      let widest = 0;
+      for (const element of container.querySelectorAll(`.library-col-${name}`)) {
+        const exact = element.getBoundingClientRect?.().width || 0;
+        widest = Math.max(widest, exact, element.scrollWidth || 0);
+      }
+      if (widest > 0) container.style.setProperty(`--library-col-${name}`,
+        `${Math.ceil(widest) + 4}px`);
+    }
   }
 
   function renderGrouped(container, groups, state = {}) {
@@ -240,6 +274,7 @@
             state.progress?.get(record.projectId),
             state.deliveries?.get(record.projectId), state)).join("")}</div></section>`
     ).join("");
+    alignColumns(container);
     return activeId;
   }
 
@@ -261,6 +296,6 @@
     ) || null;
   }
 
-  return { activeFilterCount, applySelection, card, documentState, renderContinue,
+  return { activeFilterCount, alignColumns, applySelection, card, documentState, renderContinue,
     renderGrouped, renderList };
 });

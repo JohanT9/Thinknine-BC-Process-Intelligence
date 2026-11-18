@@ -110,14 +110,16 @@ assert.deepStrictEqual([...picked.selectedIds], ["a", "b"]);
 picked = batch.select(picked, ["a", "b", "c"], "a", { toggle: true });
 assert.deepStrictEqual([...picked.selectedIds], ["b"]);
 
-// The rows share their columns, so status, star and buttons line up and each button is as wide as
-// the widest in its column, in every language.
+// The rows share their columns, so review status, test status, star and buttons line up and
+// each is as wide as the widest in its column, in every language.
 const designCss = read("src/ui/design-system.css");
-assert.match(designCss, /\.library-results\{grid-template-columns:minmax\(0,1fr\) repeat\(5,auto\);/u);
+assert.match(designCss, /\.library-results\{grid-template-columns:minmax\(0,1fr\) repeat\(6,auto\);/u);
 assert.match(designCss, /\.library-results>\.library-card\{grid-template-columns:subgrid;/u);
 assert.match(designCss, /\.library-results>\.library-card>\.library-card-footer\{display:contents\}/u);
-assert.match(designCss, /\[data-library-action="open"\]\{grid-column:5;justify-self:stretch\}/u);
-assert.match(designCss, /\.library-results>\.library-card>\.library-state\{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center;/u);
+assert.match(designCss, /\[data-library-action="open"\]\{grid-column:6;justify-self:stretch\}/u);
+assert.match(designCss, /\.library-results>\.library-card>\.library-statuses\{display:contents\}/u);
+assert.match(designCss, /\.library-results>\.library-card>\.library-statuses>\.library-state\{grid-column:2;justify-self:stretch;box-sizing:border-box;text-align:center\}/u);
+assert.match(designCss, /\.library-results>\.library-card>\.library-statuses>\.library-test-marker,\.library-results>\.library-card>\.library-statuses>span:last-child\{grid-column:3;justify-self:stretch;/u);
 
 // Library cards: the company is not repeated as a tag, and a reviewed document offers Run test.
 const record = { projectId: "p", title: "Order", tags: ["CRONUS", "Sales"],
