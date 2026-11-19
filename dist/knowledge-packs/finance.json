@@ -32,7 +32,6 @@
           "^Recalcular previsión$",
           "^Genberegn prognose$",
           "^Laske ennuste uudelleen$",
-          "^Omberegn prognose$",
           "^Beregn prognose på nytt$"
         ],
         "fieldPatterns": [],
@@ -89,13 +88,10 @@
       "match": {
         "pagePatterns": [
           "^G/L Budgets$",
-          "^G/L-budgetar$",
           "^G/L Budgets$",
           "^Sachkontenbudgets$",
-          "^Presupuestos de G/L$",
           "^Finansbudgetter$",
           "^KP-budjetit$",
-          "^G/L-budsjetter$",
           "^Redovisningsbudgetar$",
           "^Budgets comptables$",
           "^Presupuestos contables$",
@@ -172,7 +168,6 @@
           "^Aperçu validation$",
           "^Buchungsvorschau$",
           "^Vista previa de registro$",
-          "^Forhåndsversion$",
           "^Esikatsele kirjausta$",
           "^Forhåndsvis bokføring$"
         ],
@@ -224,11 +219,9 @@
           "^VAT Returns$",
           "^Momsreturer$",
           "^Retours TVA$",
-          "^Mehrwertsteuererklärungen$",
           "^Devolución de IVA$",
           "^Momsangivelser$",
           "^ALV-palautukset$",
-          "^Mva-returer$",
           "^MwSt\\.-Berichte$",
           "^Devoluciones de IVA$",
           "^Omsetningsoppgaver$"
@@ -359,12 +352,10 @@
         "pagePatterns": [
           "^Fixed Asset G/L Journals$",
           "^Anl\\.tillg\\. redovisningsjournal$",
-          "^Feuille compta\\. immo$",
           "^Anlagen-Fibu Buch\\.-Blatt$",
           "^A/F Diario general$",
           "^Anlægsfinanskladder$",
           "^Käyttöomaisuuden KP-päiväkirja$",
-          "^AKTIVA-finansjournaler$",
           "^Redovisningsjournaler för anläggningstillgång$",
           "^Feuilles compta\\. immo\\.$",
           "^Anlagen Fibu Buch\\.-Blätter$",
@@ -597,13 +588,8 @@
       "match": {
         "pagePatterns": [
           "^\\(Financial Report\\) Row Definitions$",
-          "^\\(Ekonomiska rapporter\\) Raddefinitioner$",
-          "^États financiers définitions de ligne$",
-          "^\\(Finanzberichte\\) Zeilendefinition$",
           "^Definiciones de fila \\(informe financiero\\)$",
           "^\\(Finansiel rapport\\) Rækkedefinitioner$",
-          "^\\(Talousraportit\\) rivimääritykset$",
-          "^\\(Finansrapporter\\) Raddefinisjon$",
           "^\\(Ekonomisk rapport\\) Raddefinitioner$",
           "^Définitions de ligne \\(de l’état financier\\)$",
           "^\\(Finanzbericht\\) Zeilendefinitionen$",
@@ -738,7 +724,6 @@
           "^Diarios generales$",
           "^Finanskladder$",
           "^Yleinen päiväkirja$",
-          "^Generelle journaler$",
           "^Yleiset päiväkirjat$"
         ],
         "actionPatterns": [
@@ -808,7 +793,6 @@
           "^Indent Chart of Accounts$",
           "^Indrag av kontoplan$",
           "^Indenter plan comptable$",
-          "^Kontenplan einrücken$",
           "^Test plan de cuentas$",
           "^Indryk kontoplan$",
           "^Sisennä tilikartta$",
@@ -863,9 +847,7 @@
           "^General Ledger Setup$",
           "^Redovisningsinställningar$",
           "^Paramètres comptabilité$",
-          "^Einrichtung der Finanzbuchhaltung$",
           "^Configuración de contabilidad$",
-          "^Regnskabsopsætning$",
           "^Pääkirjanpidon asetukset$",
           "^Finansoppsett$",
           "^Finanzbuchhaltung Einrichtung$",
@@ -875,11 +857,8 @@
         "actionPatterns": [
           "^Change Global Dimensions$",
           "^Ändra globala dimensioner$",
-          "^Modifier les dimensions globales$",
           "^Globale Dimensionen ändern$",
-          "^Cambiar dimensiones globales$",
           "^Rediger globale dimensioner$",
-          "^Muuta globaali dimensio$",
           "^Endre globale dimensjoner$",
           "^Modifier les axes principaux$",
           "^Cambiar dimen\\. globales$",
@@ -931,7 +910,6 @@
       "match": {
         "pagePatterns": [
           "^Accounting Periods$",
-          "^Redovisningsperioder$",
           "^Périodes comptables$",
           "^Buchhaltungsperioden$",
           "^Periodos contables$",
@@ -942,13 +920,10 @@
         ],
         "actionPatterns": [
           "^Create Year$",
-          "^Skapa år$",
           "^Créer exercice$",
           "^Jahr erstellen$",
           "^Crear ejercicio$",
-          "^Opret år$",
           "^Luo vuosi$",
-          "^Opprett år$",
           "^Upprätta år$",
           "^Crear ejercic\\.$",
           "^Nyt år$",
@@ -1000,7 +975,6 @@
       "match": {
         "pagePatterns": [
           "^Accounting Periods$",
-          "^Redovisningsperioder$",
           "^Périodes comptables$",
           "^Buchhaltungsperioden$",
           "^Periodos contables$",
@@ -1011,10 +985,7 @@
         ],
         "actionPatterns": [
           "^Close Year$",
-          "^Stäng år$",
           "^Clôturer exercice$",
-          "^Jahr beenden$",
-          "^Cerrar ejercicio$",
           "^Afslut år$",
           "^Sulje vuosi$",
           "^Lukk år$",

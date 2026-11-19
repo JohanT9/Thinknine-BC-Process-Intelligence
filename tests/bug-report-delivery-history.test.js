@@ -189,7 +189,7 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
     context.globalThis.T9StorageKeys = require("../src/engine/storage-keys");
     context.globalThis.T9DocumentLibrary = require("../src/document/document-library");
     const latestTimestamp = dashboard.match(/function latestTimestamp[\s\S]*?\n\}\n/u)[0];
-    vm.runInContext(`let documentLibraryDeliveries = new Map(); let documentLibraryRecords = [{}];
+    vm.runInContext(`let documentLibraryDeliveries = new Map(); let documentLibraryResolutions = new Map(); let documentLibraryRecords = [{}];
       let documentLibrarySessions = new Map(); let rebuilt = 0;
       function rebuildDocumentLibraryIndex() { rebuilt += 1; }
       function librarySessionRecord(session) { return { modifiedAt: session.updatedAt }; }
@@ -232,6 +232,16 @@ assert.deepStrictEqual(service.regenerate(sent, recording, steps).deliveries, se
     update({ t9_bug_report_r2: { newValue: { recordingId: "rec-2", updatedAt: "2026-11-09T08:00:00.000Z",
       summary: { title: "Bokföring misslyckas" } } } });
     assert.strictEqual(renders.length, before + 1, "an unchanged report does not redraw");
+    // A report marked resolved, in its tab or from a test, shows as resolved in an open library.
+    const resolutions = () => vm.runInContext("documentLibraryResolutions", context);
+    const resolvedAt = renders.length;
+    update({ t9_bug_report_r3: { newValue: { recordingId: "rec-3",
+      resolution: { state: "resolved", changedAt: "2026-11-18T09:00:00.000Z" } } } });
+    assert.strictEqual(resolutions().get("rec-3").state, "resolved");
+    assert.strictEqual(renders.length, resolvedAt + 1);
+    update({ t9_bug_report_r3: { newValue: { recordingId: "rec-3" } } });
+    assert.strictEqual(resolutions().has("rec-3"), false, "a report opened again is open");
+    assert.strictEqual(renders.length, resolvedAt + 2);
   }
   console.log("Bug report delivery history tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

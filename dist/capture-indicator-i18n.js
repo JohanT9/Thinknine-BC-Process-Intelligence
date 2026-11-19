@@ -98,21 +98,27 @@
     })
   });
 
+  // This script runs in the Business Central tab without the language registry, so a language is
+  // chosen among those that have texts here: the exact locale, then its language ("fr-CA" gives
+  // fr-FR, and "no" Norwegian Bokmål), and otherwise English. No locale at all keeps Swedish, the
+  // older default. tests/language-lists.test.js requires texts for every registered language.
+  const ALIASES = Object.freeze({ no: "nb-NO" });
+  function languageOf(locale) {
+    if (!locale) return "sv-SE";
+    const normalized = String(locale).trim().toLowerCase();
+    const prefix = normalized.split("-")[0];
+    const locales = Object.keys(messages);
+    return locales.find(item => item.toLowerCase() === normalized) ||
+      ALIASES[prefix] || locales.find(item => item.split("-")[0].toLowerCase() === prefix) || "en-US";
+  }
+
   function translate(english, locale = "sv-SE", swedish = english) {
-    const normalized = String(locale || "sv-SE").toLowerCase();
-    const language = normalized.startsWith("nb") || normalized.startsWith("no") ? "nb-NO" :
-      normalized.startsWith("fr") ? "fr-FR" : normalized.startsWith("de") ? "de-DE" :
-        normalized.startsWith("es") ? "es-ES" : normalized.startsWith("da") ? "da-DK" :
-          normalized.startsWith("fi") ? "fi-FI" : normalized.startsWith("en") ? "en-US" : "sv-SE";
+    const language = languageOf(locale);
     return messages[language]?.[english] ?? (language === "sv-SE" ? swedish : english);
   }
   function translateWarning(code, locale = "sv-SE") {
-    const normalized = String(locale || "sv-SE").toLowerCase();
-    const language = normalized.startsWith("nb") || normalized.startsWith("no") ? "nb-NO" :
-      normalized.startsWith("fr") ? "fr-FR" : normalized.startsWith("de") ? "de-DE" :
-        normalized.startsWith("es") ? "es-ES" : normalized.startsWith("da") ? "da-DK" :
-          normalized.startsWith("fi") ? "fi-FI" : normalized.startsWith("en") ? "en-US" : "sv-SE";
+    const language = languageOf(locale);
     return warningMessages[language]?.[String(code || "")] || "";
   }
-  return Object.freeze({ messages, warningMessages, translate, translateWarning });
+  return Object.freeze({ messages, warningMessages, languageOf, translate, translateWarning });
 });

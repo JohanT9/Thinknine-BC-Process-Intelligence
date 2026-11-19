@@ -267,7 +267,31 @@
   const activeScope = scope => ["environment", "version", "suiteId", "periodDays"]
     .filter(key => scope?.[key]).length;
 
-  return { STATES, FILTERS, PERIODS, TREND_LENGTH, activeScope, compare, counts, history, latest, started,
+  // The bug reports made from each step of a run: from the step itself, or from the same step
+  // in an earlier run of the same document. A step is the same step as in compare().
+  function linkedReports(run, runs = []) {
+    const result = new Map();
+    const add = (stepId, bugReportId) => {
+      if (!bugReportId) return;
+      const list = result.get(stepId) || [];
+      if (!list.includes(text(bugReportId))) list.push(text(bugReportId));
+      result.set(stepId, list);
+    };
+    for (const step of steps(run)) add(text(step.stepId), step.bugReportId);
+    const earlier = (Array.isArray(runs) ? runs : []).filter(other => other &&
+      text(other.testRunId) !== text(run?.testRunId) &&
+      text(other.sessionId) === text(run?.sessionId) &&
+      text(other.createdAt).localeCompare(text(run?.createdAt)) <= 0)
+      .sort(newestFirst);
+    for (const other of earlier) {
+      for (const [step, match] of counterparts(run, other).pairs) {
+        if (match) add(text(step.stepId), match.bugReportId);
+      }
+    }
+    return result;
+  }
+
+  return { STATES, FILTERS, PERIODS, TREND_LENGTH, activeScope, compare, counts, history, latest, started, linkedReports,
     overviewCounts, overviewCsv, overviewFilter, overviewRows, scopeOptions, scopeRuns, stateKey,
     summaries };
 });

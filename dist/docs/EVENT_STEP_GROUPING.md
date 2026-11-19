@@ -223,7 +223,9 @@ language is covered. The captions come from the web client's own language resour
 Microsoft Learn, whose translations of these texts are machine translated and differ from the
 client. Source: the public on-premises platform artifact 26.18.55014.0, file
 `WebClient/.../WebPublish/wwwroot/Resources/Lang/<culture>/Microsoft.Dynamics.Framework.Resource.js`,
-with these resource keys:
+with these resource keys. `tests/bc-client-resources.test.js` checks them against the texts of a
+newer client (`tests/fixtures/bc-client-resources.json`, web client 29.1.57326.58379, written by
+`scripts/build-client-resources.js`); `PdfControl_Close` is no longer in that client.
 
 | Category | Resource keys |
 | --- | --- |

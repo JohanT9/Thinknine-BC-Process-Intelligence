@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const repositoryApi = require('../src/engine/knowledge-repository');
@@ -7,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/index.json'), 'utf8'));
 const packs = manifest.packs.filter(x => x.enabled).map(x => ({
   packId: x.packId,
-  pack: JSON.parse(fs.readFileSync(path.join(root, 'src', x.file), 'utf8'))
+  pack: asLoaded(JSON.parse(fs.readFileSync(path.join(root, 'src', x.file), 'utf8')))
 }));
 const imported = repositoryApi.importRelease(manifest, packs);
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
@@ -21,7 +22,7 @@ const cashFlowSamples = [
   {locale:'es-ES',page:'Previsión de flujo de efectivo',action:'Recalcular previsión'},
   {locale:'da-DK',page:'Pengestrømsprognose',action:'Genberegn prognose'},
   {locale:'fi-FI',page:'Kassavirtaennuste',action:'Laske ennuste uudelleen'},
-  {locale:'nb-NO',page:'Kontantstrømprognose',action:'Omberegn prognose'}
+  {locale:'nb-NO',page:'Kontantstrømprognose',action:'Beregn prognose på nytt'}
 ];
 const cashFlowRule = financePack.rules.find(x => x.ruleId === 'Finance.RecalculateCashFlowForecast');
 for (const {locale,page,action} of cashFlowSamples) {
@@ -50,7 +51,7 @@ const samples = [
   {locale:'es-ES',page:'Diarios generales',post:'Registrar',source:'microsoft-learn-general-journals-es'},
   {locale:'da-DK',page:'Finanskladder',post:'Bogfør',source:'microsoft-learn-general-journals-da'},
   {locale:'fi-FI',page:'Yleinen päiväkirja',post:'Kirjaa',source:'microsoft-learn-general-journals-fi'},
-  {locale:'nb-NO',page:'Generelle journaler',post:'Bokfør',source:'microsoft-learn-general-journals-nb'}
+  {locale:'nb-NO',page:'Finanskladder',post:'Bokfør',source:'microsoft-learn-general-journals-nb'}
 ];
 
 for (const {locale,page,post,source} of samples) {
@@ -66,18 +67,18 @@ for (const {locale,page,post,source} of samples) {
 const dimensionSamples = [
   {locale:'en-US',page:'General Ledger Setup',action:'Change Global Dimensions'},
   {locale:'sv-SE',page:'Redovisningsinställningar',action:'Ändra globala dimensioner'},
-  {locale:'fr-FR',page:'Paramètres comptabilité',action:'Modifier les dimensions globales'},
-  {locale:'de-DE',page:'Einrichtung der Finanzbuchhaltung',action:'Globale Dimensionen ändern'},
-  {locale:'es-ES',page:'Configuración de contabilidad',action:'Cambiar dimensiones globales'},
-  {locale:'da-DK',page:'Regnskabsopsætning',action:'Rediger globale dimensioner'},
-  {locale:'fi-FI',page:'Pääkirjanpidon asetukset',action:'Muuta globaali dimensio'},
+  {locale:'fr-FR',page:'Paramètres comptabilité',action:'Modifier les axes principaux'},
+  {locale:'de-DE',page:'Finanzbuchhaltung Einrichtung',action:'Globale Dimensionen ändern'},
+  {locale:'es-ES',page:'Configuración de contabilidad',action:'Cambiar dimen. globales'},
+  {locale:'da-DK',page:'Opsætning af Finans',action:'Rediger globale dimensioner'},
+  {locale:'fi-FI',page:'Pääkirjanpidon asetukset',action:'Muuta globaaleja dimensioita'},
   {locale:'nb-NO',page:'Finansoppsett',action:'Endre globale dimensjoner'}
 ];
 const chartSamples = [
   {locale:'en-US',page:'Chart of Accounts',action:'Indent Chart of Accounts'},
   {locale:'sv-SE',page:'Kontoplan',action:'Indrag av kontoplan'},
   {locale:'fr-FR',page:'Plan comptable',action:'Indenter plan comptable'},
-  {locale:'de-DE',page:'Kontenplan',action:'Kontenplan einrücken'},
+  {locale:'de-DE',page:'Kontenplan',action:'Einrückung des Kontenplans'},
   {locale:'es-ES',page:'Plan de cuentas',action:'Test plan de cuentas'},
   {locale:'da-DK',page:'Kontoplan',action:'Indryk kontoplan'},
   {locale:'fi-FI',page:'Tilikartta',action:'Sisennä tilikartta'},
@@ -121,10 +122,10 @@ for (const sample of dimensionSamples) {
 
 const yearEndSamples = [
   {locale:'en-US',page:'Accounting Periods',action:'Close Year'},
-  {locale:'sv-SE',page:'Redovisningsperioder',action:'Stäng år'},
+  {locale:'sv-SE',page:'Bokföringsperioder',action:'Avsluta år'},
   {locale:'fr-FR',page:'Périodes comptables',action:'Clôturer exercice'},
-  {locale:'de-DE',page:'Buchhaltungsperioden',action:'Jahr beenden'},
-  {locale:'es-ES',page:'Periodos contables',action:'Cerrar ejercicio'},
+  {locale:'de-DE',page:'Buchhaltungsperioden',action:'Jahr abschließen'},
+  {locale:'es-ES',page:'Periodos contables',action:'Fijar cierre'},
   {locale:'da-DK',page:'Regnskabsperioder',action:'Afslut år'},
   {locale:'fi-FI',page:'Kirjanpitojaksot',action:'Sulje vuosi'},
   {locale:'nb-NO',page:'Regnskapsperioder',action:'Lukk år'}
@@ -149,13 +150,13 @@ assert.ok(!wrongYearEnd.candidates.some(x => x.provenance.ruleId === 'Finance.Cl
 
 const createPeriodsSamples = [
   {locale:'en-US',page:'Accounting Periods',action:'Create Year'},
-  {locale:'sv-SE',page:'Redovisningsperioder',action:'Skapa år'},
+  {locale:'sv-SE',page:'Bokföringsperioder',action:'Upprätta år'},
   {locale:'fr-FR',page:'Périodes comptables',action:'Créer exercice'},
   {locale:'de-DE',page:'Buchhaltungsperioden',action:'Jahr erstellen'},
   {locale:'es-ES',page:'Periodos contables',action:'Crear ejercicio'},
-  {locale:'da-DK',page:'Regnskabsperioder',action:'Opret år'},
+  {locale:'da-DK',page:'Regnskabsperioder',action:'Nyt år'},
   {locale:'fi-FI',page:'Kirjanpitojaksot',action:'Luo vuosi'},
-  {locale:'nb-NO',page:'Regnskapsperioder',action:'Opprett år'}
+  {locale:'nb-NO',page:'Regnskapsperioder',action:'Nytt år'}
 ];
 const createPeriodsRule = financePack.rules.find(x => x.ruleId === 'Finance.CreateAccountingPeriods');
 for (const {locale,page,action} of createPeriodsSamples) {
@@ -176,13 +177,13 @@ assert.ok(!wrongCreatePeriodsAction.candidates.some(x => x.provenance.ruleId ===
 
 const budgetSamples = [
   {locale:'en-US',page:'G/L Budgets',action:'Edit Budget'},
-  {locale:'sv-SE',page:'G/L-budgetar',action:'Redigera budget'},
+  {locale:'sv-SE',page:'Redovisningsbudgetar',action:'Redigera budget'},
   {locale:'fr-FR',page:'G/L Budgets',action:'Modifier budget'},
   {locale:'de-DE',page:'Sachkontenbudgets',action:'Buch.-Blatt bearbeiten'},
-  {locale:'es-ES',page:'Presupuestos de G/L',action:'Editar presupuesto'},
+  {locale:'es-ES',page:'Presupuestos contables',action:'Editar presupuesto'},
   {locale:'da-DK',page:'Finansbudgetter',action:'Rediger budget'},
   {locale:'fi-FI',page:'KP-budjetit',action:'Muokkaa budjettia'},
-  {locale:'nb-NO',page:'G/L-budsjetter',action:'Rediger budsjett'}
+  {locale:'nb-NO',page:'Finansbudsjetter',action:'Rediger budsjett'}
 ];
 const budgetRule = financePack.rules.find(x => x.ruleId === 'Finance.EditGeneralLedgerBudget');
 for (const {locale,page,action} of budgetSamples) {
@@ -208,7 +209,7 @@ const currencyAdjustmentSamples = [
   {locale:'fr-FR',page:'Ajustement des taux de change',action:'Aperçu validation'},
   {locale:'de-DE',page:'Wechselkursregulierung',action:'Buchungsvorschau'},
   {locale:'es-ES',page:'Ajustar tipos de cambio',action:'Vista previa de registro'},
-  {locale:'da-DK',page:'Justering af kursvalutaer',action:'Forhåndsversion'},
+  {locale:'da-DK',page:'Justering af kursvalutaer',action:'Vis bogføring'},
   {locale:'fi-FI',page:'Vaihtokurssien muutos',action:'Esikatsele kirjausta'},
   {locale:'nb-NO',page:'Valutakursjustering',action:'Forhåndsvis bokføring'}
 ];
@@ -234,11 +235,11 @@ const vatReportSamples = [
   {locale:'en-US',page:'VAT Returns',action:'Suggest Lines'},
   {locale:'sv-SE',page:'Momsreturer',action:'Föreslå rader'},
   {locale:'fr-FR',page:'Retours TVA',action:'Proposer lignes'},
-  {locale:'de-DE',page:'Mehrwertsteuererklärungen',action:'Vorschlagszeilen'},
+  {locale:'de-DE',page:'MwSt.-Berichte',action:'Vorschlagszeilen'},
   {locale:'es-ES',page:'Devolución de IVA',action:'Proponer líneas'},
   {locale:'da-DK',page:'Momsangivelser',action:'Foreslå linjer'},
   {locale:'fi-FI',page:'ALV-palautukset',action:'Ehdota rivejä'},
-  {locale:'nb-NO',page:'Mva-returer',action:'Foreslå linjer'}
+  {locale:'nb-NO',page:'Omsetningsoppgaver',action:'Foreslå linjer'}
 ];
 const vatReportRule = financePack.rules.find(x => x.ruleId === 'Finance.SuggestVATReportLines');
 for (const {locale,page,action} of vatReportSamples) {
@@ -292,13 +293,13 @@ assert.ok(!wrongColumnDefinitionAction.candidates.some(x =>
 
 const rowDefinitionSamples = [
   {locale:'en-US',page:'(Financial Report) Row Definitions',action:'Edit Row Definition'},
-  {locale:'sv-SE',page:'(Ekonomiska rapporter) Raddefinitioner',action:'Redigera raddefinition'},
-  {locale:'fr-FR',page:'États financiers définitions de ligne',action:'Modifier la définition de ligne'},
-  {locale:'de-DE',page:'(Finanzberichte) Zeilendefinition',action:'Zeilendefinition bearbeiten'},
+  {locale:'sv-SE',page:'(Ekonomisk rapport) Raddefinitioner',action:'Redigera raddefinition'},
+  {locale:'fr-FR',page:'Définitions de ligne (de l’état financier)',action:'Modifier la définition de ligne'},
+  {locale:'de-DE',page:'(Finanzbericht) Zeilendefinitionen',action:'Zeilendefinition bearbeiten'},
   {locale:'es-ES',page:'Definiciones de fila (informe financiero)',action:'Editar definición de fila'},
   {locale:'da-DK',page:'(Finansiel rapport) Rækkedefinitioner',action:'Rediger rækkedefinition'},
-  {locale:'fi-FI',page:'(Talousraportit) rivimääritykset',action:'Muokkaa rivimääritystä'},
-  {locale:'nb-NO',page:'(Finansrapporter) Raddefinisjon',action:'Rediger raddefinisjon'}
+  {locale:'fi-FI',page:'(Talousraportin) rivimääritykset',action:'Muokkaa rivimääritystä'},
+  {locale:'nb-NO',page:'Raddefinisjoner (for finansrapport)',action:'Rediger raddefinisjon'}
 ];
 const rowDefinitionRule = financePack.rules.find(x =>
   x.ruleId === 'Finance.EditFinancialReportRowDefinition');
@@ -350,12 +351,12 @@ for (const {locale,page,action} of depreciationCalculationSamples) {
 const depreciationPostingSamples = [
   {locale:'en-US',page:'Fixed Asset G/L Journals',action:'Post'},
   {locale:'sv-SE',page:'Anl.tillg. redovisningsjournal',action:'Bokföra'},
-  {locale:'fr-FR',page:'Feuille compta. immo',action:'Valider'},
+  {locale:'fr-FR',page:'Feuilles compta. immo.',action:'Valider'},
   {locale:'de-DE',page:'Anlagen-Fibu Buch.-Blatt',action:'Buchen'},
   {locale:'es-ES',page:'A/F Diario general',action:'Registrar'},
   {locale:'da-DK',page:'Anlægsfinanskladder',action:'Bogfør'},
   {locale:'fi-FI',page:'Käyttöomaisuuden KP-päiväkirja',action:'Kirjaa'},
-  {locale:'nb-NO',page:'AKTIVA-finansjournaler',action:'Bokfør'}
+  {locale:'nb-NO',page:'Finanskladder for aktivum',action:'Bokfør'}
 ];
 const depreciationPostingRule = financePack.rules.find(x =>
   x.ruleId === 'Finance.PostFixedAssetJournal');

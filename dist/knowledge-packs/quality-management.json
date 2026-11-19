@@ -627,8 +627,6 @@
           "^Kvalitetsinspeksjon$"
         ],
         "actionPatterns": [
-          "^Create Purchase Return$",
-          "^Skapa inköpsretur$",
           "^Create Purchase Return Order$",
           "^Skapa inköpsreturorder$",
           "^Créer un ordre de retour d’achat$",
@@ -989,7 +987,6 @@
         "pagePatterns": [
           "^Output Journal$",
           "^Production Journal$",
-          "^Utdatajournal$",
           "^Produktionsjournal$",
           "^Feuille production$",
           "^Produktions Buch\\.-Blatt$",
@@ -1322,7 +1319,6 @@
           "^Artikelspårningsrader$",
           "^Lignes de traçabilité$",
           "^Artikelverfolgungszeilen$",
-          "^Líneas de seguimiento del artículo$",
           "^Varesporingslinjer$",
           "^Lignes traçabilité$",
           "^Líns\\. seguim\\. prod\\.$",

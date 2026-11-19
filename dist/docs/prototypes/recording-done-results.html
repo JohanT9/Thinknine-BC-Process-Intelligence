@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Klart-vyn med tre resultat – prototyp</title>
+<style>
+:root{
+  --brand:#008489;--brand-hover:#006f73;--brand-ink:#005f65;--brand-subtle:#eefafa;
+  --fg:#172b4d;--fg-muted:#526273;--bd:#ccd5df;--bd-strong:#8392a5;
+  --bg:#ffffff;--bg-soft:#f5f7fa;--ok:#18713a;--ok-bg:#e9f7ed;--ok-bd:#15803d;
+  --warn:#7c5800;--warn-bg:#fff7e0;--danger:#8a1c14;--danger-bg:#fff4f2;--danger-bd:#b42318;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font:15px "Segoe UI",system-ui,sans-serif;color:var(--fg);background:#e9edf2;min-height:100vh;display:flex;flex-direction:column}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* ---------- Prototype chrome (not part of the design) ---------- */
+.proto-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;background:#1e293b;color:#fff;font-size:12px}
+.proto-bar strong{margin-right:6px;letter-spacing:.06em;text-transform:uppercase;font-size:11px;opacity:.8}
+.proto-bar button,.proto-bar select{padding:4px 10px;border-radius:5px;border:1px solid #64748b;background:#334155;color:#fff;cursor:pointer;font-size:12px}
+.proto-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.proto-bar .hint{opacity:.75}
+.stage{flex:1;display:flex;min-height:0}
+.bc{flex:1;min-width:0;background:#fff;display:flex;flex-direction:column}
+.bc-top{height:44px;background:#00475e;color:#fff;display:flex;align-items:center;padding:0 16px;font-weight:600;gap:16px}
+.bc-top span{opacity:.75;font-weight:400}
+.bc-body{flex:1;padding:22px 28px;color:#605e5c}
+.bc-body h2{margin:0 0 14px;color:#212121;font-weight:600;font-size:20px}
+.bc-note{max-width:520px;padding:10px 12px;border:1px dashed #9fb3c8;border-radius:6px;font-size:13px;color:#334155;background:#f8fafc;line-height:1.5}
+/* ---------- The side panel ---------- */
+.panel{width:var(--panel-w,360px);flex:0 0 var(--panel-w,360px);background:var(--bg);border-left:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;overflow:auto}
+.p-head{padding:12px 14px 10px;border-bottom:1px solid var(--bd)}
+.p-state{display:flex;align-items:center;gap:8px;margin:0;font-size:.875rem;font-weight:700;color:var(--fg-muted)}
+.p-state .dot{width:10px;height:10px;border-radius:50%;background:var(--bd-strong)}
+.p-body{display:grid;gap:14px;padding:14px}
+.done-top{display:grid;grid-template-columns:40px minmax(0,1fr);gap:4px 12px;align-items:center}
+.check{grid-row:span 2;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ok-bg);color:var(--ok)}
+.done-top h2{margin:0;font-size:1.0625rem;line-height:1.3}
+.done-top h2:focus{outline:none}
+.done-name{margin:0;font-weight:600;color:var(--brand-ink);overflow-wrap:anywhere}
+.facts{margin:0;font-size:.8125rem;color:var(--fg-muted)}
+.lead{margin:2px 0 -4px;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--fg-muted)}
+/* result cards */
+.result{border:1px solid var(--bd);border-radius:10px;background:var(--bg);display:grid;gap:10px;padding:12px;min-width:0}
+.result[data-state=done]{border-color:var(--ok-bd)}
+.r-head{display:grid;grid-template-columns:32px minmax(0,1fr);gap:2px 10px;align-items:start}
+.r-icon{grid-row:span 2;display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:var(--brand-subtle);color:var(--brand-ink)}
+.r-icon svg{width:18px;height:18px}
+.result h3{margin:0;font-size:.9375rem;line-height:1.3}
+.r-help{margin:0;font-size:.8125rem;line-height:1.45;color:var(--fg-muted);overflow-wrap:anywhere}
+.r-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.btn{min-height:36px;margin:0;padding:7px 14px;border:1px solid var(--bd-strong);border-radius:6px;background:var(--bg);color:var(--fg);font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--bg-soft)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--brand-hover)}
+.btn:disabled{opacity:.6;cursor:default}
+.link{margin:0;padding:2px 0;border:0;background:none;color:var(--brand-ink);font-size:.8125rem;text-decoration:underline;cursor:pointer}
+/* status line inside a card */
+.r-status{display:flex;gap:8px;align-items:flex-start;margin:0;padding:8px 10px;border-radius:6px;font-size:.8125rem;line-height:1.45;overflow-wrap:anywhere;background:var(--bg-soft)}
+.r-status:empty{display:none}
+.r-status[data-kind=ok]{background:var(--ok-bg);color:var(--ok)}
+.r-status[data-kind=warn]{background:var(--warn-bg);color:var(--warn)}
+.r-status[data-kind=error]{background:var(--danger-bg);color:var(--danger);border-left:4px solid var(--danger-bd)}
+.r-status .spin{flex:none;width:14px;height:14px;margin-top:2px;border:2px solid var(--bd);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.r-status .spin{animation:none}}
+.r-status b{font-weight:600}
+.r-status .link{font-size:inherit;color:inherit}
+/* the short list preview */
+.steps{margin:0;padding:8px 10px;border-radius:6px;background:var(--bg-soft);font-size:.8125rem;line-height:1.5;display:grid;gap:2px;list-style:none;counter-reset:step}
+.steps li{overflow-wrap:anywhere}
+.steps li:not(.sec){counter-increment:step;display:grid;grid-template-columns:1.6em minmax(0,1fr)}
+.steps li:not(.sec)::before{content:counter(step) ".";color:var(--fg-muted);font-variant-numeric:tabular-nums}
+.steps .sec{margin:4px 0 0;font-weight:700;color:var(--brand-ink)}
+.steps .sec:first-child{margin-top:0}
+.foot{display:grid;gap:8px;padding:12px 14px 16px;border-top:1px solid var(--bd)}
+.foot p{margin:0;font-size:.8125rem;line-height:1.45;color:var(--fg-muted)}
+.foot .row{display:flex;flex-wrap:wrap;gap:8px}
+.foot .row .btn{flex:1 1 130px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="proto-bar" aria-label="Prototypkontroller">
+  <strong>Prototyp</strong>
+  <select id="pWidth" aria-label="Panelbredd"><option value="360">Panel 360 px</option><option value="300">Panel 300 px (smal)</option></select>
+  <label><input type="checkbox" id="pFail"> Word-exporten misslyckas</label>
+  <label><input type="checkbox" id="pCard"> Inspelningen började på ett kort</label>
+  <label><input type="checkbox" id="pSections" checked> Med avsnitt</label>
+  <button id="pReset" type="button">Börja om</button>
+  <span class="hint">Allt är påhittat: inget hämtas och inget sparas.</span>
+</div>
+<div class="stage">
+  <div class="bc" aria-hidden="true">
+    <div class="bc-top">Dynamics 365 Business Central <span>CRONUS Sverige AB</span></div>
+    <div class="bc-body">
+      <h2>Inköpsorder 106015 · Fabrikam Inc.</h2>
+      <p class="bc-note">Användaren har just valt <b>Spara och avsluta</b> i panelen. Panelen till höger visar det som kommer efter: dokumentet är klart och kan användas direkt på tre sätt.</p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-labelledby="doneTitle">
+    <header class="p-head"><p class="p-state"><span class="dot" aria-hidden="true"></span>Inspelningen är avslutad</p></header>
+
+    <section class="p-body">
+      <div class="done-top">
+        <div class="check" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2 id="doneTitle" tabindex="-1">Dokumentet är klart</h2>
+        <p class="done-name">Skapa och släppa en inköpsorder</p>
+      </div>
+      <p class="facts" id="facts"></p>
+
+      <p class="lead" id="leadText">Använd det direkt</p>
+
+      <!-- 1. Word -->
+      <article class="result" id="rWord" aria-labelledby="rWordTitle">
+        <div class="r-head">
+          <span class="r-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8.5 13l1.2 4 1.3-3 1.3 3 1.2-4"/></svg></span>
+          <h3 id="rWordTitle">Dokument att dela</h3>
+          <p class="r-help">Word-fil med alla steg, skärmbilder och markeringar.</p>
+        </div>
+        <div class="r-actions"><button class="btn primary" id="wordBtn" type="button">Hämta Word-fil</button></div>
+        <p class="r-status" id="wordStatus" role="status" aria-live="polite"></p>
+      </article>
+
+      <!-- 2. Test -->
+      <article class="result" id="rTest" aria-labelledby="rTestTitle">
+        <div class="r-head">
+          <span class="r-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/></svg></span>
+          <h3 id="rTestTitle">Testa processen</h3>
+          <p class="r-help">Gör samma steg igen. Panelen bockar av varje steg och du får ett testprotokoll.</p>
+        </div>
+        <div class="r-actions">
+          <button class="btn" id="testBtn" type="button">Starta test</button>
+          <button class="link" id="scriptBtn" type="button">Hämta som Page Scripting-fil</button>
+        </div>
+        <p class="r-status" id="testStatus" role="status" aria-live="polite"></p>
+      </article>
+
+      <!-- 3. Short list -->
+      <article class="result" id="rList" aria-labelledby="rListTitle">
+        <div class="r-head">
+          <span class="r-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3" stroke-linecap="round"/></svg></span>
+          <h3 id="rListTitle">Kort lista att klistra in</h3>
+          <p class="r-help">En rad per steg, till exempel i ett mejl, i Teams eller i ett ärende.</p>
+        </div>
+        <ol class="steps" id="stepList" aria-label="Stegen som kopieras"></ol>
+        <div class="r-actions">
+          <button class="btn" id="copyBtn" type="button">Kopiera listan</button>
+          <button class="link" id="moreBtn" type="button" aria-expanded="false"></button>
+        </div>
+        <p class="r-status" id="copyStatus" role="status" aria-live="polite"></p>
+      </article>
+    </section>
+
+    <footer class="foot">
+      <p>Vill du ändra något först? Granska dokumentet. Du kan hämta allt igen efteråt, och då kommer dina ändringar med.</p>
+      <div class="row">
+        <button class="btn" type="button" id="reviewBtn">Granska dokumentet</button>
+        <button class="btn" type="button" id="closeBtn">Stäng panelen</button>
+      </div>
+      <p class="r-status" id="footStatus" role="status" aria-live="polite"></p>
+    </footer>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const SECTIONS = [
+    { title: "Skapa ordern", steps: [
+      "Välj <b>Sök</b>, ange <i>inköpsorder</i> och välj <b>Inköpsorder</b>.",
+      "Välj <b>Ny</b>.",
+      "Ange <i>10000</i> i <b>Leverantörsnr</b>." ] },
+    { title: "Lägg till rader", steps: [
+      "Ange <i>1896-S</i> i <b>Nr</b> på raden.",
+      "Ange <i>5</i> i <b>Antal</b>." ] },
+    { title: "Släpp ordern", steps: [
+      "Välj <b>Släpp</b>.",
+      "Kontrollera att <b>Status</b> är <i>Släppt</i>." ] }
+  ];
+  const SHOWN = 4;
+  let expanded = false, timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const allSteps = () => SECTIONS.flatMap(s => s.steps);
+  const plain = html => html.replace(/<[^>]+>/g, "");
+
+  function status(el, kind, html, busy = false) {
+    el.dataset.kind = kind || "";
+    el.innerHTML = (busy ? '<span class="spin" aria-hidden="true"></span>' : "") + `<span>${html}</span>`;
+  }
+  function clear(el) { el.dataset.kind = ""; el.innerHTML = ""; }
+
+  function renderFacts() {
+    const n = allSteps().length;
+    $("facts").textContent = $("pSections").checked
+      ? `${n} steg i ${SECTIONS.length} avsnitt · 6 skärmbilder · 2 min 40 s`
+      : `${n} steg · 6 skärmbilder · 2 min 40 s`;
+  }
+
+  function renderList() {
+    const withSections = $("pSections").checked;
+    const items = [];
+    let count = 0;
+    for (const section of SECTIONS) {
+      if (!expanded && count >= SHOWN) break;
+      if (withSections) items.push(`<li class="sec">${section.title}</li>`);
+      for (const step of section.steps) {
+        if (!expanded && count >= SHOWN) break;
+        items.push(`<li><span>${step}</span></li>`); count++;
+      }
+    }
+    $("stepList").innerHTML = items.join("");
+    const rest = allSteps().length - SHOWN;
+    $("moreBtn").hidden = rest <= 0;
+    $("moreBtn").textContent = expanded ? "Visa färre" : `Visa alla ${allSteps().length} steg`;
+    $("moreBtn").setAttribute("aria-expanded", String(expanded));
+  }
+
+  function listText() {
+    const withSections = $("pSections").checked;
+    let n = 0;
+    return SECTIONS.map(section => {
+      const lines = section.steps.map(step => `${++n}. ${plain(step)}`);
+      return withSections ? [section.title, ...lines].join("\n") : lines.join("\n");
+    }).join(withSections ? "\n\n" : "\n");
+  }
+
+  // ---- 1. Word: generation, handoff to the browser, confirmed completion ----
+  $("wordBtn").addEventListener("click", () => {
+    const btn = $("wordBtn"), el = $("wordStatus");
+    btn.disabled = true; $("rWord").dataset.state = "";
+    const total = allSteps().length;
+    let step = 0;
+    status(el, "", "Skapar Word-filen…", true);
+    const tick = () => {
+      step++;
+      if (step <= total) { status(el, "", `Skapar Word-filen… steg ${step} av ${total}`, true); later(tick, 260); return; }
+      if ($("pFail").checked) {
+        btn.disabled = false; btn.textContent = "Försök igen";
+        status(el, "error", "Word-filen kunde inte skapas eftersom en skärmbild inte gick att läsa. Dokumentet är oförändrat. Försök igen, eller granska dokumentet och byt bilden i steg 4.");
+        return;
+      }
+      status(el, "", "Filen är lämnad till webbläsaren och hämtas…", true);
+      later(() => {
+        $("rWord").dataset.state = "done";
+        btn.disabled = false; btn.textContent = "Hämta igen"; btn.classList.remove("primary");
+        status(el, "ok", '<b>Sparad i Hämtade filer:</b> Skapa och släppa en inköpsorder.docx · <button class="link" type="button" data-open>Öppna filen</button>');
+      }, 900);
+    };
+    later(tick, 300);
+  });
+  $("wordStatus").addEventListener("click", e => {
+    if (e.target.closest("[data-open]")) status($("wordStatus"), "ok", "<b>Prototyp:</b> här öppnas filen i Word.");
+  });
+
+  // ---- 2. Test ----
+  $("testBtn").addEventListener("click", () => {
+    const el = $("testStatus");
+    $("testBtn").disabled = true;
+    status(el, "", "Gör ett test av dokumentet…", true);
+    later(() => {
+      $("testBtn").disabled = false;
+      status(el, "ok", `<b>Testet är klart att köra.</b> Panelen visar de ${allSteps().length} stegen. Gå till Business Central och gör dem; varje steg bockas av när du gör det.`);
+    }, 900);
+  });
+  $("scriptBtn").addEventListener("click", () => {
+    const el = $("testStatus");
+    status(el, "", "Skapar Page Scripting-filen…", true);
+    later(() => {
+      const n = allSteps().length - 1;
+      const base = `<b>Sparad i Hämtade filer</b> med ${n} av ${allSteps().length} steg. Spela upp den under Sidskript i Business Central.`;
+      const skipped = " Kontrollsteget om Status kom inte med.";
+      if ($("pCard").checked) {
+        status(el, "warn", base + skipped + " <b>Obs:</b> testet körs på den order som är öppen när du spelar upp. Spela in från listan Inköpsorder för ett säkrare test.");
+      } else status(el, "ok", base + skipped);
+    }, 1000);
+  });
+
+  // ---- 3. Copy ----
+  $("copyBtn").addEventListener("click", async () => {
+    const el = $("copyStatus");
+    try {
+      await navigator.clipboard.writeText(listText());
+      $("rList").dataset.state = "done";
+      status(el, "ok", `<b>Kopierad.</b> ${allSteps().length} steg ligger i urklipp. Klistra in med Ctrl+V.`);
+    } catch {
+      status(el, "error", "Listan kunde inte kopieras. Markera listan ovan och kopiera med Ctrl+C.");
+    }
+  });
+  $("moreBtn").addEventListener("click", () => { expanded = !expanded; renderList(); });
+
+  $("reviewBtn").addEventListener("click", () => status($("footStatus"), "", "<b>Prototyp:</b> här öppnas dokumentet i granskningen."));
+  $("closeBtn").addEventListener("click", () => status($("footStatus"), "", "<b>Prototyp:</b> här stängs panelen."));
+
+  // ---- Prototype controls ----
+  function reset() {
+    timers.forEach(clearTimeout); timers = []; expanded = false;
+    for (const id of ["wordStatus", "testStatus", "copyStatus", "footStatus"]) clear($(id));
+    for (const id of ["rWord", "rTest", "rList"]) $(id).dataset.state = "";
+    $("wordBtn").disabled = false; $("wordBtn").textContent = "Hämta Word-fil"; $("wordBtn").classList.add("primary"); $("testBtn").disabled = false;
+    renderFacts(); renderList(); $("doneTitle").focus();
+  }
+  $("pWidth").addEventListener("change", e => document.documentElement.style.setProperty("--panel-w", e.target.value + "px"));
+  $("pSections").addEventListener("change", () => { renderFacts(); renderList(); clear($("copyStatus")); });
+  $("pReset").addEventListener("click", reset);
+  reset();
+})();
+</script>
+</body>
+</html>

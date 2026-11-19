@@ -11,7 +11,8 @@
   // glyphs, section toggles); these captions cover what structure cannot.
   // Sources: the Business Central web client's own language resources
   // (WebPublish/wwwroot/Resources/Lang/<culture>/Microsoft.Dynamics.Framework.Resource.js,
-  // platform 26.18.55014.0; resource keys in docs/EVENT_STEP_GROUPING.md) and captions observed
+  // platform 26.18.55014.0, checked against web client 29.1 by tests/bc-client-resources.test.js;
+  // resource keys in docs/EVENT_STEP_GROUPING.md) and captions observed
   // in recordings. No caption is translated by hand.
   const escape = text => text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   const stem = text => escape(text.trim().replace(/[.?]$/u, "")).replace(/\s+/gu, "\\s*");

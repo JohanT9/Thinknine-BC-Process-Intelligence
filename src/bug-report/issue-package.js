@@ -60,6 +60,9 @@
       reproduction: clone(section(document, "reproduction") || []),
       expectedResult: section(document, "expected-result") || "",
       actualResult: clone(section(document, "actual-result")),
+      // The possible cause goes with what is sent only when the user included it.
+      possibleCause: (cause => cause?.cause && cause.include && !cause.dismissed
+        ? clone(cause.cause) : null)(section(document, "possible-cause")),
       errorEvidence: clone(section(document, "bc-errors")),
       environment: clone(section(document, "environment")),
       diagnostics: clone(section(document, "technical-diagnostics")),

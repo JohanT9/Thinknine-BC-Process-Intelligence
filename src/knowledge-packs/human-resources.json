@@ -52,7 +52,7 @@
       "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
         "pagePatterns": ["^Absence Registration$", "^Frånvaroregistrering$", "^Saisie des absences$", "^Abwesenheitsregistrierung$", "^Registro ausencias$", "^Fraværsregistrering$", "^Poissaolon rekisteröinti$"],
-        "actionPatterns": ["^Overview by Categories$", "^Overview by Periods$", "^Översikt per kategori$", "^Översikt per perioder$", "^Översikt per period$", "^Détail par catégorie$", "^Détail par période$", "^Übersicht nach Kategorien$", "^Übersicht nach Perioden$", "^Panorama por categorías$", "^Panorama por periodos$", "^Oversigt pr\\. kategori$", "^Oversigt pr\\. periode$", "^Yleiskuvaus luokittain$", "^Yleiskuvaus kausittain$", "^Oversikt per kategori$", "^Oversikt per periode$"],
+        "actionPatterns": ["^Overview by Categories$", "^Overview by Periods$", "^Översikt per kategori$", "^Översikt per period$", "^Détail par catégorie$", "^Détail par période$", "^Übersicht nach Kategorien$", "^Übersicht nach Perioden$", "^Panorama por categorías$", "^Panorama por periodos$", "^Oversigt pr\\. kategori$", "^Oversigt pr\\. periode$", "^Yleiskuvaus luokittain$", "^Yleiskuvaus kausittain$", "^Oversikt per kategori$", "^Oversikt per periode$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
@@ -158,7 +158,6 @@
           "^Frånvaroregistrering$",
           "^Saisie des absences$",
           "^Abwesenheitsregistrierung$",
-          "^Registro de ausencias$",
           "^Fraværsregistrering$",
           "^Poissaolon rekisteröinti$",
           "^Registro ausencias$"
@@ -220,17 +219,13 @@
           "^Personalkort$",
           "^Fiche salarié$",
           "^Mitarbeiterkarte$",
-          "^Ficha de empleado$",
           "^Medarbejderkort$",
-          "^Työntekijäkortti$",
           "^Ansattkort$",
           "^Ficha empleado$",
           "^Työntekijän kortti$"
         ],
         "actionPatterns": [
           "^Apply Template$",
-          "^tillämpa mall$",
-          "^Appliquer le modèle$",
           "^Vorlage anwenden$",
           "^Aplicar plantilla$",
           "^Anvend skabelon$",

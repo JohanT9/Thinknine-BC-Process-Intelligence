@@ -1,10 +1,12 @@
 (function (root, factory) {
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
-  const api = factory(languages);
+  const errorCause = typeof module === "object" && module.exports
+    ? require("./error-cause") : root.T9ErrorCause;
+  const api = factory(languages, errorCause);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9IssuePackageMarkdown = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages, errorCause) {
   "use strict";
   const value = input => input == null ? "" : String(input);
   const SWEDISH = Object.freeze({ summary: "Sammanfattning",
@@ -60,6 +62,12 @@
       `${index + 1}. ${instruction(step.instruction)}`));
     add(labels.expected, [inline(pkg.expectedResult)]);
     add(labels.actual, [inline(pkg.actualResult?.userDescription)]);
+    // Only when the user included it, marked as not confirmed.
+    const cause = errorCause?.exported(pkg.possibleCause, pkg.documentLanguage || "en-US");
+    if (cause) add(inline(cause.title), [inline(cause.text),
+      ...(cause.checks.length ? ["", `**${inline(cause.checksTitle)}**`, "", ...cause.checks.map(item => `- ${inline(item)}`)] : []),
+      ...(cause.origin ? ["", `**${inline(cause.originTitle)}:** ${inline(cause.origin)}`] : []),
+      ...(cause.actions.length ? ["", `**${inline(cause.actionsTitle)}**`, "", ...cause.actions.map(item => `- ${inline(item)}`)] : [])]);
     add(labels.error, errors.flatMap((error, index) => [
       errors.length > 1 ? `### ${index === 0 ? labels.primaryError : labels.additionalError}` : null,
       code(error.rawMessage || ""), error.supportUrl

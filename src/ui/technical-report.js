@@ -860,6 +860,8 @@
     void loadReportScreenshots();
   }
   async function initialize() {
+    // Microsoft's known error messages, for where an error comes from; the report works without them.
+    const knownErrors = globalThis.T9ErrorCause?.loadKnown?.();
     try {
       const response = await send({ type: "T9_GET_SETTINGS" });
       currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
@@ -870,6 +872,7 @@
     globalThis.T9UiI18n.observe(() => currentUiLocale);
     document.title = globalThis.T9UiI18n.translateStaticText(
       "Technical Bug Report", currentUiLocale);
+    await knownErrors;
     await start();
   }
   initialize().catch(error => { message.textContent = t(error.message); });

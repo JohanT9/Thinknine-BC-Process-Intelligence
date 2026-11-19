@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require("node:fs");
 const path = require("node:path");
 const knowledgeRepository = require("../src/engine/knowledge-repository");
@@ -8,7 +9,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root,
   "src/knowledge-packs/index.json"), "utf8"));
 const packs = manifest.packs.filter(item => item.enabled).map(descriptor => ({
   packId: descriptor.packId,
-  pack: JSON.parse(fs.readFileSync(path.join(root, "src", descriptor.file), "utf8"))
+  pack: asLoaded(JSON.parse(fs.readFileSync(path.join(root, "src", descriptor.file), "utf8")))
 }));
 const imported = knowledgeRepository.importRelease(manifest, packs);
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
@@ -79,9 +80,9 @@ for (const [context, expectedRule, sourceId] of [
   [{ pageCaption: "Förs.order", fieldCaption: "Ant. att utleverera" }, "Sales.SetQtyToShip", "microsoft-learn-sales-order-process-sv"],
   [{ pageCaption: "Inköpsorder", fieldCaption: "Inlevereras antal" }, "Purchase.SetQtyToReceive", "microsoft-learn-purchase-recording-sv"],
   [{ pageCaption: "Lagerplockning", fieldCaption: "Ant. att hantera" }, "Warehouse.SetQtyToHandlePick", "microsoft-learn-inventory-picks-sv"],
-  [{ pageCaption: "Dist.lager inleverans", actionCaption: "Bokföra inleverans" }, "Warehouse.PostReceiptAction", "microsoft-learn-advanced-receiving-putaway-sv"],
+  [{ pageCaption: "Dist.lager inleverans", actionCaption: "Bokför inleverans" }, "Warehouse.PostReceiptAction", "microsoft-learn-advanced-receiving-putaway-sv"],
   [{ pageCaption: "Dist.lager artikelinförsel", actionCaption: "Registrera artikelinförsel" }, "Warehouse.RegisterPutAway", "microsoft-learn-warehouse-putaways-sv"],
-  [{ pageCaption: "Produktionsjournal", fieldCaption: "Förbrukningskvantitet" }, "Manufacturing.EnterConsumptionQuantity", "microsoft-learn-production-journal-sv"],
+  [{ pageCaption: "Produktionsjournal", fieldCaption: "Förbrukningsantal" }, "Manufacturing.EnterConsumptionQuantity", "microsoft-learn-production-journal-sv"],
   [{ pageCaption: "Produktionsjournal", fieldCaption: "Utflöde antal" }, "Manufacturing.EnterOutputQuantity", "microsoft-learn-production-journal-sv"]
 ,
   [{ pageCaption: "Sales Return Order", actionCaption: "Get Posted Document Lines to Reverse" }, "Sales.GetPostedLinesToReverse", "microsoft-learn-sales-return-orders"],
@@ -95,11 +96,11 @@ for (const [context, expectedRule, sourceId] of [
   [{ pageCaption: "Purchase Return Order", actionCaption: "Post" }, "Purchase.PostPurchaseReturnOrder", "microsoft-learn-purchase-returns"],
   [{ pageCaption: "Posted Purchase Invoices", actionCaption: "Create Corrective Credit Memo" }, "Purchase.CreateCorrectiveCreditMemo", "microsoft-learn-purchase-returns"],
   [{ pageCaption: "Inköpskreditnota", actionCaption: "Koppla transaktioner" }, "Purchase.ApplyCreditMemoEntries", "microsoft-learn-purchase-returns-sv"],
-  [{ pageCaption: "Sales Credit Memo", actionCaption: "Copy from Document" }, "Sales.CopyToCreditMemo", "microsoft-learn-sales-returns"],
+  [{ pageCaption: "Sales Credit Memo", actionCaption: "Copy Document" }, "Sales.CopyToCreditMemo", "microsoft-learn-sales-returns"],
   [{ pageCaption: "Försäljningskreditnota", actionCaption: "Bokföra" }, "Sales.PostSalesCreditMemo", "microsoft-learn-sales-returns-sv"],
   [{ pageCaption: "Posted Sales Invoices", actionCaption: "Cancel" }, "Sales.CancelUnpaidPostedInvoice", "microsoft-learn-sales-returns"],
   [{ pageCaption: "Purchase Credit Memo", actionCaption: "Apply Entries" }, "Purchase.ApplyCreditMemoEntries", "microsoft-learn-purchase-returns"],
-  [{ pageCaption: "Inköpskreditnota", actionCaption: "Kopiera från dokument" }, "Purchase.CopyToCreditMemo", "microsoft-learn-purchase-returns-sv"],
+  [{ pageCaption: "Inköpskreditnota", actionCaption: "Kopiera dokument" }, "Purchase.CopyToCreditMemo", "microsoft-learn-purchase-returns-sv"],
   [{ pageCaption: "Purchase Credit Memo", actionCaption: "Post" }, "Purchase.PostPurchaseCreditMemo", "microsoft-learn-purchase-returns"],
   [{ pageCaption: "Cash Receipt Journal", actionCaption: "Post" }, "CashManagement.PostCashReceiptJournal", "microsoft-learn-customer-payments"],
   [{ pageCaption: "Kassakvittojournaler", actionCaption: "Koppla transaktioner" }, "CashManagement.ApplyCustomerEntries", "microsoft-learn-customer-payments-sv"],
@@ -138,7 +139,7 @@ const scopedPayments=repository.resolveAction({objectRef:{objectId:"1290",appVer
 const multilingualSamples=[
   ["sv-SE","Förs.ret.order","Hämta bokförda dokumentrader som ska återföras","Sales.GetPostedLinesToReverse"],
   ["en-US","Sales Return Order","Get Posted Document Lines to Reverse","Sales.GetPostedLinesToReverse"],
-  ["fr-FR","Commandes de retour des ventes","Afficher des lignes document validées à contrepasser","Sales.GetPostedLinesToReverse"],
+  ["fr-FR","Commandes de retour des ventes","Extraire lignes document enreg. à contrepasser","Sales.GetPostedLinesToReverse"],
   ["de-DE","Verkaufsrücklaufaufträge","Zu stornierende gebuchte Belegzeilen abrufen","Sales.GetPostedLinesToReverse"],
   ["es-ES","Pedidos de devolución de ventas","Revertir líneas documentos registrados","Sales.GetPostedLinesToReverse"],
   ["da-DK","Salgsreturvareordrer","Hent bogførte bilagslinjer, der skal tilbageføres","Sales.GetPostedLinesToReverse"],
@@ -154,7 +155,7 @@ for(const [locale,pageCaption,actionCaption,ruleId] of multilingualSamples){
 const multilingualPurchaseSamples=[
   ["sv-SE","Inköpsreturorder","Hämta bokförda dokumentrader för reversering"],
   ["en-US","Purchase Return Order","Get Posted Document Lines to Reverse"],
-  ["fr-FR","Commandes de retour d'achat","Afficher des lignes document validées à contrepasser"],
+  ["fr-FR","Commandes de retour d'achat","Extraire lignes document enreg. à contrepasser"],
   ["de-DE","Rückkauf-Aufträge","Zu stornierende gebuchte Belegzeilen abrufen"],
   ["es-ES","Pedidos de devolución de compra","Revertir líneas documentos registrados"],
   ["da-DK","Købsreturvareordrer","Hent bogførte bilagslinjer, der skal tilbageføres"],
@@ -168,14 +169,14 @@ for(const [locale,pageCaption,actionCaption] of multilingualPurchaseSamples){
   assert.equal(found.candidates[0].provenance.language,locale);
 }
 const multilingualPaymentSamples=[
-  ["sv-SE","Betalningsjournaler","Föreslå leverantörsbetalningar"],
+  ["sv-SE","Betalningsjournaler","Betalningsförslag för lev."],
   ["en-US","Payment Journal","Suggest Vendor Payments"],
   ["fr-FR","Feuilles paiement","Proposer paiements fournisseur"],
-  ["de-DE","Zahlungsausgangs Buch.-Blatt","Lieferantenzahlung vorschlagen"],
-  ["es-ES","Diario de pagos","Proponer pagos a proveedor"],
+  ["de-DE","Zahlungsausgangs Buch.-Blatt","Zahlungsvorschlag"],
+  ["es-ES","Diario de pagos","Proponer pagos a proveedores"],
   ["da-DK","Betalingskladder","Lav kreditorbetalingsforslag"],
   ["fi-FI","Maksupäiväkirjat","Ehdota toimittajamaksuja"],
-  ["nb-NO","Utbetalingskladd","Betalingsforslag – leverandør"]
+  ["nb-NO","Utbetalingskladd","Betalingsforslag - leverandør"]
 ];
 for(const [locale,pageCaption,actionCaption] of multilingualPaymentSamples){
   const found=repository.resolveAction({language:locale,context:{pageCaption,actionCaption}});

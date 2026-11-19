@@ -1,10 +1,11 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const knowledge = require('../src/engine/knowledge-domain');
-const docs = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/electronic-documents.json'), 'utf8'));
-const hr = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/human-resources.json'), 'utf8'));
-const bank = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/bank-reconciliation.json'), 'utf8'));
+const docs = asLoaded(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/electronic-documents.json'), 'utf8')));
+const hr = asLoaded(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/human-resources.json'), 'utf8')));
+const bank = asLoaded(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src/knowledge-packs/bank-reconciliation.json'), 'utf8')));
 const edocMatch = docs.rules.find(rule => rule.ruleId === 'ElectronicDocuments.MatchPurchaseOrderLines');
 const edocLink = docs.rules.find(rule => rule.ruleId === 'ElectronicDocuments.UpdatePurchaseOrderLink');
 const hrAbsenceCategories = hr.rules.find(rule => rule.ruleId === 'HumanResources.ViewAbsenceByCategories');

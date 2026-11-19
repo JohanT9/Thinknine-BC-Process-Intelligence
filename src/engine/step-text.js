@@ -1,16 +1,19 @@
 (function (root, factory) {
-  const api = factory();
+  const registry = typeof module === "object" && module.exports
+    ? require("./language-registry") : root.T9LanguageRegistry;
+  const api = factory(registry);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9StepText = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (registry) {
   // The one place where a step's sentence is written. A step is described by its kind and the
   // values it was recorded with (captions as Business Central showed them, values as entered),
   // and its sentence is written from that description in the document's language when the
   // document is shown. Changing the document language therefore changes every generated step,
   // and every language has its own template instead of a translation of a Swedish sentence.
   const VERSION = "1.0.0";
-  const LOCALES = Object.freeze(["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI",
-    "nb-NO"]);
+  // The document languages of the language registry. A registered language without templates
+  // here fails tests/language-lists.test.js.
+  const LOCALES = Object.freeze(registry.supported("document").map(language => language.locale));
 
   function deepFreeze(value) {
     if (value && typeof value === "object" && !Object.isFrozen(value)) {

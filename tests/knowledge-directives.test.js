@@ -1,11 +1,12 @@
 const assert=require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs=require('fs');
-const pack=JSON.parse(fs.readFileSync('src/knowledge-packs/core.json','utf8'));
-const salesPack=JSON.parse(fs.readFileSync('src/knowledge-packs/sales.json','utf8'));
+const pack=asLoaded(JSON.parse(fs.readFileSync('src/knowledge-packs/core.json','utf8')));
+const salesPack=asLoaded(JSON.parse(fs.readFileSync('src/knowledge-packs/sales.json','utf8')));
 const knowledge=require('../src/engine/knowledge-domain');
 const pipeline=require('../src/engine/session-interpretation-pipeline');
 const manifest=JSON.parse(fs.readFileSync('src/knowledge-packs/index.json','utf8'));
-const all=manifest.packs.filter(x=>x.enabled).map(x=>JSON.parse(fs.readFileSync('src/'+x.file,'utf8')));
+const all=manifest.packs.filter(x=>x.enabled).map(x=>asLoaded(JSON.parse(fs.readFileSync('src/'+x.file,'utf8'))));
 const cases=[
  ['sv-SE','Sök'],['en-US','Search'],['fr-FR','Rechercher'],['de-DE','Suchen'],
  ['es-ES','Buscar'],['da-DK','Søg'],['fi-FI','Haku'],['nb-NO','Søk']
@@ -69,7 +70,7 @@ const salesExplanationCases=[
  ['sv-SE','Försäljningsorder','Släpp','Bokför'],
  ['en-US','Sales Order','Release','Post'],
  ['fr-FR','Commande vente','Lancer','Valider'],
- ['de-DE','Verkaufsauftrag','Freigabe','Buchen'],
+ ['de-DE','Verkaufsauftrag','Freigeben','Buchen'],
  ['es-ES','Pedido de venta','Liberar','Registrar'],
  ['da-DK','Salgsordre','Frigiv','Bogfør'],
  ['fi-FI','Myyntitilaus','Vapauta','Kirjaa'],

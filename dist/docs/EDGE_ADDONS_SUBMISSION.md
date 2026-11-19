@@ -1,7 +1,7 @@
 # Microsoft Edge Add-ons submission material
 
-Checked against `src/ui/manifest.json` for version 4.7.265 after the removal of
-Application Insights. Recheck the permission inventory and the data-handling
+Checked against `src/ui/manifest.json` for version 4.7.271 (Application
+Insights removed in 4.7.267, Share link added in 4.7.271). Recheck the permission inventory and the data-handling
 section whenever the manifest, the license service or an integration changes.
 
 ## Listing copy
@@ -24,10 +24,12 @@ Long description: BC Process Studio captures authorized user interactions in
 Microsoft Dynamics 365 Business Central, keeps the source events and
 screenshots in the browser, and creates editable process documentation. Users
 review generated steps, correct wording and structure, annotate screenshots and
-export Word or PDF documents. The same recordings become manual test scripts,
-Page Scripting tests and technical bug reports. Recordings, screenshots and
-documents stay in the browser until the user exports, emails or synchronizes
-them. Use requires a BC Process Studio license and a Microsoft work account;
+export Word or PDF documents. A document can be written again in another
+language, with Business Central's own names for fields, actions and pages in
+that language. The same recordings become manual test scripts, Page Scripting
+tests and technical bug reports. Recordings, screenshots and documents stay in
+the browser until the user exports, emails, shares or synchronizes them; Share
+link puts the Word file in the user's own OneDrive. Use requires a BC Process Studio license and a Microsoft work account;
 the license check sends only technical identifiers, never recorded content.
 
 The listing is shown in every registered language (Swedish, English, French,
@@ -42,7 +44,7 @@ without review.
 | `activeTab` | Active BC page access and visible-tab screenshot capture in `src/recorder/background.js` and popup orchestration | Required | Capture only the tab the user records. |
 | `alarms` | Retries pending document-usage statistics every five minutes (`document-usage-sync` in `background.js`) | Required | Deliver the anonymous document count reliably when the network was unavailable. |
 | `downloads` | Word, PDF, ZIP, test and library exports through `chrome.downloads.download` | Required | Save user-requested files locally. |
-| `identity` | `chrome.identity.launchWebAuthFlow` for Microsoft sign-in: the license (`src/engine/consultant-license.js`) and, when the user chooses it, Outlook email (`src/bug-report/outlook-draft.js`) | Required | Sign in with the user's Microsoft work account. |
+| `identity` | `chrome.identity.launchWebAuthFlow` for Microsoft sign-in: the license (`src/engine/consultant-license.js`) and, when the user chooses them, Outlook email (`src/bug-report/outlook-draft.js`) and Share link (`src/document/onedrive-share.js`) | Required | Sign in with the user's Microsoft work account. |
 | `scripting` | Register/inject recorder scripts into eligible BC frames in background/popup | Required | Start reliable capture in standard and nested BC UI. |
 | `sidePanel` | Recording panel and test run beside the Business Central tab (`src/ui/test-panel.html`), opened by the user | Required | Follow a recording or a manual test without leaving Business Central. |
 | `storage` | Settings, recordings, reviews, screenshots, documents, tests, bug reports and diagnostics in `chrome.storage.local`; `managed_schema` lets an administrator turn technical diagnostics off by policy | Required | Preserve work between browser sessions. |
@@ -51,7 +53,7 @@ without review.
 | `webNavigation` | Enumerate frame topology for control add-ins and diagnostics in `background.js` | Required | Capture and diagnose Business Central nested frames. |
 | `businesscentral.dynamics.com` and subdomains | Capture content scripts; one script runs in the page itself (`al-identity-capture.js`, `world: MAIN`) to read the control identity Business Central exposes | Required | Record only supported Business Central web environments. |
 | License service host (`…swedencentral-01.azurewebsites.net`) | License check, trial, consultant registration, usage statistics in `src/engine/tenant-license.js` and `consultant-license.js`; `open-link.js` runs only on its `/open` page and opens the test named in an assignment-email link | Required | Check the license and open a test from an assignment email. |
-| `login.microsoftonline.com` | Microsoft Entra token exchange for sign-in (`consultant-license.js`, `outlook-draft.js`) | Required | Complete Microsoft sign-in. |
+| `login.microsoftonline.com` | Microsoft Entra token exchange for sign-in (`consultant-license.js`, `outlook-draft.js`, `onedrive-share.js`) | Required | Complete Microsoft sign-in. |
 | `graph.microsoft.com` (optional) | Requested at runtime with `chrome.permissions.request` only when the user chooses to create an Outlook draft, send an email, look up recipients (`Mail.ReadWrite`, `Mail.Send`, `People.Read`) or share a document as a link (`Files.ReadWrite`, `src/document/onedrive-share.js`) | Optional | Email a report or test assignment from the user's own Outlook; share a document from the user's own OneDrive. |
 | `web_accessible_resources`: `knowledge-packs/*.json` for `<all_urls>` | Public Business Central knowledge catalog read by the capture scripts | Required, scope to review | Read the built-in page and field catalog. See open item 1. |
 
@@ -72,7 +74,16 @@ disclosure, not legal advice.
 | Share as a link (optional) | Microsoft Graph, into the user's own OneDrive | Only when the user chooses Share link, Update or Stop sharing for a document | The document's Word file (steps, screenshots with masking applied, highlights) in the folder BC Process Studio, and a view-only link for people in the user's organization. Nothing is stored by BC Process Studio |
 | Library synchronization (optional) | A local folder the user chooses | When the user synchronizes | Document files; any further transfer is done by the user's own sync service, such as OneDrive |
 
-Nothing else is sent. There is no analytics, no telemetry service and no AI
+Nothing else is sent. Business Central's names in other languages and the
+example document on the Get started page are packaged with the extension
+(`document/bc-captions.json`, `knowledge-packs/`, `welcome.js`), not fetched
+from a service. The same goes for the error messages of Microsoft's apps
+(`bug-report/error-labels.js`, `bug-report/error-known.json`). The .app files a
+user adds under Settings → Bug reports → Your own apps are read
+in the browser; only the apps' names, versions, error messages (with the
+objects and action captions that go with them) and the captions of their pages,
+actions and fields are kept in
+`chrome.storage.local`, and nothing is sent. There is no analytics, no telemetry service and no AI
 service. Application Insights is not queried; an Application Insights session
 ID that Business Central itself shows in an error's details is kept as captured
 evidence in the local report.
@@ -105,10 +116,13 @@ Provide in the submission's notes for certification:
 
 - a Business Central sandbox URL with demo data only, and a test user;
 - a license or trial path that works for that tenant;
-- the steps: open Business Central, choose **Record a process** in the
-  toolbar, perform a few steps, choose **Stop**, review and export;
-- that the Outlook and Graph features are optional and require the reviewer's
-  own Microsoft account.
+- the steps: after installation the **Get started** page opens and guides the
+  first recording. Open Business Central, choose **Document a process** from
+  the BC Process Studio button in the toolbar, perform a few steps in the
+  sandbox, then choose **Finish and save** in the recording panel and
+  **Download Word file**, or open the document to review it;
+- that Outlook email and Share link are optional and use the reviewer's own
+  Microsoft work account with Outlook and OneDrive.
 
 **HUMAN INPUT REQUIRED**: create and maintain the reviewer tenant and account.
 Never give reviewers customer data or a personal account.
@@ -128,12 +142,16 @@ See [EDGE_DISTRIBUTION.md](EDGE_DISTRIBUTION.md) and
 Humans must create sanitized, current screenshots, never fabricated or copied
 from a customer environment:
 
-1. Recording in a BC sandbox with the recording panel: the in-context workflow.
-2. Review Workspace: generated steps and editing.
+1. Recording in a BC sandbox with the recording panel: the in-context workflow,
+   ideally the done view after Finish and save (Download Word file, Start
+   test, Share link).
+2. Review Workspace: generated steps, editing and the document language in the
+   toolbar.
 3. Screenshot annotation: rectangle/arrow editing without sensitive data.
 4. Document Workspace: the professional generated document.
 5. Word or PDF output: the exported result.
 6. Test script or bug report, if it strengthens the listing.
+7. Get started page, if a first-use image is wanted.
 
 Provide the store logo and any promotional tiles required at submission, using
 the existing product identity. Exact dimensions and image count must be

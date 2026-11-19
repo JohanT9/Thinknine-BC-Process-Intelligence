@@ -175,7 +175,7 @@
       "confidence": 0.96,
       "verifiedRuntimeLocales": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "match": {
-        "pagePatterns": ["^Opportunity List$", "^Affärsmöjlighetslista$", "^Opportunities$", "^Affärsmöjligheter$", "^Opportunités$", "^Verkaufschancen$", "^Oportunidades$", "^Salgsmuligheder$", "^Mahdollisuudet$", "^Salgsmuligheter$"],
+        "pagePatterns": ["^Affärsmöjlighetslista$", "^Opportunities$", "^Affärsmöjligheter$", "^Opportunités$", "^Verkaufschancen$", "^Oportunidades$", "^Salgsmuligheder$", "^Mahdollisuudet$", "^Salgsmuligheter$"],
         "actionPatterns": ["^Update$", "^Uppdatera$", "^Mettre à jour$", "^Aktualisieren$", "^Actualizar$", "^Opdater$", "^Päivitä$", "^Oppdater$"],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -423,8 +423,6 @@
         "actionPatterns": [
           "^Refine Contacts$",
           "^Reduce Contacts$",
-          "^Förfina kontakter$",
-          "^Minska kontakter$",
           "^Förfina urval$",
           "^Reducera kontakter$",
           "^Redéfinir les contacts$",

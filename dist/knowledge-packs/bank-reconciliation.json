@@ -23,8 +23,6 @@
           "^Bankkontoavstemming$",
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
-          "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$",
           "^Conciliación banco$"
         ],
         "actionPatterns": [
@@ -92,8 +90,6 @@
           "^Bankkontoavstemming$",
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
-          "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$",
           "^Conciliación banco$"
         ],
         "actionPatterns": [
@@ -161,8 +157,6 @@
           "^Bankkontoavstemming$",
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
-          "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$",
           "^Conciliación banco$"
         ],
         "actionPatterns": [
@@ -231,8 +225,6 @@
           "^Bankkontoavstemming$",
           "^Bank Account Reconciliation$",
           "^Bankavstämning$",
-          "^Bankkontenabgleich$",
-          "^Conciliación de cuenta bancaria$",
           "^Conciliación banco$"
         ],
         "actionPatterns": [

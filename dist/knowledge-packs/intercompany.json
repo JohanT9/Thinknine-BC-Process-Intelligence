@@ -25,7 +25,6 @@
         "pagePatterns": [
           "^Intercompany Setup$",
           "^Koncernintern inställning$",
-          "^Företagsintern installation$",
           "^Paramètres intersociétés$",
           "^Intercompanyeinrichtung$",
           "^Config\\. empresas vinculadas$",
@@ -35,7 +34,6 @@
         ],
         "actionPatterns": [
           "^IC Chart of Accounts$",
-          "^IC-dimensions$",
           "^Koncernintern kontoplan$",
           "^Konc\\.int\\. kontoplan$",
           "^Plan comptable IC$",
@@ -104,7 +102,6 @@
           "^Importera transaktionsfil$",
           "^Importer le fichier de transaction$",
           "^Transaktionsdatei importieren$",
-          "^Importar archivo de transacción$",
           "^Indlæs transaktionsfil$",
           "^Tuo tapahtumatiedosto$",
           "^Importer transaksjonsfil$",
@@ -221,7 +218,6 @@
         "pagePatterns": [
           "^Intercompany Outbox Transactions$",
           "^Koncerninterna utkorgstransaktioner$",
-          "^Transactions boîte d’envoi Intersociétés$",
           "^Intercompany-Ausgangstransaktionen$",
           "^Transacciones de bandeja de salida entre empresas vinculadas$",
           "^Koncerninterne udbakketransaktioner$",

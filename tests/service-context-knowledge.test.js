@@ -1,8 +1,9 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const pack = JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/services.json'), 'utf8'));
+const pack = asLoaded(JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/services.json'), 'utf8')));
 const knowledge = require('../src/engine/knowledge-domain');
 const locales = require('../src/engine/language-registry').supported().map(x => x.locale).sort();
 
@@ -12,7 +13,7 @@ assert.deepEqual(Object.keys(rule.localizedExplanations).sort(), locales);
 
 for (const [locale, pageCaption, actionCaption] of [
   ['en-US', 'Service Quotes', 'Make Order'],
-  ['sv-SE', 'Offerter för tjänstkontrakt', 'Skapa order'],
+  ['sv-SE', 'Serviceofferter', 'Skapa order'],
 ]) {
   const result = knowledge.apply([{
     taskId: `convert-${locale}`,

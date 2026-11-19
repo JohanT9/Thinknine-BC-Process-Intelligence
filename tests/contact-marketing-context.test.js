@@ -1,4 +1,5 @@
 const assert=require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs=require('node:fs');
 const path=require('node:path');
 const repositoryApi=require('../src/engine/knowledge-repository');
@@ -6,7 +7,7 @@ const knowledge=require('../src/engine/knowledge-domain');
 const root=path.resolve(__dirname,'..');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'src/knowledge-packs/index.json'),'utf8'));
 const packs=manifest.packs.filter(x=>x.enabled).map(x=>({
-  packId:x.packId,pack:JSON.parse(fs.readFileSync(path.join(root,'src',x.file),'utf8'))
+  packId:x.packId,pack:asLoaded(JSON.parse(fs.readFileSync(path.join(root,'src',x.file),'utf8')))
 }));
 const imported=repositoryApi.importRelease(manifest,packs);
 assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
@@ -20,7 +21,7 @@ assert.ok(campaignRule);
 assert.deepEqual(Object.keys(rule.localizedExplanations).sort(),['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
 assert.deepEqual(rule.verifiedRuntimeLocales,['en-US','sv-SE','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']);
 for(const [locale,page,action] of [
- ['en-US','Opportunity List','Update'], ['sv-SE','Affärsmöjlighetslista','Uppdatera']
+ ['en-US','Opportunities','Update'], ['sv-SE','Affärsmöjligheter','Uppdatera']
 ]) {
  const result=repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
  assert.equal(result.status,'resolved',`${locale} opportunity stage update`);
@@ -31,7 +32,7 @@ for(const [locale,page,action] of [
  assert.ok(task.contextualExplanations[locale]);
 }
 for(const [page,action] of [
- ['Opportunities','Close'], ['Opportunity List','Delete'], ['Sales Quotes','Update'], ['Affärsmöjlighetslista','Stäng']
+ ['Opportunities','Close'], ['Opportunities','Delete'], ['Sales Quotes','Update'], ['Affärsmöjligheter','Stäng']
 ]) assert.equal(knowledge.score(rule,{pageCaption:page,actionCaption:action,entity:'',context:{}}),0,`${page} / ${action}`);
 for(const locale of Object.keys(rule.localizedExplanations)) {
  const text=rule.localizedExplanations[locale];

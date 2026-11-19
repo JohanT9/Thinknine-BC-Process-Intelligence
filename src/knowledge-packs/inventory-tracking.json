@@ -210,7 +210,6 @@
       "match": {
         "pagePatterns": [
           "^Item Reclassification Journals$",
-          "^Artikelomklassificeringsjournaler$",
           "^Artikelgrupperingsjournaler$",
           "^Feuilles reclassement article$",
           "^Artikel Umlag\\. Buch\\.-Blätter$",

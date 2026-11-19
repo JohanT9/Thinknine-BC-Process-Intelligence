@@ -51,6 +51,10 @@
   // document id: which file and link this computer made. Not part of any document, so never
   // exported.
   const DOCUMENT_SHARES_KEY = "t9_document_shares";
+  // Error messages of the user's own Business Central apps (bug-report/app-errors.js), read on
+  // this computer from .app files the user added, so that a possible cause can name the app that
+  // shows an error. Not part of any document, so never exported.
+  const KNOWN_APP_ERRORS_KEY = "t9_known_app_errors";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -80,6 +84,7 @@
     DEFAULT_DOCUMENT_TEMPLATE_KEY,
     WELCOME_KEY,
     DOCUMENT_SHARES_KEY,
+    KNOWN_APP_ERRORS_KEY,
     LIBRARY_IMPORT_UNDO_KEY,
     LIBRARY_IMPORT_UNDO_ENTRY_PREFIX,
     LIBRARY_SYNC_STATE_KEY,

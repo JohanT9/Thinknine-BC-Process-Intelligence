@@ -167,7 +167,9 @@ assert.match(read("src/ui/dashboard.js"), /\$\("documentResetZoom"\)\.textConten
 // The test run: the result first, notes in a disclosure, a way to the next step not tested.
 const testRun = read("src/ui/test-run.js");
 assert.match(testRun, /const notes = element\("details", "run-step-notes"\);/u);
-assert.match(testRun, /row\.append\(status\);\s*item\.append\(row, notes\);/u);
+// Notes follow the row; a passed step's offer to mark its bug report resolved sits between them.
+assert.match(testRun,
+  /row\.append\(status\);\s*item\.append\(row\);[^]*?const offer = followUp\?\.render\(step\);\s*if \(offer\) item\.append\(offer\);\s*item\.append\(notes\);/u);
 assert.match(testRun, /step\.expected\.trim\(\) \|\| step\.comment\.trim\(\) \|\| step\.status === "failed"/u);
 assert.match(testRun, /notesOpen: Boolean\(item\.querySelector\("\.run-step-notes"\)\?\.open\)/u);
 assert.match(testRun, /t\("test\.nextNotRun"\)/u);

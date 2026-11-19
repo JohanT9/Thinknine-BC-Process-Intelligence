@@ -1,32 +1,33 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const api = require('../src/engine/knowledge-repository');
 const root = path.resolve(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/index.json'), 'utf8'));
-const packs = manifest.packs.filter(x => x.enabled).map(x => ({ packId: x.packId, pack: JSON.parse(fs.readFileSync(path.join(root, 'src', x.file), 'utf8')) }));
+const packs = manifest.packs.filter(x => x.enabled).map(x => ({ packId: x.packId, pack: asLoaded(JSON.parse(fs.readFileSync(path.join(root, 'src', x.file), 'utf8'))) }));
 const imported = api.importRelease(manifest, packs);
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = api.createRepository(imported.snapshot);
 const samples = [
   ['sv-SE', 'Produktionsjournal', 'Utflöde antal', 'Bokför', 'microsoft-learn-production-journal-sv'],
   ['en-US', 'Production Journal', 'Output Quantity', 'Post', 'microsoft-learn-production-journal'],
-  ['fr-FR', 'Journal de production', 'Quantité produite', 'Publier', 'microsoft-learn-production-journal-fr'],
-  ['de-DE', 'Produktions-Buch.-Blatt', 'Ausgabemenge', 'Buchen', 'microsoft-learn-production-journal-de'],
+  ['fr-FR', 'Feuille production', 'Quantité produite', 'Publier', 'microsoft-learn-production-journal-fr'],
+  ['de-DE', 'Produktions Buch.-Blatt', 'Fertig gestellte Menge', 'Buchen', 'microsoft-learn-production-journal-de'],
   ['es-ES', 'Diario de producción', 'Cantidad salida', 'Publicar', 'microsoft-learn-production-journal-es'],
-  ['da-DK', 'Produktionskladde', 'Output Mængde', 'Bogfør', 'microsoft-learn-production-journal-da'],
+  ['da-DK', 'Produktionskladde', 'Afgangsantal', 'Bogfør', 'microsoft-learn-production-journal-da'],
   ['fi-FI', 'Tuotantopäiväkirja', 'Tuotoksen määrä', 'Kirjaa', 'microsoft-learn-production-journal-fi'],
-  ['nb-NO', 'Produksjonsjournal', 'Avgangsantall', 'Bokfør', 'microsoft-learn-production-journal-nb']
+  ['nb-NO', 'Produksjonskladd', 'Avgangsantall', 'Bokfør', 'microsoft-learn-production-journal-nb']
 ];
 const consumptionCaptions = [
-  ['sv-SE', 'Produktionsjournal', 'Förbrukningskvantitet', 'microsoft-learn-production-journal-sv'],
+  ['sv-SE', 'Produktionsjournal', 'Förbrukningsantal', 'microsoft-learn-production-journal-sv'],
   ['en-US', 'Production Journal', 'Consumption Quantity', 'microsoft-learn-production-journal'],
-  ['fr-FR', 'Journal de production', 'Quantité consommée', 'microsoft-learn-production-bom-fr'],
-  ['de-DE', 'Produktions-Buch.-Blatt', 'Verbrauchsmenge', 'microsoft-learn-production-bom-de'],
+  ['fr-FR', 'Feuille production', 'Quantité consommée', 'microsoft-learn-production-bom-fr'],
+  ['de-DE', 'Produktions Buch.-Blatt', 'Verbrauchsmenge', 'microsoft-learn-production-bom-de'],
   ['es-ES', 'Diario de producción', 'Consumo (cantidad)', 'microsoft-learn-production-bom-es'],
   ['da-DK', 'Produktionskladde', 'Forbrugsantal', 'microsoft-learn-production-bom-da'],
   ['fi-FI', 'Tuotantopäiväkirja', 'Kulutusmäärä', 'microsoft-learn-production-bom-fi'],
-  ['nb-NO', 'Produksjonsjournal', 'Forbruksantall', 'microsoft-learn-production-bom-nb']
+  ['nb-NO', 'Produksjonskladd', 'Forbruksantall', 'microsoft-learn-production-bom-nb']
 ];
 for (const [locale, pageCaption, outputCaption, postCaption, sourceId] of samples) {
   const output = repository.resolveAction({ language: locale, context: { pageCaption, fieldCaption: outputCaption } });

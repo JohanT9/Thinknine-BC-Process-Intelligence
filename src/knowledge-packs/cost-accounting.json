@@ -413,7 +413,6 @@
       "confidence": 0.95,
       "match": {
         "pagePatterns": [
-          "^Cost Accounting Journal$",
           "^Cost Journal$",
           "^Kostnadsredovisningsjournal$",
           "^Kostnadsjournal$",

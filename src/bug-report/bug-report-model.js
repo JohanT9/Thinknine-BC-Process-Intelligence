@@ -123,13 +123,51 @@
     });
     result.deliveries = (Array.isArray(result.deliveries) ? result.deliveries : [])
       .map(normalizeDelivery).filter(Boolean);
+    // The user's choices for the possible cause: hide it, or include it in what is sent.
+    if (result.causeHint !== undefined) {
+      result.causeHint = { ...(result.causeHint && typeof result.causeHint === "object"
+        ? clone(result.causeHint) : {}), dismissed: result.causeHint?.dismissed === true,
+      include: result.causeHint?.include === true };
+    }
+    if (result.resolution !== undefined) result.resolution = normalizeResolution(result.resolution);
+    if (result.resolution === null) delete result.resolution;
     return result;
+  }
+
+  // Whether the problem the report describes has been fixed: open until the user marks it
+  // resolved, in the report or from a test run where the step passed. changedAt orders a
+  // change made in the report against one made elsewhere at the same time.
+  function normalizeResolution(value) {
+    if (!value || typeof value !== "object" || !["open", "resolved"].includes(value.state)) return null;
+    return { ...clone(value), state: value.state, changedAt: text(value.changedAt),
+      note: text(value.note).slice(0, 500),
+      ...(value.testRunId ? { testRunId: String(value.testRunId) } : {}),
+      ...(value.stepId ? { stepId: String(value.stepId) } : {}) };
+  }
+  const isResolved = report => report?.resolution?.state === "resolved";
+  // The later of two resolutions, so that a report saved from a tab opened before the problem
+  // was marked resolved elsewhere does not mark it open again.
+  function laterResolution(first, second) {
+    const a = normalizeResolution(first), b = normalizeResolution(second);
+    if (!a || !b) return a || b;
+    return String(b.changedAt).localeCompare(String(a.changedAt)) > 0 ? b : a;
+  }
+  function setResolution(report, patch = {}, changedAt) {
+    const result = normalize(report);
+    const resolution = normalizeResolution({ ...(result.resolution || {}), ...clone(patch),
+      changedAt: changedAt || new Date().toISOString() });
+    if (!resolution) throw new TypeError("A resolution is open or resolved.");
+    if (resolution.state === "open") {
+      delete resolution.testRunId; delete resolution.stepId;
+    }
+    result.resolution = resolution;
+    return normalize(result);
   }
 
   // Identifies what the report says, so a delivery can tell whether the report has changed
   // since. The delivery history, save times, status and telemetry do not count.
   function contentRevision(report) {
-    const { deliveries, updatedAt, status, enrichment, ...content } = normalize(report);
+    const { deliveries, updatedAt, status, enrichment, resolution, ...content } = normalize(report);
     return `content:${hash(content)}`;
   }
 
@@ -159,6 +197,15 @@
     if (patch.status && STATUSES.includes(patch.status)) result.status = patch.status;
     if (patch.privacy && typeof patch.privacy.maskValues === "boolean") {
       result.privacy = { ...(result.privacy || {}), maskValues: patch.privacy.maskValues };
+    }
+    if (patch.causeHint && typeof patch.causeHint === "object") {
+      result.causeHint = { ...(result.causeHint || {}), ...Object.fromEntries(
+        ["dismissed", "include"].filter(key => typeof patch.causeHint[key] === "boolean")
+          .map(key => [key, patch.causeHint[key]])) };
+    }
+    if (patch.resolution) {
+      return setResolution({ ...result, updatedAt: updatedAt || result.updatedAt },
+        patch.resolution, updatedAt);
     }
     result.updatedAt = updatedAt || result.updatedAt;
     return normalize(result);
@@ -267,6 +314,7 @@
   }
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
+    isResolved, laterResolution, normalizeResolution, setResolution,
     addReproductionStep, contentRevision, recordDelivery, selectPrimaryError,
     updateHumanContent, updateReproductionStep, updateScreenshotVisibility,
     updateScreenshotRedactions };

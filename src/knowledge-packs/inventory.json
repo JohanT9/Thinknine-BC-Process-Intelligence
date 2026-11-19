@@ -16,7 +16,6 @@
         "pagePatterns": [
           "^Item Reclass\\. Journals$",
           "^Item Reclassification Journals$",
-          "^Artikelomklassificeringsjournaler$",
           "^Artikelgrupperingsjournaler$",
           "^Feuilles reclassement article$",
           "^Artikel Umlag\\. Buch\\.-Blätter$",
@@ -212,7 +211,6 @@
         "pagePatterns": [
           "^Transfer Order$",
           "^Överföringsorder$",
-          "^Ordre de transfer$",
           "^Umlagerungsauftrag$",
           "^Pedido de transferencia$",
           "^Overflytningsordre$",

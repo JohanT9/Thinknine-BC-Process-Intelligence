@@ -3,17 +3,19 @@
     ? require("./bug-report-completeness") : root.T9BugReportCompleteness;
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
-  const api = factory(completeness, languages);
+  const errorCause = typeof module === "object" && module.exports
+    ? require("./error-cause") : root.T9ErrorCause;
+  const api = factory(completeness, languages, errorCause);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportGenerator = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
-  completeness, languages
+  completeness, languages, errorCause
 ) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => typeof value === "string" ? value : "";
   const SECTION_ORDER = Object.freeze(["summary", "environment", "reproduction",
-    "expected-result", "actual-result", "bc-errors", "technical-diagnostics",
+    "expected-result", "actual-result", "possible-cause", "bc-errors", "technical-diagnostics",
     "al-call-stack", "affected-objects", "correlated-timeline",
     "evidence", "notes", "traceability"]);
   const LABELS = Object.freeze({ timestamp: "Timestamp",
@@ -108,6 +110,10 @@
       referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" }))]
       .filter(item => item.timestamp).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
     const checks = completeness.evaluate(report, errors);
+    // A possible cause read from the captured error messages, primary error first. It is a
+    // suggestion; the user can hide it or include it in what is sent.
+    const cause = errorCause?.suggest([primary, ...errors.filter(item => item !== primary)]
+      .filter(Boolean).map(item => item.rawMessage)) || null;
     const sections = [
       { id: "summary", title: titles.summary, kind: "summary", provenance: "manual",
         content: { title, summary: summaryText, summaryFallback: !report.summary?.summary,
@@ -123,6 +129,10 @@
         provenance: "mixed", content: { userDescription:
           text(report.actualResult?.human?.text), capturedErrors: errors.map(item => ({
           errorEvidenceId: item.errorEvidenceId, rawMessage: item.rawMessage })) } },
+      { id: "possible-cause", title: errorCause?.labels(documentLanguage).exportTitle || "",
+        kind: "possible-cause", provenance: "derived", content: { cause: clone(cause),
+          dismissed: report.causeHint?.dismissed === true,
+          include: report.causeHint?.include === true } },
       { id: "bc-errors", title: titles.errors, kind: "errors",
         provenance: "captured", content: { primaryErrorEvidenceId: primaryId,
           primary, additional: errors.filter(item => item.errorEvidenceId !== primaryId) } },

@@ -12,9 +12,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (semantic, stepText, captionTranslation) {
   const GRAMMAR_VERSION = "1.4.0";
   const cache = new WeakMap();
-  const DOCUMENT_LANGUAGES = new Set([
-    "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
-  ]);
+  // The document languages of the language registry, as engine/step-text.js reads them.
+  const DOCUMENT_LANGUAGES = new Set(stepText.LOCALES);
 
   // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
   const jsonClone = typeof module === "object" && module.exports
@@ -72,37 +71,41 @@
       "").trim();
   }
 
+  // The words of the generated step sentences in every document language;
+  // tests/language-lists.test.js requires them for every registered language.
+  const STEP_WORDS = Object.freeze({
+    "sv-SE": { choose: "Välj ", enter: "Ange ", in: " i ", andChoose: " och välj ",
+      searchText: "söktext", enable: "Aktivera ", disable: "Inaktivera ",
+      forField: " som värde för " },
+    "en-US": { choose: "Choose ", enter: "Enter ", in: " in ", andChoose: ", and choose ",
+      searchText: "search text", enable: "Enable ", disable: "Disable ",
+      forField: " for " },
+    "fr-FR": { choose: "Sélectionnez ", enter: "Saisissez ", in: " dans ", andChoose: " et sélectionnez ",
+      searchText: "terme de recherche", enable: "Activez ", disable: "Désactivez ",
+      forField: " comme valeur pour " },
+    "de-DE": { choose: "Wählen Sie ", enter: "Geben Sie ", in: " in ", andChoose: " und wählen Sie ",
+      searchText: "Suchtext", enable: "Aktivieren Sie ", disable: "Deaktivieren Sie ",
+      forField: " als Wert für " },
+    "es-ES": { choose: "Seleccione ", enter: "Introduzca ", in: " en ", andChoose: " y seleccione ",
+      searchText: "texto de búsqueda", enable: "Active ", disable: "Desactive ",
+      forField: " como valor para " },
+    "da-DK": { choose: "Vælg ", enter: "Angiv ", in: " i ", andChoose: " og vælg ",
+      searchText: "søgetekst", enable: "Aktivér ", disable: "Deaktivér ",
+      forField: " som værdi for " },
+    "fi-FI": { choose: "Valitse ", enter: "Syötä ", in: " kenttään ", andChoose: " ja valitse ",
+      searchText: "hakuteksti", enable: "Ota käyttöön ", disable: "Poista käytöstä ",
+      forField: " kentän arvoksi " },
+    "nb-NO": { choose: "Velg ", enter: "Angi ", in: " i ", andChoose: " og velg ",
+      searchText: "søketekst", enable: "Aktiver ", disable: "Deaktiver ",
+      forField: " som verdi for " }
+  });
+
   // The sentence of a step whose kind has its own wording in every language; null when the
   // step is written from its recorded text.
   function structuredPresentation(action, documentLanguage = "sv-SE") {
     const locale = DOCUMENT_LANGUAGES.has(documentLanguage)
       ? documentLanguage : "sv-SE";
-    const words = {
-      "sv-SE": { choose: "Välj ", enter: "Ange ", in: " i ", andChoose: " och välj ",
-        searchText: "söktext", enable: "Aktivera ", disable: "Inaktivera ",
-        forField: " som värde för " },
-      "en-US": { choose: "Choose ", enter: "Enter ", in: " in ", andChoose: ", and choose ",
-        searchText: "search text", enable: "Enable ", disable: "Disable ",
-        forField: " for " },
-      "fr-FR": { choose: "Sélectionnez ", enter: "Saisissez ", in: " dans ", andChoose: " et sélectionnez ",
-        searchText: "terme de recherche", enable: "Activez ", disable: "Désactivez ",
-        forField: " comme valeur pour " },
-      "de-DE": { choose: "Wählen Sie ", enter: "Geben Sie ", in: " in ", andChoose: " und wählen Sie ",
-        searchText: "Suchtext", enable: "Aktivieren Sie ", disable: "Deaktivieren Sie ",
-        forField: " als Wert für " },
-      "es-ES": { choose: "Seleccione ", enter: "Introduzca ", in: " en ", andChoose: " y seleccione ",
-        searchText: "texto de búsqueda", enable: "Active ", disable: "Desactive ",
-        forField: " como valor para " },
-      "da-DK": { choose: "Vælg ", enter: "Angiv ", in: " i ", andChoose: " og vælg ",
-        searchText: "søgetekst", enable: "Aktivér ", disable: "Deaktivér ",
-        forField: " som værdi for " },
-      "fi-FI": { choose: "Valitse ", enter: "Syötä ", in: " kenttään ", andChoose: " ja valitse ",
-        searchText: "hakuteksti", enable: "Ota käyttöön ", disable: "Poista käytöstä ",
-        forField: " kentän arvoksi " },
-      "nb-NO": { choose: "Velg ", enter: "Angi ", in: " i ", andChoose: " og velg ",
-        searchText: "søketekst", enable: "Aktiver ", disable: "Deaktiver ",
-        forField: " som verdi for " }
-    }[locale];
+    const words = STEP_WORDS[locale];
     const actionType = action?.actionType || action?.taskType;
     const value = String(action?.selectedValue ?? action?.instructionValue ??
       action?.value ?? "").trim();
@@ -371,5 +374,5 @@
     return result;
   }
 
-  return { GRAMMAR_VERSION, cleanLookupFieldCaption, legacyRuns, presentationFor, process };
+  return { GRAMMAR_VERSION, STEP_WORDS, cleanLookupFieldCaption, legacyRuns, presentationFor, process };
 });

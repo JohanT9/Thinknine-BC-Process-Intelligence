@@ -324,9 +324,11 @@ let unmatchedKnowledgeItems = [];
 
 async function loadKnowledgePacks() {
   const indexUrl = chrome.runtime.getURL("knowledge-packs/index.json");
+  // With Business Central's captions of each rule and those of the apps the user added.
   const loaded = await globalThis.BCKnowledgeRepository.load({
     indexUrl,
-    resolveUrl: file => chrome.runtime.getURL(file)
+    resolveUrl: file => chrome.runtime.getURL(file),
+    apps: await globalThis.T9KnowledgeCaptions.loadUserApps()
   });
   if (!loaded.ok) throw new Error(loaded.diagnostics.map(item => item.code).join(", "));
   const repository = globalThis.BCKnowledgeRepository.createRepository(loaded.snapshot);
@@ -341,6 +343,14 @@ async function loadKnowledgePacks() {
   return { packs: loadedKnowledgePacks, snapshot, repository,
     pageValidation };
 }
+
+// An app added or removed under Settings changes the captions the knowledge rules know.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes[globalThis.T9KnowledgeCaptions.appsStorageKey()]) return;
+  knowledgePacksReady = loadKnowledgePacks().catch(error => {
+    console.warn("Knowledge Packs could not be loaded.", error);
+  });
+});
 
 function applyKnowledgePackFramework(tasks) {
   const result = globalThis.T9KnowledgeDomain.apply(tasks, loadedKnowledgePacks);
@@ -2704,7 +2714,7 @@ function scheduleSettingsSave(event) {
   // The interface language and the appearance save through their own handlers.
   if (!event.target.matches?.("input, select, textarea") ||
       event.target.id === "uiLocale" || event.target.name === "appearance" ||
-      event.target.closest("#documentTemplates")) return;
+      event.target.closest("#documentTemplates") || event.target.closest("#appErrors")) return;
   clearTimeout(settingsSaveTimer);
   if (event.type === "change") autoSaveSettings();
   else settingsSaveTimer = setTimeout(autoSaveSettings, 700);
@@ -3718,6 +3728,8 @@ let visibleDocumentLibraryRecords = [];
 let documentLibraryProgress = new Map();
 // The latest email made from each bug report, by recording.
 let documentLibraryDeliveries = new Map();
+// Whether each bug report is resolved, by recording: its resolution, or none while open.
+let documentLibraryResolutions = new Map();
 let libraryQuickFilter = "all";
 // Library folders (document/document-folders.js). libraryFolder is the folder shown: "" for the
 // top of the library, otherwise a folder id.
@@ -3734,6 +3746,10 @@ const LIBRARY_QUICK_FILTERS = Object.freeze({
   review: record => !record.archived && ["new", "review"].includes(
     globalThis.T9DocumentLibraryView.documentState(record,
       documentLibraryProgress.get(record.projectId)).state),
+  // Bug reports whose problem is not marked resolved, wherever they are.
+  "open-bugs": record => !record.archived &&
+    record.metadata?.recordingPurpose === "bug-report" &&
+    documentLibraryResolutions.get(record.projectId)?.state !== "resolved",
   favourite: record => !record.archived && record.favourite,
   archived: record => record.archived
 });
@@ -3775,6 +3791,16 @@ function libraryCardTest(record) {
   const marker = globalThis.T9TestHistoryView.marker(latest, testHistoryT,
     applicationSettings.uiLocale || "en-US");
   return { ...marker, label: uiTf("testHistory.markerLabel", { status: marker.text }) };
+}
+
+// A bug report says on its row whether its problem is open or resolved, and when.
+function libraryCardBugStatus(record) {
+  const resolution = documentLibraryResolutions.get(record.projectId);
+  if (resolution?.state !== "resolved") return { state: "bug-open", text: uiT("library.bugOpen") };
+  const time = new Date(resolution.changedAt);
+  const date = Number.isFinite(time.getTime()) ? new Intl.DateTimeFormat(
+    applicationSettings.uiLocale || "en-US", { dateStyle: "medium" }).format(time) : "";
+  return { state: "bug-resolved", text: uiTf("library.bugResolved", { date }).trim() };
 }
 
 // The template a document follows, on its library row. A template that is not on this
@@ -3909,13 +3935,18 @@ function renderDocumentLibrary() {
     deliveries: documentLibraryDeliveries, folderOf: libraryCardFolder,
     templateLabel: libraryCardTemplate,
     testMarker: libraryCardTest,
+    bugStatus: libraryCardBugStatus,
     shareMarker: libraryCardShare,
     shareLabel: uiT("share.action"),
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
     pageScriptLabel: uiT("pageScript.exportAction"),
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
     // documents that are all in folders below say where they are.
-    emptyMessage: libraryFolder && !documentLibraryRecords.some(record =>
+    emptyMessage: libraryQuickFilter === "open-bugs" && !options.search.trim() &&
+      !view.activeFilterCount(options) && documentLibraryRecords.some(record =>
+        record.metadata?.recordingPurpose === "bug-report" && !record.archived)
+      ? uiT("library.noOpenBugs")
+      : libraryFolder && !documentLibraryRecords.some(record =>
       inLibraryFolder(record, true))
       ? uiTf("folder.empty", { select: $("librarySelectMode").textContent.trim() })
       : !finding && documentLibraryRecords.some(record => inLibraryFolder(record, true) &&
@@ -4031,6 +4062,12 @@ function updateLibraryDeliveries(changes, area) {
     const recordingId = change.newValue?.recordingId || change.oldValue?.recordingId;
     if (!recordingId) continue;
     if (change.newValue && refreshLibraryReportRecord(recordingId, change.newValue)) changed = true;
+    const resolution = change.newValue?.resolution || null;
+    if (JSON.stringify(resolution) !== JSON.stringify(documentLibraryResolutions.get(recordingId) || null)) {
+      if (resolution) documentLibraryResolutions.set(recordingId, resolution);
+      else documentLibraryResolutions.delete(recordingId);
+      changed = true;
+    }
     const latest = change.newValue ? libraryDelivery(change.newValue) : null;
     const current = documentLibraryDeliveries.get(recordingId) || null;
     if (JSON.stringify(latest) === JSON.stringify(current)) continue;
@@ -4755,7 +4792,7 @@ async function createLibraryTestSuite() {
 // and filters, so that many suites stay manageable. Each suite is shown by its latest round;
 // earlier rounds open from it. In both places a click marks a suite and unfolds what can be
 // done with it, as a click marks a document; a double click opens it.
-const LIBRARY_SUITES_SHOWN = 3;
+const LIBRARY_SUITES_SHOWN = 4;
 let testSuitesList = [];
 let testSuitesLoaded = false;
 let testSuitesFailed = false;
@@ -4932,9 +4969,33 @@ function renderLibraryTestSuites() {
   $("libraryTestSuiteList").replaceChildren(...pending.slice(0, LIBRARY_SUITES_SHOWN).map(librarySuiteCard));
   const more = $("libraryTestSuitesMore");
   const all = globalThis.T9TestSuite.listCounts(testSuitesList).all;
-  more.hidden = pending.length <= LIBRARY_SUITES_SHOWN;
+  more.dataset.pending = String(pending.length);
   more.textContent = uiTf("suite.showAllInTests", { count: all });
   $("libraryTestSuites").hidden = pending.length === 0;
+  fitLibraryTestSuites();
+}
+// The suites in progress take one row: as many cards as fit beside each other, at most
+// LIBRARY_SUITES_SHOWN, so a narrow window never pushes the documents down with a second row.
+// Show all in Tests appears whenever a suite in progress is not shown.
+function fitLibraryTestSuites() {
+  const list = $("libraryTestSuiteList");
+  const more = $("libraryTestSuitesMore");
+  const cards = [...list.children];
+  for (const card of cards) card.hidden = false;
+  const tracks = getComputedStyle(list).gridTemplateColumns.split(" ").filter(Boolean).length;
+  // While the library is hidden nothing is laid out; every card then stays shown.
+  const fits = list.offsetWidth > 0 && tracks > 0 ? tracks : cards.length;
+  cards.forEach((card, index) => { card.hidden = index >= fits; });
+  more.hidden = Number(more.dataset.pending || 0) <= Math.min(fits, cards.length);
+}
+if (typeof ResizeObserver === "function") {
+  let lastWidth = 0;
+  new ResizeObserver(entries => {
+    const width = Math.round(entries[0]?.contentRect.width || 0);
+    if (width === lastWidth) return;
+    lastWidth = width;
+    fitLibraryTestSuites();
+  }).observe($("libraryTestSuiteList"));
 }
 function suitesShown() {
   return globalThis.T9TestSuite.listFilter(testSuitesList, { filter: suitesFilter,
@@ -6787,6 +6848,8 @@ async function loadDocumentLibrary(sessions, bootstrap = {}) {
     const latest = libraryDelivery(report);
     return latest ? [[recordingId, latest]] : [];
   }));
+  documentLibraryResolutions = new Map([...bugReports].flatMap(([recordingId, report]) =>
+    report?.resolution ? [[recordingId, report.resolution]] : []));
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
     const sessionRecord = librarySessionRecord(session);

@@ -43,6 +43,7 @@ importScripts("engine/event-step-grouping.js");
 importScripts("engine/source-reference.js");
 importScripts("document/semantic-interaction-engine.js");
 importScripts("engine/task-consolidation.js");
+importScripts("engine/knowledge-captions.js");
 importScripts("engine/knowledge-domain.js");
 importScripts("engine/knowledge-repository.js");
 importScripts("engine/process-decision-code-registry.js");
@@ -77,6 +78,8 @@ importScripts("bug-report/bug-report-model.js");
 importScripts("bug-report/bug-report-completeness.js");
 importScripts("bug-report/bug-report-service.js");
 importScripts("bug-report/bug-report-store.js");
+importScripts("bug-report/error-labels.js");
+importScripts("bug-report/error-cause.js");
 importScripts("bug-report/bug-report-generator.js");
 importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
@@ -144,9 +147,12 @@ async function requireRecordingLicense(url) {
     return { source: "consultant", ...result };
   }
 }
-const pageKnowledgePacksReady = globalThis.BCKnowledgeRepository.load({
+// The knowledge packs, with Business Central's captions of each rule and those of the apps the user
+// added under Settings; loaded again when those apps change.
+const loadPageKnowledgePacks = async () => globalThis.BCKnowledgeRepository.load({
   indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
-  resolveUrl: file => chrome.runtime.getURL(file)
+  resolveUrl: file => chrome.runtime.getURL(file),
+  apps: await globalThis.T9KnowledgeCaptions.loadUserApps()
 }).then(result => {
   if (!result.ok) throw new Error(result.diagnostics.map(item => item.code).join(", "));
   const repository = globalThis.BCKnowledgeRepository.createRepository(result.snapshot);
@@ -160,6 +166,12 @@ const pageKnowledgePacksReady = globalThis.BCKnowledgeRepository.load({
   return { packs: [], snapshot: null, validation: { diagnostics: [{
     code: "knowledge-release-load-failed"
   }] } };
+});
+let pageKnowledgePacksReady = loadPageKnowledgePacks();
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes[globalThis.T9KnowledgeCaptions.appsStorageKey()]) {
+    pageKnowledgePacksReady = loadPageKnowledgePacks();
+  }
 });
 const DEFAULT_SETTINGS = {
   uiLocale: "sv-SE",
@@ -1178,6 +1190,18 @@ async function getBcErrorEvidenceForRecording(recordingId) {
   return recovered;
 }
 
+// The possible cause of a captured error message, or null. A failure only leaves it out: the error
+// itself is already saved.
+async function latestErrorCause(message) {
+  try {
+    await globalThis.T9ErrorCause?.loadKnown?.();
+    const cause = globalThis.T9ErrorCause?.suggest?.([message]);
+    return cause ? JSON.parse(JSON.stringify(cause)) : null;
+  } catch {
+    return null;
+  }
+}
+
 async function captureBcErrorEvidence(input, sender) {
   const state = await getState();
   if (state.recording) await requireActiveTenantLicense(state);
@@ -1246,6 +1270,10 @@ async function captureBcErrorEvidence(input, sender) {
     updatedSession.errorEvidenceCount || 0) + 1;
     updatedSession.lastErrorCaptureStatus = evidence.rawDiagnostics
       ? "details-captured" : "error-captured";
+    // The possible cause of the latest error, so that the recording panel can show it while the
+    // user still is in Business Central. It is read from the message only, like the report's.
+    updatedSession.lastErrorCause = { errorEvidenceId: evidence.errorEvidenceId,
+      capturedAt: evidence.capturedAt, cause: await latestErrorCause(evidence.rawMessage) };
     updatedSession.updatedAt = new Date().toISOString();
     await saveSession(updatedSession);
   }
@@ -3381,15 +3409,62 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_SAVE_BUG_REPORT":
-        sendResponse({ ok: true,
-          report: await bugReportStore.save(message.report) });
+      case "T9_SAVE_BUG_REPORT": {
+        // A report tab opened before the report was marked resolved from a test keeps the
+        // later of the two choices.
+        const model = globalThis.T9BugReportModel;
+        const incoming = model.normalize(message.report);
+        const stored = await bugReportStore.load(incoming.bugReportId);
+        const resolution = model.laterResolution(stored?.resolution, incoming.resolution);
+        sendResponse({ ok: true, report: await bugReportStore.save(resolution
+          ? { ...incoming, resolution } : incoming) });
         break;
+      }
+
+      case "T9_SET_BUG_REPORT_RESOLUTION": {
+        // Marks a bug report resolved, or open again, without changing what it says.
+        const current = await bugReportStore.load(message.bugReportId);
+        if (!current) throw new Error("test.resolveFailed");
+        const resolution = { state: message.state === "open" ? "open" : "resolved",
+          ...(message.state !== "open" && message.testRunId
+            ? { testRunId: String(message.testRunId), stepId: String(message.stepId || "") } : {}) };
+        const saved = await bugReportStore.save(globalThis.T9BugReportModel.setResolution(
+          current, resolution, new Date().toISOString()));
+        sendResponse({ ok: true, report: { bugReportId: saved.bugReportId,
+          title: saved.summary.title, resolution: saved.resolution || null } });
+        break;
+      }
+
+      case "T9_TEST_RUN_OPEN_REPORTS": {
+        // The bug reports, still open, that were made from each step of a run or from the same
+        // step in an earlier run of the document. A step that passes can then offer to mark
+        // them resolved.
+        const run = await loadTestRun(String(message.testRunId || ""));
+        if (!run) { sendResponse({ ok: true, steps: {} }); break; }
+        const linked = globalThis.T9TestHistory.linkedReports(run,
+          await listTestRuns(String(run.sessionId || "")));
+        const ids = [...new Set([...linked.values()].flat())];
+        const reports = new Map((await Promise.all(ids.map(id => bugReportStore.load(id)
+          .catch(() => null)))).filter(Boolean).map(report => [report.bugReportId, report]));
+        const steps = {};
+        for (const [stepId, reportIds] of linked) {
+          const open = reportIds.map(id => reports.get(id)).filter(report => report &&
+            report.status !== "archived" && !globalThis.T9BugReportModel.isResolved(report));
+          if (open.length) {
+            steps[stepId] = open.map(report => ({ bugReportId: report.bugReportId,
+              title: report.summary.title || "" }));
+          }
+        }
+        sendResponse({ ok: true, steps });
+        break;
+      }
 
       case "T9_BUILD_ISSUE_PACKAGE": { // Local projection only; no transmission.
         const report = await bugReportStore.load(message.bugReportId);
         if (!report) throw new Error("Bug Report kunde inte hittas.");
         const evidence = await getBcErrorEvidenceForRecording(report.recordingId);
+        // Where the error comes from needs Microsoft's known error messages, loaded once.
+        await globalThis.T9ErrorCause?.loadKnown?.();
         const issuePackage = globalThis.T9IssuePackage.build(report,
           { errorEvidence: evidence }, { generatedAt: new Date().toISOString(),
             includeCallStack: Boolean(message.options?.includeCallStack),

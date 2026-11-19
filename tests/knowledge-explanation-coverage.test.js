@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require("node:fs");
 const path = require("node:path");
 const catalog = require("../src/engine/knowledge-explanation-catalog");
@@ -7,7 +8,7 @@ const sessionPipeline = require("../src/engine/session-interpretation-pipeline")
 
 const packDir = path.join(__dirname, "..", "src", "knowledge-packs");
 const packs = fs.readdirSync(packDir).filter(name => name.endsWith(".json"))
-  .map(name => JSON.parse(fs.readFileSync(path.join(packDir, name), "utf8")))
+  .map(name => asLoaded(JSON.parse(fs.readFileSync(path.join(packDir, name), "utf8"))))
   .filter(pack => pack.rules?.length);
 const supportedLocales = ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES",
   "da-DK", "fi-FI", "nb-NO"];
@@ -110,8 +111,8 @@ const servicePack = packs.find(pack => pack.packId === "bc-services");
 const serviceRules = knowledge.rules([servicePack]);
 for (const [ruleId, task] of [
   ["Services.AllocateServiceResource", { taskType: "RunAction",
-    pageCaption: "Service Order", entity: "ServiceOrder",
-    actionCaption: "Allocate Resource", language: "sv-SE" }],
+    pageCaption: "Resource Allocations", entity: "ServiceOrder",
+    actionCaption: "Allocate to all Service Items", language: "sv-SE" }],
   ["Services.ChangeRepairStatus", { taskType: "ChangeField",
     pageCaption: "Service Order", entity: "ServiceOrder",
     fieldCaption: "Repair Status Code", language: "sv-SE" }]

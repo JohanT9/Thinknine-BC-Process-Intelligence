@@ -140,6 +140,120 @@
     section.append(heading, list, note);
     container.appendChild(section);
   }
+  // Whether the problem is fixed: a direct choice between Open and Resolved. A resolved report
+  // says when, and whether a passed test step marked it; a comment can say what fixed it.
+  function resolutionControl(doc, report, onEdit, locale) {
+    const resolution = report.resolution || { state: "open" };
+    const resolved = resolution.state === "resolved";
+    const wrapper = element(doc, "div", "", "report-resolution");
+    wrapper.dataset.state = resolved ? "resolved" : "open";
+    const label = element(doc, "span", uiKey("technical.statusLabel", locale, "Status"),
+      "report-resolution-label");
+    label.id = "technical-report-status-label";
+    const group = element(doc, "div", "", "report-resolution-choice");
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-labelledby", label.id);
+    for (const [state, key, fallback] of [["open", "technical.statusOpen", "Open"],
+      ["resolved", "technical.statusResolved", "Resolved"]]) {
+      const button = element(doc, "button", uiKey(key, locale, fallback));
+      button.type = "button"; button.dataset.state = state;
+      button.dataset.focusKey = `resolution-${state}`;
+      button.setAttribute("aria-pressed", String(resolution.state === state));
+      button.addEventListener("click", () => {
+        if (resolution.state !== state) onEdit("resolution", { state });
+      });
+      group.appendChild(button);
+    }
+    wrapper.append(label, group);
+    if (resolved) {
+      const when = resolution.changedAt ? deliveryDate(resolution.changedAt, locale) : "";
+      const info = element(doc, "p", resolution.testRunId
+        ? uiKey("technical.resolvedByTest", locale,
+          "Marked resolved {date} when the step passed in a test.").replace("{date}", when)
+        : uiKey("technical.resolvedOn", locale, "Resolved {date}.").replace("{date}", when),
+      "report-resolution-info");
+      const noteLabel = element(doc, "label", uiKey("technical.resolutionNote", locale,
+        "Comment (optional)"));
+      noteLabel.htmlFor = "technical-report-resolution-note";
+      const note = doc.createElement("input");
+      note.id = "technical-report-resolution-note"; note.value = resolution.note || "";
+      note.placeholder = uiKey("technical.resolutionNotePlaceholder", locale,
+        "For example: fixed in version 28.3");
+      note.maxLength = 500;
+      note.addEventListener("change", () => onEdit("resolution",
+        { state: "resolved", note: note.value.trim() }));
+      const details = element(doc, "div", "", "report-resolution-details");
+      details.append(info, noteLabel, note);
+      wrapper.appendChild(details);
+    }
+    return wrapper;
+  }
+  function deliveryDate(value, locale) {
+    const time = new Date(value);
+    if (!Number.isFinite(time.getTime())) return "";
+    try { return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(time); }
+    catch { return time.toISOString().slice(0, 10); }
+  }
+  // A possible cause read from the error message: clearly marked as not confirmed, with what
+  // the user can check and why it is suggested. The user can hide it, or include it when the
+  // report is sent or exported; it is left out of both by default.
+  function possibleCause(doc, content, options, locale) {
+    const causeApi = globalThis.T9ErrorCause;
+    const described = content?.cause && causeApi?.describe(content.cause, locale);
+    if (!described) return null;
+    const labels = causeApi.labels(locale);
+    const onEdit = options.onEdit || (() => {});
+    if (content.dismissed) {
+      const hidden = element(doc, "p", `${labels.hidden} `, "report-cause-hidden");
+      const show = element(doc, "button", labels.show, "report-cause-link");
+      show.type = "button"; show.dataset.focusKey = "cause-show";
+      show.addEventListener("click", () => onEdit("causeHint", { dismissed: false }));
+      hidden.appendChild(show);
+      return hidden;
+    }
+    const box = element(doc, "section", "", "report-cause");
+    box.setAttribute("aria-labelledby", "technical-report-cause-title");
+    box.dataset.kind = described.kind;
+    const head = element(doc, "div", "", "report-cause-head");
+    const title = element(doc, "h2", labels.title);
+    title.id = "technical-report-cause-title";
+    head.append(title, element(doc, "span", labels.unconfirmed, "report-cause-tag"));
+    const checksTitle = element(doc, "p", labels.checks, "report-cause-checks-title");
+    const checks = element(doc, "ul", "", "report-cause-checks");
+    described.checks.forEach(item => checks.appendChild(element(doc, "li", item)));
+    const why = doc.createElement("details"); why.className = "report-cause-why";
+    why.append(element(doc, "summary", labels.why), element(doc, "p", described.why));
+    if (described.basis) why.append(element(doc, "p", described.basis, "report-cause-basis"));
+    const actions = element(doc, "div", "", "report-cause-actions");
+    const includeLabel = element(doc, "label", "", "report-cause-include");
+    const include = doc.createElement("input"); include.type = "checkbox";
+    include.checked = content.include === true; include.dataset.focusKey = "cause-include";
+    include.addEventListener("change", () => onEdit("causeHint", { include: include.checked }));
+    includeLabel.append(include, element(doc, "span", labels.include));
+    const dismiss = element(doc, "button", labels.dismiss, "report-cause-link");
+    dismiss.type = "button"; dismiss.dataset.focusKey = "cause-show";
+    dismiss.addEventListener("click", () => onEdit("causeHint", { dismissed: true }));
+    actions.append(includeLabel, dismiss);
+    box.append(head, element(doc, "p", described.text, "report-cause-text"));
+    if (described.checks.length) box.append(checksTitle, checks);
+    // Where the message probably comes from, and the actions Business Central offers in it.
+    if (described.origin || described.actions?.length) {
+      const facts = element(doc, "dl", "", "report-cause-facts");
+      if (described.origin) {
+        facts.append(element(doc, "dt", labels.origin), element(doc, "dd", described.origin, "report-cause-origin"));
+      }
+      if (described.actions?.length) {
+        const offered = element(doc, "dd", "", "report-cause-offered");
+        const list = element(doc, "ul", "");
+        described.actions.forEach(item => list.appendChild(element(doc, "li", item)));
+        offered.appendChild(list);
+        facts.append(element(doc, "dt", labels.actions), offered);
+      }
+      box.append(facts);
+    }
+    box.append(why, actions);
+    return box;
+  }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
     const onEdit = options.onEdit || (() => {});
@@ -169,6 +283,7 @@
     severity.addEventListener("change", () => onEdit("severity", severity.value));
     const severityHeader = element(doc, "div", "", "report-severity-header");
     severityHeader.append(severityLabel, severity); container.appendChild(severityHeader);
+    container.appendChild(resolutionControl(doc, workspaceState.report, onEdit, locale));
     // Masking is chosen for each report and applies to everything made from it.
     const generator = globalThis.T9BugReportGenerator;
     const privacy = element(doc, "div", "", "report-privacy");
@@ -233,6 +348,11 @@
     const editorDuplicateKinds = new Set(["summary", "text", "notes"]);
     let technicalSectionCount = 0;
     for (const section of report.sections) {
+      if (section.kind === "possible-cause") {
+        const cause = possibleCause(doc, section.content, options, locale);
+        if (cause) container.appendChild(cause);
+        continue;
+      }
       if (advancedKinds.has(section.kind) && !hasSectionContent(section)) continue;
       // The description is edited above; the section only adds captured errors.
       if (section.kind === "actual-result" && !section.content.capturedErrors.length) continue;

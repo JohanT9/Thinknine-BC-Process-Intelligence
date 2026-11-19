@@ -10,6 +10,7 @@
   const stepSection = document.getElementById("panelStep");
   let locale = i18n.DEFAULT_LOCALE;
   let client = null;
+  let followUp = null;
   let current = 0;
   let shownSignature = "";
   const run = () => client.run();
@@ -146,6 +147,9 @@
     }
     status.append(choices);
     parts.push(status);
+    // A step that had a bug report offers to mark it resolved once it passes.
+    const offer = followUp?.render(step);
+    if (offer) parts.push(offer);
 
     const commentWrapper = element("div");
     const commentLabel = element("label", "", t("test.comment"));
@@ -394,7 +398,8 @@
   function setStatus(stepId, status) {
     client.change({ steps: [{ stepId, patch: { status } }] });
     const steps = run().steps;
-    if (status === "passed" || status === "skipped") {
+    // A passed step with an open bug report stays, so the tester sees the offer to resolve it.
+    if ((status === "passed" && !followUp?.hasOffer(stepId)) || status === "skipped") {
       const next = steps.findIndex((step, index) => index > current && step.status === "not-run");
       if (next >= 0) {
         current = next;
@@ -488,6 +493,7 @@
         patch: { bugReportId: result.report.bugReportId } }] });
       message.textContent = t("test.reportCreated");
       showStep(".panel-actions button:last-child");
+      void followUp?.refresh();
     } catch (error) {
       message.textContent = errorText(error);
       button.disabled = false;
@@ -583,6 +589,12 @@
     showSaveState("saved");
     showSetup();
     showStep();
+    followUp = globalThis.T9TestReportFollowUp.create({ send, t, testRunId,
+      onChange: (stepId, focus) => {
+        if (run().steps[current]?.stepId === stepId) showStep(focus || "");
+      },
+      onMessage: text => { message.textContent = text; } });
+    void followUp.refresh();
     void loadRecorderState();
     void send({ type: "T9_SET_ACTIVE_TEST_RUN", testRunId }).catch(() => {});
     connectAsPanel();

@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Möjlig orsak och uppföljning – prototyp</title>
+<style>
+:root{--brand:#008489;--brand-hover:#006f73;--brand-ink:#005f65;--brand-subtle:#eefafa;--fg:#172b4d;--muted:#526273;--bd:#ccd5df;--bd-strong:#8392a5;--bg:#fff;--soft:#f5f7fa;--page:#eef2f6;
+  --err:#a4262c;--err-bg:#fdf3f4;--err-bd:#e8b4b8;--hint:#4b3f8f;--hint-bg:#f5f3ff;--hint-bd:#cfc7f5;--ok:#0e6b3a;--ok-bg:#e9f7ef;--open:#8a4b00;--open-bg:#fff4e0}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font:15px "Segoe UI",system-ui,sans-serif;color:var(--fg);background:var(--page);line-height:1.45}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid #0f6cbd;outline-offset:2px}
+.proto-bar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:8px 12px;background:#1e293b;color:#fff;font-size:12px}
+.proto-bar strong{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.proto-bar .hint{opacity:.75}
+.proto-bar select{font-size:12px;padding:2px 4px}
+.proto-tabs{display:flex;gap:4px}
+.proto-tabs button{padding:3px 10px;border:1px solid #475569;border-radius:6px;background:transparent;color:#fff;font-size:12px;cursor:pointer}
+.proto-tabs button[aria-pressed=true]{background:#fff;color:#1e293b;font-weight:700}
+main{max-width:920px;margin:0 auto;padding:20px 16px}
+.btn{min-height:34px;margin:0;padding:6px 12px;border:1px solid var(--bd-strong);border-radius:6px;background:var(--bg);color:var(--fg);font-weight:600;cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-hover)}
+.btn.small{min-height:30px;padding:3px 10px;font-size:.875rem}
+.link{margin:0;padding:2px;border:0;background:none;color:var(--brand-ink);text-decoration:underline;cursor:pointer;font-size:.875rem;font-weight:600}
+.panel{display:grid;gap:16px;padding:22px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)}
+h1{margin:0;font-size:1.25rem}
+h2{margin:0;font-size:1rem}
+.muted{color:var(--muted);font-size:.875rem;margin:0}
+.head{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Status of the report: a direct choice, not a cycle. */
+.status-pick{display:inline-flex;border:1px solid var(--bd-strong);border-radius:6px;overflow:hidden}
+.status-pick button{min-height:32px;padding:4px 12px;border:0;border-right:1px solid var(--bd);background:var(--bg);color:var(--fg);font-weight:600;cursor:pointer}
+.status-pick button:last-child{border-right:0}
+.status-pick button[aria-pressed=true][data-status=open]{background:var(--open-bg);color:var(--open)}
+.status-pick button[aria-pressed=true][data-status=resolved]{background:var(--ok-bg);color:var(--ok)}
+.status-line{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:.875rem}
+.sent{color:var(--muted)}
+.resolved-note{display:grid;gap:6px;padding:10px 12px;border-radius:6px;background:var(--ok-bg)}
+.resolved-note label{font-size:.875rem;font-weight:600}
+.resolved-note input{width:100%;max-width:420px;padding:6px 8px;border:1px solid var(--bd-strong);border-radius:6px}
+
+.steps{margin:0;padding-left:22px;display:grid;gap:4px}
+.steps b{font-weight:600}
+.box{display:grid;gap:6px;padding:12px 14px;border-radius:6px}
+.bc-error{border:1px solid var(--err-bd);background:var(--err-bg)}
+.bc-error h3{margin:0;font-size:.875rem;color:var(--err)}
+.bc-error blockquote{margin:0;font-family:Consolas,monospace;font-size:.875rem;white-space:pre-wrap}
+.copy{justify-self:start}
+
+/* The new box: a possible cause, clearly not a fact. */
+.cause{border:1px solid var(--hint-bd);background:var(--hint-bg)}
+.cause-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.cause-head h3{margin:0;font-size:.9375rem;color:var(--hint)}
+.tag{display:inline-block;padding:1px 8px;border:1px solid var(--hint-bd);border-radius:10px;background:#fff;color:var(--hint);font-size:.75rem;font-weight:700}
+.cause p{margin:0}
+.cause ul{margin:0;padding-left:20px}
+.cause details{font-size:.875rem}
+.cause summary{cursor:pointer;color:var(--hint);font-weight:600}
+.cause-actions{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.875rem}
+.cause-actions label{display:inline-flex;gap:6px;align-items:center}
+.dismissed{font-size:.875rem;color:var(--muted)}
+.no-cause{font-size:.875rem;color:var(--muted);border:1px dashed var(--bd);padding:8px 12px;border-radius:6px}
+
+/* Test run */
+.run-step{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--bd);border-radius:6px}
+.num{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--soft);font-weight:700;font-size:.8125rem;color:var(--muted)}
+.run-step p{margin:0}
+.run-step .linked{display:block;font-size:.8125rem;color:var(--muted)}
+.result{display:inline-flex;border:1px solid var(--bd-strong);border-radius:6px;overflow:hidden}
+.result button{padding:4px 10px;border:0;border-right:1px solid var(--bd);background:var(--bg);font-weight:600;cursor:pointer;font-size:.875rem}
+.result button:last-child{border-right:0}
+.result button[aria-pressed=true].pass{background:var(--ok-bg);color:var(--ok)}
+.result button[aria-pressed=true].fail{background:var(--err-bg);color:var(--err)}
+.offer{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 12px;border-left:4px solid var(--ok);border-radius:6px;background:var(--ok-bg);font-size:.9375rem}
+.offer p{margin:0;flex:1 1 300px}
+.offer .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Library */
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 12px;border:1px solid var(--bd-strong);border-radius:16px;background:var(--bg);font-weight:600;font-size:.875rem;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--brand-subtle);border-color:var(--brand);color:var(--brand-ink)}
+.rows{display:grid;gap:6px}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:10px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)}
+.row .title{flex:1 1 260px;font-weight:600}
+.row .meta{font-size:.8125rem;color:var(--muted)}
+.state{padding:2px 10px;border:1px solid transparent;border-radius:12px;font-size:.8125rem;font-weight:700;line-height:18px}
+.state.open{background:var(--open-bg);color:var(--open)}
+.state.resolved{background:var(--ok-bg);color:var(--ok)}
+.state.doc{background:var(--soft);color:var(--muted)}
+.empty{padding:16px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:10px 16px;border-radius:8px;background:#1e293b;color:#fff;font-size:.875rem;width:max-content;max-width:calc(100vw - 32px)}
+.toast .link{color:#9be7ea}
+@media (max-width:560px){.run-step{grid-template-columns:28px minmax(0,1fr)}.run-step .result{grid-column:2}}
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>Prototyp</strong>
+  <div class="proto-tabs" role="group" aria-label="Vy">
+    <button type="button" data-view="report" aria-pressed="true">1 · Felrapporten</button>
+    <button type="button" data-view="test" aria-pressed="false">2 · Testkörning</button>
+    <button type="button" data-view="library" aria-pressed="false">3 · Biblioteket</button>
+  </div>
+  <label>Fel: <select id="pScenario">
+    <option value="permission">Behörighet</option>
+    <option value="required">Obligatoriskt fält</option>
+    <option value="network">Anslutning</option>
+    <option value="posting">Bokföring (osäker gissning)</option>
+  </select></label>
+  <span class="hint" id="pHint"></span>
+</div>
+
+<main>
+  <!-- 1. The bug report -->
+  <section id="viewReport" class="panel" aria-labelledby="repTitle">
+    <div class="head">
+      <div>
+        <h1 id="repTitle"></h1>
+        <p class="muted">Felrapport · Salico UAT · 18 nov 2026</p>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" type="button">E-posta PDF</button>
+        <button class="btn" type="button">Exportera PDF</button>
+        <button class="btn" type="button">Fler alternativ</button>
+      </div>
+    </div>
+    <div class="status-line">
+      <span id="statusLabel"><b>Status</b></span>
+      <div class="status-pick" role="group" aria-labelledby="statusLabel">
+        <button type="button" data-status="open" aria-pressed="true">Öppen</button>
+        <button type="button" data-status="resolved" aria-pressed="false">Löst</button>
+      </div>
+      <span class="sent">Skickad till support@salico.se 18 nov 14:32</span>
+    </div>
+    <div class="resolved-note" id="resolvedNote" hidden>
+      <span id="resolvedText">Löst 18 nov 2026.</span>
+      <label for="resolvedComment">Kommentar (valfritt)</label>
+      <input id="resolvedComment" placeholder="Till exempel: lagat i version 28.3">
+    </div>
+
+    <div>
+      <h2>Steg för att återskapa</h2>
+      <ol class="steps" id="repSteps"></ol>
+    </div>
+    <div class="box bc-error">
+      <h3>Felmeddelande från Business Central</h3>
+      <blockquote id="bcMessage"></blockquote>
+      <button class="link copy" type="button">Kopiera felmeddelandet</button>
+    </div>
+
+    <div class="box cause" id="cause" aria-labelledby="causeTitle">
+      <div class="cause-head">
+        <h3 id="causeTitle">Möjlig orsak</h3>
+        <span class="tag">Inte bekräftad</span>
+      </div>
+      <p id="causeText"></p>
+      <div>
+        <b style="font-size:.875rem">Det här kan du kontrollera</b>
+        <ul id="causeChecks"></ul>
+      </div>
+      <details>
+        <summary>Varför föreslås det här?</summary>
+        <p id="causeWhy" style="margin-top:4px"></p>
+      </details>
+      <div class="cause-actions">
+        <label><input type="checkbox" id="causeInclude"> Ta med i PDF och e-post</label>
+        <button class="link" type="button" id="causeDismiss">Stämmer inte, dölj</button>
+      </div>
+    </div>
+    <p class="dismissed" id="causeDismissed" hidden>Den möjliga orsaken är dold. <button class="link" type="button" id="causeRestore">Visa igen</button></p>
+    <p class="no-cause" id="noCause" hidden></p>
+
+    <div>
+      <h2>Förväntat resultat</h2>
+      <p style="margin:4px 0 0" id="expected"></p>
+    </div>
+  </section>
+
+  <!-- 2. A later test run of the same process -->
+  <section id="viewTest" class="panel" aria-labelledby="testTitle" hidden>
+    <div class="head">
+      <div>
+        <h1 id="testTitle">Test: Skapa och bokför inköpsorder</h1>
+        <p class="muted">Testsvit Uppgradering 28.3 · Salico UAT · körs nu</p>
+      </div>
+    </div>
+    <div class="run-step"><span class="num">1</span><p>Välj <b>Ny</b>.</p>
+      <div class="result"><button class="pass" aria-pressed="true">Godkänt</button><button class="fail" aria-pressed="false">Underkänt</button></div></div>
+    <div class="run-step"><span class="num">2</span><p>Ange <i>10000</i> i <b>Leverantörsnr</b>.</p>
+      <div class="result"><button class="pass" aria-pressed="true">Godkänt</button><button class="fail" aria-pressed="false">Underkänt</button></div></div>
+    <div class="run-step" id="bugStep"><span class="num">3</span>
+      <p>Välj <b>Bokför</b>.<span class="linked" id="linkedText"></span></p>
+      <div class="result" role="group" aria-label="Resultat för steg 3">
+        <button class="pass" type="button" id="passBug" aria-pressed="false">Godkänt</button>
+        <button class="fail" type="button" aria-pressed="false">Underkänt</button>
+      </div>
+    </div>
+    <div class="offer" id="offer" role="status" hidden>
+      <p id="offerText"></p>
+      <div class="actions">
+        <button class="btn primary small" type="button" id="offerYes">Markera som löst</button>
+        <button class="btn small" type="button" id="offerNo">Inte nu</button>
+      </div>
+    </div>
+    <p class="muted">Klicka på Godkänt i steg 3. Steget hade en felrapport från en tidigare körning.</p>
+  </section>
+
+  <!-- 3. The library -->
+  <section id="viewLibrary" class="panel" aria-labelledby="libTitle" hidden>
+    <h1 id="libTitle">Dokument</h1>
+    <div class="quick" role="group" aria-label="Snabbfilter">
+      <button class="chip" type="button" data-filter="all" aria-pressed="false">Alla</button>
+      <button class="chip" type="button" data-filter="bugs" aria-pressed="false">Felrapporter</button>
+      <button class="chip" type="button" data-filter="open" aria-pressed="true">Öppna fel <span id="openCount"></span></button>
+    </div>
+    <div class="rows" id="rows"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" hidden><span id="toastText"></span><button class="link" type="button" id="toastUndo">Ångra</button></div>
+
+<script>
+const SCENARIOS = {
+  permission: {
+    title: "Bokföring av inköpsorder stoppas av behörighet",
+    steps: ["Öppna <b>Inköpsorder</b> 106014.", "Välj <b>Bokför</b>.", "Välj <b>Leverera och fakturera</b>."],
+    message: "Du har inte följande behörigheter för TableData Purch. Rcpt. Header: Insert.\n\nKontakta systemadministratören om du vill ha mer information.",
+    cause: "Användaren som bokförde saknar troligen behörighet att skapa inleveranser (tabellen Purch. Rcpt. Header).",
+    checks: ["Vilka behörighetsuppsättningar användaren har i företaget Salico UAT.", "Om samma bokföring fungerar för en användare med fler behörigheter.", "Om behörigheterna ändrades nyligen, till exempel vid en uppgradering."],
+    why: "Felmeddelandet säger att behörigheter saknas och nämner en tabell och en åtgärd (Insert). Det säger inte vilken behörighetsuppsättning som borde ha gett rätten.",
+    expected: "Ordern levereras och faktureras, och en bokförd inleverans och faktura skapas.",
+    hint: "Säker nog att visas: meddelandet nämner behörighet."
+  },
+  required: {
+    title: "Leveransdatum saknas vid frisläppning",
+    steps: ["Öppna <b>Inköpsorder</b> 106015.", "Välj <b>Släpp</b>."],
+    message: "Förväntat inleveransdatum måste ha ett värde i Inköpsrad: Dokumenttyp=Order, Dokumentnr=106015, Radnr=10000. Det får inte vara noll eller tomt.",
+    cause: "Fältet Förväntat inleveransdatum är tomt på rad 10000, och Business Central kräver ett värde innan ordern kan släppas.",
+    checks: ["Om Förväntat inleveransdatum är ifyllt på inköpsraden.", "Om leverantören eller artikeln har en ledtid som borde ha fyllt i datumet.", "Om felet bara uppstår för vissa leverantörer eller artiklar."],
+    why: "Felmeddelandet säger att ett fält måste ha ett värde och anger fältet och raden. Fältet och raden kommer från felmeddelandet, inte från en gissning.",
+    expected: "Ordern släpps och får status Släppt.",
+    hint: "Säker nog att visas: meddelandet säger att ett värde saknas."
+  },
+  network: {
+    title: "Fel vid hämtning av valutakurser",
+    steps: ["Öppna <b>Valutor</b>.", "Välj <b>Uppdatera valutakurser</b>."],
+    message: "Det gick inte att ansluta till fjärrtjänsten. HTTP 503 Service Unavailable.",
+    cause: "Tjänsten som Business Central hämtar valutakurserna från svarade inte. Felet ligger troligen utanför Business Central.",
+    checks: ["Om tjänsten för valutakurser är tillgänglig just nu.", "Om samma åtgärd fungerar om en stund.", "Om adressen till tjänsten är rätt inställd under Inställningar för valutakursuppdatering."],
+    why: "Felmeddelandet innehåller en HTTP-felkod (503) och säger att anslutningen misslyckades. Det visar inte vilken tjänst som svarade.",
+    expected: "Valutakurserna uppdateras med dagens kurser.",
+    hint: "Säker nog att visas: meddelandet nämner anslutning och en HTTP-kod."
+  },
+  posting: {
+    title: "Bokföring av försäljningsorder avbryts",
+    steps: ["Öppna <b>Försäljningsorder</b> 101009.", "Välj <b>Bokför</b>."],
+    message: "Det finns ingenting att bokföra.",
+    cause: null,
+    expected: "Ordern bokförs och en bokförd försäljningsfaktura skapas.",
+    hint: "För osäker: motorn gissar bara \"bokföringen misslyckades\", som användaren redan vet. Ingen ruta visas."
+  }
+};
+const $ = id => document.getElementById(id);
+const fmtDate = "18 nov 2026";
+let scenario = "permission";
+let status = "open";
+let dismissed = false;
+let undo = null;
+
+function renderReport() {
+  const s = SCENARIOS[scenario];
+  $("repTitle").textContent = s.title;
+  $("repSteps").innerHTML = s.steps.map(step => `<li>${step}</li>`).join("");
+  $("bcMessage").textContent = s.message;
+  $("pHint").textContent = s.hint;
+  $("expected").textContent = s.expected;
+  const show = Boolean(s.cause);
+  $("cause").hidden = !show || dismissed;
+  $("causeDismissed").hidden = !show || !dismissed;
+  $("noCause").hidden = show;
+  $("noCause").textContent = "Ingen möjlig orsak visas för det här felet: BC Process Studio vet inte tillräckligt för att säga något du inte redan ser i felmeddelandet.";
+  if (show) {
+    $("causeText").textContent = s.cause;
+    $("causeChecks").replaceChildren(...s.checks.map(text => Object.assign(document.createElement("li"), { textContent: text })));
+    $("causeWhy").textContent = s.why;
+  }
+  document.querySelectorAll(".status-pick button").forEach(button =>
+    button.setAttribute("aria-pressed", String(button.dataset.status === status)));
+  $("resolvedNote").hidden = status !== "resolved";
+  $("resolvedText").textContent = `Löst ${fmtDate}.`;
+}
+
+function renderTest() {
+  const s = SCENARIOS[scenario];
+  $("linkedText").textContent = status === "resolved"
+    ? `Felrapport: ${s.title} · Löst`
+    : `Felrapport från förra körningen: ${s.title} · Öppen`;
+}
+
+const LIB = () => [
+  { kind: "bug", title: SCENARIOS[scenario].title, meta: "Felrapport · 18 nov · Salico UAT", status },
+  { kind: "bug", title: "Kreditgräns stoppar försäljningsorder", meta: "Felrapport · 12 nov · Salico UAT", status: "open" },
+  { kind: "bug", title: "Lagerplock visar fel lagerställe", meta: "Felrapport · 3 nov · Salico PROD", status: "resolved", note: "Löst 10 nov" },
+  { kind: "doc", title: "Skapa och bokför inköpsorder", meta: "Dokumentation · 16 nov · Salico UAT" }
+];
+let filter = "open";
+function renderLibrary() {
+  const items = LIB();
+  const open = items.filter(item => item.kind === "bug" && item.status === "open");
+  $("openCount").textContent = `(${open.length})`;
+  const shown = filter === "open" ? open : filter === "bugs" ? items.filter(item => item.kind === "bug") : items;
+  document.querySelectorAll(".chip").forEach(chip => chip.setAttribute("aria-pressed", String(chip.dataset.filter === filter)));
+  $("rows").replaceChildren(...(shown.length ? shown.map(item => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const state = item.kind === "doc" ? `<span class="state doc">Granskad</span>`
+      : item.status === "resolved" ? `<span class="state resolved">✓ ${item.note || "Löst " + fmtDate.replace(" 2026", "")}</span>`
+      : `<span class="state open">● Öppet fel</span>`;
+    row.innerHTML = `<span class="title">${item.title}<br><span class="meta">${item.meta}</span></span>${state}`;
+    return row;
+  }) : [Object.assign(document.createElement("p"), { className: "empty",
+    textContent: "Inga öppna fel. Alla felrapporter är markerade som lösta." })]));
+}
+
+function render() { renderReport(); renderTest(); renderLibrary(); }
+
+function setStatus(next, message) {
+  const before = status;
+  if (before === next) return;
+  status = next;
+  render();
+  if (message) {
+    undo = () => { status = before; render(); };
+    $("toastText").textContent = message;
+    $("toast").hidden = false;
+    clearTimeout(setStatus.timer);
+    setStatus.timer = setTimeout(() => { $("toast").hidden = true; }, 6000);
+  }
+}
+
+document.querySelectorAll(".status-pick button").forEach(button =>
+  button.addEventListener("click", () => setStatus(button.dataset.status,
+    button.dataset.status === "resolved" ? "Felrapporten är markerad som löst." : "Felrapporten är öppen igen.")));
+$("causeDismiss").addEventListener("click", () => { dismissed = true; renderReport(); $("causeRestore").focus(); });
+$("causeRestore").addEventListener("click", () => { dismissed = false; renderReport(); $("causeDismiss").focus(); });
+$("pScenario").addEventListener("change", event => { scenario = event.target.value; dismissed = false; render(); });
+
+$("passBug").addEventListener("click", () => {
+  $("passBug").setAttribute("aria-pressed", "true");
+  $("passBug").nextElementSibling.setAttribute("aria-pressed", "false");
+  if (status === "resolved") return;
+  $("offerText").textContent = `Steget som felrapporten "${SCENARIOS[scenario].title}" gällde godkändes nu. Markera rapporten som löst?`;
+  $("offer").hidden = false;
+});
+$("offerYes").addEventListener("click", () => {
+  $("offer").hidden = true;
+  setStatus("resolved", "Felrapporten är markerad som löst. Rapporten visar testkörningen som godkände steget.");
+  $("passBug").focus();
+});
+$("offerNo").addEventListener("click", () => { $("offer").hidden = true; $("passBug").focus(); });
+$("toastUndo").addEventListener("click", () => { if (undo) undo(); undo = null; $("toast").hidden = true; });
+
+document.querySelectorAll(".chip").forEach(chip => chip.addEventListener("click", () => { filter = chip.dataset.filter; renderLibrary(); }));
+document.querySelectorAll(".proto-tabs button").forEach(tab => tab.addEventListener("click", () => {
+  document.querySelectorAll(".proto-tabs button").forEach(other => other.setAttribute("aria-pressed", String(other === tab)));
+  $("viewReport").hidden = tab.dataset.view !== "report";
+  $("viewTest").hidden = tab.dataset.view !== "test";
+  $("viewLibrary").hidden = tab.dataset.view !== "library";
+}));
+render();
+</script>
+</body>
+</html>
