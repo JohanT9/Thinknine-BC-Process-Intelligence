@@ -1,0 +1,6055 @@
+{
+ "schema": 1,
+ "source": "Microsoft Base Application",
+ "version": "29.1.57326.58379",
+ "locales": [
+  "en-US",
+  "sv-SE",
+  "fr-FR",
+  "de-DE",
+  "es-ES",
+  "da-DK",
+  "fi-FI",
+  "nb-NO"
+ ],
+ "captions": {
+  "a|Absence Registration|Overview by &Categories": [
+   "Overview by Categories",
+   "Översikt per kategori",
+   "Détail par catégorie",
+   "Übersicht nach Kategorien",
+   "Panorama por categorías",
+   "Oversigt pr. kategori",
+   "Yleiskuvaus luokittain",
+   "Oversikt per kategori"
+  ],
+  "a|Absence Registration|Overview by &Periods": [
+   "Overview by Periods",
+   "Översikt per period",
+   "Détail par période",
+   "Übersicht nach Perioden",
+   "Panorama por periodos",
+   "Oversigt pr. periode",
+   "Yleiskuvaus kausittain",
+   "Oversikt per periode"
+  ],
+  "a|Account Schedule Names|EditAccountSchedule": [
+   "Edit Row Definition",
+   "Redigera raddefinition",
+   "Modifier définition de ligne",
+   "Zeilendefinition bearbeiten",
+   "Editar definición de fila",
+   "Rediger rækkedefinition",
+   "Muokkaa rivimääritystä",
+   "Rediger raddefinisjon"
+  ],
+  "a|Accounting Periods|&Create Year": [
+   "Create Year",
+   "Upprätta år",
+   "Créer exercice",
+   "Jahr erstellen",
+   "Crear ejercic.",
+   "Nyt år",
+   "Luo vuosi",
+   "Nytt år"
+  ],
+  "a|Accounting Periods|C&lose Year": [
+   "Close Year",
+   "Avsluta år",
+   "Clôturer exercice",
+   "Jahr abschließen",
+   "Fijar cierre",
+   "Afslut år",
+   "Sulje vuosi",
+   "Lukk år"
+  ],
+  "a|Assembly Order|P&ost": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogføring",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Bank Acc. Reconciliation|ImportBankStatement": [
+   "Import Bank Statement",
+   "Importera bankutdrag",
+   "Importer le relevé bancaire",
+   "Bankauszug importieren",
+   "Importar extracto bancario",
+   "Importér bankkontoudtog",
+   "Tuo pankin tiliote",
+   "Importer bankkontoutdrag"
+  ],
+  "a|Bank Acc. Reconciliation|MatchAutomatically": [
+   "Match Automatically",
+   "Matcha automatiskt",
+   "Faire correspondre automatiquement",
+   "Automatisch abgleichen",
+   "Conciliar automáticamente",
+   "Match automatisk",
+   "Kohdista automaattisesti",
+   "Avstem automatisk"
+  ],
+  "a|Bank Acc. Reconciliation|MatchManually": [
+   "Match Manually",
+   "Matcha manuellt",
+   "Faire correspondre manuellement",
+   "Manuell abgleichen",
+   "Conciliar manualmente",
+   "Match manuelt",
+   "Kohdista manuaalisesti",
+   "Avstem manuelt"
+  ],
+  "a|Bank Acc. Reconciliation|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Cash Flow Forecast Chart|Recalculate Forecast": [
+   "Recalculate Forecast",
+   "Omberäkna prognos",
+   "Recalculer la prévision",
+   "Planung neu berechnen",
+   "Recalcular previsión",
+   "Genberegn prognose",
+   "Laske ennuste uudelleen",
+   "Beregn prognose på nytt"
+  ],
+  "a|Chart of Accounts|IndentChartOfAccounts": [
+   "Indent Chart of Accounts",
+   "Indrag av kontoplan",
+   "Indenter plan comptable",
+   "Einrückung des Kontenplans",
+   "Test plan de cuentas",
+   "Indryk kontoplan",
+   "Sisennä tilikartta",
+   "Innrykk kontoplan"
+  ],
+  "a|Client Detail Cash Flow Chart|Recalculate Forecast": [
+   "Recalculate Forecast",
+   "Omberäkna prognos",
+   "Recalculer la prévision",
+   "Planung neu berechnen",
+   "Recalcular previsión",
+   "Genberegn prognose",
+   "Laske ennuste uudelleen",
+   "Beregn prognose på nytt"
+  ],
+  "a|Contact List|Create &Interaction": [
+   "Create Interaction",
+   "Skapa interaktion",
+   "Créer Interaction",
+   "Aktivität erstellen",
+   "Crear interacción",
+   "Opret interaktion",
+   "Luo vuorovaikutus",
+   "Opprett samhandling"
+  ],
+  "a|Cost Allocation|Calculate Allocation Key": [
+   "Calculate Allocation Bases",
+   "Beräkna fördelningsnyckel",
+   "Calculer la clé de ventilation",
+   "Verteilungsschlüssel berechnen",
+   "Calcular clave de asignación",
+   "Beregn fordelingsnøgle",
+   "Laske kohdistusavain",
+   "Beregn fordelingsnøkkel"
+  ],
+  "a|Cost Journal|P&ost": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogføring",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Cost Journal|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogføring",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Employee Card|ApplyTemplate": [
+   "Apply Template",
+   "Koppla mall",
+   "Appliquer modèle",
+   "Vorlage anwenden",
+   "Aplicar plantilla",
+   "Anvend skabelon",
+   "Käytä mallia",
+   "Bruk mal"
+  ],
+  "a|Employee List|Absences by Ca&tegories": [
+   "Absences by Categories",
+   "Frånvaro per kategori",
+   "Absences par catégorie",
+   "Abwesenheiten nach Kategorien",
+   "Ausencias por categorías",
+   "Fravær pr. kategori",
+   "Poissaolot luokittain",
+   "Fravær per kategori"
+  ],
+  "a|Fixed Asset G/L Journal|P&ost": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|G/L Budget Names|EditBudget": [
+   "Edit Budget",
+   "Redigera budget",
+   "Modifier budget",
+   "Budget bearbeiten",
+   "Editar presupuesto",
+   "Rediger budget",
+   "Muokkaa budjettia",
+   "Rediger budsjett"
+  ],
+  "a|General Journal|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|General Ledger Setup|ChangeGlobalDimensions": [
+   "Change Global Dimensions",
+   "Ändra globala dimensioner",
+   "Modifier les axes principaux",
+   "Globale Dimensionen ändern",
+   "Cambiar dimen. globales",
+   "Rediger globale dimensioner",
+   "Muuta globaaleja dimensioita",
+   "Endre globale dimensjoner"
+  ],
+  "a|IC Inbox Transactions|Import Transaction File": [
+   "Import Transaction File",
+   "Importera transaktionsfil",
+   "Importer le fichier de transaction",
+   "Transaktionsdatei importieren",
+   "Importar archivo transacción",
+   "Indlæs transaktionsfil",
+   "Tuo tapahtumatiedosto",
+   "Importer transaksjonsfil"
+  ],
+  "a|Intercompany Setup|ICChartOfAccounts": [
+   "IC Chart of Accounts",
+   "Konc.int. kontoplan",
+   "Plan comptable IC",
+   "IC-Kontenplan",
+   "Plan de cuentas IC",
+   "IC-kontoplan",
+   "Konsernin tilikartta",
+   "KI-kontoplan"
+  ],
+  "a|Inventory Picks|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registro",
+   "Bogfør",
+   "Kirjaa",
+   "Post"
+  ],
+  "a|Inventory Pick|P&ost": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Item Card|<Action110>": [
+   "Event",
+   "Händelse",
+   "Événement",
+   "Ereignis",
+   "Evento",
+   "Begivenhed",
+   "Tapahtuma",
+   "Hendelse"
+  ],
+  "a|Item Card|Location": [
+   "Location",
+   "Lagerställe",
+   "Magasin",
+   "Lagerort",
+   "Almacén",
+   "Lokation",
+   "Sijainti",
+   "Lokasjon"
+  ],
+  "a|Item Card|Period": [
+   "Period",
+   "Period",
+   "Période",
+   "Periode",
+   "Periodo",
+   "Periode",
+   "Jakso",
+   "Periode"
+  ],
+  "a|Item Card|Variant": [
+   "Variant",
+   "Variant",
+   "Variante",
+   "Variante",
+   "Variante",
+   "Variant",
+   "Variantti",
+   "Variant"
+  ],
+  "a|Item Reclass. Journal|Item &Tracking Lines": [
+   "Item Tracking Lines",
+   "Artikelspårningsrader",
+   "Lignes traçabilité",
+   "Artikelverfolgungszeilen",
+   "Líns. seguim. prod.",
+   "Varesporingslinjer",
+   "Nimikkeen seurantarivit",
+   "Varesporingslinjer"
+  ],
+  "a|Item Reclass. Journal|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Item Tracing|Trace": [
+   "Trace",
+   "Spåra",
+   "Suivi",
+   "Ablaufverfolgung",
+   "Realizar seguimiento",
+   "Sporing",
+   "Jäljitys",
+   "Spor"
+  ],
+  "a|Item Tracking Lines|Assign &Lot No.": [
+   "Assign Lot No.",
+   "Tilldela partinr",
+   "Affecter n° lot",
+   "Chargennr. zuweisen",
+   "Asignar nº lote",
+   "Tildel lotnr.",
+   "Määritä eränro",
+   "Tilordne partinr."
+  ],
+  "a|Item Tracking Lines|Assign &Serial No.": [
+   "Assign Serial No.",
+   "Tilldela serienr",
+   "Affecter n° de série",
+   "Seriennr. zuweisen",
+   "Asignar nº serie",
+   "Tildel serienr.",
+   "Määritä sarjanro",
+   "Tilordne serienr."
+  ],
+  "a|Item Tracking Lines|Assign Lot No.": [
+   "Assign Lot No.",
+   "Tilldela partinr",
+   "Affecter n° lot",
+   "Chargennr. zuweisen",
+   "Asignar nº lote",
+   "Tildel lotnr.",
+   "Määritä eränro",
+   "Tilordne partinr."
+  ],
+  "a|Item Tracking Lines|Assign Serial No.": [
+   "Assign Serial No.",
+   "Tilldela serienr",
+   "Affecter n° de série",
+   "Seriennr. zuweisen",
+   "Asignar nº serie",
+   "Tildel serienr.",
+   "Määritä sarjanro",
+   "Tilordne serienr."
+  ],
+  "a|Job Card|Create Inventory Pick": [
+   "Create Inventory Pick",
+   "Skapa lagerplockning",
+   "Créer prélèvement stock",
+   "Lagerkommissionierung erstellen",
+   "Crear picking inventario",
+   "Opret lagerpluk",
+   "Luo varaston poiminta",
+   "Opprett beholdningsplukk"
+  ],
+  "a|Job Card|Create Warehouse Pick": [
+   "Create Warehouse Pick",
+   "Skapa distributionslagerplockning",
+   "Créer prélèvement entrepôt",
+   "Kommissionierung erstellen",
+   "Crear picking almacén",
+   "Opret lagerstedspluk",
+   "Luo fyysisen varaston poiminta",
+   "Opprett lagerplukk"
+  ],
+  "a|Job Card|CreatePurchaseOrder": [
+   "Create Purchase Orders",
+   "Skapa inköpsorder",
+   "Créer des commandes achat",
+   "Einkaufsbestellungen erstellen",
+   "Crear pedidos de compra",
+   "Opret købsordrer",
+   "Luo ostotilaukset",
+   "Opprett bestillinger"
+  ],
+  "a|Job Journal|CalcRemainingUsage": [
+   "Calc. Remaining Usage",
+   "Ber. återstående förbrukning",
+   "Calc. activité restante",
+   "Restverbrauch berechnen",
+   "Cálc. uso restante",
+   "Beregn resterede forbrug",
+   "Laske jäljellä oleva käyttö",
+   "Beregn gjenstående forbruk"
+  ],
+  "a|Job Journal|SuggestLinesFromTimeSheets": [
+   "Suggest Lines from Time Sheets",
+   "Föreslå rader från tidrapporter",
+   "Proposer des lignes à partir des feuilles de temps",
+   "Zeilen anhand von Arbeitszeitnachweisen vorschlagen",
+   "Sugerir líneas de partes de horas",
+   "Foreslå linjer fra timesedler",
+   "Ehdota rivejä tuntiraporteista",
+   "Foreslå linjer fra timelister"
+  ],
+  "a|Job List|Create Inventory Pick": [
+   "Create Inventory Pick",
+   "Skapa lagerplockning",
+   "Créer prélèvement stock",
+   "Lagerkommissionierung erstellen",
+   "Crear picking inventario",
+   "Opret lagerpluk",
+   "Luo varaston poiminta",
+   "Opprett beholdningsplukk"
+  ],
+  "a|Job List|Create Job &Sales Invoice": [
+   "Create Project Sales Invoice",
+   "Skapa en försäljningsfaktura för projekt",
+   "Créer une facture vente projet",
+   "Projektverkaufsrechnung erstellen",
+   "Crear factura de venta de proyecto",
+   "Opret salgsfaktura for projekt",
+   "Luo projekti- ja myyntilasku",
+   "Opprett salgsfaktura for prosjekt"
+  ],
+  "a|Job List|Create Warehouse Pick": [
+   "Create Warehouse Pick",
+   "Skapa distributionslagerplockning",
+   "Créer prélèvement entrepôt",
+   "Lagerkommissionierung erstellen",
+   "Crear picking almacén",
+   "Opret lagerstedspluk",
+   "Luo fyysisen varaston poiminta",
+   "Opprett lagerplukk"
+  ],
+  "a|Job Planning Lines|CreateJobJournalLines": [
+   "Create Project Journal Lines",
+   "Skapa projektjournalrader",
+   "Créer lignes feuille projet",
+   "Projekt-Buchungsblattzeilen erstellen",
+   "Crear líneas diario proyecto",
+   "Opret projektkladdelinjer",
+   "Luo projektipäiväkirjan rivit",
+   "Opprett prosjektkladdelinjer"
+  ],
+  "a|Job Task Lines Subform|JobPlanningLines": [
+   "Project Planning Lines",
+   "Projektplaneringsrader",
+   "Lignes planning projet",
+   "Projektplanzeilen",
+   "Líneas planificación proyecto",
+   "Projektplanlægningslinjer",
+   "Projektin suunnittelurivit",
+   "Prosjektplanleggingslinjer"
+  ],
+  "a|Job Task Lines|JobPlanningLines": [
+   "Project Planning Lines",
+   "Projektplaneringsrader",
+   "Lignes planning projet",
+   "Projektplanzeilen",
+   "Líneas planificación proyecto",
+   "Projektplanlægningslinjer",
+   "Projektin suunnittelurivit",
+   "Prosjektplanleggingslinjer"
+  ],
+  "a|Navigate|Find": [
+   "Find",
+   "Hitta",
+   "Rechercher",
+   "Suchen",
+   "Buscar",
+   "Find",
+   "Etsi",
+   "Finn"
+  ],
+  "a|Opportunity List|Close": [
+   "Close",
+   "Avsluta",
+   "Terminer",
+   "Schließen",
+   "Cerrar",
+   "Luk",
+   "Sulje",
+   "Lukk"
+  ],
+  "a|Opportunity List|Update": [
+   "Update",
+   "Uppdatera",
+   "Mettre à jour",
+   "Aktualisieren",
+   "Actualizar",
+   "Opdater",
+   "Päivitä",
+   "Oppdater"
+  ],
+  "a|Posted Purchase Invoices|CancelInvoice": [
+   "Cancel",
+   "Avbryt",
+   "Annuler",
+   "Stornieren",
+   "Cancelar",
+   "Annuller",
+   "Peruuta",
+   "Annuller"
+  ],
+  "a|Posted Purchase Invoices|CreateCreditMemo": [
+   "Create Corrective Credit Memo",
+   "Skapa korrigerande kreditnota",
+   "Créer un avoir correctif",
+   "Korrekturgutschrift erstellen",
+   "Crear nota de abono correctiva",
+   "Opret rettelseskreditnota",
+   "Luo korjaava hyvityslasku",
+   "Opprett korrigerende kreditnota"
+  ],
+  "a|Posted Sales Invoices|CancelInvoice": [
+   "Cancel",
+   "Avbryt",
+   "Annuler",
+   "Stornieren",
+   "Cancelar",
+   "Annuller",
+   "Peruuta",
+   "Annuller"
+  ],
+  "a|Posted Sales Invoices|CreateCreditMemo": [
+   "Create Corrective Credit Memo",
+   "Skapa korrigerande kreditnota",
+   "Créer un avoir correctif",
+   "Korrekturgutschrift erstellen",
+   "Crear nota de abono correctiva",
+   "Opret rettelseskreditnota",
+   "Luo korjaava hyvityslasku",
+   "Opprett korrigerende kreditnota"
+  ],
+  "a|Production Journal|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Purchase Credit Memo|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Purchase Credit Memo|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Purchase Invoices|Action7": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Liberar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Invoices|Category_Category7": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Invoices|PostSelected": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaus",
+   "Bokfør"
+  ],
+  "a|Purchase Invoices|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Purchase Invoice|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Purchase Invoice|Category_Category10": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Invoice|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Purchase Invoice|Re&lease": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Purchase Invoice|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Purchase Invoice|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Purchase Order List|Action10": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Liberar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Order List|Category_Category7": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Order List|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Purchase Order List|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Purchase Order List|Reopen": [
+   "Reopen",
+   "Öppna igen",
+   "Rouvrir",
+   "Status zurücksetzen",
+   "Volver a abrir",
+   "Åbn igen",
+   "Avaa uudelleen",
+   "Åpne på nytt"
+  ],
+  "a|Purchase Order|Action13": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Liberar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Order|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Purchase Order|Category_Category5": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Purchase Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Purchase Order|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Purchase Order|Reopen": [
+   "Reopen",
+   "Öppna igen",
+   "Rouvrir",
+   "Status zurücksetzen",
+   "Volver a abrir",
+   "Åbn igen",
+   "Uudelleenavaa",
+   "Åpne på nytt"
+  ],
+  "a|Purchase Order|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Purchase Return Order List|Get Posted Doc&ument Lines to Reverse": [
+   "Get Posted Document Lines to Reverse",
+   "Hämta bokförda dokumentrader som ska återföras",
+   "Extraire lignes document enreg. à contrepasser",
+   "Zu stornierende gebuchte Belegzeilen abrufen",
+   "Revertir líneas documentos registrados",
+   "Hent bogførte bilagslinjer, der skal tilbageføres",
+   "Hae peruutettavat kirjatut asiakirjarivit",
+   "Hent bokførte dokumentlinjer som skal tilbakeføres"
+  ],
+  "a|Purchase Return Order List|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Purchase Return Order|GetPostedDocumentLinesToReverse": [
+   "Get Posted Document Lines to Reverse",
+   "Hämta bokförda dokumentrader som ska återföras",
+   "Extraire lignes document enreg. à contrepasser",
+   "Zu stornierende gebuchte Belegzeilen abrufen",
+   "Revertir líneas documentos registrados",
+   "Hent bogførte bilagslinjer, der skal tilbageføres",
+   "Hae peruutettavat kirjatut asiakirjarivit",
+   "Hent bokførte dokumentlinjer som skal tilbakeføres"
+  ],
+  "a|Purchase Return Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Requests to Approve|Approve": [
+   "Approve",
+   "Godkänn",
+   "Approuver",
+   "Genehmigen",
+   "Aprobar",
+   "Godkend",
+   "Hyväksy",
+   "Godkjenn"
+  ],
+  "a|Requests to Approve|Delegate": [
+   "Delegate",
+   "Delegera",
+   "Déléguer",
+   "Delegieren",
+   "Delegar",
+   "Uddeleger",
+   "Delegoi",
+   "Deleger"
+  ],
+  "a|Requests to Approve|Reject": [
+   "Reject",
+   "Avvisa",
+   "Rejeter",
+   "Ablehnen",
+   "Rechazar",
+   "Afvis",
+   "Hylkää",
+   "Avvis"
+  ],
+  "a|Resource Allocations|Allocate to &all Service Items": [
+   "Allocate to all Service Items",
+   "Fördela till alla serviceartiklar",
+   "Affecter à tous les articles de service",
+   "Allen Serviceartikeln zuordnen",
+   "Asignar a todos prods. serv.",
+   "Alloker til alle serviceartikler",
+   "Kohd. kaikkiin huoltonimik.",
+   "Tildel til alle servicevarer"
+  ],
+  "a|Resource Capacity Settings|UpdateCapacity": [
+   "Update Capacity",
+   "Uppdatera kapacitet",
+   "Mettre à jour la capacité",
+   "Kapazität aktualisieren",
+   "Actualizar capacidad",
+   "Opdater kapacitet",
+   "Päivitä kapasiteetti",
+   "Oppdater kapasitet"
+  ],
+  "a|Resource Card|&Prices": [
+   "Prices",
+   "Priser",
+   "Prix",
+   "Preise",
+   "Precios",
+   "Priser",
+   "Hinnat",
+   "Priser"
+  ],
+  "a|Resource Card|Category_Category6": [
+   "Prices",
+   "Priser",
+   "Prix",
+   "Preise",
+   "Precios",
+   "Priser",
+   "Hinnat",
+   "Priser"
+  ],
+  "a|Resource Card|Costs": [
+   "Costs",
+   "Kostnader",
+   "Coûts",
+   "Einstandspreise",
+   "Costes",
+   "Kostpriser",
+   "Kustannukset",
+   "Kostpriser"
+  ],
+  "a|Resource Card|Prices": [
+   "Prices",
+   "Priser",
+   "Prix",
+   "VK-Preise",
+   "Precios",
+   "Salgspriser",
+   "Hinnat",
+   "Priser"
+  ],
+  "a|Resource Card|Resource &Capacity": [
+   "Resource Capacity",
+   "Resurskapacitet",
+   "Capacité ressource",
+   "Ressourcen Kapazität",
+   "Capacidad recurso",
+   "Ressourcekapacitet",
+   "Resurssikapasiteetti",
+   "Ressurskapasitet"
+  ],
+  "a|Sales Credit Memo|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Sales Credit Memo|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Sales Invoice Subform|GetJobPlanningLines": [
+   "Get Project Planning Lines",
+   "Hämta projektplaneringsrader",
+   "Obtenir les lignes de planification de projet",
+   "Projektplanzeilen abrufen",
+   "Obtener líneas de planificación de proyectos",
+   "Hent projektplanlægningslinjer",
+   "Hae projektin suunnittelurivit",
+   "Hent prosjektplanleggingslinjer"
+  ],
+  "a|Sales Invoice Subform|GetShipmentLines": [
+   "Get Shipment Lines",
+   "Hämta utleveransrader",
+   "Extraire lignes expédition",
+   "Lieferzeilen abrufen",
+   "Traer líneas alb. venta",
+   "Hent salgsleverancelinjer",
+   "Hae toimitusrivit",
+   "Hent leveringslinjer"
+  ],
+  "a|Sales Invoice|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Sales Invoice|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Sales Order List|Action12": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Liberar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Sales Order List|Category_Category6": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Sales Order List|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Sales Order List|PostAndSend": [
+   "Post and Send",
+   "Bokför och skicka",
+   "Valider et envoyer",
+   "Buchen und senden",
+   "Registrar y enviar",
+   "Bogfør og send",
+   "Kirjaa ja lähetä",
+   "Bokfør og send"
+  ],
+  "a|Sales Order List|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Sales Order List|Reopen": [
+   "Reopen",
+   "Öppna igen",
+   "Rouvrir",
+   "Status zurücksetzen",
+   "Volver a abrir",
+   "Åbn igen",
+   "Avaa uudelleen",
+   "Åpne på nytt"
+  ],
+  "a|Sales Order|Action21": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Liberar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Sales Order|CancelApprovalRequest": [
+   "Cancel Approval Request",
+   "Annullera godkännandebegäran",
+   "Annuler demande d'approbation",
+   "Genehmigungsanforderung stornieren",
+   "Cancelar solicitud aprobación",
+   "Annuller godkendelsesanmodning",
+   "Peruuta hyväksymispyyntö",
+   "Annuller godkjenningsforespørsel"
+  ],
+  "a|Sales Order|Category_Category5": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapautus",
+   "Frigi"
+  ],
+  "a|Sales Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Sales Order|PostAndSend": [
+   "Post and Send",
+   "Bokför och skicka",
+   "Valider et envoyer",
+   "Buchen und senden",
+   "Registrar y enviar",
+   "Bogfør og send",
+   "Kirjaa ja lähetä",
+   "Bokfør og Send"
+  ],
+  "a|Sales Order|Release": [
+   "Release",
+   "Släpp",
+   "Lancer",
+   "Freigeben",
+   "Lanzar",
+   "Frigiv",
+   "Vapauta",
+   "Frigi"
+  ],
+  "a|Sales Order|Reopen": [
+   "Reopen",
+   "Öppna igen",
+   "Rouvrir",
+   "Status zurücksetzen",
+   "Volver a abrir",
+   "Åbn igen",
+   "Uudelleenavaa",
+   "Åpne på nytt"
+  ],
+  "a|Sales Order|SendApprovalRequest": [
+   "Send Approval Request",
+   "Skicka godkännandebegäran",
+   "Envoyer demande d'approbation",
+   "Genehmigungsanforderung senden",
+   "Enviar solicitud aprobación",
+   "Send godkendelsesanmodning",
+   "Lähetä hyväksymispyyntö",
+   "Send godkjenningsforespørsel"
+  ],
+  "a|Sales Return Order List|Get Posted Doc&ument Lines to Reverse": [
+   "Get Posted Document Lines to Reverse",
+   "Hämta bokförda dokumentrader som ska återföras",
+   "Extraire lignes document enreg. à contrepasser",
+   "Zu stornierende gebuchte Belegzeilen abrufen",
+   "Revertir líneas documentos registrados",
+   "Hent bogførte bilagslinjer, der skal tilbageføres",
+   "Hae peruutettavat kirjatut asiakirjarivit",
+   "Hent bokførte dokumentlinjer som skal tilbakeføres"
+  ],
+  "a|Sales Return Order List|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Sales Return Order|GetPostedDocumentLinesToReverse": [
+   "Get Posted Document Lines to Reverse",
+   "Hämta bokförda dokumentrader som ska återföras",
+   "Extraire lignes document enreg. à contrepasser",
+   "Zu stornierende gebuchte Belegzeilen abrufen",
+   "Revertir líneas documentos registrados",
+   "Hent bogførte bilagslinjer, der skal tilbageføres",
+   "Hae peruutettavat kirjatut asiakirjarivit",
+   "Hent bokførte dokumentlinjer som skal tilbakeføres"
+  ],
+  "a|Sales Return Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Segment|AddContacts": [
+   "Add Contacts",
+   "Lägg till kontakter",
+   "Ajouter contacts",
+   "Kontakte hinzufügen",
+   "Añadir contactos",
+   "Tilføj kontakter",
+   "Lisää kontakteja",
+   "Legg til kontakter"
+  ],
+  "a|Segment|ReduceContacts": [
+   "Reduce Contacts",
+   "Reducera kontakter",
+   "Réduire les contacts",
+   "Kontakte entfernen",
+   "Reducir contactos",
+   "Reducer kontakter",
+   "Vähennä kontakteja",
+   "Reduser kontakter"
+  ],
+  "a|Segment|RefineContacts": [
+   "Refine Contacts",
+   "Förfina urval",
+   "Redéfinir les contacts",
+   "Kontakte neu definieren",
+   "Redefinir contactos",
+   "Begræns kontakter",
+   "Tarkenna kontakteja",
+   "Forny kontakter"
+  ],
+  "a|Service Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Service Quotes|Make &Order": [
+   "Make Order",
+   "Skapa order",
+   "Créer commande",
+   "Auftrag erst.",
+   "Convertir en pedido",
+   "Opret ordre",
+   "Tee tilaus",
+   "Lag ordre"
+  ],
+  "a|Service Tasks|&Item Worksheet": [
+   "Item Worksheet",
+   "Artikelförslag",
+   "Feuille activité article",
+   "Servicearbeitsblatt",
+   "Hoja trabajo producto",
+   "Serviceartikelkld.",
+   "Nimikkeen työkirja",
+   "Arbeidsordre"
+  ],
+  "a|Transfer Order|Post": [
+   "Post",
+   "Bokför",
+   "Valider",
+   "Buchen",
+   "Registrar",
+   "Bogfør",
+   "Kirjaa",
+   "Bokfør"
+  ],
+  "a|Warehouse Picks|RegisterPick": [
+   "Register Pick",
+   "Registrera plockning",
+   "Enregistrer prélèvement",
+   "Kommissionierung registrieren",
+   "Registrar picking",
+   "Registrer pluk",
+   "Rekisteröi poiminta",
+   "Registrer plukk"
+  ],
+  "a|Warehouse Pick|RegisterPick": [
+   "Register Pick",
+   "Registrera plockning",
+   "Enregistrer prélèvement",
+   "Kommissionierung registrieren",
+   "Registrar picking",
+   "Registrer pluk",
+   "Rekisteröi poiminta",
+   "Registrer plukk"
+  ],
+  "a|Warehouse Put-aways|Register Put-away": [
+   "Register Put-away",
+   "Registrera artikelinförsel",
+   "Enregistrer rangement",
+   "Einlagerung registrieren",
+   "Registrar almacenamiento",
+   "Registrer læg-på-lager",
+   "Rekisteröi hyllytys",
+   "Registrer plassering"
+  ],
+  "a|Warehouse Put-away|&Register Put-away": [
+   "Register Put-away",
+   "Registrera artikelinförsel",
+   "Enregistrer rangement",
+   "Einlagerung registrieren",
+   "Registrar almacenamiento",
+   "Registrer læg-på-lager",
+   "Rekisteröi hyllytys",
+   "Registrer plassering"
+  ],
+  "a|Warehouse Receipts|Post Receipt": [
+   "Post Receipt",
+   "Bokför inleverans",
+   "Valider réception",
+   "Wareneingang buchen",
+   "Registrar recep.",
+   "Bogfør leverance",
+   "Kirjaa vastaanotto",
+   "Bokfør mottak"
+  ],
+  "a|Warehouse Receipt|Post Receipt": [
+   "Post Receipt",
+   "Bokför inleverans",
+   "Valider réception",
+   "Wareneingang buchen",
+   "Registrar recep.",
+   "Bogfør leverance",
+   "Kirjaa vast.otto",
+   "Bokfør mottak"
+  ],
+  "a|Warehouse Shipment List|Post Shipment": [
+   "Post Shipment",
+   "Bokför utleverans",
+   "Valider expédition",
+   "Warenausgang buchen",
+   "Registrar envío",
+   "Bogfør forsendelse",
+   "Kirjaa toimitus",
+   "Bokfør følgeseddel"
+  ],
+  "a|Warehouse Shipment|P&ost Shipment": [
+   "Post Shipment",
+   "Bokför utleverans",
+   "Valider expédition",
+   "Warenausgang buchen",
+   "Registrar envío",
+   "Bogfør lev.",
+   "Kirjaa toimitus",
+   "Bokfør følgeseddel"
+  ],
+  "f|Assembly Order|Quantity to Assemble": [
+   "Quantity to Assemble",
+   "Antal att montera",
+   "Quantité à assembler",
+   "Menge für Montage",
+   "Cantidad a ensamblar",
+   "Antal til montage",
+   "Kokoonpantava määrä",
+   "Antall å montere"
+  ],
+  "f|Item Card|Assembly Policy": [
+   "Assembly Policy",
+   "Monteringsmetod",
+   "Stratégie d'assemblage",
+   "Montagerichtlinie",
+   "Directiva de ensamblado",
+   "Montagepolitik",
+   "Kokoonpanokäytäntö",
+   "Monteringsprinsipp"
+  ],
+  "f|Job Planning Lines Part|Qty. to Transfer to Invoice": [
+   "Qty. to Transfer to Invoice",
+   "Antal att överföra till faktura",
+   "Qté à transférer à facturer",
+   "In Rechnung zu übertragende Menge",
+   "Cant. a transferir a factura",
+   "Antal, der skal overf. til faktura",
+   "Laskuun siirrettävä määrä",
+   "Ant. som skal overføres til faktura"
+  ],
+  "f|Job Planning Lines Part|Qty. to Transfer to Journal": [
+   "Qty. to Transfer to Journal",
+   "Antal att överföra till journal",
+   "Qté à transférer sur la feuille",
+   "In Buch.-Blatt zu übertragende Menge",
+   "Cant. a transferir al diario",
+   "Antal, der skal overføres til kladde",
+   "Päiväkirjaan siirrettävä määrä",
+   "Ant. som skal overføres til kladd"
+  ],
+  "f|Job Planning Lines|Qty. to Transfer to Invoice": [
+   "Qty. to Transfer to Invoice",
+   "Antal att överföra till faktura",
+   "Qté à transférer à facturer",
+   "In Rechnung zu übertragende Menge",
+   "Cant. a transferir a factura",
+   "Antal, der skal overf. til faktura",
+   "Laskuun siirrettävä määrä",
+   "Ant. som skal overføres til faktura"
+  ],
+  "f|Job Planning Lines|Qty. to Transfer to Journal": [
+   "Qty. to Transfer to Journal",
+   "Antal att överföra till journal",
+   "Qté à transférer sur la feuille",
+   "In Buch.-Blatt zu übertragende Menge",
+   "Cant. a transferir al diario",
+   "Antal, der skal overføres til kladde",
+   "Päiväkirjaan siirrettävä määrä",
+   "Ant. som skal overføres til kladd"
+  ],
+  "f|Production Journal|ActualOutputQty": [
+   "Output Qty.",
+   "Utflöde antal",
+   "Quantité produite",
+   "Fertig gestellte Menge",
+   "Cant. resultado",
+   "Afgangsantal",
+   "Tuotoksen määrä",
+   "Avgangsant."
+  ],
+  "f|Production Journal|Quantity": [
+   "Consumption Quantity",
+   "Förbrukningsantal",
+   "Quantité consommée",
+   "Verbrauchsmenge",
+   "Consumo (cantidad)",
+   "Forbrugsantal",
+   "Kulutusmäärä",
+   "Forbruksantall"
+  ],
+  "f|Purchase Invoices|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Invoices|Pay-to Vendor No.": [
+   "Vendor No.",
+   "Betalningsleverantörsnr",
+   "N° fournisseur à payer",
+   "Zahlung an Kred.-Nr.",
+   "Pago-a Nº proveedor",
+   "Faktureringsleverandørnr.",
+   "Tavaran laskuttajan nro",
+   "Betal til-levrd.nr."
+  ],
+  "f|Purchase Invoice|Buy-from Vendor Name": [
+   "Vendor Name",
+   "Leverantörsnamn",
+   "Nom fournisseur",
+   "Kreditorenname",
+   "Nombre del proveedor",
+   "Kreditornavn",
+   "Toimittajan nimi",
+   "Leverandørnavn"
+  ],
+  "f|Purchase Invoice|Buy-from Vendor No.": [
+   "Vendor No.",
+   "Leverantörsnr",
+   "N° fournisseur",
+   "Kreditorennr.",
+   "N.º de proveedor",
+   "Kreditornr.",
+   "Toimittajan nro",
+   "Leverandørnr."
+  ],
+  "f|Purchase Invoice|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Order List|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Order List|Pay-to Vendor No.": [
+   "Vendor No.",
+   "Betalningsleverantörsnr",
+   "N° fournisseur à payer",
+   "Zahlung an Kred.-Nr.",
+   "Pago-a Nº proveedor",
+   "Faktureringsleverandørnr.",
+   "Tavaran laskuttajan nro",
+   "Betal til-levrd.nr."
+  ],
+  "f|Purchase Order Subform|Direct Unit Cost": [
+   "Direct Unit Cost",
+   "Inköpspris",
+   "Coût unitaire direct",
+   "EK-Preis",
+   "Coste unit. directo",
+   "Købspris",
+   "Välitön yksikkökustannus",
+   "Direkte enhetskost"
+  ],
+  "f|Purchase Order Subform|Expected Receipt Date": [
+   "Expected Receipt Date",
+   "Förväntat inleveransdatum",
+   "Date réception prévue",
+   "Erwartetes Wareneingangsdatum",
+   "Fecha recepción esperada",
+   "Forventet modt.dato",
+   "Oletettu vastaanottopvm",
+   "Forventet mottaksdato"
+  ],
+  "f|Purchase Order Subform|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Order Subform|Qty. to Receive": [
+   "Qty. to Receive",
+   "Ant. att inlevereras",
+   "Qté à recevoir",
+   "Menge akt. Lieferung",
+   "Cantidad a recibir",
+   "Modtag (antal)",
+   "Vastaanotettava määrä",
+   "Motta (antall)"
+  ],
+  "f|Purchase Order Subform|Quantity": [
+   "Quantity",
+   "Antal",
+   "Quantité",
+   "Menge",
+   "Cantidad",
+   "Antal",
+   "Määrä",
+   "Antall"
+  ],
+  "f|Purchase Orders|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Orders|Quantity": [
+   "Quantity",
+   "Antal",
+   "Quantité",
+   "Menge",
+   "Cantidad",
+   "Antal",
+   "Määrä",
+   "Antall"
+  ],
+  "f|Purchase Order|Buy-from Vendor Name": [
+   "Vendor Name",
+   "Leverantörsnamn",
+   "Nom fournisseur",
+   "Kreditorenname",
+   "Nombre del proveedor",
+   "Kreditornavn",
+   "Toimittajan nimi",
+   "Leverandørnavn"
+  ],
+  "f|Purchase Order|Buy-from Vendor No.": [
+   "Vendor No.",
+   "Leverantörsnr",
+   "N° fournisseur",
+   "Kreditorennr.",
+   "N.º de proveedor",
+   "Kreditornr.",
+   "Toimittajan nro",
+   "Leverandørnr."
+  ],
+  "f|Purchase Order|Expected Receipt Date": [
+   "Expected Receipt Date",
+   "Förväntat inleveransdatum",
+   "Date réception prévue",
+   "Erwartetes Wareneingangsdatum",
+   "Fecha recepción esperada",
+   "Forventet modt.dato",
+   "Oletettu vastaanottopvm",
+   "Forventet mottaksdato"
+  ],
+  "f|Purchase Order|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Purchase Return Order Subform|Return Reason Code": [
+   "Return Reason Code",
+   "Returorsakskod",
+   "Code motif retour",
+   "Reklamationsgrundcode",
+   "Cód. auditoría dev.",
+   "Returårsagskode",
+   "Palautuksen syykoodi",
+   "Returårsakskode"
+  ],
+  "f|Sales Order List|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Sales Order Subform|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Sales Order Subform|Qty. to Ship": [
+   "Qty. to Ship",
+   "Ant. att utleverera",
+   "Qté à expédier",
+   "Zu liefern",
+   "Cantidad a enviar",
+   "Lever (antal)",
+   "Toimitettava määrä",
+   "Levere (antall)"
+  ],
+  "f|Sales Order Subform|Quantity": [
+   "Quantity",
+   "Antal",
+   "Quantité",
+   "Menge",
+   "Cantidad",
+   "Antal",
+   "Määrä",
+   "Antall"
+  ],
+  "f|Sales Order Subform|Shipment Date": [
+   "Shipment Date",
+   "Utleveransdatum",
+   "Date d’expédition",
+   "Warenausgangsdatum",
+   "Fecha envío",
+   "Afsendelsesdato",
+   "Lähetyksen pvm",
+   "Forsendelsesdato"
+  ],
+  "f|Sales Order Subform|Unit Price": [
+   "Unit Price",
+   "A-pris",
+   "Prix unitaire",
+   "VK-Preis",
+   "Precio venta",
+   "Enhedspris",
+   "Yksikköhinta",
+   "Salgspris"
+  ],
+  "f|Sales Orders|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Sales Orders|Quantity": [
+   "Quantity",
+   "Antal",
+   "Quantité",
+   "Menge",
+   "Cantidad",
+   "Antal",
+   "Määrä",
+   "Antall"
+  ],
+  "f|Sales Orders|Unit Price": [
+   "Unit Price",
+   "A-pris",
+   "Prix unitaire",
+   "VK-Preis",
+   "Precio venta",
+   "Enhedspris",
+   "Yksikköhinta",
+   "Salgspris"
+  ],
+  "f|Sales Order|No.": [
+   "No.",
+   "Nr",
+   "N°",
+   "Nr.",
+   "Nº",
+   "Nummer",
+   "Nro",
+   "Nr."
+  ],
+  "f|Sales Order|Sell-to Customer Name": [
+   "Customer Name",
+   "Kundens namn",
+   "Nom du client",
+   "Debitorenname",
+   "Nombre del cliente",
+   "Debitornavn",
+   "Asiakkaan nimi",
+   "Kundens navn"
+  ],
+  "f|Sales Order|Sell-to Customer No.": [
+   "Customer No.",
+   "Kundnr",
+   "N° client",
+   "Debitorennr.",
+   "N.º de cliente",
+   "Debitornr.",
+   "Asiakasnumero",
+   "Kundenr."
+  ],
+  "f|Sales Order|Shipment Date": [
+   "Shipment Date",
+   "Utleveransdatum",
+   "Date d’expédition",
+   "Warenausgangsdatum",
+   "Fecha envío",
+   "Afsendelsesdato",
+   "Lähetyksen pvm",
+   "Forsendelsesdato"
+  ],
+  "f|Sales Return Order Subform|Return Reason Code": [
+   "Return Reason Code",
+   "Returorsakskod",
+   "Code motif retour",
+   "Reklamationsgrundcode",
+   "Cód. auditoría dev.",
+   "Returårsagskode",
+   "Palautuksen syykoodi",
+   "Returårsakskode"
+  ],
+  "f|Sales Return Orders|Return Reason Code": [
+   "Return Reason Code",
+   "Returorsakskod",
+   "Code motif retour",
+   "Reklamationsgrundcode",
+   "Cód. auditoría dev.",
+   "Returårsagskode",
+   "Palautuksen syykoodi",
+   "Returårsakskode"
+  ],
+  "f|Service Item Worksheet Subform|Quantity": [
+   "Quantity",
+   "Antal",
+   "Quantité",
+   "Menge",
+   "Cantidad",
+   "Antal",
+   "Määrä",
+   "Antall"
+  ],
+  "f|Service Item Worksheet|Repair Status Code": [
+   "Repair Status Code",
+   "Reparationsstatuskod",
+   "Code état réparation",
+   "Reparaturstatuscode",
+   "Cód. estado reparación",
+   "Reparationsstatuskode",
+   "Korjauksen tilakoodi",
+   "Reparasjonsstatuskode"
+  ],
+  "f|Service Order Subform|Repair Status Code": [
+   "Repair Status Code",
+   "Reparationsstatuskod",
+   "Code état réparation",
+   "Reparaturstatuscode",
+   "Cód. estado reparación",
+   "Reparationsstatuskode",
+   "Korjauksen tilakoodi",
+   "Reparasjonsstatuskode"
+  ],
+  "f|Service Orders|Customer No.": [
+   "Customer No.",
+   "Kundnr",
+   "N° client",
+   "Debitorennr.",
+   "Nº cliente",
+   "Debitornr.",
+   "Asiakasnro",
+   "Kundenr."
+  ],
+  "f|Service Order|Customer No.": [
+   "Customer No.",
+   "Kundnr",
+   "N° client",
+   "Debitorennr.",
+   "Nº cliente",
+   "Debitornr.",
+   "Asiakasnro",
+   "Kundenr."
+  ],
+  "f|Service Tasks|Repair Status Code": [
+   "Repair Status Code",
+   "Reparationsstatuskod",
+   "Code état réparation",
+   "Reparaturstatuscode",
+   "Cód. estado reparación",
+   "Reparationsstatuskode",
+   "Korjauksen tilakoodi",
+   "Reparasjonsstatuskode"
+  ],
+  "p|Absence Registration": [
+   "Absence Registration",
+   "Frånvaroregistrering",
+   "Saisie des absences",
+   "Abwesenheitsregistrierung",
+   "Registro ausencias",
+   "Fraværsregistrering",
+   "Poissaolon rekisteröinti",
+   "Fraværsregistrering"
+  ],
+  "p|Account Schedule Names": [
+   "(Financial Report) Row Definitions",
+   "(Ekonomisk rapport) Raddefinitioner",
+   "Définitions de ligne (de l’état financier)",
+   "(Finanzbericht) Zeilendefinitionen",
+   "Definiciones de fila (informe financiero)",
+   "(Finansiel rapport) Rækkedefinitioner",
+   "(Talousraportin) rivimääritykset",
+   "Raddefinisjoner (for finansrapport)"
+  ],
+  "p|Accounting Periods": [
+   "Accounting Periods",
+   "Bokföringsperioder",
+   "Périodes comptables",
+   "Buchhaltungsperioden",
+   "Periodos contables",
+   "Regnskabsperioder",
+   "Kirjanpitojaksot",
+   "Regnskapsperioder"
+  ],
+  "p|Approval User Setup": [
+   "Approval User Setup",
+   "Användarinställningar för godkännande",
+   "Paramètres utilisateur approbation",
+   "Genehmigungsbenutzereinrichtung",
+   "Config. usuario aprobación",
+   "Brugeropsætning af godkendelser",
+   "Hyväksynnän käyttäjäasetukset",
+   "Brukeroppsett for godkjenning"
+  ],
+  "p|Assembly Order": [
+   "Assembly Order",
+   "Monteringsorder",
+   "Ordre d'assemblage",
+   "Montageauftrag",
+   "Pedido de ensamblado",
+   "Montageordre",
+   "Kokoonpanotilaus",
+   "Monteringsordre"
+  ],
+  "p|Assembly Orders": [
+   "Assembly Orders",
+   "Monteringsorder",
+   "Ordres d'assemblage",
+   "Montageaufträge",
+   "Pedidos de ensamblado",
+   "Montageordrer",
+   "Kokoonpanotilaukset",
+   "Monteringsordrer"
+  ],
+  "p|Bank Acc. Reconciliation": [
+   "Bank Acc. Reconciliation",
+   "Bankkontoavstämning",
+   "Rapprochement bancaire",
+   "Bankkontoabstimmung",
+   "Conciliación banco",
+   "Bankkontoafstemning",
+   "Pankkitilin täsmäytys",
+   "Bankkontoavstemming"
+  ],
+  "p|Campaign List": [
+   "Campaigns",
+   "Kampanjer",
+   "Campagnes",
+   "Kampagnen",
+   "Campañas",
+   "Kampagner",
+   "Kampanjat",
+   "Kampanjer"
+  ],
+  "p|Cash Flow Forecast Chart": [
+   "Cash Flow Forecast",
+   "Kassaflödesprognos",
+   "Prévision de trésorerie",
+   "Cashflowplanung",
+   "Previsión de flujo de efectivo",
+   "Pengestrømsprognose",
+   "Kassavirtaennuste",
+   "Kontantstrømprognose"
+  ],
+  "p|Change Production Order Status": [
+   "Change Production Order Status",
+   "Ändra produktionsorderstatus",
+   "Changer statut O.F.",
+   "FA-Status ändern",
+   "Cambiar estado orden prod.",
+   "Skift prod.ordrestatus",
+   "Muuta tuotantotilauksen tila",
+   "Endre produksjonsordrestatus"
+  ],
+  "p|Chart of Accounts": [
+   "Chart of Accounts",
+   "Kontoplan",
+   "Plan comptable",
+   "Kontenplan",
+   "Plan de cuentas",
+   "Kontoplan",
+   "Tilikartta",
+   "Kontoplan"
+  ],
+  "p|Chart of Cost Centers": [
+   "Chart of Cost Centers",
+   "Lista över kostnadsställen",
+   "Plan comptable des centres de coûts",
+   "Kostenstellenplan",
+   "Plan centros coste",
+   "Omkostningssteder",
+   "Kustannuspaikkakartta",
+   "Diagram med kostsentre"
+  ],
+  "p|Chart of Cost Objects": [
+   "Chart of Cost Objects",
+   "Lista över kostnadsbärare",
+   "Plan comptable des coûts associés",
+   "Kostenträgerplan",
+   "Plan objetos coste",
+   "Omkostningsemner",
+   "Kustannuskohdekartta",
+   "Diagram med kostobjekter"
+  ],
+  "p|Client Detail Cash Flow Chart": [
+   "Cash Flow Forecast",
+   "Kassaflödesprognos",
+   "Prévision de trésorerie",
+   "Cashflowplanung",
+   "Previsión de flujo de efectivo",
+   "Pengestrømsprognose",
+   "Kassavirtaennuste",
+   "Kontantstrømprognose"
+  ],
+  "p|Contact List": [
+   "Contacts",
+   "Kontakter",
+   "Contacts",
+   "Kontakte",
+   "Contactos",
+   "Kontakter",
+   "Kontaktit",
+   "Kontakter"
+  ],
+  "p|Cost Allocation": [
+   "Cost Allocation",
+   "Kostnadsfördelning",
+   "Affectation des coûts",
+   "Kostenzuteilung",
+   "Asignación costes",
+   "Omkostningsfordeling",
+   "Kustannusten kohdistaminen",
+   "Kostfordeling"
+  ],
+  "p|Cost Budget Names": [
+   "Cost Budgets",
+   "Kostnadsbudgetar",
+   "Budgets des coûts",
+   "Kostenbudgets",
+   "Presupuestos de costes",
+   "Omkostningsbudgetter",
+   "Kustannusbudjetit",
+   "Kostbudsjetter"
+  ],
+  "p|Cost Journal": [
+   "Cost Journals",
+   "Kostnadsjournaler",
+   "Feuilles des coûts",
+   "Kosten-Buch.-Blätter",
+   "Diarios de costes",
+   "Omkostningskladder",
+   "Kustannuspäiväkirjat",
+   "Kostkladder"
+  ],
+  "p|Data Exch Col Def Part": [
+   "Column Definitions",
+   "Kolumndefinitioner",
+   "Définitions colonne",
+   "Spaltendefinitionen",
+   "Definiciones de columna",
+   "Kolonnedefinitioner",
+   "Sarakemääritykset",
+   "Kolonnedefinisjoner"
+  ],
+  "p|Dispatch Board": [
+   "Dispatch Board",
+   "Beordringstavla",
+   "Tableau d'affectation",
+   "Einsatzplanung",
+   "Panel despacho",
+   "Ordreoversigt",
+   "Lähetystaulukko",
+   "Servicefordeling"
+  ],
+  "p|Employee Card": [
+   "Employee Card",
+   "Personalkort",
+   "Fiche salarié",
+   "Mitarbeiterkarte",
+   "Ficha empleado",
+   "Medarbejderkort",
+   "Työntekijän kortti",
+   "Ansattkort"
+  ],
+  "p|Employee List": [
+   "Employees",
+   "Personal",
+   "Salariés",
+   "Mitarbeiter",
+   "Empleados",
+   "Medarbejdere",
+   "Työntekijät",
+   "Ansatte"
+  ],
+  "p|Finished Production Order": [
+   "Finished Production Order",
+   "Färdig prod.order",
+   "O.F. terminé",
+   "Beendeter FA",
+   "Orden producción terminada",
+   "Færdig produktionsordre",
+   "Valmis tuotantotilaus",
+   "Ferdig produksjonsordre"
+  ],
+  "p|Finished Production Orders": [
+   "Finished Production Orders",
+   "Färdiga produktionsorder",
+   "O.F. terminés",
+   "Beendete Fertigungsaufträge",
+   "Órdenes producción terminadas",
+   "Færdige produktionsordrer",
+   "Valmiit tuotantotilaukset",
+   "Ferdige produksjonsordrer"
+  ],
+  "p|Fixed Asset G/L Journal": [
+   "Fixed Asset G/L Journals",
+   "Redovisningsjournaler för anläggningstillgång",
+   "Feuilles compta. immo.",
+   "Anlagen Fibu Buch.-Blätter",
+   "Diarios generales de activos fijos",
+   "Anlægsfinanskladder",
+   "Käyttöomaisuuden KP-päiväkirjat",
+   "Finanskladder for aktivum"
+  ],
+  "p|G/L Budget Names": [
+   "G/L Budgets",
+   "Redovisningsbudgetar",
+   "Budgets comptables",
+   "Sachkontenbudgets",
+   "Presupuestos contables",
+   "Finansbudgetter",
+   "KP-budjetit",
+   "Finansbudsjetter"
+  ],
+  "p|General Journal": [
+   "General Journals",
+   "Redovisningsjournaler",
+   "Feuilles comptabilité",
+   "Fibu Buch.-Blätter",
+   "Diarios generales",
+   "Finanskladder",
+   "Yleiset päiväkirjat",
+   "Finanskladder"
+  ],
+  "p|General Ledger Setup": [
+   "General Ledger Setup",
+   "Redovisningsinställningar",
+   "Paramètres comptabilité",
+   "Finanzbuchhaltung Einrichtung",
+   "Configuración contabilidad",
+   "Opsætning af Finans",
+   "Pääkirjanpidon asetukset",
+   "Finansoppsett"
+  ],
+  "p|IC Inbox Transactions": [
+   "Intercompany Inbox Transactions",
+   "Koncerninterna inkorgstransaktioner",
+   "Transactions Boîte de réception Intersociétés",
+   "Intercompany-Eingangstransaktionen",
+   "Transacciones de bandeja de entrada entre empresas vinculadas",
+   "Koncerninterne indbakketransaktioner",
+   "Konsernin Saapuneet-kansion tapahtumat",
+   "Konserninterne inngående transaksjoner"
+  ],
+  "p|IC Outbox Transactions": [
+   "Intercompany Outbox Transactions",
+   "Koncerninterna utkorgstransaktioner",
+   "Transactions Boîte d'envoi Intersociétés",
+   "Intercompany-Ausgangstransaktionen",
+   "Transacciones de bandeja de salida entre empresas vinculadas",
+   "Koncerninterne udbakketransaktioner",
+   "Konsernin Lähtevät-kansion tapahtumat",
+   "Konserninterne utgående transaksjoner"
+  ],
+  "p|Intercompany Setup": [
+   "Intercompany Setup",
+   "Koncernintern inställning",
+   "Paramètres intersociétés",
+   "Intercompanyeinrichtung",
+   "Config. empresas vinculadas",
+   "Koncernintern opsætning",
+   "Konsernin asetukset",
+   "Konserninternt oppsett"
+  ],
+  "p|Inventory Pick": [
+   "Inventory Pick",
+   "Lagerplockning",
+   "Prélèvement stock",
+   "Lagerkommissionierung",
+   "Picking inventario",
+   "Pluk (lager)",
+   "Varaston poiminta",
+   "Beholdningsplukk"
+  ],
+  "p|Inventory Picks": [
+   "Inventory Picks",
+   "Lagerplockningar",
+   "Prélèvements stock",
+   "Lagerkommissionierungen",
+   "Picking inventario",
+   "Pluk (lager)",
+   "Varaston poiminnat",
+   "Beholdningsplukk"
+  ],
+  "p|Item Card": [
+   "Item Card",
+   "Artikelkort",
+   "Fiche article",
+   "Artikelkarte",
+   "Ficha producto",
+   "Varekort",
+   "Nimikkeen kortti",
+   "Varekort"
+  ],
+  "p|Item Reclass. Journal": [
+   "Item Reclassification Journals",
+   "Artikelgrupperingsjournaler",
+   "Feuilles reclassement article",
+   "Artikel Umlag. Buch.-Blätter",
+   "Diarios de reclasificación de producto",
+   "Vareomposteringskladder",
+   "Nimikkeen uudelleenluokituspäiväkirjat",
+   "Varereklassifiseringskladder"
+  ],
+  "p|Item Tracing": [
+   "Item Tracing",
+   "Artikelspårning",
+   "Traçabilité",
+   "Artikelablaufverfolgung",
+   "Seguimiento productos",
+   "Varesporing",
+   "Nimikkeen jäljitys",
+   "Varesporing"
+  ],
+  "p|Item Tracking Lines": [
+   "Item Tracking Lines",
+   "Artikelspårningsrader",
+   "Lignes traçabilité",
+   "Artikelverfolgungszeilen",
+   "Líns. seguim. prod.",
+   "Varesporingslinjer",
+   "Nimikkeen seurantarivit",
+   "Varesporingslinjer"
+  ],
+  "p|Job Card": [
+   "Project Card",
+   "Projektkort",
+   "Fiche projet",
+   "Projektkarte",
+   "Ficha proyecto",
+   "Projektkort",
+   "Projektikortti",
+   "Prosjektkort"
+  ],
+  "p|Job Journal": [
+   "Project Journals",
+   "Projektjournaler",
+   "Feuilles projet",
+   "Projekterfassungen",
+   "Diario de proyecto",
+   "Projektkladder",
+   "Projektipäiväkirjat",
+   "Prosjektkladder"
+  ],
+  "p|Job List": [
+   "Projects",
+   "Projekt",
+   "Projets",
+   "Projekte",
+   "Proyectos",
+   "Projekter",
+   "Projektit",
+   "Prosjekter"
+  ],
+  "p|Job Planning Lines": [
+   "Project Planning Lines",
+   "Projektplaneringsrader",
+   "Lignes de planification de projet",
+   "Projektplanzeilen",
+   "Líneas de planificación de proyecto",
+   "Projektplanlægningslinjer",
+   "Projektin suunnittelurivit",
+   "Prosjektplanleggingslinjer"
+  ],
+  "p|Job Planning Lines Part": [
+   "Project Planning Lines",
+   "Projektplaneringsrader",
+   "Lignes de planification de projet",
+   "Projektplanzeilen",
+   "Líneas de planificación de proyecto",
+   "Projektplanlægningslinjer",
+   "Projektin suunnittelurivit",
+   "Prosjektplanleggingslinjer"
+  ],
+  "p|Job Task Lines": [
+   "Project Task Lines",
+   "Projektaktivitetsrader",
+   "Lignes tâche projet",
+   "Projektaufgabenzeilen",
+   "Líneas tarea proyecto",
+   "Projektopgavelinjer",
+   "Projektitehtävän rivit",
+   "Prosjektoppgavelinjer"
+  ],
+  "p|Lot No. Information Card": [
+   "Lot No. Information Card",
+   "Partinrinfo.kort",
+   "Fiche information n° lot",
+   "Chargennr.-Informationskarte",
+   "Ficha información n.º lote",
+   "Lotnr.oplysningskort",
+   "Eränumerotietojen kortti",
+   "Informasjonskort for partinr."
+  ],
+  "p|Lot No. Information List": [
+   "Lot No. Information List",
+   "Lista med partinr.information",
+   "Liste information n° lot",
+   "Chargennr.-Informationsliste",
+   "Lista información nº lote",
+   "Oversigt over lotnr.oplysninger",
+   "Eränumeron tietoluettelo",
+   "Informasjonsoversikt for partinummer"
+  ],
+  "p|Navigate": [
+   "Find entries",
+   "Sök transaktioner",
+   "Rechercher des écritures",
+   "Posten suchen",
+   "Buscar movs.",
+   "Søg efter poster",
+   "Etsi tapahtumat",
+   "Søk etter poster"
+  ],
+  "p|Office Job Journal": [
+   "Project Journal",
+   "Projektjournal",
+   "Feuille projet",
+   "Projekt Buch.-Blatt",
+   "Diario del proyecto",
+   "Projektkladde",
+   "Projektipäiväkirja",
+   "Prosjektkladd"
+  ],
+  "p|Opportunities": [
+   "Opportunities",
+   "Affärsmöjligheter",
+   "Opportunités",
+   "Verkaufschancen",
+   "Oportunidades",
+   "Salgsmuligheder",
+   "Mahdollisuudet",
+   "Salgsmuligheter"
+  ],
+  "p|Opportunity Chart": [
+   "Opportunities",
+   "Affärsmöjligheter",
+   "Opportunités",
+   "Verkaufschancen",
+   "Oportunidades",
+   "Salgsmuligheder",
+   "Mahdollisuudet",
+   "Salgsmuligheter"
+  ],
+  "p|Opportunity List": [
+   "Opportunities",
+   "Affärsmöjligheter",
+   "Opportunités",
+   "Verkaufschancen",
+   "Oportunidades",
+   "Salgsmuligheder",
+   "Mahdollisuudet",
+   "Salgsmuligheter"
+  ],
+  "p|Planned Production Order": [
+   "Planned Production Order",
+   "Planerad prod.order",
+   "O.F. planifié",
+   "Geplanter FA",
+   "Orden producción planificada",
+   "Planlagt produktionsordre",
+   "Suunniteltu tuotantotilaus",
+   "Planlagt produksjonsordre"
+  ],
+  "p|Planned Production Orders": [
+   "Planned Production Orders",
+   "Planerade produktionsorder",
+   "O.F. planifiés",
+   "Geplante FA",
+   "Órdenes producción planificadas",
+   "Planlagte produktionsordrer",
+   "Suunnitellut tuotantotilaukset",
+   "Planlagte produksjonsordrer"
+  ],
+  "p|Post Pmts and Rec. Bank Acc.": [
+   "Bank Account Reconciliation",
+   "Bankkontoavstämning",
+   "Rapprochement bancaire",
+   "Bankkontoabstimmung",
+   "Conciliación banco",
+   "Bankkontoafstemning",
+   "Pankkitilin täsmäytys",
+   "Bankkontoavstemming"
+  ],
+  "p|Posted Invt. Pick List": [
+   "Posted Inventory Picks",
+   "Bokförda lagerplockningar",
+   "Prélèvements stock enregistrés",
+   "Gebuchte Lagerkommissionierungen",
+   "Pickings de inventario registrados",
+   "Bogførte lagerpluk",
+   "Kirjatut varaston poiminnat",
+   "Bokførte beholdningsplukk"
+  ],
+  "p|Posted Purchase Invoices": [
+   "Posted Purchase Invoices",
+   "Bokförda inköpsfakturor",
+   "Factures achat enregistrées",
+   "Geb. Einkaufsrechnungen",
+   "Histórico facturas de compra",
+   "Bogf. købsfakturaer",
+   "Kirjatut ostolaskut",
+   "Bokførte kjøpsfakturaer"
+  ],
+  "p|Posted Sales Credit Memo Lines": [
+   "Posted Sales Credit Memo Lines",
+   "Bokförda förs.kreditnotarader",
+   "Lignes avoir vente enreg.",
+   "Geb. Verkaufsgutschriftzeilen",
+   "Hist. líns. notas abono venta",
+   "Bogførte salgskreditnotalinjer",
+   "Kirj. myyntihyvityslask. rivit",
+   "Bokførte salgskr.notalinjer"
+  ],
+  "p|Posted Sales Credit Memos": [
+   "Posted Sales Credit Memos",
+   "Bokförda försäljningskreditnotor",
+   "Avoirs vente enregistrés",
+   "Geb. Verkaufsgutschriften",
+   "Histórico notas abono venta",
+   "Bogf. salgskr.notaer",
+   "Kirjatut myyntihyvityslaskut",
+   "Bokførte salgskreditnotaer"
+  ],
+  "p|Posted Sales Invoices": [
+   "Posted Sales Invoices",
+   "Bokförda försäljningsfakturor",
+   "Factures vente enregistrées",
+   "Geb. Verkaufsrechnungen",
+   "Lista hist. facturas venta",
+   "Bogf. salgsfakturaer",
+   "Kirjatut myyntilaskut",
+   "Bokførte salgsfakturaer"
+  ],
+  "p|Posted Whse. Receipt List": [
+   "Posted Warehouse Receipts",
+   "Bokförda inleveranser till distributionslager",
+   "Réceptions entrepôt enregistrées",
+   "Gebuchte Wareneingänge",
+   "Recepciones de almacén registradas",
+   "Bogførte lagerstedsmodtagelser",
+   "Kirjatut fyysisen varaston vastaanotot",
+   "Bokførte lagermottak"
+  ],
+  "p|Posted Whse. Shipment List": [
+   "Posted Warehouse Shipments",
+   "Bokförda utleveranser från distributionslager",
+   "Expéditions entrepôt enregistrées",
+   "Gebuchte Warenausgänge",
+   "Envíos registrados de almacén",
+   "Bogførte lagerstedsforsendelser",
+   "Kirjatut fyysisen varaston toimitukset",
+   "Bokførte lagerleveringer"
+  ],
+  "p|Production Journal": [
+   "Production Journal",
+   "Produktionsjournal",
+   "Feuille production",
+   "Produktions Buch.-Blatt",
+   "Diario de producción",
+   "Produktionskladde",
+   "Tuotantopäiväkirja",
+   "Produksjonskladd"
+  ],
+  "p|Production Order List": [
+   "Production Order List",
+   "Prod.orderlista",
+   "Liste des O.F.",
+   "Fertigungsauftragsübersicht",
+   "Lista órdenes producción",
+   "Prod.ordreoversigt",
+   "Tuotantotilausluettelo",
+   "Produksjonsordreoversikt"
+  ],
+  "p|Production Order Statistics": [
+   "Production Order Statistics",
+   "Prod.order statistik",
+   "Statistiques O.F.",
+   "FA-Statistik",
+   "Estadísticas orden producción",
+   "Prod.ordrestatistik",
+   "Tuotantotilaustilastot",
+   "Produksjonsordrestatistikk"
+  ],
+  "p|Purchase Credit Memo": [
+   "Purchase Credit Memo",
+   "Inköpskreditnota",
+   "Avoir achat",
+   "Einkaufsgutschrift",
+   "Nota abono compra",
+   "Købskreditnota",
+   "Ostohyvityslasku",
+   "Kjøpskreditnota"
+  ],
+  "p|Purchase Invoice": [
+   "Purchase Invoice",
+   "Inköpsfaktura",
+   "Facture achat",
+   "Einkaufsrechnung",
+   "Factura compra",
+   "Købsfaktura",
+   "Ostolasku",
+   "Kjøpsfaktura"
+  ],
+  "p|Purchase Invoices": [
+   "Purchase Invoices",
+   "Inköpsfakturor",
+   "Factures achat",
+   "Einkaufsrechnungen",
+   "Facturas compra",
+   "Købsfakturaer",
+   "Ostolaskut",
+   "Kjøpsfakturaer"
+  ],
+  "p|Purchase Order": [
+   "Purchase Order",
+   "Inköpsorder",
+   "Commande achat",
+   "Einkaufsbestellung",
+   "Pedido compra",
+   "Købsordre",
+   "Ostotilaus",
+   "Bestilling"
+  ],
+  "p|Purchase Order List": [
+   "Purchase Orders",
+   "Inköpsorder",
+   "Commandes achat",
+   "Einkaufsbestellungen",
+   "Pedidos compra",
+   "Købsordrer",
+   "Ostotilaukset",
+   "Bestillinger"
+  ],
+  "p|Purchase Orders": [
+   "Purchase Orders",
+   "Inköpsorder",
+   "Commandes achat",
+   "Einkaufsbestellungen",
+   "Pedidos compra",
+   "Købsordrer",
+   "Ostotilaukset",
+   "Bestillinger"
+  ],
+  "p|Purchase Return List Archive": [
+   "Purchase Return Order Archives",
+   "Arkiverade inköpsreturorder",
+   "Archives retour achat",
+   "Archive für Einkaufsreklamationen",
+   "Archivos de devolución de compra",
+   "Købsreturvareordrearkiver",
+   "Ostopalautustilausarkistot",
+   "Arkiver for bestillingsretur"
+  ],
+  "p|Purchase Return Order": [
+   "Purchase Return Order",
+   "Inköpsreturorder",
+   "Retour achat",
+   "Einkaufsreklamation",
+   "Devolución compra",
+   "Købsreturvareordre",
+   "Ostopalautustilaus",
+   "Bestillingsretur"
+  ],
+  "p|Purchase Return Order Archive": [
+   "Purchase Return Order Archive",
+   "Arkiv för inköpsreturorder",
+   "Archives retour achat",
+   "Einkaufsreklamationsarchiv",
+   "Archivo devolución venta",
+   "Købsreturvareordrearkiv",
+   "Ostopalautustilausten arkisto",
+   "Arkiv for bestillingsretur"
+  ],
+  "p|Purchase Return Order List": [
+   "Purchase Return Orders",
+   "Inköpsreturorder",
+   "Retours achat",
+   "Einkaufsreklamationen",
+   "Pedidos dev. compra",
+   "Købsreturvareordrer",
+   "Ostopalautustilaukset",
+   "Bestillingsreturer"
+  ],
+  "p|Purchase Return Orders": [
+   "Purchase Return Orders",
+   "Inköpsreturorder",
+   "Retours achat",
+   "Einkaufsreklamationen",
+   "Devoluciones compras",
+   "Købsreturvareordrer",
+   "Ostopalautustilaus",
+   "Bestillingsreturer"
+  ],
+  "p|Released Production Order": [
+   "Released Production Order",
+   "Släppt produktionsorder",
+   "O.F. lancé",
+   "Freigegebener FA",
+   "Orden producción lanzada",
+   "Frigivet produktionsordre",
+   "Vapautettu tuotantotilaus",
+   "Frigitt produksjonsordre"
+  ],
+  "p|Released Production Orders": [
+   "Released Production Orders",
+   "Släppta produktionsorder",
+   "O.F. lancés",
+   "Freigegebene Fertigungsaufträge",
+   "Órdenes producción lanzadas",
+   "Frigivne produktionsordrer",
+   "Vapautetut tuotantotilaukset",
+   "Frigitte produksjonsordrer"
+  ],
+  "p|Requests to Approve": [
+   "Requests to Approve",
+   "Begäranden att godkänna",
+   "Demandes à approuver",
+   "Zu genehmigende Anforderungen",
+   "Solicitudes para aprobar",
+   "Anmodninger til godkendelse",
+   "Hyväksyttävät pyynnöt",
+   "Forespørsler å godkjenne"
+  ],
+  "p|Resource Allocations": [
+   "Resource Allocations",
+   "Resursfördelningar",
+   "Affectations ressources",
+   "Ressourcenzuordnungen",
+   "Asignaciones recurso",
+   "Ressourceallokeringer",
+   "Resurssin kohdistukset",
+   "Ressurstildelinger"
+  ],
+  "p|Resource Capacity Settings": [
+   "Resource Capacity Settings",
+   "Resurskapacitetssättning",
+   "Paramétrage capacité ressource",
+   "Res.-Kapazität Einstellungen",
+   "Config. capacidad recurso",
+   "Ressourcekap.indstillinger",
+   "Resurssin kapasiteetti asetuk.",
+   "Innstillinger for ressurskapasitet"
+  ],
+  "p|Resource Card": [
+   "Resource Card",
+   "Resurskort",
+   "Fiche ressource",
+   "Ressourcenkarte",
+   "Ficha recurso",
+   "Ressourcekort",
+   "Resurssin kortti",
+   "Ressurskort"
+  ],
+  "p|Sales Credit Memo": [
+   "Sales Credit Memo",
+   "Förs.kreditnota",
+   "Avoir vente",
+   "Verkaufsgutschrift",
+   "Nota abono venta",
+   "Salgskreditnota",
+   "Myyntihyvityslasku",
+   "Salgskreditnota"
+  ],
+  "p|Sales Invoice": [
+   "Sales Invoice",
+   "Förs.faktura",
+   "Facture vente",
+   "Verkaufsrechnung",
+   "Factura venta",
+   "Salgsfaktura",
+   "Myyntilasku",
+   "Salgsfaktura"
+  ],
+  "p|Sales Invoice List": [
+   "Sales Invoices",
+   "Försäljningsfakturor",
+   "Factures vente",
+   "Verkaufsrechnungen",
+   "Facturas venta",
+   "Salgsfakturaer",
+   "Myyntilaskut",
+   "Salgsfakturaer"
+  ],
+  "p|Sales Order": [
+   "Sales Order",
+   "Förs.order",
+   "Commande vente",
+   "Verkaufsauftrag",
+   "Pedido venta",
+   "Salgsordre",
+   "Myyntitilaus",
+   "Ordre"
+  ],
+  "p|Sales Order List": [
+   "Sales Orders",
+   "Förs.order",
+   "Commandes vente",
+   "Verkaufsaufträge",
+   "Pedidos venta",
+   "Salgsordrer",
+   "Myyntitilaukset",
+   "Ordrer"
+  ],
+  "p|Sales Orders": [
+   "Sales Orders",
+   "Förs.order",
+   "Commandes vente",
+   "Verkaufsaufträge",
+   "Pedidos venta",
+   "Salgsordrer",
+   "Myyntitilaukset",
+   "Ordrer"
+  ],
+  "p|Sales Return List Archive": [
+   "Sales Return Orders Archive",
+   "Arkiv för försäljningsreturorder",
+   "Archives retours vente",
+   "Archiv für Verkaufsreklamationen",
+   "Archivo de devoluciones de venta",
+   "Salgsreturvareordrearkiv",
+   "Myyntipalautustilausten arkisto",
+   "Arkiv for ordrereturer"
+  ],
+  "p|Sales Return Order": [
+   "Sales Return Order",
+   "Förs.returorder",
+   "Retour vente",
+   "Verkaufsreklamation",
+   "Devolución venta",
+   "Salgsreturvareordre",
+   "Myyntipalautustilaus",
+   "Ordreretur"
+  ],
+  "p|Sales Return Order Archive": [
+   "Sales Return Order Archive",
+   "Arkiv för försäljningsreturorder",
+   "Archives retours vente",
+   "Verkaufsreklamationsarchiv",
+   "Archivo de devolución de venta",
+   "Salgsreturvareordrearkiv",
+   "Myyntipalautustilausten arkisto",
+   "Arkiv for ordreretur"
+  ],
+  "p|Sales Return Order List": [
+   "Sales Return Orders",
+   "Förs.returorder",
+   "Retours vente",
+   "Verkaufsreklamationen",
+   "Pedido dev. venta",
+   "Salgsreturvareordrer",
+   "Myyntipalautustilaukset",
+   "Ordrereturer"
+  ],
+  "p|Sales Return Orders": [
+   "Sales Return Orders",
+   "Förs.returorder",
+   "Retours vente",
+   "Verkaufsreklamationen",
+   "Devoluciones ventas",
+   "Salgsreturvareordrer",
+   "Myyntipalautustilaukset",
+   "Ordrereturer"
+  ],
+  "p|Segment": [
+   "Segment",
+   "Segment",
+   "Segment",
+   "Segment",
+   "Segmento",
+   "Målgruppe",
+   "Segmentti",
+   "Segment"
+  ],
+  "p|Segment List": [
+   "Segments",
+   "Segment",
+   "Segments",
+   "Segmente",
+   "Segmentos",
+   "Målgrupper",
+   "Segmentit",
+   "Segmenter"
+  ],
+  "p|Service Contract Quotes": [
+   "Service Contract Quotes",
+   "Servicekontraktsofferter",
+   "Devis contrat de service",
+   "Servicevertragsangebote",
+   "Ofertas contrato servicio",
+   "Servicekontrakttilbud",
+   "Huoltosopimustarjoukset",
+   "Servicekontrakttilbud"
+  ],
+  "p|Service Item Worksheet": [
+   "Service Item Worksheet",
+   "Serviceartikeldokument",
+   "Feuille activité article serv.",
+   "Service Artikel Arbeitsblatt",
+   "Hoja trabajo prod. serv.",
+   "Serviceartikelkladde",
+   "Huoltonimikkeen työkirja",
+   "Arbeidsordre"
+  ],
+  "p|Service Order": [
+   "Service Order",
+   "Serviceorder",
+   "Commande service",
+   "Serviceauftrag",
+   "Pedido servicio",
+   "Serviceordre",
+   "Huoltotilaus",
+   "Serviceordre"
+  ],
+  "p|Service Orders": [
+   "Service Orders",
+   "Serviceorder",
+   "Commandes service",
+   "Serviceaufträge",
+   "Pedidos servicio",
+   "Serviceordrer",
+   "Huoltotilaukset",
+   "Serviceordrer"
+  ],
+  "p|Service Quote": [
+   "Service Quote",
+   "Serviceoffert",
+   "Devis service",
+   "Serviceangebot",
+   "Oferta servicio",
+   "Servicetilbud",
+   "Huoltotarjous",
+   "Servicetilbud"
+  ],
+  "p|Service Quotes": [
+   "Service Quotes",
+   "Serviceofferter",
+   "Devis service",
+   "Serviceangebote",
+   "Ofertas servicio",
+   "Servicetilbud",
+   "Huoltotarjoukset",
+   "Servicetilbud"
+  ],
+  "p|Service Tasks": [
+   "Service Tasks",
+   "Serviceuppgifter",
+   "Tâches service",
+   "Serviceaufgaben",
+   "Tareas servicio",
+   "Serviceopgaver",
+   "Huoltotehtävät",
+   "Serviceoppgaver"
+  ],
+  "p|Simulated Production Order": [
+   "Simulated Production Order",
+   "Simulerad produktionsorder",
+   "O.F. simulé",
+   "Simulierter FA",
+   "Orden producción simulada",
+   "Simuleret produktionsordre",
+   "Simuloitu tuotantotilaus",
+   "Simulert produksjonsordre"
+  ],
+  "p|Simulated Production Orders": [
+   "Simulated Production Orders",
+   "Simulerade produktionsorder",
+   "O.F. simulés",
+   "Simulierte Fertigungsaufträge",
+   "Órdenes producción simuladas",
+   "Simulerede produktionsordrer",
+   "Simuloidut tuotantotilaukset",
+   "Simulerte produksjonsordrer"
+  ],
+  "p|Time Sheet Chart": [
+   "Time Sheets",
+   "Tidrapporter",
+   "Feuilles de temps",
+   "Arbeitszeitnachweise",
+   "Partes de horas",
+   "Timesedler",
+   "Tuntiraportit",
+   "Timelister"
+  ],
+  "p|Time Sheet List": [
+   "Time Sheets",
+   "Tidrapporter",
+   "Feuilles de temps",
+   "Arbeitszeitnachweise",
+   "Partes de horas",
+   "Timesedler",
+   "Tuntiraportit",
+   "Timelister"
+  ],
+  "p|Time Sheet Setup Employees": [
+   "Employees",
+   "Medarbetare",
+   "Employés",
+   "Mitarbeiter",
+   "Empleados",
+   "Medarbejdere",
+   "Työntekijät",
+   "Ansatte"
+  ],
+  "p|Transfer Order": [
+   "Transfer Order",
+   "Överföringsorder",
+   "Ordre de transfert",
+   "Umlagerungsauftrag",
+   "Ped. transfer.",
+   "Overflytningsordre",
+   "Siirtotilaus",
+   "Overføringsordre"
+  ],
+  "p|VAT Report List": [
+   "Tax Returns",
+   "Momsreturer",
+   "Retours TVA",
+   "MwSt.-Berichte",
+   "Devoluciones de IVA",
+   "Momsangivelser",
+   "ALV-palautukset",
+   "Omsetningsoppgaver"
+  ],
+  "p|Warehouse Pick": [
+   "Warehouse Pick",
+   "Distributionslagerplockning",
+   "Prélèvement entrepôt",
+   "Kommissionierung",
+   "Picking almacén",
+   "Pluk (logistik)",
+   "F.varastoinnin poiminta",
+   "Plukk"
+  ],
+  "p|Warehouse Picks": [
+   "Warehouse Picks",
+   "Distributionslagerplockningar",
+   "Prélèvements entrepôt",
+   "Kommissionierungen",
+   "Picking almacén",
+   "Pluk (logistik)",
+   "Fyysisen varaston poiminnat",
+   "Lagerplukk"
+  ],
+  "p|Warehouse Put-away": [
+   "Warehouse Put-away",
+   "Dist.lager artikelinförsel",
+   "Rangement entrepôt",
+   "Einlagerung",
+   "Almacenamiento almacén",
+   "Læg-på-lager (logistik)",
+   "F.varastoinnin hyllytys",
+   "Plassering"
+  ],
+  "p|Warehouse Put-aways": [
+   "Warehouse Put-aways",
+   "Distributionslager, artikelinförslar",
+   "Rangements entrepôt",
+   "Einlagerungen",
+   "Almacenamientos de almacén",
+   "Læg-på-lager (lager)",
+   "Fyysisen varaston hyllytykset",
+   "Lagerplasseringer"
+  ],
+  "p|Warehouse Receipt": [
+   "Warehouse Receipt",
+   "Distributionslagerinleverans",
+   "Réception entrepôt",
+   "Wareneingang",
+   "Recep. almacén",
+   "Lagerstedsmodtagelse",
+   "F. varastoinnin vastaanotto",
+   "Lagermottak"
+  ],
+  "p|Warehouse Receipts": [
+   "Warehouse Receipts",
+   "Dist.lager inleveranser",
+   "Réceptions entrepôt",
+   "Wareneingänge",
+   "Recepciones almacén",
+   "Lagerstedsmodtagelser",
+   "F.var. vast.otot",
+   "Lagermottak"
+  ],
+  "p|Warehouse Shipment": [
+   "Warehouse Shipment",
+   "Distributionslagerutleverans",
+   "Expédition entrepôt",
+   "Warenausgang",
+   "Envío almacén",
+   "Lagerstedsforsendelse",
+   "F.var. toimitus",
+   "Lagerlevering"
+  ],
+  "p|Warehouse Shipment List": [
+   "Warehouse Shipments",
+   "Utleveranser från distributionslager",
+   "Expéditions entrepôt",
+   "Warenausgänge",
+   "Envíos de almacén",
+   "Lagerstedsforsendelser",
+   "Fyysisen varaston toimitukset",
+   "Lagerleveringer"
+  ],
+  "p|Workflow Status FactBox": [
+   "Workflows",
+   "Arbetsflöden",
+   "Flux de travail",
+   "Workflows",
+   "Flujos de trabajo",
+   "Workflows",
+   "Työnkulut",
+   "Arbeidsflyter"
+  ],
+  "p|Workflows": [
+   "Workflows",
+   "Arbetsflöden",
+   "Flux de travail",
+   "Workflows",
+   "Flujos de trabajo",
+   "Workflows",
+   "Työnkulut",
+   "Arbeidsflyter"
+  ]
+ },
+ "rules": {
+  "bc-core": {
+   "Core.SearchAndOpenPage": {
+    "action": {
+     "keys": [
+      "a|*|Search"
+     ],
+     "captions": [
+      "Search",
+      "Sök",
+      "Rechercher",
+      "Suchen",
+      "Buscar",
+      "Søg",
+      "Haku",
+      "Søk"
+     ]
+    }
+   },
+   "Core.NavigateBack": {
+    "action": {
+     "keys": [
+      "a|*|Back",
+      "a|*|ActionBack",
+      "a|*|PreviousPage",
+      "a|*|BackAction"
+     ],
+     "captions": [
+      "Back",
+      "Bakåt",
+      "Tillbaka",
+      "Précédent",
+      "Zurück",
+      "Atrás",
+      "Tilbage",
+      "Takaisin",
+      "Edellinen",
+      "Tilbake"
+     ]
+    }
+   },
+   "Core.CreateNew": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Core.EditRecord": {
+    "action": {
+     "keys": [
+      "a|*|EditVariant",
+      "a|*|EditSettings",
+      "a|*|EditAction"
+     ],
+     "captions": [
+      "Edit",
+      "Redigera",
+      "Modifier",
+      "Bearbeiten",
+      "Editar",
+      "Rediger",
+      "Muokkaa"
+     ]
+    }
+   },
+   "Core.DeleteRecord": {
+    "action": {
+     "keys": [
+      "a|*|Delete",
+      "a|*|Remove",
+      "a|*|DeletePicture",
+      "a|*|RemoveICPartner",
+      "a|*|Category_Delete",
+      "a|*|&Delete",
+      "a|*|DeleteArtifact",
+      "a|*|RemoveRelation",
+      "a|*|DeleteAction"
+     ],
+     "captions": [
+      "Delete",
+      "Remove",
+      "Ta bort",
+      "Supprimer",
+      "Löschen",
+      "Eliminar",
+      "Slet",
+      "Poista",
+      "Slett",
+      "Fjern"
+     ]
+    }
+   }
+  },
+  "bc-sales": {
+   "Sales.CreateSalesOrderFromList": {
+    "page": {
+     "keys": [
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    }
+   },
+   "Sales.OpenSalesOrder": {
+    "page": {
+     "keys": [
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    }
+   },
+   "Sales.Release": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Order|Action21",
+      "a|Sales Order|Category_Category5",
+      "a|Sales Order|Release",
+      "a|Sales Order List|Action12",
+      "a|Sales Order List|Category_Category6",
+      "a|Sales Order List|Release"
+     ]
+    }
+   },
+   "Sales.Reopen": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Order|Reopen",
+      "a|Sales Order List|Reopen"
+     ]
+    }
+   },
+   "Sales.Post": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Order|Post",
+      "a|Sales Order|PostAndSend",
+      "a|Sales Order List|Post",
+      "a|Sales Order List|PostAndSend"
+     ]
+    }
+   },
+   "Sales.ChangeShipmentDate": {
+    "page": {
+     "keys": [
+      "p|Sales Order"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order|Shipment Date",
+      "f|Sales Order Subform|Shipment Date"
+     ]
+    }
+   },
+   "Sales.SelectCustomer": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order|Sell-to Customer Name",
+      "f|Sales Order|Sell-to Customer No."
+     ]
+    }
+   },
+   "Sales.OpenPostedInvoice": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Invoices"
+     ]
+    }
+   },
+   "Sales.SetQtyToShip": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order Subform|Qty. to Ship"
+     ]
+    }
+   },
+   "Sales.SelectSalesLineItem": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order|No.",
+      "f|Sales Order Subform|No.",
+      "f|Sales Order List|No.",
+      "f|Sales Orders|No."
+     ]
+    }
+   },
+   "Sales.SetSalesLineQuantity": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order Subform|Quantity",
+      "f|Sales Orders|Quantity"
+     ]
+    }
+   },
+   "Sales.OpenSalesReturnOrder": {
+    "page": {
+     "keys": [
+      "p|Sales Return List Archive",
+      "p|Sales Return Order",
+      "p|Sales Return Order Archive",
+      "p|Sales Return Order List",
+      "p|Sales Return Orders"
+     ]
+    }
+   },
+   "Sales.GetPostedLinesToReverse": {
+    "page": {
+     "keys": [
+      "p|Sales Return List Archive",
+      "p|Sales Return Order",
+      "p|Sales Return Order Archive",
+      "p|Sales Return Order List",
+      "p|Sales Return Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Return Order|GetPostedDocumentLinesToReverse",
+      "a|Sales Return Order List|Get Posted Doc&ument Lines to Reverse"
+     ]
+    }
+   },
+   "Sales.SetReturnReasonCode": {
+    "page": {
+     "keys": [
+      "p|Sales Return List Archive",
+      "p|Sales Return Order",
+      "p|Sales Return Order Archive",
+      "p|Sales Return Order List",
+      "p|Sales Return Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Return Order Subform|Return Reason Code",
+      "f|Sales Return Orders|Return Reason Code"
+     ]
+    }
+   },
+   "Sales.PostSalesReturnOrder": {
+    "page": {
+     "keys": [
+      "p|Sales Return List Archive",
+      "p|Sales Return Order",
+      "p|Sales Return Order Archive",
+      "p|Sales Return Order List",
+      "p|Sales Return Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Return Order|Post",
+      "a|Sales Return Order List|Post"
+     ]
+    }
+   },
+   "Sales.CreateCorrectiveCreditMemo": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Invoices"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Posted Sales Invoices|CreateCreditMemo"
+     ]
+    }
+   },
+   "Sales.CancelUnpaidPostedInvoice": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Invoices"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Posted Sales Invoices|CancelInvoice"
+     ]
+    }
+   },
+   "Sales.CopyToCreditMemo": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Credit Memo Lines",
+      "p|Posted Sales Credit Memos"
+     ]
+    }
+   },
+   "Sales.ApplyCreditMemoEntries": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Credit Memo Lines",
+      "p|Posted Sales Credit Memos"
+     ]
+    }
+   },
+   "Sales.PostSalesCreditMemo": {
+    "page": {
+     "keys": [
+      "p|Posted Sales Credit Memo Lines",
+      "p|Posted Sales Credit Memos"
+     ]
+    }
+   },
+   "Sales.GetShipmentLines": {
+    "page": {
+     "keys": [
+      "p|Sales Invoice",
+      "p|Sales Invoice List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Invoice Subform|GetShipmentLines"
+     ]
+    }
+   },
+   "Sales.ViewSalesPriceDiscountDetails": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    }
+   },
+   "Sales.OpenManualPrice": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    }
+   },
+   "Sales.ChangeAppliedUnitPrice": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    }
+   },
+   "Sales.SetSalesLineUnitPrice": {
+    "page": {
+     "keys": [
+      "p|Sales Order",
+      "p|Sales Order List",
+      "p|Sales Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Sales Order Subform|Unit Price",
+      "f|Sales Orders|Unit Price"
+     ]
+    }
+   }
+  },
+  "bc-purchase": {
+   "Purchase.CreatePurchaseOrderFromList": {
+    "page": {
+     "keys": [
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    }
+   },
+   "Purchase.ApplyPurchasePricesAndDiscounts": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "Purchase.OpenPurchaseOrder": {
+    "page": {
+     "keys": [
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    }
+   },
+   "Purchase.Release": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Invoice|Category_Category10",
+      "a|Purchase Invoice|Re&lease",
+      "a|Purchase Invoice|Release",
+      "a|Purchase Invoices|Action7",
+      "a|Purchase Invoices|Category_Category7",
+      "a|Purchase Invoices|Release",
+      "a|Purchase Order|Action13",
+      "a|Purchase Order|Category_Category5",
+      "a|Purchase Order|Release",
+      "a|Purchase Order List|Action10",
+      "a|Purchase Order List|Category_Category7",
+      "a|Purchase Order List|Release"
+     ]
+    }
+   },
+   "Purchase.Reopen": {
+    "page": {
+     "keys": [
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Order|Reopen",
+      "a|Purchase Order List|Reopen"
+     ]
+    }
+   },
+   "Purchase.Post": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Invoice|Post",
+      "a|Purchase Invoices|PostSelected",
+      "a|Purchase Order|Post",
+      "a|Purchase Order List|Post"
+     ]
+    }
+   },
+   "Purchase.SelectVendor": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Invoice|Buy-from Vendor Name",
+      "f|Purchase Invoice|Buy-from Vendor No.",
+      "f|Purchase Invoices|Pay-to Vendor No.",
+      "f|Purchase Order|Buy-from Vendor Name",
+      "f|Purchase Order|Buy-from Vendor No.",
+      "f|Purchase Order List|Pay-to Vendor No."
+     ]
+    }
+   },
+   "Purchase.ChangeExpectedReceiptDate": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Order|Expected Receipt Date",
+      "f|Purchase Order Subform|Expected Receipt Date"
+     ]
+    }
+   },
+   "Purchase.SetQtyToReceive": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Order Subform|Qty. to Receive"
+     ]
+    }
+   },
+   "Purchase.SelectPurchaseLineItem": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Invoice|No.",
+      "f|Purchase Invoices|No.",
+      "f|Purchase Order|No.",
+      "f|Purchase Order Subform|No.",
+      "f|Purchase Order List|No.",
+      "f|Purchase Orders|No."
+     ]
+    }
+   },
+   "Purchase.SelectPurchaseLineItemFromLookup": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "Purchase.OpenManualPurchasePrice": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "Purchase.SetDirectUnitCost": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Order Subform|Direct Unit Cost"
+     ]
+    }
+   },
+   "Purchase.SetPurchaseLineQuantity": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices",
+      "p|Purchase Order",
+      "p|Purchase Order List",
+      "p|Purchase Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Order Subform|Quantity",
+      "f|Purchase Orders|Quantity"
+     ]
+    }
+   },
+   "Purchase.OpenPurchaseReturnOrder": {
+    "page": {
+     "keys": [
+      "p|Purchase Return List Archive",
+      "p|Purchase Return Order",
+      "p|Purchase Return Order Archive",
+      "p|Purchase Return Order List",
+      "p|Purchase Return Orders"
+     ]
+    }
+   },
+   "Purchase.GetPostedLinesToReverse": {
+    "page": {
+     "keys": [
+      "p|Purchase Return List Archive",
+      "p|Purchase Return Order",
+      "p|Purchase Return Order Archive",
+      "p|Purchase Return Order List",
+      "p|Purchase Return Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Return Order|GetPostedDocumentLinesToReverse",
+      "a|Purchase Return Order List|Get Posted Doc&ument Lines to Reverse"
+     ]
+    }
+   },
+   "Purchase.SetReturnReasonCode": {
+    "page": {
+     "keys": [
+      "p|Purchase Return List Archive",
+      "p|Purchase Return Order",
+      "p|Purchase Return Order Archive",
+      "p|Purchase Return Order List",
+      "p|Purchase Return Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Purchase Return Order Subform|Return Reason Code"
+     ]
+    }
+   },
+   "Purchase.PostPurchaseReturnOrder": {
+    "page": {
+     "keys": [
+      "p|Purchase Return List Archive",
+      "p|Purchase Return Order",
+      "p|Purchase Return Order Archive",
+      "p|Purchase Return Order List",
+      "p|Purchase Return Orders"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Return Order|Post",
+      "a|Purchase Return Order List|Post"
+     ]
+    }
+   },
+   "Purchase.CreateCorrectiveCreditMemo": {
+    "page": {
+     "keys": [
+      "p|Posted Purchase Invoices"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Posted Purchase Invoices|CreateCreditMemo"
+     ]
+    }
+   },
+   "Purchase.CancelUnpaidPostedInvoice": {
+    "page": {
+     "keys": [
+      "p|Posted Purchase Invoices"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Posted Purchase Invoices|CancelInvoice"
+     ]
+    }
+   },
+   "Purchase.CopyToCreditMemo": {
+    "action": {
+     "keys": [
+      "a|*|Copy Document"
+     ],
+     "captions": [
+      "Copy Document",
+      "Kopiera dokument",
+      "Copier document",
+      "Beleg kopieren",
+      "Copiar líneas",
+      "Kopiér dokument",
+      "Kopioi asiakirja",
+      "Kopier dokument"
+     ]
+    }
+   },
+   "Purchase.PostPurchaseCreditMemo": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "Purchase.ApplyCreditMemoEntries": {
+    "action": {
+     "keys": [
+      "a|*|Apply Entries",
+      "a|*|Category_ApplyEntries",
+      "a|*|ActionApplyEntries"
+     ],
+     "captions": [
+      "Apply Entries",
+      "Koppla transaktioner",
+      "Lettrer écritures",
+      "Posten ausgleichen",
+      "Liquidar movs.",
+      "Udlign",
+      "Kohdista tapahtumat",
+      "Utlign poster"
+     ]
+    }
+   },
+   "Purchase.GetReceiptLines": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices"
+     ]
+    }
+   },
+   "Purchase.GetOrderLines": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Invoices"
+     ]
+    }
+   }
+  },
+  "bc-warehouse": {
+   "Warehouse.OpenReceipt": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Receipt List",
+      "p|Warehouse Receipt",
+      "p|Warehouse Receipts"
+     ]
+    }
+   },
+   "Warehouse.OpenShipment": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Shipment List",
+      "p|Warehouse Shipment",
+      "p|Warehouse Shipment List"
+     ]
+    }
+   },
+   "Warehouse.CreatePick": {
+    "action": {
+     "keys": [
+      "a|*|Create Inventor&y Put-away/Pick"
+     ],
+     "captions": [
+      "Create Inventory Put-away/Pick",
+      "Skapa lagerinförsel / plockning",
+      "Créer prélèv./rangement stock",
+      "Lagerbelege erstellen",
+      "Crear almac./ pick. inventario",
+      "Opret læg-på-lager (lager)/pluk (lager)",
+      "Luo varastohyllytys/-poiminta",
+      "Opprett lagerplassering/-plukk"
+     ]
+    }
+   },
+   "Warehouse.RegisterPick": {
+    "page": {
+     "keys": [
+      "p|Warehouse Pick",
+      "p|Warehouse Picks"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Warehouse Pick|RegisterPick",
+      "a|Warehouse Picks|RegisterPick"
+     ]
+    }
+   },
+   "Warehouse.PostReceipt": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Receipt List",
+      "p|Warehouse Receipt",
+      "p|Warehouse Receipts"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Warehouse Receipt|Post Receipt",
+      "a|Warehouse Receipts|Post Receipt"
+     ]
+    }
+   },
+   "Warehouse.PostShipment": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Shipment List",
+      "p|Warehouse Shipment",
+      "p|Warehouse Shipment List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Warehouse Shipment|P&ost Shipment",
+      "a|Warehouse Shipment List|Post Shipment"
+     ]
+    }
+   },
+   "Warehouse.SetQtyToHandlePick": {
+    "page": {
+     "keys": [
+      "p|Inventory Pick",
+      "p|Inventory Picks",
+      "p|Posted Invt. Pick List"
+     ]
+    }
+   },
+   "Warehouse.PostInventoryPick": {
+    "page": {
+     "keys": [
+      "p|Inventory Pick",
+      "p|Inventory Picks",
+      "p|Posted Invt. Pick List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Inventory Pick|P&ost",
+      "a|Inventory Picks|Post"
+     ]
+    }
+   },
+   "Warehouse.RegisterPutAway": {
+    "page": {
+     "keys": [
+      "p|Warehouse Put-away",
+      "p|Warehouse Put-aways"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Warehouse Put-away|&Register Put-away",
+      "a|Warehouse Put-aways|Register Put-away"
+     ]
+    }
+   },
+   "Warehouse.SetQtyToReceive": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Receipt List",
+      "p|Warehouse Receipt",
+      "p|Warehouse Receipts"
+     ]
+    }
+   },
+   "Warehouse.PostReceiptAction": {
+    "page": {
+     "keys": [
+      "p|Posted Whse. Receipt List",
+      "p|Warehouse Receipt",
+      "p|Warehouse Receipts"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Warehouse Receipt|Post Receipt",
+      "a|Warehouse Receipts|Post Receipt"
+     ]
+    }
+   },
+   "Warehouse.ViewAvailabilityByEvent": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Card|<Action110>"
+     ]
+    }
+   },
+   "Warehouse.ViewAvailabilityByPeriod": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Card|Period"
+     ]
+    }
+   },
+   "Warehouse.ViewAvailabilityByLocation": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Card|Location"
+     ]
+    }
+   },
+   "Warehouse.ViewItemsByLocation": {
+    "action": {
+     "keys": [
+      "a|*|ItemsByLocation",
+      "a|*|Items b&y Location"
+     ],
+     "captions": [
+      "Items by Location",
+      "Artiklar per lagerställe",
+      "Articles par magasin",
+      "Artikel nach Lagerort",
+      "Prods. por almacén",
+      "Varer pr. lokation",
+      "Nimikkeet sijainneittain",
+      "Varer per lokasjon"
+     ]
+    }
+   },
+   "Warehouse.ViewAvailabilityByBOMLevel": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    }
+   },
+   "Warehouse.ViewAvailabilityByVariant": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Card|Variant"
+     ]
+    }
+   }
+  },
+  "bc-manufacturing": {
+   "Manufacturing.OpenProductionOrder": {
+    "page": {
+     "keys": [
+      "p|Change Production Order Status",
+      "p|Finished Production Order",
+      "p|Finished Production Orders",
+      "p|Planned Production Order",
+      "p|Planned Production Orders",
+      "p|Production Order List",
+      "p|Production Order Statistics",
+      "p|Released Production Order",
+      "p|Released Production Orders",
+      "p|Simulated Production Order",
+      "p|Simulated Production Orders"
+     ]
+    }
+   },
+   "Manufacturing.RefreshProductionOrder": {
+    "action": {
+     "keys": [
+      "a|*|ActionRefresh",
+      "a|*|Update",
+      "a|*|RefreshTableInformationCache",
+      "a|*|Re&fresh"
+     ],
+     "captions": [
+      "Update",
+      "Refresh",
+      "Uppdatera",
+      "Mettre à jour",
+      "Actualiser",
+      "Aktualisieren",
+      "Actualizar",
+      "Opdater",
+      "Päivitä",
+      "Oppdater"
+     ]
+    }
+   },
+   "Manufacturing.ChangeStatus": {
+    "action": {
+     "keys": [
+      "a|*|Change &Status"
+     ],
+     "captions": [
+      "Change Status",
+      "Ändra status",
+      "Changer statut",
+      "Status ändern",
+      "Cambiar estado",
+      "Skift status",
+      "Muuta tila",
+      "Endre status",
+      "Endringsstatus"
+     ]
+    }
+   },
+   "Manufacturing.PostProductionJournal": {
+    "page": {
+     "keys": [
+      "p|Production Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Production Journal|Post"
+     ]
+    }
+   },
+   "Manufacturing.EnterConsumptionQuantity": {
+    "page": {
+     "keys": [
+      "p|Production Journal"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Production Journal|Quantity"
+     ]
+    }
+   },
+   "Manufacturing.EnterOutputQuantity": {
+    "page": {
+     "keys": [
+      "p|Production Journal"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Production Journal|ActualOutputQty"
+     ]
+    }
+   },
+   "Manufacturing.ReplanProductionOrder": {
+    "action": {
+     "keys": [
+      "a|*|Re&plan"
+     ],
+     "captions": [
+      "Replan",
+      "Omplanera",
+      "Replanifier",
+      "Neu planen",
+      "Replanificar",
+      "Replanlæg",
+      "Uudelleensuunnittele",
+      "Planlegg på nytt"
+     ]
+    }
+   }
+  },
+  "bc-projects": {
+   "Projects.SetQtyToTransferToJournal": {
+    "page": {
+     "keys": [
+      "p|Job Planning Lines",
+      "p|Job Planning Lines Part"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Job Planning Lines|Qty. to Transfer to Journal",
+      "f|Job Planning Lines Part|Qty. to Transfer to Journal"
+     ]
+    }
+   },
+   "Projects.CreateProjectJournalLines": {
+    "page": {
+     "keys": [
+      "p|Job Planning Lines",
+      "p|Job Planning Lines Part"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Planning Lines|CreateJobJournalLines"
+     ]
+    }
+   },
+   "Projects.PostProjectJournal": {
+    "page": {
+     "keys": [
+      "p|Office Job Journal"
+     ]
+    }
+   },
+   "Projects.OpenProjectPlanningLines": {
+    "page": {
+     "keys": [
+      "p|Job Task Lines"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Task Lines|JobPlanningLines",
+      "a|Job Task Lines Subform|JobPlanningLines"
+     ]
+    }
+   },
+   "Projects.SetQtyToTransferToInvoice": {
+    "page": {
+     "keys": [
+      "p|Job Planning Lines",
+      "p|Job Planning Lines Part"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Job Planning Lines|Qty. to Transfer to Invoice",
+      "f|Job Planning Lines Part|Qty. to Transfer to Invoice"
+     ]
+    }
+   },
+   "Projects.CreateProjectSalesInvoice": {
+    "page": {
+     "keys": [
+      "p|Job List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job List|Create Job &Sales Invoice"
+     ]
+    }
+   },
+   "Projects.CreateTimeSheetLinesFromPlanning": {
+    "page": {
+     "keys": [
+      "p|Time Sheet Chart",
+      "p|Time Sheet List"
+     ]
+    }
+   },
+   "Projects.SuggestApprovedTimeSheetLinesToProjectJournal": {
+    "page": {
+     "keys": [
+      "p|Job Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Journal|SuggestLinesFromTimeSheets"
+     ]
+    }
+   },
+   "Projects.OpenResourceCapacity": {
+    "page": {
+     "keys": [
+      "p|Resource Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Resource Card|Resource &Capacity"
+     ]
+    }
+   },
+   "Projects.UpdateResourceCapacity": {
+    "page": {
+     "keys": [
+      "p|Resource Capacity Settings"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Resource Capacity Settings|UpdateCapacity"
+     ]
+    }
+   },
+   "Projects.OpenResourceCosts": {
+    "page": {
+     "keys": [
+      "p|Resource Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Resource Card|Costs"
+     ]
+    }
+   },
+   "Projects.OpenResourcePrices": {
+    "page": {
+     "keys": [
+      "p|Resource Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Resource Card|&Prices",
+      "a|Resource Card|Category_Category6",
+      "a|Resource Card|Prices"
+     ]
+    }
+   },
+   "Projects.CalculateRemainingUsage": {
+    "page": {
+     "keys": [
+      "p|Job Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Journal|CalcRemainingUsage"
+     ]
+    }
+   },
+   "Projects.CreateProjectInventoryPick": {
+    "page": {
+     "keys": [
+      "p|Job Card",
+      "p|Job List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Card|Create Inventory Pick",
+      "a|Job List|Create Inventory Pick"
+     ]
+    }
+   },
+   "Projects.CreateProjectWarehousePick": {
+    "page": {
+     "keys": [
+      "p|Job Card",
+      "p|Job List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Card|Create Warehouse Pick",
+      "a|Job List|Create Warehouse Pick"
+     ]
+    }
+   },
+   "Projects.GetProjectPlanningLinesForInvoice": {
+    "page": {
+     "keys": [
+      "p|Sales Invoice"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Sales Invoice Subform|GetJobPlanningLines"
+     ]
+    }
+   },
+   "Projects.CreatePurchaseOrders": {
+    "page": {
+     "keys": [
+      "p|Job Card",
+      "p|Job List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Job Card|CreatePurchaseOrder"
+     ]
+    }
+   }
+  },
+  "bc-services": {
+   "Services.OpenServiceItemWorksheet": {
+    "page": {
+     "keys": [
+      "p|Service Tasks"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Service Tasks|&Item Worksheet"
+     ]
+    }
+   },
+   "Services.SetServiceItemWorksheetQuantity": {
+    "page": {
+     "keys": [
+      "p|Service Item Worksheet"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Service Item Worksheet Subform|Quantity"
+     ]
+    }
+   },
+   "Services.PostServiceOrder": {
+    "page": {
+     "keys": [
+      "p|Service Order"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Service Order|Post"
+     ]
+    }
+   },
+   "Services.CreateServiceOrder": {
+    "page": {
+     "keys": [
+      "p|Service Orders"
+     ]
+    }
+   },
+   "Services.ConvertAcceptedQuoteToOrder": {
+    "page": {
+     "keys": [
+      "p|Service Contract Quotes",
+      "p|Service Quotes"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Service Quotes|Make &Order"
+     ]
+    }
+   },
+   "Services.SelectServiceOrderCustomer": {
+    "page": {
+     "keys": [
+      "p|Service Order",
+      "p|Service Orders"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Service Order|Customer No.",
+      "f|Service Orders|Customer No."
+     ]
+    }
+   },
+   "Services.AllocateServiceResource": {
+    "page": {
+     "keys": [
+      "p|Dispatch Board",
+      "p|Resource Allocations",
+      "p|Service Order",
+      "p|Service Orders",
+      "p|Service Quote",
+      "p|Service Quotes"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Resource Allocations|Allocate to &all Service Items"
+     ]
+    }
+   },
+   "Services.ChangeRepairStatus": {
+    "page": {
+     "keys": [
+      "p|Service Item Worksheet",
+      "p|Service Order",
+      "p|Service Orders",
+      "p|Service Tasks"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Service Item Worksheet|Repair Status Code",
+      "f|Service Order Subform|Repair Status Code",
+      "f|Service Tasks|Repair Status Code"
+     ]
+    }
+   }
+  },
+  "aptean-fb": {
+   "Aptean.CreatePurchaseOrdersFromForecastWorksheet": {
+    "action": {
+     "keys": [
+      "a|*|Create Purchase Order",
+      "a|*|Purchase Order"
+     ],
+     "captions": [
+      "Create Purchase Order",
+      "Skapa inköpsorder",
+      "Créer commande achat",
+      "Créer une commande achat",
+      "Bestellung erstellen",
+      "Einkaufsbestellung erstellen",
+      "Crear pedido compra",
+      "Opret købsordre",
+      "Luo ostotilaus",
+      "Opprett bestilling"
+     ]
+    }
+   },
+   "Aptean.SetPurchaseClaimActionType": {
+    "field": {
+     "keys": [
+      "f|*|Action Type",
+      "f|*|Action type"
+     ],
+     "captions": [
+      "Action Type",
+      "Åtgärdstyp",
+      "Type action",
+      "Aktionsart",
+      "Tipo acción",
+      "Handlingstype",
+      "Toiminnon tyyppi"
+     ]
+    }
+   },
+   "Aptean.CreatePurchaseOrderFromWeekForecast": {
+    "action": {
+     "keys": [
+      "a|*|Create Purchase Order",
+      "a|*|Purchase Order"
+     ],
+     "captions": [
+      "Create Purchase Order",
+      "Skapa inköpsorder",
+      "Créer commande achat",
+      "Créer une commande achat",
+      "Bestellung erstellen",
+      "Einkaufsbestellung erstellen",
+      "Crear pedido compra",
+      "Opret købsordre",
+      "Luo ostotilaus",
+      "Opprett bestilling"
+     ]
+    }
+   },
+   "Aptean.CreateHarvestOrder": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Aptean.PostQualityAction": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "Aptean.AnswerQualityCheckLine": {
+    "field": {
+     "keys": [
+      "f|*|ProfileQuestionnaireLine.Description",
+      "f|*|Answer",
+      "f|*|ResultText"
+     ],
+     "captions": [
+      "Answer",
+      "Result",
+      "Svar",
+      "Réponse",
+      "Antwort",
+      "Respuesta",
+      "Vastaus"
+     ]
+    }
+   },
+   "Aptean.CreateQCCheck": {
+    "page": {
+     "keys": [
+      "p|Lot No. Information Card",
+      "p|Purchase Order",
+      "p|Purchase Return Order",
+      "p|Released Production Order",
+      "p|Sales Order",
+      "p|Sales Return Order",
+      "p|Transfer Order",
+      "p|Warehouse Receipt",
+      "p|Warehouse Shipment"
+     ]
+    }
+   },
+   "Aptean.CreateInventoryQCTrigger": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Aptean.CreateCustomerNonConformance": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Aptean.CreatePurchaseClaim": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Aptean.ChangeLotInspectionStatus": {
+    "page": {
+     "keys": [
+      "p|Lot No. Information List"
+     ]
+    }
+   },
+   "Aptean.PostGrowerSettlement": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "Aptean.PostPackAndShip": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "Aptean.ProcessEDIMessage": {
+    "action": {
+     "keys": [
+      "a|*|&Process",
+      "a|*|Process"
+     ],
+     "captions": [
+      "Process",
+      "Traitement",
+      "Verarbeiten",
+      "Proceso",
+      "Proces",
+      "Käsittely",
+      "Prosess"
+     ]
+    }
+   },
+   "Aptean.SendOrderToTLx": {
+    "page": {
+     "keys": [
+      "p|Purchase Order",
+      "p|Sales Order"
+     ]
+    }
+   }
+  },
+  "aptean-weigh-scale": {
+   "AptWeighScale.SaveRegistration": {
+    "action": {
+     "keys": [
+      "a|*|Save"
+     ],
+     "captions": [
+      "Save",
+      "Spara",
+      "Sauvegarder",
+      "Speichern",
+      "Guardar",
+      "Gem",
+      "Tallenna",
+      "Lagre"
+     ]
+    }
+   },
+   "AptWeighScale.AssignLotNo": {
+    "action": {
+     "keys": [
+      "a|*|Assign &Lot No.",
+      "a|*|Assign Lot No."
+     ],
+     "captions": [
+      "Assign Lot No.",
+      "Tilldela partinr",
+      "Affecter n° lot",
+      "Chargennr. zuweisen",
+      "Asignar nº lote",
+      "Tildel lotnr.",
+      "Määritä eränro",
+      "Tilordne partinr."
+     ]
+    }
+   },
+   "AptWeighScale.OpenWeighScaleEntries": {
+    "page": {
+     "keys": [
+      "p|Released Production Order"
+     ]
+    }
+   },
+   "AptWeighScale.ChangeEntryStatus": {
+    "action": {
+     "keys": [
+      "a|*|Change &Status"
+     ],
+     "captions": [
+      "Change Status",
+      "Ändra status",
+      "Changer statut",
+      "Status ändern",
+      "Cambiar estado",
+      "Skift status",
+      "Muuta tila",
+      "Endre status",
+      "Endringsstatus"
+     ]
+    }
+   }
+  },
+  "bc-cash-management": {
+   "CashManagement.OpenCashReceiptJournal": {
+    "action": {
+     "keys": [
+      "a|*|OpenDocument"
+     ],
+     "captions": [
+      "Open Record",
+      "Öppna post",
+      "Ouvrir l'enregistrement",
+      "Datensatz öffnen",
+      "Abrir registro",
+      "Åbn record",
+      "Avaa tietue",
+      "Åpne post"
+     ]
+    }
+   },
+   "CashManagement.ApplyCustomerEntries": {
+    "action": {
+     "keys": [
+      "a|*|Apply Entries",
+      "a|*|Category_ApplyEntries",
+      "a|*|ActionApplyEntries"
+     ],
+     "captions": [
+      "Apply Entries",
+      "Koppla transaktioner",
+      "Lettrer écritures",
+      "Posten ausgleichen",
+      "Liquidar movs.",
+      "Udlign",
+      "Kohdista tapahtumat",
+      "Utlign poster"
+     ]
+    }
+   },
+   "CashManagement.PostCashReceiptJournal": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "CashManagement.OpenPaymentJournal": {
+    "action": {
+     "keys": [
+      "a|*|OpenDocument"
+     ],
+     "captions": [
+      "Open Record",
+      "Öppna post",
+      "Ouvrir l'enregistrement",
+      "Datensatz öffnen",
+      "Abrir registro",
+      "Åbn record",
+      "Avaa tietue",
+      "Åpne post"
+     ]
+    }
+   },
+   "CashManagement.SuggestVendorPayments": {
+    "action": {
+     "keys": [
+      "a|*|SuggestVendorPayments"
+     ],
+     "captions": [
+      "Suggest Vendor Payments",
+      "Betalningsförslag för lev.",
+      "Proposer paiements fournisseur",
+      "Zahlungsvorschlag",
+      "Proponer pagos a proveedores",
+      "Lav forslag",
+      "Ehdota toimittajamaksuja",
+      "Betalingsforslag - leverandør"
+     ]
+    }
+   },
+   "CashManagement.PostPaymentJournal": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   },
+   "CashManagement.OpenPaymentReconciliationJournal": {
+    "action": {
+     "keys": [
+      "a|*|OpenDocument"
+     ],
+     "captions": [
+      "Open Record",
+      "Öppna post",
+      "Ouvrir l'enregistrement",
+      "Datensatz öffnen",
+      "Abrir registro",
+      "Åbn record",
+      "Avaa tietue",
+      "Åpne post"
+     ]
+    }
+   },
+   "CashManagement.ApplyPaymentsAutomatically": {
+    "action": {
+     "keys": [
+      "a|*|Match",
+      "a|*|ApplyAutomatically"
+     ],
+     "captions": [
+      "Apply Automatically",
+      "Koppla automatiskt",
+      "Lettrer automatiquement",
+      "Automatisch ausgleichen",
+      "Liquidar automáticamente",
+      "Udlign automatisk",
+      "Kohdista automaattisesti",
+      "Utlign automatisk"
+     ]
+    }
+   },
+   "CashManagement.ApplyPaymentsManually": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "Apply Manually",
+      "Koppla manuellt",
+      "Lettrer manuellement",
+      "Manuell ausgleichen",
+      "Liquidar manualmente",
+      "Udlign manuelt",
+      "Kohdista manuaalisesti",
+      "Utlign manuelt"
+     ]
+    }
+   },
+   "CashManagement.PostPaymentReconciliationJournal": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   }
+  },
+  "bc-finance": {
+   "Finance.RecalculateCashFlowForecast": {
+    "page": {
+     "keys": [
+      "p|Cash Flow Forecast Chart",
+      "p|Client Detail Cash Flow Chart"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Cash Flow Forecast Chart|Recalculate Forecast",
+      "a|Client Detail Cash Flow Chart|Recalculate Forecast"
+     ]
+    }
+   },
+   "Finance.EditGeneralLedgerBudget": {
+    "page": {
+     "keys": [
+      "p|G/L Budget Names"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|G/L Budget Names|EditBudget"
+     ]
+    }
+   },
+   "Finance.PreviewExchangeRateAdjustment": {
+    "action": {
+     "keys": [
+      "a|*|Preview Posting",
+      "a|*|PreviewPosting"
+     ],
+     "captions": [
+      "Preview Posting",
+      "Förhandsgranska bokföring",
+      "Aperçu validation",
+      "Buchungsvorschau",
+      "Vista previa de registro",
+      "Vis bogføring",
+      "Esikatsele kirjausta",
+      "Forhåndsvis bokføring"
+     ]
+    }
+   },
+   "Finance.SuggestVATReportLines": {
+    "page": {
+     "keys": [
+      "p|VAT Report List"
+     ]
+    }
+   },
+   "Finance.CalculateFixedAssetDepreciation": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   },
+   "Finance.PostFixedAssetJournal": {
+    "page": {
+     "keys": [
+      "p|Fixed Asset G/L Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Fixed Asset G/L Journal|P&ost"
+     ]
+    }
+   },
+   "Finance.RunFixedAssetIndexation": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   },
+   "Finance.CancelFixedAssetDepreciation": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   },
+   "Finance.EditFinancialReportRowDefinition": {
+    "page": {
+     "keys": [
+      "p|Account Schedule Names"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Account Schedule Names|EditAccountSchedule"
+     ]
+    }
+   },
+   "Finance.EditFinancialReportColumnDefinition": {
+    "page": {
+     "keys": [
+      "p|Data Exch Col Def Part"
+     ]
+    }
+   },
+   "Finance.PostGeneralJournal": {
+    "page": {
+     "keys": [
+      "p|General Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|General Journal|Post"
+     ]
+    }
+   },
+   "Finance.IndentChartOfAccounts": {
+    "page": {
+     "keys": [
+      "p|Chart of Accounts"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Chart of Accounts|IndentChartOfAccounts"
+     ]
+    }
+   },
+   "Finance.ChangeGlobalDimensions": {
+    "page": {
+     "keys": [
+      "p|General Ledger Setup"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|General Ledger Setup|ChangeGlobalDimensions"
+     ]
+    }
+   },
+   "Finance.CreateAccountingPeriods": {
+    "page": {
+     "keys": [
+      "p|Accounting Periods"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Accounting Periods|&Create Year"
+     ]
+    }
+   },
+   "Finance.CloseFiscalYear": {
+    "page": {
+     "keys": [
+      "p|Accounting Periods"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Accounting Periods|C&lose Year"
+     ]
+    }
+   },
+   "Finance.RunCloseIncomeStatement": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   }
+  },
+  "bc-intercompany": {
+   "Intercompany.SetupAccountsAndDimensions": {
+    "page": {
+     "keys": [
+      "p|Intercompany Setup"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Intercompany Setup|ICChartOfAccounts"
+     ]
+    }
+   },
+   "BCExpansion.ImportInbox": {
+    "page": {
+     "keys": [
+      "p|IC Inbox Transactions"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|IC Inbox Transactions|Import Transaction File"
+     ]
+    }
+   },
+   "BCExpansion.CompleteInbox": {
+    "page": {
+     "keys": [
+      "p|IC Inbox Transactions"
+     ]
+    }
+   },
+   "BCExpansion.SendOutbox": {
+    "page": {
+     "keys": [
+      "p|IC Outbox Transactions"
+     ]
+    }
+   }
+  },
+  "bc-assembly": {
+   "BCExpansion.CreateOrder": {
+    "page": {
+     "keys": [
+      "p|Assembly Orders"
+     ]
+    }
+   },
+   "BCExpansion.QuantityToAssemble": {
+    "page": {
+     "keys": [
+      "p|Assembly Order"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Assembly Order|Quantity to Assemble"
+     ]
+    }
+   },
+   "BCExpansion.PostOrder": {
+    "page": {
+     "keys": [
+      "p|Assembly Order"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Assembly Order|P&ost"
+     ]
+    }
+   },
+   "BCAssembly.AssemblyPolicyContext": {
+    "page": {
+     "keys": [
+      "p|Item Card"
+     ]
+    },
+    "field": {
+     "keys": [
+      "f|Item Card|Assembly Policy"
+     ]
+    }
+   }
+  },
+  "bc-bank-reconciliation": {
+   "BCExpansion.ImportStatement": {
+    "page": {
+     "keys": [
+      "p|Bank Acc. Reconciliation",
+      "p|Post Pmts and Rec. Bank Acc."
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Bank Acc. Reconciliation|ImportBankStatement"
+     ]
+    }
+   },
+   "BCExpansion.MatchAutomatically": {
+    "page": {
+     "keys": [
+      "p|Bank Acc. Reconciliation",
+      "p|Post Pmts and Rec. Bank Acc."
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Bank Acc. Reconciliation|MatchAutomatically"
+     ]
+    }
+   },
+   "BCExpansion.PostReconciliation": {
+    "page": {
+     "keys": [
+      "p|Bank Acc. Reconciliation",
+      "p|Post Pmts and Rec. Bank Acc."
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Bank Acc. Reconciliation|Post"
+     ]
+    }
+   },
+   "BCExpansion.MatchManually": {
+    "page": {
+     "keys": [
+      "p|Bank Acc. Reconciliation",
+      "p|Post Pmts and Rec. Bank Acc."
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Bank Acc. Reconciliation|MatchManually"
+     ]
+    }
+   }
+  },
+  "bc-approvals": {
+   "BCExpansion.ApproveRequest": {
+    "page": {
+     "keys": [
+      "p|Requests to Approve"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Requests to Approve|Approve"
+     ]
+    }
+   },
+   "BCExpansion.RejectRequest": {
+    "page": {
+     "keys": [
+      "p|Requests to Approve"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Requests to Approve|Reject"
+     ]
+    }
+   },
+   "BCExpansion.DelegateRequest": {
+    "page": {
+     "keys": [
+      "p|Requests to Approve"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Requests to Approve|Delegate"
+     ]
+    }
+   },
+   "BCExpansion.SendApproval": {
+    "page": {
+     "keys": [
+      "p|Purchase Credit Memo",
+      "p|Purchase Invoice",
+      "p|Purchase Order",
+      "p|Sales Credit Memo",
+      "p|Sales Invoice",
+      "p|Sales Order"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Credit Memo|SendApprovalRequest",
+      "a|Purchase Invoice|SendApprovalRequest",
+      "a|Purchase Order|SendApprovalRequest",
+      "a|Sales Credit Memo|SendApprovalRequest",
+      "a|Sales Invoice|SendApprovalRequest",
+      "a|Sales Order|SendApprovalRequest"
+     ]
+    }
+   },
+   "BCExpansion.CancelApproval": {
+    "page": {
+     "keys": [
+      "p|Purchase Credit Memo",
+      "p|Purchase Invoice",
+      "p|Purchase Order",
+      "p|Sales Credit Memo",
+      "p|Sales Invoice",
+      "p|Sales Order"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Purchase Credit Memo|CancelApprovalRequest",
+      "a|Purchase Invoice|CancelApprovalRequest",
+      "a|Purchase Order|CancelApprovalRequest",
+      "a|Sales Credit Memo|CancelApprovalRequest",
+      "a|Sales Invoice|CancelApprovalRequest",
+      "a|Sales Order|CancelApprovalRequest"
+     ]
+    }
+   },
+   "BCExpansion.CreateApprovalUser": {
+    "page": {
+     "keys": [
+      "p|Approval User Setup"
+     ]
+    }
+   }
+  },
+  "bc-human-resources": {
+   "HumanResources.ViewAbsenceByCategories": {
+    "page": {
+     "keys": [
+      "p|Employee List",
+      "p|Time Sheet Setup Employees"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Employee List|Absences by Ca&tegories"
+     ]
+    }
+   },
+   "HumanResources.OpenAbsenceOverview": {
+    "page": {
+     "keys": [
+      "p|Absence Registration"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Absence Registration|Overview by &Categories",
+      "a|Absence Registration|Overview by &Periods"
+     ]
+    }
+   },
+   "BCExpansion.CreateEmployee": {
+    "page": {
+     "keys": [
+      "p|Employee List",
+      "p|Time Sheet Setup Employees"
+     ]
+    }
+   },
+   "BCExpansion.RegisterAbsence": {
+    "page": {
+     "keys": [
+      "p|Absence Registration"
+     ]
+    }
+   },
+   "BCExpansion.ApplyEmployeeTemplate": {
+    "page": {
+     "keys": [
+      "p|Employee Card"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Employee Card|ApplyTemplate"
+     ]
+    }
+   }
+  },
+  "bc-sustainability": {
+   "Sustainability.EnterPurchaseDocumentEmissions": {
+    "page": {
+     "keys": [
+      "p|Purchase Invoice",
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "Sustainability.CreateAccountCategory": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "Sustainability.CreateAccountSubcategory": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "BCExpansion.RecalculateJournal": {
+    "action": {
+     "keys": [
+      "a|*|Recalculate"
+     ],
+     "captions": [
+      "Recalculate",
+      "Omberäkna",
+      "Recalculer",
+      "Neu berechnen",
+      "Recalcular",
+      "Genberegn",
+      "Laske uudelleen",
+      "Beregn på nytt"
+     ]
+    }
+   },
+   "BCExpansion.PostJournal": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   }
+  },
+  "bc-subscription-billing": {
+   "SubscriptionBilling.ManualContractLine": {
+    "field": {
+     "keys": [
+      "f|*|FilteredTypeField",
+      "f|*|TypeOnPrem",
+      "f|*|TypeSaaS",
+      "f|*|FilterType",
+      "f|*|DocLineType",
+      "f|*|type",
+      "f|*|ActionType",
+      "f|*|Layout Format"
+     ],
+     "captions": [
+      "Type",
+      "Radtyp",
+      "Typ",
+      "Art",
+      "Tipo",
+      "Tyyppi"
+     ]
+    }
+   }
+  },
+  "bc-electronic-documents": {
+   "BCExpansion.CreatePurchaseDocument": {
+    "action": {
+     "keys": [
+      "a|*|CreateDocument"
+     ],
+     "captions": [
+      "Create Document",
+      "Skapa dokument",
+      "Créer document",
+      "Beleg erstellen",
+      "Crear documento",
+      "Opret dokument",
+      "Luo asiakirja",
+      "Opprett dokument"
+     ]
+    }
+   }
+  },
+  "bc-microsoft365": {
+   "BCExpansion.EditExcel": {
+    "action": {
+     "keys": [
+      "a|*|EditInExcel"
+     ],
+     "captions": [
+      "Edit in Excel",
+      "Redigera i Excel",
+      "Modifier dans Excel",
+      "In Excel bearbeiten",
+      "Editar en Excel",
+      "Rediger i Excel",
+      "Muokkaa Excelissä"
+     ]
+    }
+   },
+   "BCExpansion.OpenOneDrive": {
+    "action": {
+     "keys": [
+      "a|*|OpenInOneDrive"
+     ],
+     "captions": [
+      "Open in OneDrive",
+      "Öppna i OneDrive",
+      "Ouvrir dans OneDrive",
+      "In OneDrive öffnen",
+      "Abrir en OneDrive",
+      "Åbn i OneDrive",
+      "Avaa OneDrivessa",
+      "Åpne i OneDrive"
+     ]
+    }
+   },
+   "BCExpansion.InstallOutlook": {
+    "action": {
+     "keys": [
+      "a|*|ActionInstall"
+     ],
+     "captions": [
+      "Install to my Outlook",
+      "Installera till mitt Outlook",
+      "Installer dans mon Outlook",
+      "In mein Outlook installieren",
+      "Instalar en mi Outlook",
+      "Installer i min Outlook",
+      "Asenna Outlookiin"
+     ]
+    }
+   }
+  },
+  "bc-inventory": {
+   "BCExpansion.PostItemReclassification": {
+    "page": {
+     "keys": [
+      "p|Item Reclass. Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Reclass. Journal|Post"
+     ]
+    }
+   },
+   "BCExpansion.CalculateInventory": {
+    "action": {
+     "keys": [
+      "a|*|CalculateInventory",
+      "a|*|Calculate &Inventory"
+     ],
+     "captions": [
+      "Calculate Inventory",
+      "Beräkna lagersaldo",
+      "Calculer quantité en stock",
+      "Lagerbestand berechnen",
+      "Calcular inventario físico",
+      "Beregn beholdning",
+      "Laske varasto"
+     ]
+    }
+   },
+   "BCExpansion.PostTransfer": {
+    "page": {
+     "keys": [
+      "p|Transfer Order"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Transfer Order|Post"
+     ]
+    }
+   },
+   "BCExpansion.PostPhysicalInventory": {
+    "action": {
+     "keys": [
+      "a|*|P&ost"
+     ],
+     "captions": [
+      "Post",
+      "Bokför",
+      "Valider",
+      "Buchen",
+      "Registrar",
+      "Bogfør",
+      "Kirjaa",
+      "Bokfør"
+     ]
+    }
+   }
+  },
+  "bc-quality-management": {
+   "QualityManagement.CreateInspectionTemplate": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "QualityManagement.CreateTestDefinition": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "QualityManagement.CopyInspectionTemplate": {
+    "action": {
+     "keys": [
+      "a|*|CopyTemplate"
+     ],
+     "captions": [
+      "Copy Template",
+      "Kopiera mall",
+      "Copier le modèle",
+      "Vorlage kopieren",
+      "Copiar plantilla",
+      "Kopiér skabelon",
+      "Kopioi malli",
+      "Kopier mal"
+     ]
+    }
+   },
+   "QualityManagement.CreateInspectionFromSourceLine": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "QualityManagement.ScheduleInspections": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   },
+   "QualityManagement.CreatePurchaseReturnFromFailedInspection": {
+    "action": {
+     "keys": [
+      "a|*|Create Purchase Return Order"
+     ],
+     "captions": [
+      "Create Purchase Return Order",
+      "Skapa inköpsreturorder",
+      "Créer retour commande achat",
+      "Einkaufsretoure erstellen",
+      "Crear pedido de devolución de compra",
+      "Opret købsreturordre",
+      "Luo ostopalautustilaus",
+      "Opprett bestillingsretur"
+     ]
+    }
+   },
+   "QualityManagement.BlockLotInWorkflow": {
+    "page": {
+     "keys": [
+      "p|Workflow Status FactBox",
+      "p|Workflows"
+     ]
+    }
+   },
+   "QualityManagement.UnblockLotOnPassInWorkflow": {
+    "page": {
+     "keys": [
+      "p|Workflow Status FactBox",
+      "p|Workflows"
+     ]
+    }
+   },
+   "QualityManagement.FinishPurchaseReceiptInspection": {
+    "action": {
+     "keys": [
+      "a|*|Finish",
+      "a|*|Finalize",
+      "a|*|FinishInteraction",
+      "a|*|FinishWizard",
+      "a|*|FinishAction",
+      "a|*|ActionFinishAndEnable",
+      "a|*|Fi&nish"
+     ],
+     "captions": [
+      "Finish",
+      "Slutför",
+      "Terminer",
+      "Fertig stellen",
+      "Beenden",
+      "Terminar",
+      "Finalizar",
+      "Udfør",
+      "Valmis",
+      "Fullfør"
+     ]
+    }
+   },
+   "QualityManagement.ScheduleTimeBasedInspections": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "QualityManagement.CreateInspectionResult": {
+    "action": {
+     "keys": [
+      "a|*|New",
+      "a|*|NewConfigTemplate",
+      "a|*|NewLayout",
+      "a|*|NewGroup",
+      "a|*|NewAction",
+      "a|*|NewSettings",
+      "a|*|NewRelation"
+     ],
+     "captions": [
+      "New",
+      "Ny",
+      "Nouveau",
+      "Neu",
+      "Nuevo",
+      "Uusi"
+     ]
+    }
+   },
+   "QualityManagement.PostProductionOutputWithInspection": {
+    "page": {
+     "keys": [
+      "p|Production Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Production Journal|Post"
+     ]
+    }
+   },
+   "QualityManagement.ShowPurchaseOrderInspections": {
+    "page": {
+     "keys": [
+      "p|Purchase Order"
+     ]
+    }
+   },
+   "QualityManagement.CreateInspectionFromTrackingLine": {
+    "page": {
+     "keys": [
+      "p|Item Tracking Lines"
+     ]
+    }
+   }
+  },
+  "bc-cost-accounting": {
+   "CostAccounting.RunCostAllocation": {
+    "page": {
+     "keys": [
+      "p|Cost Allocation"
+     ]
+    }
+   },
+   "CostAccounting.CalculateAllocationKey": {
+    "page": {
+     "keys": [
+      "p|Cost Allocation"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Cost Allocation|Calculate Allocation Key"
+     ]
+    }
+   },
+   "CostAccounting.CreateCostBudget": {
+    "page": {
+     "keys": [
+      "p|Cost Budget Names"
+     ]
+    }
+   },
+   "CostAccounting.CreateCostCenter": {
+    "page": {
+     "keys": [
+      "p|Chart of Cost Centers"
+     ]
+    }
+   },
+   "CostAccounting.CreateCostObject": {
+    "page": {
+     "keys": [
+      "p|Chart of Cost Objects"
+     ]
+    }
+   },
+   "CostAccounting.PostCostJournal": {
+    "page": {
+     "keys": [
+      "p|Cost Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Cost Journal|P&ost",
+      "a|Cost Journal|Post"
+     ]
+    }
+   },
+   "CostAccounting.DeleteCostBudgetEntries": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "OK",
+      "Aceptar"
+     ]
+    }
+   }
+  },
+  "bc-contact-marketing": {
+   "ContactMarketing.CreateCampaign": {
+    "page": {
+     "keys": [
+      "p|Campaign List"
+     ]
+    }
+   },
+   "ContactMarketing.CreateInteraction": {
+    "page": {
+     "keys": [
+      "p|Contact List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Contact List|Create &Interaction"
+     ]
+    }
+   },
+   "ContactMarketing.CloseSalesOpportunity": {
+    "page": {
+     "keys": [
+      "p|Opportunities",
+      "p|Opportunity Chart",
+      "p|Opportunity List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Opportunity List|Close"
+     ]
+    }
+   },
+   "ContactMarketing.UpdateOpportunityStage": {
+    "page": {
+     "keys": [
+      "p|Opportunities",
+      "p|Opportunity Chart",
+      "p|Opportunity List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Opportunity List|Update"
+     ]
+    }
+   },
+   "ContactMarketing.CreateSegmentInteraction": {
+    "page": {
+     "keys": [
+      "p|Segment",
+      "p|Segment List"
+     ]
+    }
+   },
+   "ContactMarketing.CreateSegment": {
+    "page": {
+     "keys": [
+      "p|Segment",
+      "p|Segment List"
+     ]
+    }
+   },
+   "ContactMarketing.AddContactsToSegment": {
+    "page": {
+     "keys": [
+      "p|Segment",
+      "p|Segment List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Segment|AddContacts"
+     ]
+    }
+   },
+   "ContactMarketing.RefineOrReduceSegmentContacts": {
+    "page": {
+     "keys": [
+      "p|Segment",
+      "p|Segment List"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Segment|ReduceContacts",
+      "a|Segment|RefineContacts"
+     ]
+    }
+   }
+  },
+  "bc-shopify-connector": {
+   "Shopify.CreateSalesDocumentsFromOrder": {
+    "action": {
+     "keys": [],
+     "captions": [
+      "Create Sales Documents",
+      "Skapa försäljningsdokument",
+      "Créer documents vente",
+      "Verkaufsbelege erstellen",
+      "Crear documentos de venta",
+      "Opret salgsdokumenter",
+      "Luo myyntiasiakirjat",
+      "Opprett salgsdokumenter"
+     ]
+    }
+   }
+  },
+  "bc-inventory-tracking": {
+   "InventoryTracking.TraceSerialOrLot": {
+    "page": {
+     "keys": [
+      "p|Item Tracing"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Tracing|Trace"
+     ]
+    }
+   },
+   "InventoryTracking.FindAllSerialOrLotEntries": {
+    "page": {
+     "keys": [
+      "p|Navigate"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Navigate|Find"
+     ]
+    }
+   },
+   "InventoryTracking.AssignTrackingNumber": {
+    "page": {
+     "keys": [
+      "p|Item Tracking Lines"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Tracking Lines|Assign &Lot No.",
+      "a|Item Tracking Lines|Assign &Serial No.",
+      "a|Item Tracking Lines|Assign Lot No.",
+      "a|Item Tracking Lines|Assign Serial No."
+     ]
+    }
+   },
+   "InventoryTracking.ReclassifyLotOrSerialNumber": {
+    "page": {
+     "keys": [
+      "p|Item Reclass. Journal"
+     ]
+    },
+    "action": {
+     "keys": [
+      "a|Item Reclass. Journal|Item &Tracking Lines"
+     ]
+    }
+   }
+  }
+ }
+}

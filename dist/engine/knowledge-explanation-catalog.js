@@ -4,7 +4,10 @@
   root.T9KnowledgeExplanationCatalog = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const locales = ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"];
+  // The order of the languages in the text lists below (apteanText, financeText...). It is the
+  // order of the data, so it is written here; tests/language-lists.test.js requires it to hold
+  // every language of the language registry.
+  const locales = Object.freeze(["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]);
   const text = {
     serviceResourceAllocation: {
       "sv-SE": "Tilldelningen kopplar en resurs eller resursgrupp till en serviceuppgift och anger planerat datum och timmar. Statusen Aktiv betyder att arbetet är tilldelat, inte att det är utfört; registrerade arbetstimmar och reparationsstatus hanteras separat. Kontrollera tillgänglighet och serviceartikel.",

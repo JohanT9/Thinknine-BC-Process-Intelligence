@@ -11,6 +11,7 @@
   const stepList = document.getElementById("runSteps");
   let locale = i18n.DEFAULT_LOCALE;
   let client = null;
+  let followUp = null;
   const run = () => client.run();
   const t = (key, values = {}) => Object.entries(values).reduce((value, [name, item]) =>
     value.replaceAll(`{${name}}`, String(item)), i18n.translate(key, locale));
@@ -297,7 +298,11 @@
     // The result and the screenshot button share a row; the notes follow.
     const row = element("div", "run-step-row");
     row.append(status);
-    item.append(row, notes);
+    item.append(row);
+    // A step that had a bug report offers to mark it resolved once it passes.
+    const offer = followUp?.render(step);
+    if (offer) item.append(offer);
+    item.append(notes);
 
     item.append(screenshotStrip(step));
     const actions = element("div", "run-step-report");
@@ -349,6 +354,7 @@
             patch: { bugReportId: result.report.bugReportId } }] });
           message.textContent = t("test.reportCreated");
           rerenderStep(step.stepId, ".run-step-report button:last-child");
+          void followUp?.refresh();
         } catch (error) {
           message.textContent = errorText(error);
           create.disabled = false;
@@ -565,7 +571,11 @@
       document.getElementById("processExpected").hidden = false;
       document.getElementById("processExpectedText").textContent = value.processExpectedResult;
     }
+    followUp = globalThis.T9TestReportFollowUp.create({ send, t, testRunId,
+      onChange: (stepId, focus) => rerenderStep(stepId, focus || ""),
+      onMessage: text => { message.textContent = text; } });
     showSaveState("saved"); showSummary(); showSteps();
+    void followUp.refresh();
     void showEarlierRuns();
     void findTestTab();
     window.addEventListener("focus", () => { void findTestTab(); });

@@ -33,6 +33,13 @@ assert.ok(dashboard.includes(
   'const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "2.0.0"'
 ));
 assert.ok(content.includes('version: "2.1.0"'));
+// Every script a page of the extension loads is in the build; a missing one fails silently.
+for (const page of fs.readdirSync(path.join(root, "dist")).filter(name => name.endsWith(".html"))) {
+  for (const [, src] of read(`dist/${page}`).matchAll(/<script\b[^>]*\bsrc="([^"]+)"/gu)) {
+    if (/^[a-z]+:/iu.test(src)) continue;
+    assert.ok(fs.existsSync(path.join(root, "dist", src.split("?")[0])), `${page} loads ${src}, which the build leaves out`);
+  }
+}
 assert.ok(fs.existsSync(path.join(root, "dist/capture-focus-session.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/capture-surface-mode.js")));
 assert.ok(fs.existsSync(path.join(root,

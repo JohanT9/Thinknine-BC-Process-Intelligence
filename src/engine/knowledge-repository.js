@@ -5,11 +5,13 @@
     ? require("./knowledge-domain") : root.T9KnowledgeDomain;
   const pageEngine = typeof module === "object" && module.exports
     ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
-  const api = factory(adapter, knowledge, pageEngine);
+  const captions = typeof module === "object" && module.exports
+    ? require("./knowledge-captions") : root.T9KnowledgeCaptions;
+  const api = factory(adapter, knowledge, pageEngine, captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.BCKnowledgeRepository = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (adapter, knowledge, pageEngine) {
+function (adapter, knowledge, pageEngine, captions) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const FRAMEWORK_VERSION = "1.0.0";
@@ -322,8 +324,24 @@ function (adapter, knowledge, pageEngine) {
     if (failed >= 0) {
       return { ok: false, snapshot: null, diagnostics: [diagnostic("knowledge-required-pack-load-failed", `/packs/${descriptors[failed].packId}`)] };
     }
+    let loadedPacks = fetched.map(result => result.value);
+    // What Business Central calls each rule's pages, actions and fields in every language, and
+    // their AL names (scripts/build-knowledge-captions.js), and the same from the apps the user
+    // added (options.apps). A missing caption file leaves the rules as they are written.
+    if (captions?.attach) {
+      let microsoft = null;
+      if (typeof manifest.ruleCaptions === "string" &&
+          /^knowledge-packs\/generated\/[a-z0-9][a-z0-9._-]*\.json$/u.test(manifest.ruleCaptions)) {
+        try {
+          microsoft = await fetchJson(options.resolveUrl ? options.resolveUrl(manifest.ruleCaptions)
+            : manifest.ruleCaptions);
+        } catch { microsoft = null; }
+        if (microsoft?.schema !== 1) microsoft = null;
+      }
+      loadedPacks = captions.attach(loadedPacks, { microsoft, apps: array(options.apps) });
+    }
     const packs = descriptors.map((descriptor, index) =>
-      ({ packId: descriptor.packId, pack: fetched[index].value }));
+      ({ packId: descriptor.packId, pack: loadedPacks[index] }));
     return importRelease(manifest, packs);
   }
 

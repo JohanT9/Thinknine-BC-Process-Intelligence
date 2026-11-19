@@ -1,0 +1,319 @@
+{
+ "source": "Business Central web client language resources (WebPublish/wwwroot/Resources/Lang/<culture>/Microsoft.Dynamics.Framework.Resource.js)",
+ "version": "29.1.57326.58379",
+ "uses": {
+  "Core.CreateNew": [
+   "CreateActionCaption",
+   "New_Title"
+  ],
+  "Core.EditRecord": [
+   "EditContextMenucaption"
+  ],
+  "Core.DeleteRecord": [
+   "Delete",
+   "DeleteContextMenucaption"
+  ],
+  "Core.ConfirmYes": [
+   "ConfirmYes",
+   "Yes"
+  ],
+  "Core.ConfirmNo": [
+   "ConfirmNo",
+   "No"
+  ],
+  "Core.NavigateBack": [
+   "Back_Title",
+   "HelpPaneBackButton"
+  ],
+  "Core.SearchAndOpenPage": [
+   "SearchPlaceholderCaption",
+   "MobileAppPageSearch"
+  ],
+  "close": [
+   "CloseButton",
+   "DetailsPageExitAction",
+   "PdfControl_Close",
+   "DatePickerCloseText"
+  ],
+  "scroll": [
+   "ScrollLeft",
+   "ScrollRight"
+  ],
+  "display": [
+   "ShowMoreFields",
+   "ShowLess",
+   "CommandBar_ShowWrappedItemsInContextMenu_Tooltip",
+   "CommandBar_ShowMore_Tooltip",
+   "CommandBar_ShowLess_Tooltip"
+  ],
+  "history": [
+   "Back_Title",
+   "HelpPaneBackButton",
+   "HelpPaneForwardButton"
+  ],
+  "tellMe": [
+   "ProductMenuBar_PageSearch"
+  ],
+  "create": [
+   "CreateActionCaption"
+  ],
+  "confirmYes": [
+   "ConfirmYes"
+  ]
+ },
+ "missing": [
+  "PdfControl_Close"
+ ],
+ "texts": {
+  "Back_Title": {
+   "en-US": "Back",
+   "sv-SE": "Bakåt",
+   "fr-FR": "Précédent",
+   "de-DE": "Zurück",
+   "es-ES": "Atrás",
+   "da-DK": "Tilbage",
+   "fi-FI": "Takaisin",
+   "nb-NO": "Tilbake"
+  },
+  "CloseButton": {
+   "en-US": "Close",
+   "sv-SE": "Stäng",
+   "fr-FR": "Fermer",
+   "de-DE": "Schließen",
+   "es-ES": "Cerrar",
+   "da-DK": "Luk",
+   "fi-FI": "Sulje",
+   "nb-NO": "Lukk"
+  },
+  "CommandBar_ShowLess_Tooltip": {
+   "en-US": "Hide secondary actions",
+   "sv-SE": "Dölj sekundära åtgärder",
+   "fr-FR": "Masquer les actions secondaires",
+   "de-DE": "Sekundäre Aktionen ausblenden",
+   "es-ES": "Ocultar acciones secundarias",
+   "da-DK": "Skjul sekundære handlinger",
+   "fi-FI": "Piilota toissijaiset toiminnot",
+   "nb-NO": "Skjul sekundære handlinger"
+  },
+  "CommandBar_ShowMore_Tooltip": {
+   "en-US": "Reveal secondary actions",
+   "sv-SE": "Visa sekundära åtgärder",
+   "fr-FR": "Afficher les actions secondaires",
+   "de-DE": "Sekundäre Aktionen anzeigen",
+   "es-ES": "Mostrar acciones secundarias",
+   "da-DK": "Vis sekundære handlinger",
+   "fi-FI": "Näytä toissijaiset toiminnot",
+   "nb-NO": "Vis sekundære handlinger"
+  },
+  "CommandBar_ShowWrappedItemsInContextMenu_Tooltip": {
+   "en-US": "Show the rest",
+   "sv-SE": "Visa resten",
+   "fr-FR": "Afficher le reste",
+   "de-DE": "Rest anzeigen",
+   "es-ES": "Mostrar el resto",
+   "da-DK": "Vis resten",
+   "fi-FI": "Näytä loput",
+   "nb-NO": "Vis resten"
+  },
+  "ConfirmNo": {
+   "en-US": "No",
+   "sv-SE": "Nej",
+   "fr-FR": "Non",
+   "de-DE": "Nein",
+   "es-ES": "No",
+   "da-DK": "Nej",
+   "fi-FI": "Ei",
+   "nb-NO": "Nei"
+  },
+  "ConfirmYes": {
+   "en-US": "Yes",
+   "sv-SE": "Ja",
+   "fr-FR": "Oui",
+   "de-DE": "Ja",
+   "es-ES": "Sí",
+   "da-DK": "Ja",
+   "fi-FI": "Kyllä",
+   "nb-NO": "Ja"
+  },
+  "CreateActionCaption": {
+   "en-US": "New",
+   "sv-SE": "Ny",
+   "fr-FR": "Créer",
+   "de-DE": "Neu",
+   "es-ES": "Nuevo",
+   "da-DK": "Ny",
+   "fi-FI": "Uusi",
+   "nb-NO": "Ny"
+  },
+  "DatePickerCloseText": {
+   "en-US": "close",
+   "sv-SE": "stäng",
+   "fr-FR": "fermer",
+   "de-DE": "Schließen",
+   "es-ES": "cerrar",
+   "da-DK": "luk",
+   "fi-FI": "sulje",
+   "nb-NO": "lukk"
+  },
+  "Delete": {
+   "en-US": "Delete",
+   "sv-SE": "Ta bort",
+   "fr-FR": "Supprimer",
+   "de-DE": "Löschen",
+   "es-ES": "Eliminar",
+   "da-DK": "Slet",
+   "fi-FI": "Poista",
+   "nb-NO": "Slett"
+  },
+  "DeleteContextMenucaption": {
+   "en-US": "Delete",
+   "sv-SE": "Ta bort",
+   "fr-FR": "Supprimer",
+   "de-DE": "Löschen",
+   "es-ES": "Eliminar",
+   "da-DK": "Slet",
+   "fi-FI": "Poista",
+   "nb-NO": "Slett"
+  },
+  "DetailsPageExitAction": {
+   "en-US": "Close",
+   "sv-SE": "Stäng",
+   "fr-FR": "Fermer",
+   "de-DE": "Schließen",
+   "es-ES": "Cerrar",
+   "da-DK": "Luk",
+   "fi-FI": "Sulje",
+   "nb-NO": "Lukk"
+  },
+  "EditContextMenucaption": {
+   "en-US": "Edit",
+   "sv-SE": "Redigera",
+   "fr-FR": "Modifier",
+   "de-DE": "Bearbeiten",
+   "es-ES": "Editar",
+   "da-DK": "Rediger",
+   "fi-FI": "Muokkaa",
+   "nb-NO": "Rediger"
+  },
+  "HelpPaneBackButton": {
+   "en-US": "Back",
+   "sv-SE": "Bakåt",
+   "fr-FR": "Précédent",
+   "de-DE": "Zurück",
+   "es-ES": "Atrás",
+   "da-DK": "Tilbage",
+   "fi-FI": "Takaisin",
+   "nb-NO": "Tilbake"
+  },
+  "HelpPaneForwardButton": {
+   "en-US": "Forward",
+   "sv-SE": "Framåt",
+   "fr-FR": "Aval",
+   "de-DE": "Vorwärts",
+   "es-ES": "Adelante",
+   "da-DK": "Fremad",
+   "fi-FI": "Eteenpäin",
+   "nb-NO": "Fremover"
+  },
+  "MobileAppPageSearch": {
+   "en-US": "Search",
+   "sv-SE": "Sök",
+   "fr-FR": "Rechercher",
+   "de-DE": "Suchen",
+   "es-ES": "Buscar",
+   "da-DK": "Søg",
+   "fi-FI": "Hae",
+   "nb-NO": "Søk"
+  },
+  "New_Title": {
+   "en-US": "New",
+   "sv-SE": "Ny",
+   "fr-FR": "Créer",
+   "de-DE": "Neu",
+   "es-ES": "Nuevo",
+   "da-DK": "Ny",
+   "fi-FI": "Uusi",
+   "nb-NO": "Ny"
+  },
+  "No": {
+   "en-US": "No",
+   "sv-SE": "Nej",
+   "fr-FR": "Non",
+   "de-DE": "Nein",
+   "es-ES": "No",
+   "da-DK": "Nej",
+   "fi-FI": "Ei",
+   "nb-NO": "Nei"
+  },
+  "ProductMenuBar_PageSearch": {
+   "en-US": "Tell me what you want to do. Quickly access actions, pages, reports, documentation, and apps and consulting services.",
+   "sv-SE": "Berätta vad du vill göra. Få snabbt tillgång till åtgärder, sidor, rapporter, dokumentation, appar och konsulttjänster.",
+   "fr-FR": "Dites-moi ce que vous voulez faire. Accédez rapidement aux actions, aux pages, aux états, à la documentation, aux applications et aux services de conseil.",
+   "de-DE": "Was möchten Sie tun? Greifen Sie schnell auf Aktivitäten, Seiten, Berichte, Dokumentation sowie Apps und Beratungsservices zu.",
+   "es-ES": "Indique qué desea hacer. Acceda rápidamente a acciones, páginas, informes y documentación, así como a aplicaciones y servicios de consultoría.",
+   "da-DK": "Fortæl mig, hvad du vil foretage dig. Få hurtig adgang til handlinger, sider, rapporter, dokumentation, apps og konsulentbistand.",
+   "fi-FI": "Kerro, mitä haluat tehdä. Voit siirtyä nopeasti toimintoihin, sivuille, raportteihin, dokumentaatioon, sovelluksiin ja konsultointipalveluihin.",
+   "nb-NO": "Fortell hva du vil gjøre. Få rask tilgang til handlinger, sider, rapporter, dokumentasjon og apper og konsulenttjenester."
+  },
+  "ScrollLeft": {
+   "en-US": "Scroll Left",
+   "sv-SE": "Rulla åt vänster",
+   "fr-FR": "Défiler vers la gauche",
+   "de-DE": "Nach links verschieben",
+   "es-ES": "Desplazarse hacia la izquierda",
+   "da-DK": "Rul til venstre",
+   "fi-FI": "Vieritä vasemmalle",
+   "nb-NO": "Bla til venstre"
+  },
+  "ScrollRight": {
+   "en-US": "Scroll Right",
+   "sv-SE": "Rulla åt höger",
+   "fr-FR": "Défiler vers la droite",
+   "de-DE": "Nach rechts verschieben",
+   "es-ES": "Desplazarse a la derecha",
+   "da-DK": "Rul til højre",
+   "fi-FI": "Vieritä oikealle",
+   "nb-NO": "Bla til høyre"
+  },
+  "SearchPlaceholderCaption": {
+   "en-US": "Search",
+   "sv-SE": "Sök",
+   "fr-FR": "Rechercher",
+   "de-DE": "Suchen",
+   "es-ES": "Buscar",
+   "da-DK": "Søg",
+   "fi-FI": "Haku",
+   "nb-NO": "Søk"
+  },
+  "ShowLess": {
+   "en-US": "Show less",
+   "sv-SE": "Visa mindre",
+   "fr-FR": "Afficher moins",
+   "de-DE": "Weniger anzeigen",
+   "es-ES": "Mostrar menos",
+   "da-DK": "Vis mindre",
+   "fi-FI": "Näytä vähemmän",
+   "nb-NO": "Vis mindre"
+  },
+  "ShowMoreFields": {
+   "en-US": "Show more",
+   "sv-SE": "Visa mer",
+   "fr-FR": "Afficher plus",
+   "de-DE": "Mehr anzeigen",
+   "es-ES": "Mostrar más",
+   "da-DK": "Vis mere",
+   "fi-FI": "Näytä enemmän",
+   "nb-NO": "Vis mer"
+  },
+  "Yes": {
+   "en-US": "Yes",
+   "sv-SE": "Ja",
+   "fr-FR": "Oui",
+   "de-DE": "Ja",
+   "es-ES": "Sí",
+   "da-DK": "Ja",
+   "fi-FI": "Kyllä",
+   "nb-NO": "Ja"
+  }
+ }
+}

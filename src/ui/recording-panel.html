@@ -21,6 +21,11 @@
     @media (prefers-reduced-motion:reduce){.rp-state[data-state=recording] .dot{animation:none}}
     .rp-time{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-fg-526273)}
     .rp-meta{margin:0;font-size:.8125rem;color:var(--c-fg-526273);overflow-wrap:anywhere}
+    .rp-cause{margin:8px 0 0;padding:8px 10px;border:1px solid var(--c-bd-66558f);border-radius:6px;background:var(--c-bg-f5f3ff);font-size:.8125rem;overflow-wrap:anywhere}
+    .rp-cause h2{margin:0 0 4px;font-size:.875rem}
+    .rp-cause p{margin:4px 0 0}
+    .rp-cause-tag{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid var(--c-bd-66558f);border-radius:10px;font-size:.75rem;font-weight:700;color:var(--c-fg-6d28d9);vertical-align:1px}
+    .rp-cause-origin,.rp-cause-note{color:var(--c-fg-526273)}
     .rp-warning{margin:6px 0 0;padding:8px 10px;border-left:4px solid var(--c-fg-9a3412);border-radius:6px;background:var(--c-bg-fff7ed);color:var(--c-fg-9a3412);font-size:.8125rem;font-weight:600;overflow-wrap:anywhere}
     .rp-body{flex:1;display:grid;align-content:start;gap:12px;padding:12px 14px;min-width:0}
     .rp-body h1{margin:0;font-size:1.05rem;line-height:1.3}
@@ -165,6 +170,13 @@
       <p id="rpContext" class="rp-meta" data-i18n-ignore hidden></p>
       <p id="rpCounts" class="rp-meta" data-i18n-ignore hidden></p>
       <p id="rpWarning" class="rp-warning" role="status" data-i18n-ignore hidden></p>
+      <!-- The latest Business Central error of a bug report recording and its possible cause. -->
+      <section id="rpCause" class="rp-cause" role="status" aria-labelledby="rpCauseTitle" data-i18n-ignore hidden>
+        <h2 id="rpCauseTitle"></h2>
+        <p id="rpCauseText"></p>
+        <p id="rpCauseOrigin" class="rp-cause-origin" hidden></p>
+        <p id="rpCauseNote" class="rp-cause-note"></p>
+      </section>
     </header>
 
     <!-- Starting, no recording, a test recording, or a recording ended elsewhere. -->
@@ -280,6 +292,7 @@
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
   <script src="i18n.js"></script>
+  <script src="bug-report/error-cause.js"></script>
   <script src="recording-panel.js"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 {
   "frameworkVersion": "2.0.0",
+  "ruleCaptions": "knowledge-packs/generated/bc-rule-captions.json",
   "packs": [
     {
       "file": "knowledge-packs/core.json",

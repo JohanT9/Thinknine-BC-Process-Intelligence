@@ -190,7 +190,6 @@
           "^Öppna i OneDrive$",
           "^Abrir en OneDrive$",
           "^Åbn i OneDrive$",
-          "^Avaa OneDrive$",
           "^Åpne i OneDrive$",
           "^Ouvrir dans OneDrive$",
           "^In OneDrive öffnen$",
@@ -252,12 +251,9 @@
         ],
         "actionPatterns": [
           "^Install to my Outlook$",
-          "^Installera till min Outlook$",
           "^Installer dans mon Outlook$",
           "^In mein Outlook installieren$",
           "^Instalar en mi Outlook$",
-          "^Installer på min Outlook$",
-          "^Asenna omaan Outlookiin$",
           "^Installer i min Outlook$",
           "^Installera till mitt Outlook$",
           "^Asenna Outlookiin$"

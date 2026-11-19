@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
@@ -9,7 +10,7 @@ const projector = require('../src/document/review-document-projector');
 const locales = require('../src/engine/language-registry').supported().map(x => x.locale).sort();
 const manifest = require('../src/knowledge-packs/index.json');
 const packs = manifest.packs.filter(p => p.enabled).map(p =>
-  JSON.parse(fs.readFileSync(path.join(root, 'src', p.file), 'utf8')));
+  asLoaded(JSON.parse(fs.readFileSync(path.join(root, 'src', p.file), 'utf8'))));
 const fixtures = require('./fixtures/bc-expansion-captions.json');
 const translatedCaptions = require('./fixtures/knowledge-localized-captions.json').cases;
 const imported = repositoryApi.importRelease(manifest, packs.map(pack => ({packId:pack.packId,pack})));

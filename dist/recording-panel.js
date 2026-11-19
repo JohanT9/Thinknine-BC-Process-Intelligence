@@ -171,7 +171,7 @@
     show($("rpTime"), live);
     show($("rpContext"), live);
     show($("rpCounts"), live);
-    if (!live) show($("rpWarning"), false);
+    if (!live) { show($("rpWarning"), false); show($("rpCause"), false); }
     if (info) {
       setState(info[0], next === "test" ? "recording" : "idle");
       setText($("rpInfoTitle"), t(info[1]));
@@ -218,6 +218,38 @@
       screenshots: screenshots.captured || 0 }) + (screenshots.pending
       ? t("recorder.pendingCount", { count: screenshots.pending }) : ""));
     renderWarnings(liveStatus);
+    renderCause(response.session?.lastErrorCause);
+  }
+
+  // The latest error Business Central showed in a bug report recording, and its possible cause
+  // when the message gives one. The report has the whole suggestion, with what to check.
+  let causeShown = "";
+  function renderCause(latest) {
+    const causeApi = globalThis.T9ErrorCause;
+    const shown = purpose === "bug" && Boolean(latest?.errorEvidenceId);
+    show($("rpCause"), shown);
+    // The panel refreshes every second; a screen reader announces the box only for a new error.
+    const shownKey = shown ? `${latest.errorEvidenceId}|${locale}` : "";
+    if (shownKey === causeShown) return;
+    causeShown = shownKey;
+    if (!shown) return;
+    const described = latest.cause && causeApi?.describe(latest.cause, locale);
+    const labels = causeApi?.labels(locale) || {};
+    setText($("rpCauseTitle"), t("recPanel.errorSeen"));
+    const text = $("rpCauseText");
+    text.replaceChildren();
+    if (described) {
+      const title = document.createElement("strong");
+      title.textContent = labels.title;
+      const tag = document.createElement("span");
+      tag.className = "rp-cause-tag";
+      tag.textContent = labels.unconfirmed;
+      text.append(title, tag, document.createElement("br"), described.text);
+    }
+    show(text, Boolean(described));
+    setText($("rpCauseOrigin"), described?.origin ? `${labels.origin}: ${described.origin}` : "");
+    show($("rpCauseOrigin"), Boolean(described?.origin));
+    setText($("rpCauseNote"), t(described ? "recPanel.causeNote" : "recPanel.errorSaved"));
   }
 
   // ---- Steps and sections as they stand, with changes not yet interpreted ------------------

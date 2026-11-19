@@ -1,10 +1,11 @@
 const assert=require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs=require('node:fs');
 const path=require('node:path');
 const api=require('../src/engine/knowledge-repository');
 const root=path.resolve(__dirname,'..');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'src/knowledge-packs/index.json'),'utf8'));
-const packs=manifest.packs.filter(x=>x.enabled).map(x=>({packId:x.packId,pack:JSON.parse(fs.readFileSync(path.join(root,'src',x.file),'utf8'))}));
+const packs=manifest.packs.filter(x=>x.enabled).map(x=>({packId:x.packId,pack:asLoaded(JSON.parse(fs.readFileSync(path.join(root,'src',x.file),'utf8')))}));
 const imported=api.importRelease(manifest,packs);assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
 const repo=api.createRepository(imported.snapshot);
 const locales=['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO'];
@@ -12,9 +13,9 @@ const sales=[
  ['sv-SE','Förs.order','Ant. att utleverera','Kvantitet','Bokför','microsoft-learn-sales-order-process-sv'],
  ['en-US','Sales Order','Qty. to Ship','Quantity','Post','microsoft-learn-sales-order-process'],
  ['fr-FR','Commande vente','Qté à expédier','Quantité','Valider','microsoft-learn-sales-order-process-fr'],
- ['de-DE','Verkaufsauftrag','Menge für Versand','Menge','Buchen','microsoft-learn-sales-order-process-de'],
+ ['de-DE','Verkaufsauftrag','Zu liefern','Menge','Buchen','microsoft-learn-sales-order-process-de'],
  ['es-ES','Pedido de venta','Cantidad a enviar','Cantidad','Registrar','microsoft-learn-sales-order-process-es'],
- ['da-DK','Salgsordre','Lever antal','Antal','Bogfør','microsoft-learn-sales-order-process-da'],
+ ['da-DK','Salgsordre','Lever (antal)','Antal','Bogfør','microsoft-learn-sales-order-process-da'],
  ['fi-FI','Myyntitilaus','Toimitettava määrä','Määrä','Kirjaa','microsoft-learn-sales-order-process-fi'],
  ['nb-NO','Ordre','Levere (antall)','Antall','Bokfør','microsoft-learn-sales-order-process-nb']
 ];
@@ -31,10 +32,10 @@ const salesAux=[
  ['sv-SE','Förs.order','Nr.','Kundens namn','Släpp','microsoft-learn-sales-order-process-sv'],
  ['en-US','Sales Order','No.','Customer Name','Release','microsoft-learn-sales-order-process'],
  ['fr-FR','Commande vente','N°','Nom client','Lancer','microsoft-learn-sales-order-process-fr'],
- ['de-DE','Verkaufsauftrag','Nr.','Kundenname','Freigabe','microsoft-learn-sales-order-process-de'],
+ ['de-DE','Verkaufsauftrag','Nr.','Kundenname','Freigeben','microsoft-learn-sales-order-process-de'],
  ['es-ES','Pedido de venta','N.º','Nombre del cliente','Liberar','microsoft-learn-sales-order-process-es'],
  ['da-DK','Salgsordre','Nr.','Kundenavn','Frigiv','microsoft-learn-sales-order-process-da'],
- ['fi-FI','Myyntitilaus','Nro.','Asiakkaan nimi','Vapauta','microsoft-learn-sales-order-process-fi'],
+ ['fi-FI','Myyntitilaus','Nro','Asiakkaan nimi','Vapauta','microsoft-learn-sales-order-process-fi'],
  ['nb-NO','Ordre','Nr.','Kundenavn','Frigi','microsoft-learn-sales-order-process-nb']
 ];
 for(const [locale,page,itemField,customerField,release,source] of salesAux){
@@ -60,7 +61,7 @@ const purchaseAux=[
  ['sv-SE','Inköpsorder','Artikelnr','Leverantörsnamn','Släpp','microsoft-learn-purchase-recording-sv'],
  ['en-US','Purchase Order','Item No.','Vendor Name','Release','microsoft-learn-purchase-recording'],
  ['fr-FR','Commande achat','N° article','Nom fournisseur','Lancer','microsoft-learn-purchase-recording-fr'],
- ['de-DE','Bestellung','Positionsnummer','Kreditorenname','Freigabe','microsoft-learn-purchase-recording-de'],
+ ['de-DE','Bestellung','Nr.','Kreditorenname','Freigeben','microsoft-learn-purchase-recording-de'],
  ['es-ES','Pedido de compra','N.º producto','Nombre del proveedor','Liberar','microsoft-learn-purchase-recording-es'],
  ['da-DK','Indkøbsordre','Varenr.','Kreditornavn','Frigiv','microsoft-learn-purchase-recording-da'],
  ['fi-FI','Ostotilaus','Nimikkeen nro','Toimittajan nimi','Vapauta','microsoft-learn-purchase-recording-fi'],
@@ -72,7 +73,7 @@ const reopenCases=[
  ['fr-FR','Commande vente','Commande achat','Rouvrir','microsoft-learn-release-reopen-documents-fr'],
  ['de-DE','Verkaufsauftrag','Bestellung','Erneut öffnen','microsoft-learn-release-reopen-documents-de'],
  ['es-ES','Pedido de venta','Pedido de compra','Reabrir','microsoft-learn-release-reopen-documents-es'],
- ['da-DK','Salgsordre','Indkøbsordre','Genåbne','microsoft-learn-release-reopen-documents-da'],
+ ['da-DK','Salgsordre','Indkøbsordre','Åbn igen','microsoft-learn-release-reopen-documents-da'],
  ['fi-FI','Myyntitilaus','Ostotilaus','Avaa uudelleen','microsoft-learn-sales-prepayments-fi'],
  ['nb-NO','Ordre','Bestilling','Åpne på nytt','microsoft-learn-release-reopen-documents-nb']
 ];
@@ -106,13 +107,13 @@ for(const [locale,page,receive,quantity,post,source] of purchase){
 for(const packId of ['bc-sales','bc-purchase'])for(const rule of imported.snapshot.packs.find(x=>x.packId===packId).rules.filter(x=>x.languages?.includes('fr-FR')||x.sourceIds?.some(id=>/order-process-|purchase-recording-|release-reopen-documents|purchase-date-calculation|sales-date-calculation/.test(id))))for(const locale of locales)assert.ok(rule.languages.includes(locale),`${rule.ruleId} ${locale}`);
 console.log('Sales and purchase line, release/reopen, date fields, shipment/receipt quantity, and posting rules resolve in all eight supported locales.');
 const dateFieldCases=[
- ['sv-SE','Inköpsorder','Förväntat kvittodatum','Försäljningsorder','Utleveransdatum','microsoft-learn-purchase-date-calculation-sv','microsoft-learn-sales-date-calculation-sv'],
+ ['sv-SE','Inköpsorder','Förväntat inleveransdatum','Försäljningsorder','Utleveransdatum','microsoft-learn-purchase-date-calculation-sv','microsoft-learn-sales-date-calculation-sv'],
  ['en-US','Purchase Order','Expected Receipt Date','Sales Order','Shipment Date','microsoft-learn-purchase-date-calculation','microsoft-learn-sales-date-calculation'],
- ['fr-FR','Commande achat','Date de réception attendue','Commande vente','Date d’expédition','microsoft-learn-purchase-date-calculation-fr','microsoft-learn-sales-date-calculation-fr'],
- ['de-DE','Bestellung','Erwartetes Wareneingangsdatum','Verkaufsauftrag','Versanddatum','microsoft-learn-purchase-date-calculation-de','microsoft-learn-sales-date-calculation-de'],
- ['es-ES','Pedido de compra','Fecha de recepción esperada','Pedido de venta','Fecha envío','microsoft-learn-purchase-date-calculation-es','microsoft-learn-sales-date-calculation-es'],
+ ['fr-FR','Commande achat','Date réception prévue','Commande vente','Date d’expédition','microsoft-learn-purchase-date-calculation-fr','microsoft-learn-sales-date-calculation-fr'],
+ ['de-DE','Bestellung','Erwartetes Wareneingangsdatum','Verkaufsauftrag','Warenausgangsdatum','microsoft-learn-purchase-date-calculation-de','microsoft-learn-sales-date-calculation-de'],
+ ['es-ES','Pedido de compra','Fecha recepción esperada','Pedido de venta','Fecha envío','microsoft-learn-purchase-date-calculation-es','microsoft-learn-sales-date-calculation-es'],
  ['da-DK','Indkøbsordre','Forventet modtagelsesdato','Salgsordre','Afsendelsesdato','microsoft-learn-purchase-date-calculation-da','microsoft-learn-sales-date-calculation-da'],
- ['fi-FI','Ostotilaus','Odotettu vastaanottopäivä','Myyntitilaus','Toimituspäivä','microsoft-learn-purchase-recording-fi','microsoft-learn-sales-order-process-fi'],
+ ['fi-FI','Ostotilaus','Oletettu vastaanottopvm','Myyntitilaus','Lähetyksen pvm','microsoft-learn-purchase-recording-fi','microsoft-learn-sales-order-process-fi'],
  ['nb-NO','Bestilling','Forventet mottaksdato','Ordre','Forsendelsesdato','microsoft-learn-purchase-date-calculation-nb','microsoft-learn-sales-date-calculation-nb']
 ];
 for(const [locale,purchasePage,receipt,salesPage,shipment,purchaseSource,salesSource] of dateFieldCases){
@@ -121,7 +122,7 @@ for(const [locale,purchasePage,receipt,salesPage,shipment,purchaseSource,salesSo
   assert.equal(result.status,'resolved',locale+' '+ruleId);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),locale+' '+ruleId+' source');
  }
 }
-for(const [locale,field] of [['sv-SE','Förväntat kvittodatum'],['en-US','Expected Receipt Date']]){
+for(const [locale,field] of [['sv-SE','Förväntat inleveransdatum'],['en-US','Expected Receipt Date']]){
  const wrong=repo.resolveAction({language:locale,context:{pageCaption:'Item Card',fieldCaption:field}});
  assert.ok(!wrong.candidates.some(x=>x.provenance.ruleId==='Purchase.ChangeExpectedReceiptDate'),locale+' receipt-date rule must require purchase-order context');
 }

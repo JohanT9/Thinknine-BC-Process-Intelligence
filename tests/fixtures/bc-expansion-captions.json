@@ -58,7 +58,7 @@
   {
     "ruleId": "BCExpansion.PostItemReclassification",
     "locale": "sv-SE",
-    "pageCaption": "Artikelomklassificeringsjournaler",
+    "pageCaption": "Artikelgrupperingsjournaler",
     "actionCaption": "Bokför",
     "sourceId": "inventory-reclassify-transfer-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-transfer-between-locations"
@@ -99,7 +99,7 @@
     "ruleId": "BCExpansion.ImportInbox",
     "locale": "es-ES",
     "pageCaption": "Transacciones de bandeja de entrada entre empresas vinculadas",
-    "actionCaption": "Importar archivo de transacción",
+    "actionCaption": "Importar archivo transacción",
     "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
   },
@@ -210,7 +210,7 @@
   {
     "ruleId": "BCExpansion.SendOutbox",
     "locale": "fr-FR",
-    "pageCaption": "Transactions boîte d’envoi Intersociétés",
+    "pageCaption": "Transactions Boîte d'envoi Intersociétés",
     "actionCaption": "Envoyer au partenaire Intersociétés",
     "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
@@ -266,7 +266,7 @@
   {
     "ruleId": "BCExpansion.CreateOrder",
     "locale": "sv-SE",
-    "pageCaption": "Sammansättningsbeställningar",
+    "pageCaption": "Monteringsorder",
     "actionCaption": "Ny",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -274,7 +274,7 @@
   {
     "ruleId": "BCExpansion.CreateOrder",
     "locale": "fr-FR",
-    "pageCaption": "Commandes d’assembly",
+    "pageCaption": "Ordres d'assemblage",
     "actionCaption": "Nouveau",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -282,7 +282,7 @@
   {
     "ruleId": "BCExpansion.CreateOrder",
     "locale": "de-DE",
-    "pageCaption": "Assemblyaufträge",
+    "pageCaption": "Montageaufträge",
     "actionCaption": "Neu",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -314,7 +314,7 @@
   {
     "ruleId": "BCExpansion.CreateOrder",
     "locale": "nb-NO",
-    "pageCaption": "Samlingsordrer",
+    "pageCaption": "Monteringsordrer",
     "actionCaption": "Ny",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
     "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -322,7 +322,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "en-US",
-    "pageCaption": "New Assembly Order",
+    "pageCaption": "Assembly Order",
     "fieldCaption": "Quantity to Assemble",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
     "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -338,7 +338,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "sv-SE",
-    "pageCaption": "Ny monteringsorder",
+    "pageCaption": "Monteringsorder",
     "fieldCaption": "Antal att montera",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -354,7 +354,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "fr-FR",
-    "pageCaption": "Nouvel ordre d’assemblage",
+    "pageCaption": "Ordre d'assemblage",
     "fieldCaption": "Quantité à assembler",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -370,8 +370,8 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "de-DE",
-    "pageCaption": "Neuer Montageauftrag",
-    "fieldCaption": "Zu montierende Menge",
+    "pageCaption": "Montageauftrag",
+    "fieldCaption": "Menge für Montage",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
   },
@@ -379,14 +379,14 @@
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "de-DE",
     "pageCaption": "Montageauftrag",
-    "fieldCaption": "Zu montierende Menge",
+    "fieldCaption": "Menge für Montage",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
   },
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "es-ES",
-    "pageCaption": "Nuevo pedido de ensamblado",
+    "pageCaption": "Pedido de ensamblado",
     "fieldCaption": "Cantidad a ensamblar",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -402,7 +402,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "da-DK",
-    "pageCaption": "Ny montageordre",
+    "pageCaption": "Montageordre",
     "fieldCaption": "Antal til montage",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
     "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -418,7 +418,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "fi-FI",
-    "pageCaption": "Uusi kokoonpanotilaus",
+    "pageCaption": "Kokoonpanotilaus",
     "fieldCaption": "Kokoonpantava määrä",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -434,7 +434,7 @@
   {
     "ruleId": "BCExpansion.QuantityToAssemble",
     "locale": "nb-NO",
-    "pageCaption": "Ny monteringsvare",
+    "pageCaption": "Monteringsordre",
     "fieldCaption": "Antall å montere",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
     "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -450,7 +450,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "en-US",
-    "pageCaption": "New Assembly Order",
+    "pageCaption": "Assembly Order",
     "actionCaption": "Post",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
     "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -466,7 +466,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "sv-SE",
-    "pageCaption": "Ny monteringsorder",
+    "pageCaption": "Monteringsorder",
     "actionCaption": "Bokföra",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -482,7 +482,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "fr-FR",
-    "pageCaption": "Nouvel ordre d’assemblage",
+    "pageCaption": "Ordre d'assemblage",
     "actionCaption": "Valider",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -498,7 +498,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "de-DE",
-    "pageCaption": "Neuer Montageauftrag",
+    "pageCaption": "Montageauftrag",
     "actionCaption": "Buchen",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -514,7 +514,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "es-ES",
-    "pageCaption": "Nuevo pedido de ensamblado",
+    "pageCaption": "Pedido de ensamblado",
     "actionCaption": "Registrar",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -530,7 +530,7 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "da-DK",
-    "pageCaption": "Ny montageordre",
+    "pageCaption": "Montageordre",
     "actionCaption": "Bogfør",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
     "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -546,8 +546,8 @@
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "fi-FI",
-    "pageCaption": "Uusi kokoonpanotilaus",
-    "actionCaption": "Kirjaat",
+    "pageCaption": "Kokoonpanotilaus",
+    "actionCaption": "Kirjaa",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
   },
@@ -555,14 +555,14 @@
     "ruleId": "BCExpansion.PostOrder",
     "locale": "fi-FI",
     "pageCaption": "Kokoonpanotilaus",
-    "actionCaption": "Kirjaat",
+    "actionCaption": "Kirjaa",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
   },
   {
     "ruleId": "BCExpansion.PostOrder",
     "locale": "nb-NO",
-    "pageCaption": "Ny monteringsvare",
+    "pageCaption": "Monteringsordre",
     "actionCaption": "Bokfør",
     "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
     "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
@@ -626,7 +626,7 @@
   {
     "ruleId": "BCExpansion.ImportStatement",
     "locale": "de-DE",
-    "pageCaption": "Bankkontenabgleich",
+    "pageCaption": "Bankkontoabstimmung",
     "actionCaption": "Bankauszug importieren",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -642,7 +642,7 @@
   {
     "ruleId": "BCExpansion.ImportStatement",
     "locale": "es-ES",
-    "pageCaption": "Conciliación de cuenta bancaria",
+    "pageCaption": "Conciliación banco",
     "actionCaption": "Importar extracto bancario",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -722,7 +722,7 @@
   {
     "ruleId": "BCExpansion.MatchAutomatically",
     "locale": "de-DE",
-    "pageCaption": "Bankkontenabgleich",
+    "pageCaption": "Bankkontoabstimmung",
     "actionCaption": "Automatisch abgleichen",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -738,7 +738,7 @@
   {
     "ruleId": "BCExpansion.MatchAutomatically",
     "locale": "es-ES",
-    "pageCaption": "Conciliación de cuenta bancaria",
+    "pageCaption": "Conciliación banco",
     "actionCaption": "Conciliar automáticamente",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -818,7 +818,7 @@
   {
     "ruleId": "BCExpansion.PostReconciliation",
     "locale": "de-DE",
-    "pageCaption": "Bankkontenabgleich",
+    "pageCaption": "Bankkontoabstimmung",
     "actionCaption": "Buchen",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -834,7 +834,7 @@
   {
     "ruleId": "BCExpansion.PostReconciliation",
     "locale": "es-ES",
-    "pageCaption": "Conciliación de cuenta bancaria",
+    "pageCaption": "Conciliación banco",
     "actionCaption": "Registrar",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -875,7 +875,7 @@
     "ruleId": "BCExpansion.ApproveRequest",
     "locale": "sv-SE",
     "pageCaption": "Begäranden att godkänna",
-    "actionCaption": "Godkänna",
+    "actionCaption": "Godkänn",
     "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
   },
@@ -1154,7 +1154,7 @@
   {
     "ruleId": "BCExpansion.RegisterAbsence",
     "locale": "es-ES",
-    "pageCaption": "Registro de ausencias",
+    "pageCaption": "Registro ausencias",
     "actionCaption": "Nuevo",
     "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-manage-absence"
@@ -1971,7 +1971,7 @@
     "ruleId": "BCExpansion.OpenOneDrive",
     "locale": "fi-FI",
     "pageCaption": "Recorded Business Central page",
-    "actionCaption": "Avaa OneDrive",
+    "actionCaption": "Avaa OneDrivessa",
     "sourceId": "microsoft-learn-expansion-across-onedrive-overview-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-onedrive-overview"
   },
@@ -1995,7 +1995,7 @@
     "ruleId": "BCExpansion.InstallOutlook",
     "locale": "sv-SE",
     "pageCaption": "Konfigurera Outlook",
-    "actionCaption": "Installera till min Outlook",
+    "actionCaption": "Installera till mitt Outlook",
     "sourceId": "microsoft-learn-expansion-admin-outlook-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/admin-outlook"
   },
@@ -2027,7 +2027,7 @@
     "ruleId": "BCExpansion.InstallOutlook",
     "locale": "da-DK",
     "pageCaption": "Konfigurer Outlook",
-    "actionCaption": "Installer på min Outlook",
+    "actionCaption": "Installer i min Outlook",
     "sourceId": "microsoft-learn-expansion-admin-outlook-da-dk",
     "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/admin-outlook"
   },
@@ -2035,7 +2035,7 @@
     "ruleId": "BCExpansion.InstallOutlook",
     "locale": "fi-FI",
     "pageCaption": "Määritä Outlook",
-    "actionCaption": "Asenna omaan Outlookiin",
+    "actionCaption": "Asenna Outlookiin",
     "sourceId": "microsoft-learn-expansion-admin-outlook-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/admin-outlook"
   },
@@ -2194,7 +2194,7 @@
   {
     "ruleId": "BCExpansion.PostTransfer",
     "locale": "fr-FR",
-    "pageCaption": "Ordre de transfer",
+    "pageCaption": "Ordre de transfert",
     "actionCaption": "Valider",
     "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-transfer-between-locations"
@@ -2290,7 +2290,7 @@
   {
     "ruleId": "BCExpansion.MatchManually",
     "locale": "de-DE",
-    "pageCaption": "Bankkontenabgleich",
+    "pageCaption": "Bankkontoabstimmung",
     "actionCaption": "Manuell abgleichen",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -2306,7 +2306,7 @@
   {
     "ruleId": "BCExpansion.MatchManually",
     "locale": "es-ES",
-    "pageCaption": "Conciliación de cuenta bancaria",
+    "pageCaption": "Conciliación banco",
     "actionCaption": "Conciliar manualmente",
     "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
@@ -2459,7 +2459,7 @@
     "ruleId": "BCExpansion.ApplyEmployeeTemplate",
     "locale": "sv-SE",
     "pageCaption": "Personalkort",
-    "actionCaption": "tillämpa mall",
+    "actionCaption": "Koppla mall",
     "sourceId": "microsoft-learn-expansion-hr-how-register-employees-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-register-employees"
   },
@@ -2467,7 +2467,7 @@
     "ruleId": "BCExpansion.ApplyEmployeeTemplate",
     "locale": "fr-FR",
     "pageCaption": "Fiche salarié",
-    "actionCaption": "Appliquer le modèle",
+    "actionCaption": "Appliquer modèle",
     "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
     "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-register-employees"
   },
@@ -2482,7 +2482,7 @@
   {
     "ruleId": "BCExpansion.ApplyEmployeeTemplate",
     "locale": "es-ES",
-    "pageCaption": "Ficha de empleado",
+    "pageCaption": "Ficha empleado",
     "actionCaption": "Aplicar plantilla",
     "sourceId": "microsoft-learn-expansion-hr-how-register-employees-es-es",
     "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-register-employees"
@@ -2498,7 +2498,7 @@
   {
     "ruleId": "BCExpansion.ApplyEmployeeTemplate",
     "locale": "fi-FI",
-    "pageCaption": "Työntekijäkortti",
+    "pageCaption": "Työntekijän kortti",
     "actionCaption": "Käytä mallia",
     "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
     "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-register-employees"
@@ -2539,7 +2539,7 @@
     "ruleId": "BCExpansion.SendApproval",
     "locale": "de-DE",
     "pageCaption": "Purchase Order",
-    "actionCaption": "Genehmigungsantrag senden",
+    "actionCaption": "Genehmigungsanforderung senden",
     "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
   },
@@ -2603,7 +2603,7 @@
     "ruleId": "BCExpansion.CancelApproval",
     "locale": "de-DE",
     "pageCaption": "Purchase Invoice",
-    "actionCaption": "Genehmigungsanfrage stornieren",
+    "actionCaption": "Genehmigungsanforderung stornieren",
     "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
     "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
   },
@@ -2811,7 +2811,7 @@
     "ruleId": "BCAssembly.AssemblyPolicyContext",
     "locale": "sv-SE",
     "pageCaption": "Artikelkort",
-    "fieldCaption": "Monteringsprincip",
+    "fieldCaption": "Monteringsmetod",
     "sourceId": "microsoft-learn-assembly-policy-sv-se",
     "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock"
   },

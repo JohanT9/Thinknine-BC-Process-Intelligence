@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inspelningspanel – prototyp</title>
+<style>
+:root{
+  --brand:#008489;--brand-hover:#006f73;--brand-subtle:#e6f4f4;
+  --rec:#c50f1f;--rec-subtle:#fdecee;
+  --fg:#172b4d;--fg-muted:#526273;--bd:#ccd5df;--bd-strong:#8392a5;
+  --bg:#ffffff;--bg-soft:#f5f7fa;--warn:#9a3412;--warn-bg:#fff7ed;
+  --imp:#8a5a08;--imp-bg:#fff5df;--imp-bd:#e8c98f;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px "Segoe UI",system-ui,sans-serif;color:var(--fg);background:#e9edf2;height:100vh;display:flex;flex-direction:column}
+/* ---------- Prototype chrome (not part of the design) ---------- */
+.proto-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;background:#1e293b;color:#fff;font-size:12px}
+.proto-bar strong{margin-right:6px;letter-spacing:.06em;text-transform:uppercase;font-size:11px;opacity:.8}
+.proto-bar button,.proto-bar select{font:inherit;padding:4px 10px;border-radius:5px;border:1px solid #64748b;background:#334155;color:#fff;cursor:pointer}
+.proto-bar button:hover{background:#475569}
+.stage{flex:1;display:flex;min-height:0}
+/* ---------- Mock Business Central ---------- */
+.bc{flex:1;min-width:0;position:relative;background:#fff;box-shadow:inset 0 0 0 3px var(--brand);display:flex;flex-direction:column}
+.bc-top{height:44px;background:#00475e;color:#fff;display:flex;align-items:center;padding:0 16px;font-weight:600;gap:16px}
+.bc-top span{opacity:.75;font-weight:400}
+.bc-body{flex:1;padding:22px 28px;color:#605e5c;overflow:hidden}
+.bc-body h2{margin:0 0 14px;color:#212121;font-weight:600;font-size:20px}
+.bc-actions{display:flex;gap:18px;margin-bottom:18px;font-size:13px}.bc-actions span{color:#00475e}
+.bc-fields{display:grid;grid-template-columns:repeat(2,minmax(0,280px));gap:10px 40px;font-size:13px}
+.bc-fields div{display:flex;justify-content:space-between;border-bottom:1px dotted #c8c6c4;padding:4px 0}
+.bc-lines{margin-top:26px;border-top:1px solid #e1dfdd;font-size:13px}
+.bc-lines div{display:grid;grid-template-columns:80px 120px 1fr 80px;padding:6px 0;border-bottom:1px solid #f3f2f1}
+.bc-note{position:absolute;left:28px;bottom:18px;font-size:12px;color:var(--fg-muted);max-width:460px}
+/* ---------- The side panel ---------- */
+.panel{width:var(--panel-w,380px);flex:0 0 var(--panel-w,380px);background:var(--bg);border-left:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;transition:width .2s}
+.p-head{padding:12px 14px 10px;border-bottom:1px solid var(--bd);display:grid;gap:6px}
+.p-state{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--rec);letter-spacing:.02em}
+.p-state .dot{width:9px;height:9px;border-radius:50%;background:var(--rec);animation:pulse 1.6s infinite}
+.p-state .time{margin-left:auto;color:var(--fg-muted);font-weight:600;font-variant-numeric:tabular-nums}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.p-state .dot{animation:none}}
+.p-head h1{margin:0;font-size:16px;line-height:1.3;overflow-wrap:anywhere}
+.p-meta{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;color:var(--fg-muted)}
+.p-meta .ok{color:#18713a}
+.p-preview-note{margin:0;font-size:12px;color:var(--fg-muted);line-height:1.4}
+.p-warning{margin:0;padding:8px 10px;border-left:4px solid var(--warn);border-radius:5px;background:var(--warn-bg);color:var(--warn);font-size:12px;font-weight:600}
+.p-list{flex:1;overflow:auto;padding:10px 12px 14px;display:grid;align-content:start;gap:6px;scroll-behavior:smooth}
+.section-head{margin:8px 2px 2px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted)}
+.section-head:first-child{margin-top:0}
+/* step card */
+.step{position:relative;border:1px solid var(--bd);border-radius:8px;background:var(--bg);transition:opacity .15s,background .15s,border-color .15s}
+.step:hover,.step:focus-within{border-color:var(--bd-strong)}
+.step.latest{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.step.new{animation:arrive .5s ease-out}
+@keyframes arrive{from{background:var(--brand-subtle)}}
+.step-main{display:grid;grid-template-columns:26px minmax(0,1fr) 72px;gap:8px;padding:9px 10px;align-items:start}
+.num{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--bg-soft);font-size:12px;font-weight:700;color:var(--fg-muted)}
+.step.latest .num{background:var(--brand);color:#fff}
+.text{margin:0;line-height:1.4;overflow-wrap:anywhere}
+.text b{font-weight:600}
+.where{margin:2px 0 0;font-size:12px;color:var(--fg-muted);overflow-wrap:anywhere}
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid}
+.badge.imp{color:var(--imp);background:var(--imp-bg);border-color:var(--imp-bd)}
+.badge.img{color:#1e3a8a;background:#eef4ff;border-color:#bcd0f5}
+.badge.latest-b{color:var(--brand-hover);background:var(--brand-subtle);border-color:#9fd3d4}
+.thumb{width:72px;aspect-ratio:16/10;border:1px solid var(--bd);border-radius:4px;overflow:hidden;background:var(--bg-soft)}
+.thumb svg{display:block;width:100%;height:100%}
+.thumb.chosen{outline:2px solid #2f5fd0;outline-offset:1px}
+.step.important{border-left:4px solid #d39b2a}
+.step.ignored{opacity:.55;background:var(--bg-soft)}
+.step.ignored .text{text-decoration:line-through;text-decoration-color:var(--bd-strong)}
+.step.preview-ignore{opacity:.55}
+.step.preview-important{border-left:4px dashed #d39b2a}
+.ignored-note{display:none;margin:0 10px 9px 44px;font-size:12px;color:var(--fg-muted)}
+.step.ignored .ignored-note{display:block}
+/* actions */
+.acts{display:none;padding:0 10px 9px 44px}
+.step.latest .acts,.step:hover .acts,.step:focus-within .acts{display:block}
+.act-row{display:flex;flex-wrap:wrap;gap:5px}
+.act{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:12px;padding:4px 8px;min-height:28px;border:1px solid var(--bd-strong);border-radius:6px;background:var(--bg);color:var(--fg);cursor:pointer}
+.act svg{width:14px;height:14px;flex:0 0 14px}
+.act:hover{background:var(--bg-soft)}
+.act:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.act[aria-pressed=true]{background:var(--brand-subtle);border-color:var(--brand);color:var(--brand-hover);font-weight:600}
+.act-help{margin:6px 0 0;font-size:12px;line-height:1.4;color:var(--fg-muted);min-height:2.8em}
+.act-help b{color:var(--fg)}
+/* section divider */
+.divider{display:flex;align-items:center;gap:8px;margin:6px 2px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand-hover)}
+.divider::before,.divider::after{content:"";flex:1;border-top:2px solid var(--brand)}
+.divider.ghost{color:var(--fg-muted)}.divider.ghost::before,.divider.ghost::after{border-top-style:dashed;border-color:var(--bd-strong)}
+.divider button{font:inherit;text-transform:none;letter-spacing:0;font-weight:600;font-size:11px;border:0;background:none;color:var(--brand-hover);text-decoration:underline;cursor:pointer;padding:0}
+/* waiting row */
+.waiting{display:flex;align-items:center;gap:8px;padding:10px;border:1px dashed var(--bd);border-radius:8px;font-size:12px;color:var(--fg-muted)}
+.waiting .dots span{display:inline-block;width:5px;height:5px;margin-right:3px;border-radius:50%;background:var(--bd-strong);animation:pulse 1.2s infinite}
+.waiting .dots span:nth-child(2){animation-delay:.2s}.waiting .dots span:nth-child(3){animation-delay:.4s}
+/* footer */
+.p-foot{border-top:1px solid var(--bd);padding:10px 12px;display:grid;gap:8px;background:var(--bg)}
+.p-status{margin:0;font-size:12px;min-height:1.3em;color:#18713a}
+.p-status.err{color:#8a1c14;font-weight:600}
+.foot-row{display:flex;gap:8px}
+.btn{font:inherit;font-weight:600;padding:9px 12px;border-radius:6px;border:1px solid var(--bd-strong);background:var(--bg);color:var(--fg);cursor:pointer;min-height:38px}
+.btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.btn.primary{flex:1;background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-hover)}
+.btn.link{border:0;background:none;color:#8a1c14;text-decoration:underline;padding:4px 0;min-height:0;font-weight:500;justify-self:start}
+/* stop form */
+.stop-form{display:none;gap:10px}
+.panel.stopping .stop-form{display:grid}.panel.stopping .foot-row.recording-actions{display:none}
+.stop-form h2{margin:0;font-size:15px}
+.stop-form label{display:grid;gap:4px;font-size:12px;font-weight:600}
+.stop-form input,.stop-form select{font:inherit;padding:8px 9px;border:1px solid var(--bd-strong);border-radius:5px;width:100%}
+.stop-form p{margin:0;font-size:12px;color:var(--fg-muted)}
+.panel.stopping .p-state{color:var(--fg-muted)}.panel.stopping .p-state .dot{animation:none;background:var(--bd-strong)}
+</style>
+</head>
+<body>
+<div class="proto-bar" aria-label="Prototypkontroller">
+  <strong>Prototyp</strong>
+  <button id="simNext" type="button">Simulera nästa händelse i BC</button>
+  <button id="simWarn" type="button">Visa varning</button>
+  <label>Panelbredd
+    <select id="simWidth"><option value="320">320 px (smal)</option><option value="380" selected>380 px</option><option value="460">460 px</option></select>
+  </label>
+  <span style="opacity:.7">Håll musen över en knapp för att se vad den gör med dokumentet.</span>
+</div>
+<div class="stage">
+  <div class="bc" aria-hidden="true">
+    <div class="bc-top">Dynamics 365 Business Central <span>CRONUS Sverige AB</span></div>
+    <div class="bc-body">
+      <h2>Försäljningsorder · 101005</h2>
+      <div class="bc-actions"><span>Släpp</span><span>Bokför…</span><span>Skriv ut</span><span>Order</span></div>
+      <div class="bc-fields">
+        <div>Kundnr.<b>10000</b></div><div>Orderdatum<b>2026-11-16</b></div>
+        <div>Kundnamn<b>Adatum Corporation</b></div><div>Leveransdatum<b>2026-11-18</b></div>
+        <div>Kontakt<b>Robert Townes</b></div><div>Status<b>Öppen</b></div>
+      </div>
+      <div class="bc-lines"><div><b>Typ</b><b>Nr.</b><b>Beskrivning</b><b>Antal</b></div><div>Artikel<span>1896-S</span><span>ATHEN Skrivbord</span><span>5</span></div></div>
+      <p class="bc-note">Business Central fortsätter att visas som vanligt. Den turkosa ramen visar att inspelning pågår — den flytande rutan behövs inte längre när panelen är öppen.</p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-labelledby="pTitle">
+    <header class="p-head">
+      <div class="p-state" role="status"><span class="dot" aria-hidden="true"></span><span id="stateText">Spelar in</span><span class="time" id="timer">00:00</span></div>
+      <h1 id="pTitle">Dokumenterar en process</h1>
+      <div class="p-meta"><span id="counts">0 steg · 0 bilder</span><span class="ok">● Ansluten till Business Central</span></div>
+      <p id="warning" class="p-warning" role="status" hidden></p>
+      <p class="p-preview-note">Så här ser stegen ut i dokumentet. Texten är ett förslag — du kan justera allt när du granskar.</p>
+    </header>
+
+    <div class="p-list" id="list" aria-label="Inspelade steg" aria-live="polite"></div>
+
+    <footer class="p-foot">
+      <p id="pStatus" class="p-status" role="status" aria-live="polite"></p>
+      <div class="foot-row recording-actions">
+        <button class="btn primary" id="stopBtn" type="button">Avsluta och spara</button>
+      </div>
+      <form class="stop-form" id="stopForm">
+        <h2>Spara inspelningen</h2>
+        <label>Namn<input id="recName" value="Skapa och bokföra försäljningsorder" maxlength="120" required></label>
+        <label>Dokumentspråk<select><option>Svenska</option><option>English</option><option>Deutsch</option><option>Français</option><option>Español</option><option>Dansk</option><option>Suomi</option><option>Norsk bokmål</option></select></label>
+        <p>Inspelningen är pausad medan du fyller i. Inget går förlorat om du fortsätter spela in.</p>
+        <div class="foot-row">
+          <button class="btn" type="button" id="resumeBtn">Fortsätt spela in</button>
+          <button class="btn primary" type="submit">Spara och öppna</button>
+        </div>
+        <button class="btn link" type="button" id="discardBtn">Ta bort inspelningen…</button>
+      </form>
+    </footer>
+  </aside>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  // ---- Simulated recording ----------------------------------------------
+  const feed = [
+    { text: 'Öppna sidan <b>Försäljningsorder</b>', where: 'Rollcenter → Försäljning', shot: 0 },
+    { text: 'Välj <b>Ny</b>', where: 'Försäljningsorder', shot: 1 },
+    { text: 'Ange <b>Kundnr.</b> <b>10000</b>', where: 'Försäljningsorder · Allmänt', shot: 1 },
+    { text: 'Ange <b>Leveransdatum</b> <b>2026-11-18</b>', where: 'Försäljningsorder · Allmänt', shot: 1 },
+    { text: 'Välj <b>Typ</b> <b>Artikel</b> på raden', where: 'Försäljningsorder · Rader', shot: 2 },
+    { text: 'Ange <b>Nr.</b> <b>1896-S</b>', where: 'Försäljningsorder · Rader', shot: 2 },
+    { text: 'Ange <b>Antal</b> <b>5</b>', where: 'Försäljningsorder · Rader', shot: 2 },
+    { text: 'Välj <b>Släpp</b>', where: 'Försäljningsorder', shot: 1 },
+    { text: 'Välj <b>Bokför…</b> och sedan <b>Leverera och fakturera</b>', where: 'Dialogruta: Bokför', shot: 3 },
+    { text: 'Business Central visar: <i>Ordern har bokförts.</i>', where: 'Meddelande', shot: 3, result: true }
+  ];
+  const steps = [];
+  let nextFeed = 0, seconds = 0, shots = 0;
+
+  const actions = {
+    important: { label: "Viktigt", help: "<b>Viktigt steg:</b> steget lyfts fram i dokumentet så att läsaren inte missar det.",
+      icon: '<path d="M8 1.5l1.9 4 4.3.5-3.2 2.9.9 4.3L8 11l-3.9 2.2.9-4.3L1.8 6l4.3-.5z"/>' },
+    image: { label: "Använd bilden", help: "<b>Använd bilden:</b> dokumentet visar just den här skärmbilden för steget, i stället för den som väljs automatiskt.",
+      icon: '<rect x="1.5" y="3" width="13" height="10" rx="1.5"/><circle cx="5.5" cy="7" r="1.3"/><path d="M14 11l-3.5-3.5L5 13"/>' },
+    section: { label: "Ny sektion efter", help: "<b>Ny sektion efter:</b> dokumentet får en ny rubrik efter det här steget. Du namnger den när du granskar.",
+      icon: '<path d="M2 8h12M2 4h12M2 12h7"/>' },
+    ignore: { label: "Ta inte med", help: "<b>Ta inte med:</b> steget visas inte i dokumentet. Det finns kvar i inspelningen och kan tas med igen.",
+      icon: '<path d="M2 8s2.2-4.5 6-4.5S14 8 14 8s-2.2 4.5-6 4.5S2 8 2 8z"/><circle cx="8" cy="8" r="1.8"/><path d="M2.5 13.5l11-11"/>' }
+  };
+  const defaultHelp = "Håll muspekaren över en knapp för att se vad den gör med dokumentet.";
+
+  const $ = id => document.getElementById(id);
+  const list = $("list");
+
+  function thumbSvg(kind) {
+    const body = [
+      '<rect x="8" y="16" width="30" height="16" fill="#cfe3ea"/><rect x="42" y="16" width="30" height="16" fill="#cfe3ea"/><rect x="76" y="16" width="30" height="16" fill="#cfe3ea"/><rect x="8" y="36" width="98" height="20" fill="#eef2f6"/>',
+      '<rect x="8" y="14" width="40" height="4" fill="#8aa6b8"/><rect x="8" y="22" width="44" height="3" fill="#cbd5e1"/><rect x="60" y="22" width="44" height="3" fill="#cbd5e1"/><rect x="8" y="28" width="44" height="3" fill="#cbd5e1"/><rect x="60" y="28" width="44" height="3" fill="#cbd5e1"/><rect x="8" y="34" width="44" height="3" fill="#cbd5e1"/>',
+      '<rect x="8" y="14" width="40" height="4" fill="#8aa6b8"/><rect x="8" y="24" width="98" height="5" fill="#e2e8f0"/><rect x="8" y="31" width="98" height="5" fill="#f1f5f9"/><rect x="8" y="38" width="98" height="5" fill="#fff7d6"/><rect x="8" y="45" width="98" height="5" fill="#f1f5f9"/>',
+      '<rect x="0" y="9" width="114" height="62" fill="#94a3b8" opacity=".35"/><rect x="28" y="20" width="58" height="36" rx="2" fill="#fff" stroke="#94a3b8"/><rect x="34" y="27" width="34" height="4" fill="#8aa6b8"/><rect x="34" y="36" width="44" height="3" fill="#cbd5e1"/><rect x="64" y="47" width="16" height="5" fill="#0f6cbd"/>'
+    ][kind];
+    return `<svg viewBox="0 0 114 71" aria-hidden="true"><rect width="114" height="71" fill="#fff"/><rect width="114" height="9" fill="#00475e"/>${body}</svg>`;
+  }
+
+  function addStep() {
+    if (nextFeed >= feed.length) { status("Simuleringen har inga fler händelser. Prova knapparna på stegen eller avsluta.", false); return; }
+    const source = feed[nextFeed++];
+    steps.push({ id: "s" + nextFeed, ...source, important: false, image: false, section: false, ignore: false, fresh: true });
+    shots++;
+    render();
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function stepHtml(step, index, isLatest) {
+    const pressed = key => step[key] ? "true" : "false";
+    const buttons = Object.entries(actions).map(([key, a]) =>
+      `<button type="button" class="act" data-step="${step.id}" data-act="${key}" aria-pressed="${pressed(key)}"
+        aria-describedby="help-${step.id}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">${a.icon}</svg>${a.label}</button>`).join("");
+    const badges = [
+      isLatest ? '<span class="badge latest-b">Senaste steget</span>' : "",
+      step.important ? '<span class="badge imp">★ Viktigt</span>' : "",
+      step.image ? '<span class="badge img">Vald bild</span>' : ""
+    ].join("");
+    return `<article class="step${isLatest ? " latest" : ""}${step.important ? " important" : ""}${step.ignore ? " ignored" : ""}${step.fresh ? " new" : ""}" id="${step.id}" aria-label="Steg ${index}">
+      <div class="step-main">
+        <span class="num" aria-hidden="true">${step.ignore ? "–" : index}</span>
+        <div><p class="text">${step.text}</p><p class="where">${step.where}</p>${badges ? `<div class="badges">${badges}</div>` : ""}</div>
+        <div class="thumb${step.image ? " chosen" : ""}">${thumbSvg(step.shot)}</div>
+      </div>
+      <p class="ignored-note">Visas inte i dokumentet.</p>
+      <div class="acts" role="group" aria-label="Ändra hur steget visas i dokumentet">
+        <div class="act-row">${buttons}</div>
+        <p class="act-help" id="help-${step.id}">${defaultHelp}</p>
+      </div>
+    </article>
+    ${step.section ? `<div class="divider" id="div-${step.id}">Ny sektion <button type="button" data-undo-section="${step.id}">Ångra</button></div>` : ""}`;
+  }
+
+  function render() {
+    const focusedKey = document.activeElement?.dataset?.act
+      ? `${document.activeElement.dataset.step}:${document.activeElement.dataset.act}` : "";
+    let html = '<p class="section-head">Avsnitt 1</p>', number = 0, sectionNo = 1;
+    steps.forEach((step, i) => {
+      if (!step.ignore) number++;
+      html += stepHtml(step, number, i === steps.length - 1);
+      if (step.section && i < steps.length - 1) html += `<p class="section-head">Avsnitt ${++sectionNo}</p>`;
+      step.fresh = false;
+    });
+    html += steps.length
+      ? '<div class="waiting"><span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>Fortsätt arbeta i Business Central — nästa steg visas här.</div>'
+      : '<div class="waiting"><span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>Väntar på första steget. Börja arbeta i Business Central.</div>';
+    list.innerHTML = html;
+    const kept = steps.filter(s => !s.ignore).length;
+    $("counts").textContent = `${kept} steg · ${shots} bilder`;
+    if (focusedKey) {
+      const [s, a] = focusedKey.split(":");
+      list.querySelector(`[data-step="${s}"][data-act="${a}"]`)?.focus();
+    }
+  }
+
+  const confirmations = {
+    important: [n => `Steg ${n} är markerat som viktigt.`, n => `Steg ${n} är inte längre markerat som viktigt.`],
+    image: [n => `Skärmbilden för steg ${n} används i dokumentet.`, n => `Bilden för steg ${n} väljs automatiskt igen.`],
+    section: [n => `En ny sektion börjar efter steg ${n}.`, n => `Sektionsbrytningen efter steg ${n} är borttagen.`],
+    ignore: [() => `Steget tas inte med i dokumentet.`, () => `Steget tas med i dokumentet igen.`]
+  };
+  function status(text, error) { const el = $("pStatus"); el.textContent = text; el.classList.toggle("err", Boolean(error)); }
+
+  function numberOf(step) { return steps.filter((s, i) => i <= steps.indexOf(step) && !s.ignore).length; }
+
+  list.addEventListener("click", event => {
+    const undo = event.target.closest("[data-undo-section]");
+    if (undo) { const s = steps.find(x => x.id === undo.dataset.undoSection); s.section = false; render(); status(confirmations.section[1](numberOf(s))); return; }
+    const button = event.target.closest(".act");
+    if (!button) return;
+    const step = steps.find(s => s.id === button.dataset.step);
+    const key = button.dataset.act;
+    step[key] = !step[key];
+    clearPreview();
+    render();
+    status(confirmations[key][step[key] ? 0 : 1](numberOf(step)));
+  });
+
+  // ---- Hover / focus preview: show the effect before the click ------------
+  function clearPreview() {
+    list.querySelectorAll(".preview-ignore,.preview-important").forEach(el => el.classList.remove("preview-ignore", "preview-important"));
+    list.querySelectorAll(".divider.ghost").forEach(el => el.remove());
+  }
+  function preview(button) {
+    clearPreview();
+    const card = button.closest(".step");
+    const step = steps.find(s => s.id === button.dataset.step);
+    const key = button.dataset.act;
+    card.querySelector(".act-help").innerHTML = actions[key].help +
+      (step[key] ? " <i>Klicka igen för att ångra.</i>" : "");
+    if (step[key]) return;
+    if (key === "ignore") card.classList.add("preview-ignore");
+    if (key === "important") card.classList.add("preview-important");
+    if (key === "section") card.insertAdjacentHTML("afterend", '<div class="divider ghost">Ny sektion börjar här</div>');
+  }
+  function endPreview(button) {
+    clearPreview();
+    const help = button.closest(".step")?.querySelector(".act-help");
+    if (help) help.textContent = defaultHelp;
+  }
+  list.addEventListener("mouseover", e => { const b = e.target.closest(".act"); if (b) preview(b); });
+  list.addEventListener("mouseout", e => { const b = e.target.closest(".act"); if (b && !b.contains(e.relatedTarget)) endPreview(b); });
+  list.addEventListener("focusin", e => { const b = e.target.closest(".act"); if (b) preview(b); });
+  list.addEventListener("focusout", e => { const b = e.target.closest(".act"); if (b) endPreview(b); });
+
+  // ---- Stop flow inside the panel ----------------------------------------
+  let paused = false;
+  $("stopBtn").addEventListener("click", () => {
+    paused = true; $("panel").classList.add("stopping"); $("stateText").textContent = "Pausad – sparar";
+    status(""); $("recName").focus(); $("recName").select();
+  });
+  $("resumeBtn").addEventListener("click", () => {
+    paused = false; $("panel").classList.remove("stopping"); $("stateText").textContent = "Spelar in";
+    status("Inspelningen fortsätter."); $("stopBtn").focus();
+  });
+  $("stopForm").addEventListener("submit", e => {
+    e.preventDefault();
+    status(`”${$("recName").value}” är sparad. (I produkten öppnas dokumentet för granskning.)`);
+  });
+  $("discardBtn").addEventListener("click", () => status("I produkten: en bekräftelse visas innan inspelningen tas bort.", true));
+
+  // ---- Prototype controls -------------------------------------------------
+  $("simNext").addEventListener("click", addStep);
+  $("simWarn").addEventListener("click", () => {
+    const w = $("warning"); w.hidden = !w.hidden;
+    w.textContent = "Några skärmbilder kunde inte sparas. Vissa steg kan sakna bild.";
+  });
+  $("simWidth").addEventListener("change", e => document.documentElement.style.setProperty("--panel-w", e.target.value + "px"));
+  setInterval(() => { if (paused) return; seconds++; $("timer").textContent =
+    `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; }, 1000);
+
+  for (let i = 0; i < 5; i++) addStep();
+  steps[1].important = true; steps[3].section = true; render();
+})();
+</script>
+</body>
+</html>

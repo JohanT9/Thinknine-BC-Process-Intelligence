@@ -228,7 +228,21 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 .document-workspace-page-company{color:#1f2937}
 .document-workspace-page-title{margin-left:auto;text-align:right;overflow-wrap:anywhere}.document-workspace-page-band.pageHeader.is-banded{padding:6px 8px}.document-workspace-page-band.is-banded .document-workspace-page-title{margin-left:0;text-align:left}
 .document-templates{margin:22px 0 18px;padding-top:16px;border-top:1px solid var(--c-bd-d8dee5)}
-.document-templates h4{margin:0 0 4px;font-size:16px}.document-templates h5{margin:12px 0 8px;font-size:15px;overflow-wrap:anywhere}
+.document-templates h4{margin:0 0 4px;font-size:16px}
+.app-errors{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--c-bd-d8dee5)}
+.app-errors h4{margin:0 0 4px;font-size:16px}
+.app-errors>button{margin:10px 0 0}
+.app-errors-status{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-height:18px;margin:6px 0 0;color:var(--c-fg-52606d);font-size:13px;overflow-wrap:anywhere}
+.app-errors-status [data-state="error"]{color:var(--c-fg-b42318)}
+#appErrorsStatusText{display:grid;gap:2px}
+.app-errors-status button{margin:0;padding:2px 8px;font-size:13px}
+.app-errors-list{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.app-errors-list:empty{display:none}
+.app-errors-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:10px 12px;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-ffffff)}
+.app-errors-item-text{display:grid;gap:2px;min-width:0;flex:1 1 200px}
+.app-errors-item-name{font-weight:600;overflow-wrap:anywhere}
+.app-errors-item-meta{color:var(--c-fg-52606d);font-size:13px;overflow-wrap:anywhere}
+.app-errors-item button{margin:0}.document-templates h5{margin:12px 0 8px;font-size:15px;overflow-wrap:anywhere}
 .document-template-list{display:grid;gap:8px;margin:12px 0;padding:0;list-style:none}
 .document-template-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:10px 12px;border:1px solid var(--c-bd-d8dee5);border-radius:6px;background:var(--c-bg-ffffff)}
 .document-template-item-label{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 180px}
@@ -480,6 +494,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
       <button type="button" data-library-filter="all" aria-pressed="true"><span>Alla</span> <span class="library-quick-count"></span></button>
       <button type="button" data-library-filter="documentation" aria-pressed="false"><span>Dokumentation</span> <span class="library-quick-count"></span></button>
       <button type="button" data-library-filter="bug-report" aria-pressed="false"><span>Felrapporter</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="open-bugs" aria-pressed="false"><span data-i18n="library.openBugs">Öppna fel</span> <span class="library-quick-count"></span></button>
       <button type="button" data-library-filter="review" aria-pressed="false"><span>Behöver granskas</span> <span class="library-quick-count"></span></button>
       <button type="button" data-library-filter="favourite" aria-pressed="false"><span>Favoriter</span> <span class="library-quick-count"></span></button>
       <button type="button" data-library-filter="archived" aria-pressed="false"><span>Arkiverade</span> <span class="library-quick-count"></span></button>
@@ -931,6 +946,18 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
   placeholder="support@example.com" aria-describedby="supportEmailHelp supportEmailStatus">
 <p id="supportEmailStatus" class="settings-save-status" role="status" aria-live="polite"></p>
 <p id="supportEmailHelp" class="muted" data-i18n="Används när en felrapport skapas som adresserat e-postutkast.">Används när en felrapport skapas som adresserat e-postutkast.</p>
+<!-- The user's own apps (partners' or their own extensions): their error messages are read on this
+  computer from the .app files, so that the possible cause in a bug report can name the app. -->
+<div id="appErrors" class="app-errors" aria-labelledby="appErrorsTitle">
+<h4 id="appErrorsTitle" data-i18n="appErrors.title">Your own apps</h4>
+<p id="appErrorsHelp" class="muted" data-i18n="appErrors.help">Add the .app files of partner apps or your own extensions. A bug report's possible cause can then name the app and object that show an error, and the actions the error offers. The app's names of pages, actions and fields also help recognize the steps in documents, in every language the app is translated to. The files are read on this computer; nothing is sent.</p>
+<input id="appErrorsFile" type="file" accept=".app" multiple hidden>
+<button id="appErrorsAdd" type="button" class="secondary" aria-describedby="appErrorsHelp" data-i18n="appErrors.add">Add .app files…</button>
+<p id="appErrorsStatus" class="app-errors-status" role="status" aria-live="polite"><span id="appErrorsStatusText"></span>
+  <button id="appErrorsUndo" type="button" class="secondary" data-i18n="appErrors.undo" hidden>Undo</button></p>
+<p id="appErrorsEmpty" class="muted" data-i18n="appErrors.empty">No apps added yet.</p>
+<ul id="appErrorsList" class="app-errors-list" data-i18n-ignore></ul>
+</div>
 </section>
 
 </div>
@@ -1586,6 +1613,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/semantic-interaction-engine.js"></script>
 <script src="engine/task-consolidation.js"></script>
 <script src="engine/knowledge-explanation-catalog.js"></script>
+<script src="engine/knowledge-captions.js"></script>
 <script src="engine/knowledge-domain.js"></script>
 <script src="engine/process-decision-code-registry.js"></script>
 <script src="review/task-visibility.js"></script>
@@ -1681,6 +1709,10 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="document/process-task-context.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
+<script src="bug-report/al-errors.js"></script>
+<script src="document/app-captions.js"></script>
+<script src="bug-report/app-errors.js"></script>
+<script src="app-errors-settings.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

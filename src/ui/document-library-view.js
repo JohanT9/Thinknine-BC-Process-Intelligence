@@ -81,7 +81,9 @@
     const tags = record.tags.filter(tag => String(tag).trim().toLocaleLowerCase() !== company);
     const visibleTags = tags.slice(0, 3);
     const hiddenTagCount = Math.max(0, tags.length - visibleTags.length);
-    const label = stateLabel(state, locale);
+    // A bug report shows whether its problem is open or resolved where a document shows its review.
+    const bugStatus = bugReport ? view.bugStatus?.(record) || null : null;
+    const label = bugStatus ? bugStatus.text : stateLabel(state, locale);
     // The status chip says whether a document is reviewed, so its button always names what it opens.
     // The review status and the test status stand side by side on the right, in the same form,
     // so both are read in one place; the test status is a button that opens the test history.
@@ -132,7 +134,7 @@
             ? `<span aria-label="${escape(localized("Additional tags: {count}",
               locale, "Ytterligare taggar: {count}", { count: hiddenTagCount }))}">+${hiddenTagCount}</span>` : ""}</div>` : ""}
         </div></div>
-      <div class="library-statuses">${label ? `<span class="library-state" data-state="${state.state}">${escape(label)}</span>` : "<span></span>"}${(test => test ? `<button type="button" class="library-test-marker" data-library-action="test-history"
+      <div class="library-statuses">${label ? `<span class="library-state" data-state="${escape(bugStatus ? bugStatus.state : state.state)}">${escape(label)}</span>` : "<span></span>"}${(test => test ? `<button type="button" class="library-test-marker" data-library-action="test-history"
         data-state="${escape(test.state)}" aria-label="${escape(test.label)}"><span aria-hidden="true">${escape(test.icon)}</span> ${escape(test.text)}</button>` : "<span></span>")(!bugReport && view.testMarker?.(record))}</div>
       <div class="library-card-footer">
         <button class="library-favourite" data-library-action="favourite"

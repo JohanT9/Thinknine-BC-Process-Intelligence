@@ -230,12 +230,9 @@
         "pagePatterns": [
           "^Production Journal$",
           "^Produktionsjournal$",
-          "^Journal de production$",
-          "^Produktions-Buch\\.-Blatt$",
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$",
           "^Feuille production$",
           "^Produktions Buch\\.-Blatt$",
           "^Produksjonskladd$"
@@ -292,12 +289,9 @@
         "pagePatterns": [
           "^Production Journal$",
           "^Produktionsjournal$",
-          "^Journal de production$",
-          "^Produktions-Buch\\.-Blatt$",
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$",
           "^Feuille production$",
           "^Produktions Buch\\.-Blatt$",
           "^Produksjonskladd$"
@@ -305,7 +299,6 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^Consumption Quantity$",
-          "^Förbrukningskvantitet$",
           "^Quantité consommée$",
           "^Verbrauchsmenge$",
           "^Consumo \\(cantidad\\)$",
@@ -358,12 +351,9 @@
         "pagePatterns": [
           "^Production Journal$",
           "^Produktionsjournal$",
-          "^Journal de production$",
-          "^Produktions-Buch\\.-Blatt$",
           "^Diario de producción$",
           "^Produktionskladde$",
           "^Tuotantopäiväkirja$",
-          "^Produksjonsjournal$",
           "^Feuille production$",
           "^Produktions Buch\\.-Blatt$",
           "^Produksjonskladd$"
@@ -372,11 +362,8 @@
         "fieldPatterns": [
           "^Output Quantity$",
           "^Utflöde antal$",
-          "^Utflödeskvantitet$",
           "^Quantité produite$",
-          "^Ausgabemenge$",
           "^Cantidad salida$",
-          "^Output Mængde$",
           "^Tuotoksen määrä$",
           "^Avgangsantall$",
           "^Fertig gestellte Menge$",

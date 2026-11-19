@@ -1,5 +1,6 @@
 /* global Buffer -- used only after a typeof check when running in Node. */
 import languages from "../engine/language-registry.js";
+import errorCause from "./error-cause.js";
 import { PDFDocument, StandardFonts, rgb, PDFString } from "pdf-lib";
 import JSZip from "jszip";
 
@@ -36,6 +37,12 @@ export function project(pkg) {
   add("actual", label("Actual result", "Faktiskt resultat"), [...new Set([
     ...errors.map(error => error.rawMessage)
   ].filter(Boolean))]);
+  // The possible cause is in the PDF only when the user included it, marked as not confirmed.
+  const cause = errorCause.exported(pkg.possibleCause, locale);
+  if (cause) add("cause", cause.title, [cause.text,
+    ...(cause.checks.length ? [`${cause.checksTitle}:`, ...cause.checks.map(item => `- ${item}`)] : []),
+    ...(cause.origin ? [`${cause.originTitle}: ${cause.origin}`] : []),
+    ...(cause.actions.length ? [`${cause.actionsTitle}:`, ...cause.actions.map(item => `- ${item}`)] : [])]);
   add("expected", label("Expected result", "Förväntat resultat"), [pkg.expectedResult]);
   add("reproduction", label("Steps to reproduce", "Steg för att återskapa"),
     steps.map((step, index) => `${index + 1}. ${instructionText(step.instruction)}${index === triggerIndex

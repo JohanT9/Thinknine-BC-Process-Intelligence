@@ -9,14 +9,17 @@
     ? require("./bc-client-captions") : root.T9BCClientCaptions;
   const stepText = typeof module === "object" && module.exports
     ? require("./step-text") : root.T9StepText;
+  const ruleCaptions = typeof module === "object" && module.exports
+    ? require("./knowledge-captions") : root.T9KnowledgeCaptions;
   const api = factory(consolidation, explanationCatalog, pageIdentification, clientCaptions,
-    stepText);
+    stepText, ruleCaptions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9KnowledgeDomain = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (consolidation, explanationCatalog, pageIdentification, clientCaptions, stepText) {
+function (consolidation, explanationCatalog, pageIdentification, clientCaptions, stepText,
+  ruleCaptions) {
   "use strict";
-  const VERSION = "2.3.0";
+  const VERSION = "2.4.0";
   const text = value => String(value || "");
   const patternCache = new Map();
   const confidenceValue = (value, fallback) => Number.isFinite(value)
@@ -41,6 +44,26 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
         .filter(Boolean)
     }))).sort((a, b) =>
       (b.priority + b.packPriority) - (a.priority + a.packPriority));
+  }
+
+  // Whether a rule names the recorded page, action or field: by its written patterns, by one of
+  // Business Central's own captions of it in any registered language (rule.bcCaptions and
+  // rule.appCaptions, engine/knowledge-captions.js), or by the AL name the step was recorded
+  // with, which is the same in every language.
+  const KIND_OF = Object.freeze({ pagePatterns: "page", actionPatterns: "action",
+    fieldPatterns: "field" });
+  function declaredMatch(rule, key, value, task) {
+    const patterns = rule?.match?.[key] || [];
+    if (!patterns.length) return false;
+    if (patternsMatch(patterns, value)) return true;
+    const kind = KIND_OF[key];
+    if (!kind || !ruleCaptions) return false;
+    // An action or field caption counts on the page of the step it belongs to.
+    const pages = kind === "page" ? null : ruleCaptions.taskPages(rule, task,
+      task?.knowledgePageCaption || task?.pageCaption || task?.context?.currentPageCaption ||
+      task?.context?.previousPageCaption);
+    return ruleCaptions.captionMatches(rule, kind, value, pages) ||
+      ruleCaptions.keyMatches(rule, kind, ruleCaptions.taskKeys(task, kind));
   }
 
   function patternsMatch(patterns, value) {
@@ -133,7 +156,7 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
     const pageCaption = task.knowledgePageCaption || task.pageCaption || context.currentPageCaption ||
       context.previousPageCaption;
     const pageMatches = (match.pagePatterns || []).length > 0 &&
-      (patternsMatch(match.pagePatterns, pageCaption) || pageResolvedByObjectId);
+      (declaredMatch(rule, "pagePatterns", pageCaption, task) || pageResolvedByObjectId);
     if (ruleEntity && observedEntity && ruleEntity !== observedEntity && !pageMatches) return 0;
     const checks = [["pagePatterns", pageCaption],
       ["actionPatterns", task.actionCaption], ["fieldPatterns", task.fieldCaption],
@@ -158,7 +181,7 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
       required += 1;
       const pageResolvedByEntity = key === "pagePatterns" && ruleEntity &&
         observedEntity === ruleEntity;
-      if (patternsMatch(declared, key === "pagePatterns" ? pageCaption : candidate) ||
+      if (declaredMatch(rule, key, key === "pagePatterns" ? pageCaption : candidate, task) ||
           (key === "pagePatterns" && pageResolvedByObjectId) ||
           (pageResolvedByEntity && entityStandsInForPage())) {
         matched += 1; value += 25;
@@ -243,7 +266,7 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
     // starts with Create (for example creating a warehouse receipt from a
     // purchase order) are different business operations and must retain their
     // own instruction instead of being rewritten as a new record.
-    return /^(?:(?:ny(?:tt)?(?:\s+(?:post|order|faktura|kreditnota))?)|(?:new(?:\s+(?:record|order|invoice|credit memo))?)|(?:skapa ny|create new|nouveau|nouvelle|neu(?:e|er|es)?|nuevo|nueva|uusi|opret|opprett(?:e)?))$/iu
+    return /^(?:(?:ny(?:tt)?(?:\s+(?:post|order|faktura|kreditnota))?)|(?:new(?:\s+(?:record|order|invoice|credit memo))?)|(?:skapa ny|create new|créer|nouveau|nouvelle|neu(?:e|er|es)?|nuevo|nueva|uusi|opret|opprett(?:e)?))$/iu
       .test(text(value).trim().replace(/\.$/u, ""));
   }
   // The language a task was interpreted in, as one of the step text languages.
@@ -277,11 +300,9 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
   function explanationEligible(rule, task, availableRules = [], packs = []) {
     if (!localizedExplanations(rule, task)) return false;
     const matchSpec = rule.match || {};
-    const explicitSignal = [
-      [matchSpec.actionPatterns, task.actionCaption],
-      [matchSpec.fieldPatterns, task.fieldCaption],
-      [matchSpec.automationIdPatterns, task.automationId]
-    ].some(([patterns, value]) => patterns?.length && patternsMatch(patterns, value));
+    const explicitSignal = [["actionPatterns", task.actionCaption],
+      ["fieldPatterns", task.fieldCaption], ["automationIdPatterns", task.automationId]]
+      .some(([key, value]) => declaredMatch(rule, key, value, task));
     if (!explicitSignal) return false;
     const observedEntity = text(task.entity || task.context?.currentEntity)
       .trim().toLowerCase();
@@ -305,7 +326,7 @@ function (consolidation, explanationCatalog, pageIdentification, clientCaptions,
       task.pageIdentification?.pageObjectId || task.pageContext?.pageObjectId ||
       task.context?.currentPageObjectId);
     const pageMatches = Boolean(matchSpec.pagePatterns?.length &&
-      (patternsMatch(matchSpec.pagePatterns, pageCaption) ||
+      (declaredMatch(rule, "pagePatterns", pageCaption, task) ||
         (matchSpec.pageObjectIds || []).map(String).includes(pageObjectId)));
     if (ruleEntity && observedEntity && observedEntity !== ruleEntity && !pageMatches) return false;
     const entityBackedPage = observedEntity === ruleEntity;

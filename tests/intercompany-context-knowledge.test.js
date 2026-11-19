@@ -1,8 +1,9 @@
 const assert = require('node:assert/strict');
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const pack = JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/intercompany.json'), 'utf8'));
+const pack = asLoaded(JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/intercompany.json'), 'utf8')));
 const knowledge = require('../src/engine/knowledge-domain');
 const locales = require('../src/engine/language-registry').supported().map(x => x.locale).sort();
 const rules = [
@@ -16,7 +17,7 @@ assert.deepEqual(Object.keys(setupRule.localizedExplanations).sort(), locales);
 assert.deepEqual(setupRule.verifiedRuntimeLocales, ['en-US', 'sv-SE', 'fr-FR', 'de-DE', 'es-ES', 'da-DK', 'fi-FI', 'nb-NO']);
 for (const [locale, pageCaption, actionCaption] of [
   ['en-US', 'Intercompany Setup', 'IC Chart of Accounts'],
-  ['sv-SE', 'Företagsintern installation', 'Koncernintern kontoplan'],
+  ['sv-SE', 'Koncernintern inställning', 'Koncernintern kontoplan'],
 ]) {
   const task = knowledge.apply([{ taskId: 'ic-setup-' + locale, pageCaption, actionCaption, language: locale }], [pack]).tasks[0];
   assert.equal(task.contextualExplanationRuleId, setupRule.ruleId, `setup maps in ${locale}`);

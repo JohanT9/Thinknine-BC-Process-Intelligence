@@ -3,6 +3,7 @@
 // captions of the same objects are: the same rule wins, unless two different actions share
 // one translation in a language, which is then reported as ambiguous instead of guessed.
 const assert = require("node:assert/strict");
+const { asLoaded } = require("./helpers/knowledge-packs");
 const fs = require("node:fs");
 const path = require("node:path");
 const knowledge = require("../src/engine/knowledge-domain");
@@ -12,7 +13,7 @@ const languages = require("../src/engine/language-registry");
 const root = path.resolve(__dirname, "..");
 const manifest = require("../src/knowledge-packs/index.json");
 const packs = manifest.packs.filter(item => item.enabled).map(item =>
-  JSON.parse(fs.readFileSync(path.join(root, "src", item.file), "utf8")));
+  asLoaded(JSON.parse(fs.readFileSync(path.join(root, "src", item.file), "utf8"))));
 const imported = repositoryApi.importRelease(manifest, packs.map(pack => ({ packId: pack.packId, pack })));
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = repositoryApi.createRepository(imported.snapshot);

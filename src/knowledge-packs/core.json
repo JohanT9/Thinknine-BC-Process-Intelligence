@@ -91,6 +91,7 @@
           "^Buscar$",
           "^Søg$",
           "^Haku$",
+          "^Hae$",
           "^Søk$"
         ],
         "fieldPatterns": [],
@@ -140,7 +141,7 @@
         "pagePatterns": [],
         "actionPatterns": [
           "^Tillbaka$", "^Back$", "^Précédent$", "^Retour$", "^Zurück$",
-          "^Atrás$", "^Volver$", "^Tilbage$", "^Takaisin$", "^Tilbake$",
+          "^Atrás$", "^Tilbage$", "^Takaisin$", "^Tilbake$",
           "^Bakåt$"
         ],
         "fieldPatterns": [],
@@ -166,15 +167,14 @@
           "^New(?:\\s+(?:record|order|invoice|credit memo))?\\.?$",
           "^Create new\\.?$",
           "^Skapa ny\\.?$",
+          "^Créer\\.?$",
           "^Nouveau\\.?$",
-          "^Nouvelle\\.?$",
           "^Neu(?:e|er|es)?\\.?$",
           "^Nuevo\\.?$",
           "^Nueva\\.?$",
           "^Opret\\.?$",
           "^Uusi\\.?$",
-          "^Opprett\\.?$",
-          "^Opprette\\.?$"
+          "^Opprett\\.?$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -204,7 +204,7 @@
       "localizedInstructions": {
         "sv-SE": "Välj Ny för att öppna sidan där du kan skapa en post. Kontrollera sidans innehåll och sammanhang innan du fortsätter.",
         "en-US": "Choose New to open the page where you can create a record. Check the page and its context before continuing.",
-        "fr-FR": "Sélectionnez Nouveau pour ouvrir la page où vous pouvez créer un enregistrement. Vérifiez la page et son contexte avant de continuer.",
+        "fr-FR": "Sélectionnez Créer pour ouvrir la page où vous pouvez créer un enregistrement. Vérifiez la page et son contexte avant de continuer.",
         "de-DE": "Wählen Sie Neu aus, um die Seite zum Erstellen eines Datensatzes zu öffnen. Prüfen Sie die Seite und ihren Kontext, bevor Sie fortfahren.",
         "es-ES": "Seleccione Nuevo para abrir la página donde puede crear un registro. Compruebe la página y su contexto antes de continuar.",
         "da-DK": "Vælg Ny for at åbne siden, hvor du kan oprette en post. Kontrollér siden og dens kontekst, før du fortsætter.",

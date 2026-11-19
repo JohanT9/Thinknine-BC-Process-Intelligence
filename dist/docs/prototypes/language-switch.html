@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Språkbyte – prototyp</title>
+<style>
+:root{--brand:#008489;--brand-hover:#006f73;--brand-ink:#005f65;--brand-subtle:#eefafa;--fg:#172b4d;--muted:#526273;--bd:#ccd5df;--bd-strong:#8392a5;--bg:#fff;--soft:#f5f7fa;--page:#eef2f6;--flash:#fff4ce;--own:#7c5800;--own-bg:#fff8e6}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font:15px "Segoe UI",system-ui,sans-serif;color:var(--fg);background:var(--page);line-height:1.45}
+button{font:inherit}
+:focus-visible{outline:2px solid #0f6cbd;outline-offset:2px}
+.proto-bar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;background:#1e293b;color:#fff;font-size:12px}
+.proto-bar strong{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.proto-bar .hint{opacity:.75}
+header.review{position:sticky;top:34px;z-index:10;display:grid;gap:8px;padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--bd)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.title-row h1{margin:0;font-size:1.25rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{min-height:34px;margin:0;padding:6px 12px;border:1px solid var(--bd-strong);border-radius:6px;background:var(--bg);color:var(--fg);font-weight:600;cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+/* The new control: the document language, always visible, one click to change. */
+.lang-wrap{position:relative}
+.lang-btn{display:inline-flex;align-items:center;gap:8px;border-color:var(--brand);color:var(--brand-ink)}
+.lang-btn svg{width:16px;height:16px}
+.lang-btn .chev{font-size:.75rem}
+.lang-pop{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:min(320px,calc(100vw - 32px));padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);box-shadow:0 8px 24px rgba(23,43,77,.18)}
+.lang-pop h2{margin:2px 6px 8px;font-size:.875rem}
+.lang-list{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0;padding:0;list-style:none}
+.lang-list button{width:100%;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid transparent;border-radius:6px;background:none;color:var(--fg);text-align:left;cursor:pointer}
+.lang-list button:hover{background:var(--soft)}
+.lang-list button[aria-current=true]{border-color:var(--brand);background:var(--brand-subtle);font-weight:700}
+.lang-list button[aria-current=true]::after{content:"✓";margin-left:auto;color:var(--brand-ink)}
+.lang-note{margin:10px 6px 2px;font-size:.8125rem;color:var(--muted)}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-left:4px solid var(--brand);border-radius:6px;background:var(--brand-subtle);font-size:.875rem}
+.status p{margin:0;flex:1 1 260px}
+.link{margin:0;padding:2px;border:0;background:none;color:var(--brand-ink);text-decoration:underline;cursor:pointer;font-size:.875rem;font-weight:600}
+main{max-width:860px;margin:0 auto;padding:20px}
+.doc{display:grid;gap:14px;padding:22px;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
+.doc h2{margin:0;font-size:1.125rem}
+.sec{margin:6px 0 0;padding:6px 10px;border-left:4px solid var(--brand);background:var(--brand-subtle);font-weight:700;color:var(--brand-ink)}
+.step{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--bd);border-radius:8px}
+.num{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--soft);font-weight:700;font-size:.8125rem;color:var(--muted)}
+.step p{margin:3px 0 0}
+.step b{font-weight:600}
+.step i{font-style:normal;font-weight:700}
+.own{border-color:#e9c46a;background:var(--own-bg)}
+.own-tag{display:inline-block;margin-top:6px;padding:1px 8px;border-radius:10px;background:#fff1c2;color:var(--own);font-size:.75rem;font-weight:700}
+.expected{padding:10px 12px;border-radius:8px;background:var(--soft)}
+.expected h3{margin:0 0 4px;font-size:.875rem}
+.expected p{margin:0;font-size:.9375rem}
+.rewritten{animation:rewrite 1.1s ease-out both}
+@keyframes rewrite{0%{background:var(--flash)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.rewritten{animation:none}}
+.caption-note{margin:0;font-size:.8125rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>Prototyp</strong>
+  <label><input type="checkbox" id="pOwn" checked> Ett steg är skrivet av användaren</label>
+  <span class="hint">Granskningen av ett dokument. Välj språkknappen i verktygsraden.</span>
+</div>
+
+<header class="review">
+  <div class="title-row">
+    <h1>Skapa och släppa en inköpsorder</h1>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" type="button">Slutför granskning</button>
+    <button class="btn" type="button">Ångra</button>
+    <button class="btn" type="button">Exportera Word</button>
+    <div class="lang-wrap">
+      <button id="langBtn" class="btn lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="langPop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/></svg>
+        <span>Dokumentspråk: <span id="langName">Svenska</span></span><span class="chev" aria-hidden="true">▾</span>
+      </button>
+      <div id="langPop" class="lang-pop" hidden>
+        <h2>Visa dokumentet på</h2>
+        <ul id="langList" class="lang-list"></ul>
+        <p class="lang-note">Stegen skrivs om direkt. Det du har skrivit själv och texter från Business Central ändras inte. Du kan ångra bytet.</p>
+      </div>
+    </div>
+    <button class="btn" type="button">Fler åtgärder</button>
+  </div>
+  <div id="status" class="status" role="status" aria-live="polite" hidden>
+    <p id="statusText"></p>
+    <button id="undo" class="link" type="button">Ångra</button>
+  </div>
+</header>
+
+<main>
+  <article class="doc" id="doc">
+    <h2 id="hSteps"></h2>
+    <p class="sec">Skapa ordern</p>
+    <div class="step"><span class="num">1</span><p data-step="0"></p></div>
+    <div class="step"><span class="num">2</span><p data-step="1"></p></div>
+    <div class="step"><span class="num">3</span><p data-step="2"></p></div>
+    <div class="step own" id="ownStep"><span class="num">4</span><div><p>Kontrollera att leveransdatumet stämmer med avtalet.</p><span class="own-tag" id="ownTag"></span></div></div>
+    <div class="step"><span class="num" id="n5">5</span><p data-step="3"></p></div>
+    <div class="step"><span class="num" id="n6">6</span><p data-step="4"></p></div>
+    <div class="expected"><h3 id="hExpected"></h3><p id="expected"></p></div>
+    <p class="caption-note" id="captionNote"></p>
+  </article>
+</main>
+
+<script>
+const DATA={"sv-SE":{"name":"Svenska","steps":[[{"text":"Välj ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Ange ","role":"action"},{"text":"10000","role":"value"},{"text":" i ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Ange ","role":"action"},{"text":"1896-S","role":"value"},{"text":" i ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Ange ","role":"action"},{"text":"5","role":"value"},{"text":" i ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Välj ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"en-US":{"name":"English","steps":[[{"text":"Choose ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Enter ","role":"action"},{"text":"10000","role":"value"},{"text":" in ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Enter ","role":"action"},{"text":"1896-S","role":"value"},{"text":" in ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Enter ","role":"action"},{"text":"5","role":"value"},{"text":" in ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Choose ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"fr-FR":{"name":"Français","steps":[[{"text":"Sélectionnez ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Saisissez ","role":"action"},{"text":"10000","role":"value"},{"text":" dans ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Saisissez ","role":"action"},{"text":"1896-S","role":"value"},{"text":" dans ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Saisissez ","role":"action"},{"text":"5","role":"value"},{"text":" dans ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Sélectionnez ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"de-DE":{"name":"Deutsch","steps":[[{"text":"Wählen Sie ","role":"action"},{"text":"Ny","role":"interface"},{"text":" aus.","role":"text"}],[{"text":"Geben Sie ","role":"action"},{"text":"10000","role":"value"},{"text":" in ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":" ein.","role":"text"}],[{"text":"Geben Sie ","role":"action"},{"text":"1896-S","role":"value"},{"text":" in ","role":"text"},{"text":"Nr","role":"interface"},{"text":" ein.","role":"text"}],[{"text":"Geben Sie ","role":"action"},{"text":"5","role":"value"},{"text":" in ","role":"text"},{"text":"Antal","role":"interface"},{"text":" ein.","role":"text"}],[{"text":"Wählen Sie ","role":"action"},{"text":"Släpp","role":"interface"},{"text":" aus.","role":"text"}]]},"es-ES":{"name":"Español","steps":[[{"text":"Seleccione ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Introduzca ","role":"action"},{"text":"10000","role":"value"},{"text":" en ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Introduzca ","role":"action"},{"text":"1896-S","role":"value"},{"text":" en ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Introduzca ","role":"action"},{"text":"5","role":"value"},{"text":" en ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Seleccione ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"da-DK":{"name":"Dansk","steps":[[{"text":"Vælg ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Angiv ","role":"action"},{"text":"10000","role":"value"},{"text":" i ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Angiv ","role":"action"},{"text":"1896-S","role":"value"},{"text":" i ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Angiv ","role":"action"},{"text":"5","role":"value"},{"text":" i ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Vælg ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"fi-FI":{"name":"Suomi","steps":[[{"text":"Valitse ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Syötä ","role":"action"},{"text":"10000","role":"value"},{"text":" kenttään ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Syötä ","role":"action"},{"text":"1896-S","role":"value"},{"text":" kenttään ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Syötä ","role":"action"},{"text":"5","role":"value"},{"text":" kenttään ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Valitse ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]},"nb-NO":{"name":"Norsk (bokmål)","steps":[[{"text":"Velg ","role":"action"},{"text":"Ny","role":"interface"},{"text":".","role":"text"}],[{"text":"Angi ","role":"action"},{"text":"10000","role":"value"},{"text":" i ","role":"text"},{"text":"Leverantörsnr","role":"interface"},{"text":".","role":"text"}],[{"text":"Angi ","role":"action"},{"text":"1896-S","role":"value"},{"text":" i ","role":"text"},{"text":"Nr","role":"interface"},{"text":".","role":"text"}],[{"text":"Angi ","role":"action"},{"text":"5","role":"value"},{"text":" i ","role":"text"},{"text":"Antal","role":"interface"},{"text":".","role":"text"}],[{"text":"Velg ","role":"action"},{"text":"Släpp","role":"interface"},{"text":".","role":"text"}]]}};
+const SYS = {
+  "sv-SE": { steps: "Steg", expectedH: "Förväntat resultat", expected: "Processen är genomförd och resultatet är kontrollerat.", own: "Skriven av dig", ownNote: "inget steg", genitive: "svenska" },
+  "en-US": { steps: "Steps", expectedH: "Expected result", expected: "The process is completed and the result has been checked.", own: "Written by you", genitive: "English" },
+  "fr-FR": { steps: "Étapes", expectedH: "Résultat attendu", expected: "Le processus est terminé et le résultat a été vérifié.", own: "Rédigé par vous", genitive: "français" },
+  "de-DE": { steps: "Schritte", expectedH: "Erwartetes Ergebnis", expected: "Der Prozess ist abgeschlossen und das Ergebnis wurde geprüft.", own: "Von Ihnen geschrieben", genitive: "Deutsch" },
+  "es-ES": { steps: "Pasos", expectedH: "Resultado esperado", expected: "El proceso se ha completado y el resultado se ha comprobado.", own: "Escrito por usted", genitive: "español" },
+  "da-DK": { steps: "Trin", expectedH: "Forventet resultat", expected: "Processen er gennemført, og resultatet er kontrolleret.", own: "Skrevet af dig", genitive: "dansk" },
+  "fi-FI": { steps: "Vaiheet", expectedH: "Odotettu tulos", expected: "Prosessi on suoritettu ja tulos on tarkistettu.", own: "Itse kirjoittamasi", genitive: "suomeksi" },
+  "nb-NO": { steps: "Trinn", expectedH: "Forventet resultat", expected: "Prosessen er gjennomført, og resultatet er kontrollert.", own: "Skrevet av deg", genitive: "norsk" }
+};
+const SV_LANG = { "sv-SE": "svenska", "en-US": "engelska", "fr-FR": "franska", "de-DE": "tyska", "es-ES": "spanska", "da-DK": "danska", "fi-FI": "finska", "nb-NO": "norska" };
+const $ = id => document.getElementById(id);
+let current = "sv-SE", previous = null;
+
+function runsTo(el, runs) {
+  el.replaceChildren(...runs.map(r => r.role === "interface" ? Object.assign(document.createElement("b"), { textContent: r.text })
+    : r.role === "value" ? Object.assign(document.createElement("i"), { textContent: r.text }) : document.createTextNode(r.text)));
+}
+function renderList() {
+  $("langList").replaceChildren(...Object.entries(DATA).map(([loc, d]) => {
+    const li = document.createElement("li");
+    const b = Object.assign(document.createElement("button"), { type: "button", textContent: d.name });
+    b.lang = loc.split("-")[0];
+    b.setAttribute("aria-current", String(loc === current));
+    b.addEventListener("click", () => choose(loc));
+    li.append(b); return li;
+  }));
+}
+function render(animate) {
+  document.querySelectorAll("[data-step]").forEach((p, i) => {
+    runsTo(p, DATA[current].steps[Number(p.dataset.step)]);
+    if (animate) { p.classList.remove("rewritten"); void p.offsetWidth; p.style.animationDelay = (i * 70) + "ms"; p.classList.add("rewritten"); }
+  });
+  for (const [id, key] of [["hSteps", "steps"], ["hExpected", "expectedH"], ["expected", "expected"], ["ownTag", "own"]]) {
+    $(id).textContent = SYS[current][key];
+    if (animate && id === "expected") { $(id).classList.remove("rewritten"); void $(id).offsetWidth; $(id).classList.add("rewritten"); }
+  }
+  $("langName").textContent = DATA[current].name;
+  $("doc").lang = current.split("-")[0];
+  const own = $("pOwn").checked;
+  $("ownStep").hidden = !own;
+  $("n5").textContent = own ? 5 : 4; $("n6").textContent = own ? 6 : 5;
+  $("captionNote").textContent = current === "sv-SE" ? "" :
+    "Leverantörsnr, Nr, Antal, Ny och Släpp står som Business Central visade dem vid inspelningen.";
+  renderList();
+}
+function choose(loc) {
+  closePop();
+  if (loc === current) return;
+  previous = current; current = loc; render(true);
+  const own = $("pOwn").checked;
+  $("statusText").textContent = `Dokumentet är nu på ${SV_LANG[loc]}. 5 steg skrevs om` + (own ? ", 1 steg som du skrivit själv är oförändrat." : ".");
+  $("status").hidden = false;
+  $("langBtn").focus();
+}
+function closePop() { $("langPop").hidden = true; $("langBtn").setAttribute("aria-expanded", "false"); }
+$("langBtn").addEventListener("click", () => {
+  const open = $("langPop").hidden;
+  $("langPop").hidden = !open; $("langBtn").setAttribute("aria-expanded", String(open));
+  if (open) $("langList").querySelector("[aria-current=true]").focus();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("langPop").hidden) { closePop(); $("langBtn").focus(); } });
+document.addEventListener("click", e => { if (!e.target.closest(".lang-wrap")) closePop(); });
+$("undo").addEventListener("click", () => {
+  if (!previous) return;
+  const back = previous; previous = null; current = back; render(true);
+  $("statusText").textContent = `Tillbaka på ${SV_LANG[back]}.`;
+  $("undo").hidden = true;
+  setTimeout(() => { $("status").hidden = true; $("undo").hidden = false; }, 3000);
+});
+$("pOwn").addEventListener("change", () => render(false));
+render(false);
+</script>
+</body>
+</html>
