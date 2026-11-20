@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.32.0");
+assert.strictEqual(quantity.groupingVersion, "1.33.0");
 // Regression: event 125 from the user's September 7 recording. No usable name or identity.
 const legacyBack = run([event("legacy125", "activation", {
   rawEventType: "click", actionIdentification: { caption: "\uE72B" },
@@ -725,4 +725,56 @@ for (const caption of ['The value for this field is required.', 'Värde krävs',
     assert.equal(run([{...focus,kind:'activation',controlIdentification:{role:'combobox',controlType:'lookup',caption}}]).groups.length,1);
     assert.equal(run([{...focus,kind:'selection-change',value:{normalized:'ITEM-1'}}]).groups.length,1);
   }
+}
+
+// A page shown as a dialog has its own action bar. Recorded on a purchase order: Tillämpat
+// inköpspris och rabatt opened as a dialog, Manuellt pris... in its action bar opened another
+// dialog, and its OK closed it. The recorder gave every click in the dialog the interaction of
+// the action that opened it, so Manuellt pris... joined that step and was missing from the
+// document. The menu item is a step of its own; the dialog's own buttons stay with their action.
+{
+  const at = ms => new Date(Date.parse("2026-11-13T12:34:26.000Z") + ms).toISOString();
+  const same = { interactionId: "apply", interactionIds: ["apply"] };
+  const click = (id, ms, role, caption, extra = same) => event(id, "activation", { ...extra,
+    timestamp: at(ms), controlIdentification: { role, caption } });
+  const opened = (id, ms, caption) => event(id, "dialog-open", { ...same, timestamp: at(ms),
+    controlIdentification: { caption } });
+  const groups = run([
+    click("m1", 0, "menuitem", "Tillämpat inköpspris och rabatt"),
+    opened("m2", 700, "Tillämpat inköpspris och rabatt"),
+    click("m3", 4000, "menuitem", "Manuellt pris..."),
+    opened("m4", 4300, "Ändra tillämpad direkt enhetskostnad")
+  ]).groups.map(group => group.sourceEventIds.map(id => id.slice(7)));
+  assert.deepStrictEqual(groups, [["m1", "m2"], ["m3", "m4"]],
+    "an action in a dialog page's action bar is its own step");
+  // The button that answers a dialog still belongs to the action that opened it.
+  assert.strictEqual(run([click("n1", 0, "menuitem", "Bokför"), opened("n2", 300, "Bokför"),
+    click("n3", 900, "button", "Ja")]).groups.length, 1);
+}
+
+// Recorded on an item journal: the search result Artikeljournaler opened the journal template
+// list as a dialog, and the template ARTIKEL was chosen in it. The recorder gave the choice the
+// interaction of the search result, so the template was missing from the document as a step.
+// Choosing a record in the list a choice opened is a step of its own; a lookup's list is not.
+{
+  const at = ms => new Date(Date.parse("2026-11-20T13:18:39.000Z") + ms).toISOString();
+  const same = { interactionId: "search", interactionIds: ["search"] };
+  const page = caption => ({ pageIdentification: { caption } });
+  const groups = run([
+    event("t1", "selection-change", { ...same, ...page("Rollcenter"), timestamp: at(0),
+      controlIdentification: { type: "repeaterCell", caption: "Artikeljournaler Uppgifter" } }),
+    event("t2", "dialog-open", { ...same, ...page("Artikeljournalmallslista"), timestamp: at(600),
+      controlIdentification: { caption: "Artikeljournalmallslista" } }),
+    event("t3", "activation", { ...same, ...page("Artikeljournalmallslista"), timestamp: at(3500),
+      controlIdentification: { role: "button", caption: 'Namn, sorterade i Stigande order Välj posten "ARTIKEL"' } })
+  ]).groups.map(group => group.sourceEventIds.map(id => id.slice(7)));
+  assert.deepStrictEqual(groups, [["t1", "t2"], ["t3"]],
+    "a record chosen in a list that a choice opened is its own step");
+  const lookup = run([
+    event("l1", "activation", { ...same, ...page("Inköpsorder"), timestamp: at(0),
+      controlIdentification: { controlType: "lookup", caption: "Nr", identity: { value: "No." } } }),
+    event("l2", "activation", { ...same, ...page("Artikellista"), timestamp: at(900),
+      controlIdentification: { role: "button", caption: 'Nr, sorterade i Stigande order Välj posten "1000"' } })
+  ]);
+  assert.strictEqual(lookup.groups.length, 1, "a record chosen in a lookup's list stays with the lookup");
 }

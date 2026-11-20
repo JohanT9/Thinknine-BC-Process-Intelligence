@@ -140,4 +140,42 @@ assert.deepStrictEqual(changedPreview.changeSet.screenshotChanges[0]
 assert.deepStrictEqual(changedPreview.changeSet.screenshotChanges[0]
   .after.screenshotIds, ["new.png"]);
 
+// A step the consultant hid stays hidden when the new interpretation keeps it as one step, so
+// an improved interpretation can be taken without showing the step again (recorded on an item
+// journal: a list-box click hidden by hand while the search steps before it were joined).
+{
+  const journal = { id: "journal", name: "Item journal" };
+  const base = [
+    { taskId: "search", instruction: "Search.", sourceEventIds: ["e1"] },
+    { taskId: "query", instruction: "Enter art journ.", sourceEventIds: ["e2"] },
+    { taskId: "result", instruction: "Choose Item Journals Tasks.", sourceEventIds: ["e3"] },
+    { taskId: "noise", instruction: "Choose Purchase Sale Positive Adjmt.", sourceEventIds: ["e4"] },
+    { taskId: "entry", instruction: "Choose Positive Adjmt. in Entry Type.", sourceEventIds: ["e5"] }
+  ];
+  const hidden = review.createReview(journal, base);
+  review.setTaskHidden(hidden, 3, true, { now: "2026-11-20T10:00:00.000Z" });
+  assert.strictEqual(hidden.structureOverrides.length, 1);
+  const improved = [
+    { taskId: "search-open", instruction: "Search for art journ and open Item Journals.",
+      sourceEventIds: ["e1", "e2", "e3"] },
+    { taskId: "noise", instruction: "Choose Purchase Sale Positive Adjmt.", sourceEventIds: ["e4"] },
+    { taskId: "entry", instruction: "Choose Positive Adjmt. in Entry Type.", sourceEventIds: ["e5"] }
+  ];
+  const hidePreview = regeneration.preview(hidden, journal, improved);
+  assert.strictEqual(hidePreview.blocked, false, JSON.stringify(hidePreview.blockingReasons));
+  const regenerated = regeneration.apply(hidden, hidePreview, { now: "2026-11-20T10:05:00.000Z" });
+  assert.strictEqual(regenerated.tasks.length, 3);
+  assert.deepStrictEqual(regenerated.structureOverrides.map(item => [item.type, item.sourceStepIds]),
+    [["hide", ["noise"]]], "the hide moves to the same step");
+  const noise = regenerated.tasks.find(task => task.taskId === "noise");
+  assert.strictEqual(noise.stepOverride?.visibility || noise.visibility, "hidden");
+  // A hidden step that the new interpretation joins with others cannot stay hidden on its own.
+  const joined = regeneration.preview(hidden, journal, [
+    { taskId: "search-open", instruction: "Search.", sourceEventIds: ["e1", "e2", "e3"] },
+    { taskId: "entry", instruction: "Choose Positive Adjmt. in Entry Type.", sourceEventIds: ["e4", "e5"] }
+  ]);
+  assert.strictEqual(joined.blocked, true);
+  assert(joined.blockingReasons.includes("structure-overrides"));
+}
+
 console.log("Review regeneration UI adapter tests passed.");

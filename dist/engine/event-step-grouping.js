@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.32.0";
+  const GROUPING_VERSION = "1.33.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
@@ -42,7 +42,24 @@
   function unique(values) { return [...new Set(values.filter(Boolean))]; }
   function interactionIds(events) { return unique(events.flatMap(event =>
     event.interactionIds || [event.interactionId])); }
+  // A page shown as a dialog, such as Tillämpat inköpspris och rabatt, has its own action bar.
+  // The recorder gives a click in a dialog the interaction of the action that opened the dialog,
+  // so that its OK or Ja belongs to that action; an action of the dialog's action bar (a menu
+  // item, as Manuellt pris...) is a step of its own all the same.
+  // Choosing a record in a list that an earlier choice or action opened as a dialog, as the
+  // journal template ARTIKEL in Artikeljournalmallslista after the search result
+  // Artikeljournaler, is likewise a step of its own. A lookup's own list stays with its lookup.
+  function dialogPageAction(events, event) {
+    if (event?.kind !== "activation") return false;
+    if (["menuitem", "menuitemcheckbox"].includes(String(event.controlIdentification?.role || ""))) {
+      return events.some(item => item.kind === "activation");
+    }
+    return Boolean(recordChoiceList(event)) && !events.some(isLookupOrigin) &&
+      events.some(item => ["activation", "selection-change"].includes(item.kind) &&
+        pageKey(item) && pageKey(event) && pageKey(item) !== pageKey(event));
+  }
   function sameRecordedInteraction(events, event) {
+    if (dialogPageAction(events, event)) return false;
     const pendingIds = interactionIds(events);
     const nextIds = interactionIds([event]);
     return pendingIds.length === 1 && nextIds.length === 1 &&
@@ -650,7 +667,8 @@
         assignments.set(unanswered.normalizedEventId, "supporting");
         pending = null;
       }
-      if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
+      if (pending && (conflictingRecordedInteraction(pending.events, event) ||
+        dialogPageAction(pending.events, event))) emit();
       if (!pending && event.kind === "status-message") {
         supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
           classification: "result", reason: "orphan-status-message" }));

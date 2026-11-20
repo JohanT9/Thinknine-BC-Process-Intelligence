@@ -1289,7 +1289,7 @@ const CAPTURE_SCRIPT_FILES = Object.freeze([
   "engine/business-central-version-capture.js", "capture-field-privacy.js", "capture-value-regions.js",
   "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js",
   "engine/bc-client-captions.js", "bc-error-detector.js",
-  "capture-indicator-i18n.js", "content.js"
+  "capture-indicator-i18n.js", "content.js", "guide-overlay.js"
 ]);
 
 // The manifest runs al-identity-capture.js in the page's own world in every Business Central
@@ -3497,8 +3497,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const result = globalThis.T9PageScriptExport.build({ name: session.name,
           locale: session.settings?.documentLanguage || "en-US", pageTypeOf,
           description: "BC Process Studio", events: raw?.events || [] });
+        // Steps left out only because a missing step opens their page or question are counted,
+        // not named: the user is told which steps are missing, and that these follow from them.
+        const missing = result.skipped.filter(item => item.reason !== "withoutCause");
         sendResponse({ ok: true, content: result.content, stepCount: result.stepCount,
-          skipped: result.skipped, startPage: result.startPage,
+          skipped: missing.length ? missing : result.skipped,
+          dependentCount: missing.length ? result.skipped.length - missing.length : 0, startPage: result.startPage,
           recordedIdentity: result.recordedIdentity, startsOnRecord: result.startsOnRecord,
           startCaption: result.startCaption,
           fileName: globalThis.T9PageScriptExport.fileName(session.name) });

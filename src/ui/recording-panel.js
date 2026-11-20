@@ -1141,7 +1141,9 @@
         (skipped.length > 5 ? "; …" : "");
       const text = [t("recPanel.savedFile", { fileName }),
         response.stepCount === 1 ? t("recPanel.scriptStepsOne") : t("recPanel.scriptSteps", { count: response.stepCount }),
-        skipped.length ? t("recPanel.scriptSkipped", { skipped: skipped.length, steps: names }) : ""]
+        skipped.length ? t("recPanel.scriptSkipped", { skipped: skipped.length, steps: names }) : "",
+        response.dependentCount === 1 ? t("pageScript.dependentSkippedOne")
+          : response.dependentCount > 1 ? t("pageScript.dependentSkipped", { count: response.dependentCount }) : ""]
         .filter(Boolean).join(" ");
       setStatus("rpTestStatus", skipped.length ? "warn" : "ok", text, showInFolder(download.downloadId));
     } catch (error) {

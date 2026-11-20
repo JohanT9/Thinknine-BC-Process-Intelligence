@@ -177,6 +177,40 @@ assert.strictEqual(searchWithDialogClick[0].displayText,
 assert.deepStrictEqual(searchWithDialogClick[0].sourceEventIds,
   ["search-open", "search-input", "dialog-click", "search-result"]);
 assert.strictEqual(searchWithDialogClick.length, 2, "the step after the search is kept");
+
+// Recorded on an item journal (Salico UAT, 2026-11-20): the search result Artikeljournaler of the
+// kind Uppgifter opened the journal template list as a dialog before the journal. The row is
+// known as a search result by the client's PageSearchForm in any language; the page worked on
+// afterwards names the result, so an older recording's kind is not part of the name.
+const searchRow = { type: "repeaterCell", alControlPath: ["PageSearchForm"] };
+const searchTasks = caption => [{
+  taskType: "SearchAndOpenPage", fieldCaption: "Sök", actionCaption: "Sök",
+  sourceEventIds: ["search-open"]
+}, {
+  taskType: "EnterFieldValue", fieldCaption: "Berätta vad du vill göra.",
+  instructionValue: "art journ", sourceEventIds: ["search-input"]
+}, {
+  taskType: "SelectRecord", selectedCaption: caption, targetControl: searchRow,
+  actionCaption: "AI-genererat innehåll kan vara felaktigt", pageCaption: "Artikeljournalmallslista",
+  sourceEventIds: ["search-result"]
+}, {
+  taskType: "SelectRecord", selectedCaption: "ARTIKEL", pageCaption: "Artikeljournalmallslista",
+  actionCaption: 'Namn, sorterade i Stigande order Välj posten "ARTIKEL"', sourceEventIds: ["template"]
+}, {
+  taskType: "SelectOption", fieldCaption: "Transaktionstyp", pageCaption: "Artikeljournaler",
+  sourceEventIds: ["entry-type"]
+}];
+for (const caption of ["Artikeljournaler Uppgifter ", "Artikeljournaler"]) {
+  const steps = engine.processInteractions(searchTasks(caption));
+  assert.strictEqual(steps[0].actionType, "SearchAndOpenPage", caption);
+  assert.strictEqual(steps[0].displayText, "Sök efter __art journ__ och öppna **Artikeljournaler**.", caption);
+  assert.deepStrictEqual(steps[0].sourceEventIds, ["search-open", "search-input", "search-result"]);
+  assert.strictEqual(steps.length, 3, "the template and the entry type stay steps of their own");
+}
+// A row that is not a search result is not taken for one.
+assert.notStrictEqual(engine.processInteractions(searchTasks("Artikeljournaler Uppgifter")
+  .map(task => ({ ...task, targetControl: undefined })))[0].displayText,
+  "Sök efter __art journ__ och öppna **Artikeljournaler**.");
 // A click on a control in the dialog is not passed over.
 const searchWithControlClick = engine.processInteractions([{
   taskType: "SearchAndOpenPage", fieldCaption: "Sök", actionCaption: "Sök"

@@ -1000,6 +1000,24 @@ function (sourceReference, captions, stepText) {
         a[count].toLocaleLowerCase() === b[count].toLocaleLowerCase()) count += 1;
       return a.slice(0, count).join(" ");
     };
+    // A row of the search's own result list (the client's PageSearchForm), known by its AL
+    // name in any language. Recordings from 4.7.273 keep the page's name alone as the row's
+    // caption; in older ones the caption ends with the kind (Artikeljournaler Uppgifter), and
+    // the page the user went on to work on names the result, as the page a result opened does.
+    // A result that opened a dialog first, as a journal's template list, is found the same way.
+    const SEARCH_RESULTS = "PageSearchForm";
+    const isSearchRow = value => [value?.targetControl,
+      ...(value?.semanticActionModel?.rawInteractions || []).map(item => item?.targetControl)]
+      .some(control => [...(control?.alControlPath || []), ...(control?.alPath || [])]
+        .includes(SEARCH_RESULTS));
+    const searchRowResult = (context, resultIndex, candidate, caption) => {
+      if (!caption || !isSearchRow(candidate)) return "";
+      for (const later of context.interactions.slice(resultIndex + 1, resultIndex + 6)) {
+        const shared = sharedWords(caption, text(later?.pageCaption));
+        if (shared) return shared;
+      }
+      return caption;
+    };
     const onDialogSurface = value => {
       const control = value?.targetControl || {};
       return ["RunAction", "ClickAction"].includes(value?.taskType) &&
@@ -1029,7 +1047,8 @@ function (sourceReference, captions, stepText) {
       const category = CATEGORY.test(resultCaption);
       const opened = openedPage(candidateResult);
       const result = category ? resultCaption.replace(CATEGORY, "")
-        : opened && sharedWords(resultCaption, opened) || "";
+        : opened && sharedWords(resultCaption, opened) ||
+          searchRowResult(context, resultIndex, candidateResult, resultCaption);
       return { inputEnd, resultIndex, candidateResult, result, category };
     };
     const rule = {

@@ -116,7 +116,7 @@ assert.strictEqual(manifest.content_scripts[0].all_frames, true);
 assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
 const captureScripts = ["engine/business-central-version-capture.js",
   "capture-field-privacy.js", "capture-value-regions.js", "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js",
-  "engine/bc-client-captions.js", "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"];
+  "engine/bc-client-captions.js", "bc-error-detector.js", "capture-indicator-i18n.js", "content.js", "guide-overlay.js"];
 assert.deepStrictEqual(manifest.content_scripts[0].js, captureScripts);
 // Dynamic registration and re-injection must load the same helpers as the
 // manifest; otherwise tabs opened before install/update lose capture context.
@@ -293,3 +293,34 @@ function memoryAdapter() {
 
   console.log("React/control add-in capture reliability tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });
+
+// A search result row shows the page's name and its kind in elements of their own (seen in
+// Business Central 2026-11-20: ms-itemName "Artikeljournaler", ms-itemType "Uppgifter"). The
+// recorder keeps the name alone, so the document names the page whatever the client's language.
+{
+  const vm = require("vm");
+  const start = content.indexOf("  // A search result row shows");
+  assert(start > 0, "the recorder reads a search result's name");
+  const helper = content.slice(start, content.indexOf("  function keyFields(event)"));
+  const node = (text, children = [], attrs = {}) => ({ textContent: text, innerText: text, children, attrs,
+    getAttribute: name => attrs[name] ?? null,
+    closest: selector => selector.includes("row") && attrs.role === "row" ? null : null,
+    querySelector: selector => {
+      const all = []; const walk = item => item.children.forEach(child => { all.push(child); walk(child); });
+      walk({ children });
+      if (selector.includes("ms-itemName--")) return all.find(child => /ms-itemName--/.test(child.attrs.class || "")) || null;
+      if (selector.includes("gridcell")) return all.find(child => child.attrs.role === "gridcell") || null;
+      return null;
+    } });
+  const name = node("Artikeljournaler", [], { class: "ms-itemName--GtXSKGRmkhInH7g6" });
+  const kind = node("Uppgifter", [], { class: "ms-itemType--QC_mRuUY3jwyFa6J" });
+  const cell = node("Artikeljournaler Uppgifter ", [name, kind], { role: "gridcell" });
+  const row = node("Artikeljournaler Uppgifter ", [cell], { role: "row" });
+  cell.closest = selector => selector.includes("row") ? row : null;
+  const caption = target => vm.runInNewContext(`${helper}; selectionCaption(target)`,
+    { target, clean: value => String(value).replace(/\s+/gu, " ").trim() });
+  assert.strictEqual(caption(cell), "Artikeljournaler", "a search result's name without its kind");
+  assert.strictEqual(caption(row), "Artikeljournaler");
+  const listCell = node("10000 Kontorsmöbler", [], { role: "gridcell" });
+  assert.strictEqual(caption(listCell), "10000 Kontorsmöbler", "another row keeps its whole text");
+}

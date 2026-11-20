@@ -4,7 +4,7 @@
   root.T9ReviewToolbar = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const COMMANDS = Object.freeze([
-    "undo", "redo", "merge", "split", "move-up", "move-down", "export", "share"
+    "undo", "redo", "merge", "split", "move-up", "move-down", "export", "share", "guide"
   ]);
 
   function derive(context) {
@@ -23,7 +23,9 @@
       "move-down": count >= 1 && selectedIndexes.at(-1) < taskIds.length - 1,
       export: Boolean(context.canExport) && taskIds.length > 0,
       // Share link makes the same Word file as Export Word.
-      share: Boolean(context.canExport) && taskIds.length > 0
+      share: Boolean(context.canExport) && taskIds.length > 0,
+      // Visa mig guides through the same document beside Business Central.
+      guide: Boolean(context.canExport) && taskIds.length > 0
     };
   }
 

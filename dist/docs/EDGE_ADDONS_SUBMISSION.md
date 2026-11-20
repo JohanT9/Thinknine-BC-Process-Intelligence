@@ -163,6 +163,12 @@ confirmed in Partner Center because store requirements can change.
    (`<all_urls>`). Check whether the capture scripts need it from pages other
    than Business Central, and if not, limit `matches` to the Business Central
    hosts. A narrower scope is easier to justify to reviewers.
+   **Done 2026-11-20 (not released):** `matches` is limited to
+   `https://businesscentral.dynamics.com/*` and
+   `https://*.businesscentral.dynamics.com/*` in `src/ui/manifest.json`. The
+   packs are read by the background script and the dashboard, which are the
+   extension's own pages; no content script loads them. Update the permission
+   table above once verified in a build.
 2. Privacy policy, support contact and website (see Listing copy).
 3. Reviewer tenant and certification notes.
 4. Migration guidance for pilot users, published before the store version is

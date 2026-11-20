@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visa mig – prototyp</title>
+<style>
+:root{
+  --brand:#008489;--brand-hover:#006f73;--brand-ink:#005f65;--brand-subtle:#eefafa;
+  --fg:#172b4d;--fg-muted:#526273;--bd:#ccd5df;--bd-strong:#8392a5;
+  --bg:#ffffff;--bg-soft:#f5f7fa;--ok:#18713a;--ok-bg:#e9f7ed;
+  --warn:#7c5800;--warn-bg:#fff7e0;--ring:#e8590c;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font:15px "Segoe UI",system-ui,sans-serif;color:var(--fg);background:#e9edf2;height:100vh;display:flex;flex-direction:column}
+button,input{font:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* ---------- Prototype chrome (not part of the design) ---------- */
+.proto-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:#1e293b;color:#fff;font-size:12px}
+.proto-bar strong{letter-spacing:.06em;text-transform:uppercase;font-size:11px;opacity:.8}
+.proto-bar button{padding:4px 10px;border-radius:5px;border:1px solid #64748b;background:#334155;color:#fff;cursor:pointer;font-size:12px}
+.proto-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.proto-bar .hint{opacity:.75}
+.stage{flex:1;display:flex;min-height:0}
+/* ---------- A simplified Business Central ---------- */
+.bc{flex:1;min-width:0;background:#fff;display:flex;flex-direction:column;position:relative;overflow:auto}
+.bc-top{height:44px;flex:none;background:#00475e;color:#fff;display:flex;align-items:center;padding:0 16px;font-weight:600;gap:16px}
+.bc-top span{opacity:.75;font-weight:400}
+.bc-page{padding:18px 26px;color:#212121}
+.bc-page h2{margin:0 0 10px;font-weight:600;font-size:20px}
+.bc-actions{display:flex;gap:4px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #e1e1e1}
+.bc-actions button{border:0;background:none;padding:6px 10px;border-radius:3px;cursor:pointer;color:#212121}
+.bc-actions button:hover{background:#f0f0f0}
+.bc-list{width:100%;border-collapse:collapse;font-size:14px}
+.bc-list th{text-align:left;font-weight:600;color:#605e5c;border-bottom:1px solid #e1e1e1;padding:6px 8px}
+.bc-list td{padding:6px 8px;border-bottom:1px solid #f3f2f1}
+.bc-fasttab{margin:6px 0 16px}
+.bc-fasttab h3{margin:0 0 8px;font-size:15px;font-weight:600}
+.bc-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,320px));gap:8px 40px}
+.bc-field{display:grid;grid-template-columns:120px minmax(100px,1fr);align-items:center;gap:8px;font-size:14px}
+.bc-field label{color:#605e5c}
+.bc-field input{border:0;border-bottom:1px solid #8a8886;padding:4px 2px;min-width:0}
+.bc-field input:focus{outline:none;border-bottom:2px solid #00475e}
+.bc-lines input{width:100%;min-width:60px;border:0;border-bottom:1px solid transparent;padding:3px 2px}
+.bc-lines input:focus{outline:none;border-bottom:1px solid #00475e}
+/* The ring BC Process Studio draws around the control of the step. */
+.guide-ring{position:absolute;pointer-events:none;border:3px solid var(--ring);border-radius:6px;box-shadow:0 0 0 4px rgba(232,89,12,.22);transition:all .25s ease;z-index:5;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(232,89,12,.08)}}
+@media (prefers-reduced-motion:reduce){.guide-ring{animation:none;transition:none}}
+.guide-tag{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:8px;padding:2px 8px;border-radius:4px;background:var(--ring);color:#fff;font-size:12px;font-weight:600;white-space:nowrap}
+/* ---------- The side panel ---------- */
+.panel{width:360px;flex:0 0 360px;background:var(--bg);border-left:1px solid var(--bd);display:flex;flex-direction:column;min-height:0}
+.p-head{padding:12px 14px 10px;border-bottom:1px solid var(--bd)}
+.p-kicker{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand-ink)}
+.p-title{margin:2px 0 8px;font-size:1rem;line-height:1.3}
+.p-progress{display:flex;align-items:center;gap:10px;font-size:.8125rem;color:var(--fg-muted)}
+.p-bar{flex:1;height:6px;border-radius:3px;background:#e3e8ee;overflow:hidden}
+.p-bar span{display:block;height:100%;background:var(--brand);transition:width .3s}
+.p-body{flex:1;overflow:auto;padding:14px;display:grid;gap:12px;align-content:start}
+.p-section{margin:0;font-size:.75rem;font-weight:700;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.04em}
+.p-step{margin:0;font-size:1.1875rem;line-height:1.4;font-weight:600}
+.p-step b{color:var(--brand-ink)}
+.p-step i{font-style:normal;background:var(--brand-subtle);padding:0 4px;border-radius:3px}
+.p-hint{display:flex;gap:8px;align-items:flex-start;margin:0;padding:10px 12px;border-radius:8px;background:var(--bg-soft);font-size:.875rem;line-height:1.45}
+.p-hint[data-kind="warn"]{background:var(--warn-bg);color:var(--warn)}
+.p-hint[data-kind="ok"]{background:var(--ok-bg);color:var(--ok)}
+.p-hint .dot{flex:none;width:9px;height:9px;margin-top:6px;border-radius:50%;background:var(--ring);animation:pulse2 1.6s infinite}
+@keyframes pulse2{50%{opacity:.35}}
+.p-shot{border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:#f8fafc}
+.p-shot summary{padding:8px 10px;cursor:pointer;font-size:.875rem;color:var(--brand-ink);font-weight:600}
+.p-shot .img{height:120px;margin:0 10px 10px;border-radius:4px;background:repeating-linear-gradient(135deg,#eef2f6 0 10px,#e3e8ee 10px 20px);display:grid;place-items:center;color:var(--fg-muted);font-size:.8125rem}
+.p-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;border-top:1px solid var(--bd)}
+.p-foot button{min-height:36px;padding:7px 14px;border-radius:6px;border:1px solid var(--bd-strong);background:#fff;color:var(--fg);font-weight:600;cursor:pointer}
+.p-foot button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.p-foot button.text{border-color:transparent;background:none;color:var(--brand-ink);text-decoration:underline;padding:4px}
+.p-foot .spacer{flex:1}
+.p-done{text-align:center;display:grid;gap:10px;justify-items:center;padding:30px 10px}
+.p-done .check{width:54px;height:54px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:28px}
+.p-done h2{margin:0;font-size:1.1875rem}
+.p-done p{margin:0;color:var(--fg-muted);font-size:.9375rem}
+.p-list{margin:0;padding-left:22px;font-size:.875rem;display:grid;gap:3px}
+.p-list li[data-state="done"]{color:var(--fg-muted);text-decoration:line-through}
+.p-list li[data-state="now"]{font-weight:700;color:var(--fg)}
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>Prototyp</strong>
+  <span class="hint">Gör stegen i Business Central till vänster. Guiden ringar in var och går vidare av sig själv.</span>
+  <label><input type="checkbox" id="protoMissing"> Simulera: fältet hittas inte</label>
+  <button type="button" id="protoRestart">Börja om</button>
+</div>
+<div class="stage">
+  <main class="bc" id="bc" aria-label="Business Central (simulerad)">
+    <div class="bc-top">Dynamics 365 Business Central <span>CRONUS Sverige AB</span></div>
+    <section class="bc-page" id="pageList">
+      <h2>Inköpsorder</h2>
+      <div class="bc-actions"><button type="button" data-target="new">+ Ny</button><button type="button">Redigera lista</button><button type="button">Ta bort</button></div>
+      <table class="bc-list"><thead><tr><th>Nr</th><th>Leverantörsnr</th><th>Leverantörsnamn</th><th>Status</th></tr></thead>
+        <tbody><tr><td>106001</td><td>20000</td><td>First Up Consultants</td><td>Öppen</td></tr><tr><td>106002</td><td>30000</td><td>Graphic Design Institute</td><td>Släppt</td></tr></tbody></table>
+    </section>
+    <section class="bc-page" id="pageCard" hidden>
+      <h2>Inköpsorder · 106003</h2>
+      <div class="bc-actions"><button type="button" data-target="release">Släpp</button><button type="button">Bokför…</button><button type="button">Skriv ut…</button></div>
+      <div class="bc-fasttab"><h3>Allmänt</h3>
+        <div class="bc-fields">
+          <div class="bc-field"><label for="vendor">Leverantörsnr</label><input id="vendor" data-target="vendor" autocomplete="off"></div>
+          <div class="bc-field"><label for="vname">Leverantörsnamn</label><input id="vname" readonly></div>
+          <div class="bc-field"><label for="odate">Orderdatum</label><input id="odate" value="2026-11-19"></div>
+          <div class="bc-field"><label for="status">Status</label><input id="status" value="Öppen" readonly></div>
+        </div></div>
+      <div class="bc-fasttab"><h3>Rader</h3>
+        <table class="bc-list bc-lines"><thead><tr><th>Typ</th><th>Nr</th><th>Beskrivning</th><th>Antal</th></tr></thead>
+          <tbody><tr><td>Artikel</td><td><input data-target="item" aria-label="Nr" autocomplete="off"></td><td><input id="desc" aria-label="Beskrivning" readonly></td><td><input data-target="qty" aria-label="Antal" autocomplete="off"></td></tr></tbody></table></div>
+    </section>
+    <div class="guide-ring" id="ring" hidden></div>
+  </main>
+  <aside class="panel" aria-label="BC Process Studio">
+    <header class="p-head">
+      <p class="p-kicker">Visa mig</p>
+      <h1 class="p-title">Skapa och släppa en inköpsorder</h1>
+      <div class="p-progress"><div class="p-bar" aria-hidden="true"><span id="bar"></span></div><span id="count"></span></div>
+    </header>
+    <div class="p-body" id="body">
+      <p class="p-section" id="section"></p>
+      <p class="p-step" id="step" tabindex="-1"></p>
+      <p class="p-hint" id="hint" role="status" aria-live="polite"></p>
+      <details class="p-shot"><summary>Visa skärmbilden från dokumentet</summary><div class="img">Skärmbild av steget</div></details>
+      <details class="p-shot"><summary>Alla steg</summary><ol class="p-list" id="all"></ol></details>
+    </div>
+    <div class="p-body p-done" id="done" hidden>
+      <div class="check" aria-hidden="true">✓</div>
+      <h2 tabindex="-1" id="doneTitle">Klart! Du har gjort alla 5 stegen.</h2>
+      <p>Inköpsordern är skapad och släppt. Gå igenom igen när du vill, eller gör samma steg som ett test.</p>
+    </div>
+    <footer class="p-foot" id="foot">
+      <button type="button" class="text" id="back">Föregående</button>
+      <span class="spacer"></span>
+      <button type="button" id="skip">Hoppa över</button>
+      <button type="button" class="primary" id="manual">Jag har gjort det</button>
+    </footer>
+    <footer class="p-foot" id="doneFoot" hidden>
+      <button type="button" id="again">Gå igenom igen</button>
+      <button type="button" class="primary">Starta som test</button>
+    </footer>
+  </aside>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  // The document's steps, with what each step's control is and what it expects.
+  const steps = [
+    { section: "Skapa ordern", html: "Välj <b>Ny</b>.", page: "pageList", pageName: "Inköpsorder", target: "new", kind: "action" },
+    { section: "Skapa ordern", html: "Ange <i>10000</i> i <b>Leverantörsnr</b>.", page: "pageCard", pageName: "Inköpsorder", target: "vendor", kind: "field", value: "10000" },
+    { section: "Lägg till rader", html: "Ange <i>1896-S</i> i <b>Nr</b> på raden.", page: "pageCard", pageName: "Inköpsorder", target: "item", kind: "field", value: "1896-S" },
+    { section: "Lägg till rader", html: "Ange <i>5</i> i <b>Antal</b>.", page: "pageCard", pageName: "Inköpsorder", target: "qty", kind: "field", value: "5" },
+    { section: "Släpp ordern", html: "Välj <b>Släpp</b>.", page: "pageCard", pageName: "Inköpsorder", target: "release", kind: "action" }
+  ];
+  let index = 0;
+  let note = null;
+  const ring = $("ring");
+  function element(step) { return document.querySelector(`#${step.page}:not([hidden]) [data-target="${step.target}"]`); }
+  function placeRing(target) {
+    const bc = $("bc").getBoundingClientRect();
+    const box = target.getBoundingClientRect();
+    ring.hidden = false;
+    Object.assign(ring.style, { left: `${box.left - bc.left + $("bc").scrollLeft - 6}px`, top: `${box.top - bc.top + $("bc").scrollTop - 6}px`,
+      width: `${box.width + 12}px`, height: `${box.height + 12}px` });
+  }
+  function hint(kind, text, pulse = false) {
+    $("hint").dataset.kind = kind;
+    $("hint").replaceChildren(...(pulse ? [Object.assign(document.createElement("span"), { className: "dot" })] : []),
+      Object.assign(document.createElement("span"), { textContent: text }));
+  }
+  function render(focus = false) {
+    if (index >= steps.length) return finish();
+    const step = steps[index];
+    $("done").hidden = true; $("doneFoot").hidden = true; $("body").hidden = false; $("foot").hidden = false;
+    $("section").textContent = step.section;
+    $("step").innerHTML = step.html;
+    $("count").textContent = `Steg ${index + 1} av ${steps.length}`;
+    $("bar").style.width = `${index / steps.length * 100}%`;
+    $("back").disabled = index === 0;
+    $("all").replaceChildren(...steps.map((item, n) => {
+      const li = document.createElement("li");
+      li.innerHTML = item.html;
+      li.dataset.state = n < index ? "done" : n === index ? "now" : "";
+      return li;
+    }));
+    const target = element(step);
+    if (!document.querySelector(`#${step.page}:not([hidden])`)) {
+      ring.hidden = true;
+      hint("warn", `Det här steget görs på sidan ${step.pageName}. Öppna den, så fortsätter guiden.`);
+    } else if (!target || $("protoMissing").checked) {
+      ring.hidden = true;
+      hint("warn", "Guiden hittar inte fältet på sidan just nu. Det kan ligga på en snabbflik som är hopfälld. Titta på skärmbilden, gör steget och välj Jag har gjort det.");
+    } else {
+      target.scrollIntoView({ block: "nearest" });
+      placeRing(target);
+      if (note) hint("ok", note, false);
+      else hint("", step.kind === "field" ? "Fältet är inringat i Business Central. Skriv värdet, så går guiden vidare." :
+        "Knappen är inringad i Business Central. Klicka på den, så går guiden vidare.", true);
+    }
+    if (focus) $("step").focus();
+  }
+  function advance(message = null) {
+    note = message;
+    index += 1;
+    render(true);
+    setTimeout(() => { if (note) { note = null; } }, 0);
+  }
+  function finish() {
+    ring.hidden = true;
+    $("bar").style.width = "100%";
+    $("count").textContent = `${steps.length} av ${steps.length}`;
+    $("body").hidden = true; $("foot").hidden = true; $("done").hidden = false; $("doneFoot").hidden = false;
+    $("doneTitle").focus();
+  }
+  // What the user does in Business Central: the guide follows only the step's own control.
+  $("bc").addEventListener("click", event => {
+    const button = event.target.closest("button[data-target]");
+    if (!button) return;
+    if (button.dataset.target === "new") { $("pageList").hidden = true; $("pageCard").hidden = false; }
+    if (button.dataset.target === "release") $("status").value = "Släppt";
+    const step = steps[index];
+    if (step && step.kind === "action" && button.dataset.target === step.target) advance();
+    else render();
+  });
+  $("bc").addEventListener("change", event => {
+    const input = event.target.closest("input[data-target]");
+    const step = steps[index];
+    if (input?.dataset.target === "vendor") $("vname").value = input.value === "10000" ? "Fabrikam, Inc." : "Annan leverantör";
+    if (input?.dataset.target === "item") $("desc").value = "Stol, blå";
+    if (!input || !step || step.kind !== "field" || input.dataset.target !== step.target) return;
+    // A different value is fine: the document's value is an example.
+    advance(input.value.trim() && input.value.trim() !== step.value
+      ? `Du angav ${input.value.trim()}. I dokumentet står ${step.value}, och det går bra om det är meningen.` : null);
+  });
+  $("bc").addEventListener("keydown", event => { if (event.key === "Enter" && event.target.matches("input")) event.target.blur(); });
+  $("manual").addEventListener("click", () => advance());
+  $("skip").addEventListener("click", () => advance());
+  $("back").addEventListener("click", () => { if (index > 0) { index -= 1; note = null; render(true); } });
+  $("again").addEventListener("click", restart);
+  $("protoRestart").addEventListener("click", restart);
+  $("protoMissing").addEventListener("change", () => render());
+  window.addEventListener("resize", () => render());
+  function restart() {
+    index = 0; note = null;
+    $("pageList").hidden = false; $("pageCard").hidden = true;
+    document.querySelectorAll(".bc input").forEach(input => { if (!input.readOnly && input.id !== "odate") input.value = ""; });
+    $("status").value = "Öppen"; $("vname").value = ""; $("desc").value = "";
+    render(true);
+  }
+  render();
+})();
+</script>
+</body>
+</html>
