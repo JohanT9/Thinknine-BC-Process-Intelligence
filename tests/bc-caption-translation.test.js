@@ -242,4 +242,51 @@ const itemStep = grammar.process({ schemaVersion: 1, documentId: "item",
   .sections[0].blocks[0].blocks[0];
 assert.strictEqual(itemStep.text, "Choose Item No. 21036.");
 
+// A page opened from the search names the page as Business Central does in each language, also
+// when the result is not a list and a dialog (the journal's template list) comes first: the page
+// is the next one with the result's own name.
+{
+  const top = { sourceFrameId: "top", frameDepth: 0, pageCaption: "Rollcenter" };
+  const frame = { sourceFrameId: "bc", frameDepth: 1, pageCaption: "Rollcenter" };
+  const searchRaw = [
+    { ...top, type: "click", category: "action", controlType: "button", role: "button", accessibleName: "Sök",
+      label: "Sök", pointerTarget: true, interactionId: "top:search", timestamp: at(1) },
+    { ...frame, type: "field-change", category: "field", inputSource: "input", value: "art journ",
+      controlType: "input", role: "searchbox", accessibleName: "Berätta vad du vill göra.",
+      fieldName: "Berätta vad du vill göra.", label: "Berätta vad du vill göra.", interactionId: "bc:query", timestamp: at(4) },
+    { ...frame, type: "click", category: "selection", controlType: "div", role: "gridcell",
+      accessibleName: "Artikeljournaler Uppgifter ", label: "Artikeljournaler Uppgifter ",
+      selectedCaption: "Artikeljournaler", selectedValue: "Artikeljournaler", alControlPath: ["PageSearchForm"],
+      pointerTarget: true, interactionId: "bc:result", timestamp: at(6) },
+    { ...frame, pageCaption: "Artikeljournalmallslista", type: "click", category: "action", controlType: "a",
+      role: "button", accessibleName: 'Namn, sorterade i Stigande order Välj posten "ARTIKEL"',
+      label: 'Namn, sorterade i Stigande order Välj posten "ARTIKEL"', pointerTarget: true,
+      interactionId: "bc:result", timestamp: at(9), alIdentity: { v: 1, kind: "row",
+        path: [{ page: "Item Journal Template List" }, { repeater: "Control1" }], field: "Name", value: "ARTIKEL" } },
+    { ...frame, pageCaption: "Artikeljournaler", pageId: "40", type: "field-change", category: "field",
+      inputSource: "input", value: "30043", controlType: "input", role: "textbox", accessibleName: "Artikelnr",
+      fieldName: "Artikelnr", label: "Artikelnr", interactionId: "bc:item", timestamp: at(14),
+      alIdentity: { v: 1, kind: "field", path: [{ page: "Item Journal" }, { repeater: "Control1" }], field: "Item No." } }
+  ].map((event, index) => ({ ...event, sourceEventId: `search:${index + 1}`, sourceSequence: index + 1,
+    recordingId: "search-translation" }));
+  let searchRecording = canonical.create({ id: "search-translation", name: "Search" });
+  const searchEvents = searchRaw.map((event, index) => {
+    searchRecording = canonical.addEvent(searchRecording, event, identify.identify(event, { eventId: `search:event:${index}` }));
+    return { ...event, eventNo: index + 1, canonicalSourceEventId: searchRecording.events.at(-1).id };
+  });
+  const searchNormalized = normalization.normalizeRecording(searchRecording);
+  const searchGrouped = grouping.group(searchNormalized);
+  const searchTasks = pipeline.interpret({
+    session: { id: "search-translation", name: "Search", settings: { documentLanguage: "sv-SE" } },
+    events: searchEvents, normalizedEvents: searchNormalized.events, stepGroups: searchGrouped.groups,
+    supportingEvents: searchGrouped.supportingEvents, groupingDiagnostics: searchGrouped.diagnostics,
+    imagePaths: {}, knowledgePacks: [] }).businessTasks;
+  const search = searchTasks.find(task => task.taskType === "SearchAndOpenPage");
+  assert.ok(search, JSON.stringify(searchTasks.map(task => task.instruction)));
+  assert.strictEqual(search.instruction, "Sök efter __art journ__ och öppna **Artikeljournaler**.");
+  assert.strictEqual(search.semanticActionModel.captionKeys.page, "p|Item Journal");
+  assert.match(sentence(search, "en-US").text, /open Item Journals\./u);
+  assert.match(sentence(search, "da-DK").text, /Varekladder/u);
+}
+
 console.log("Business Central caption translation tests passed");

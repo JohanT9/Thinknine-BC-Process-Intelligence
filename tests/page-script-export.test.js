@@ -219,6 +219,175 @@ assert.deepStrictEqual(result.skipped.map(item => [item.label, item.reason]), [
   assert.deepStrictEqual(closed.skipped, [], "the ✕ is the close step; a page the test never used is not closed");
 }
 
+// The item journal recorded on 2026-11-20 (Artikeljournaler, BF/SF ALM): five of its steps
+// failed in Business Central's replay. The file now follows Business Central's own recording of
+// the same steps: an option by its number, the link in the line as an invoke on its field, the
+// lookup button of a field in a dialog with the row chosen, and a split button that cannot be
+// named left out together with the questions it opens.
+{
+  const journal = [{ page: "Item Journal" }, { repeater: "Control1" }];
+  const opens = page => ({ type: "dialog-open", eventNo: ++n, timestamp: at(), alControlPath: [page] });
+  const closes = page => ({ type: "dialog-close", eventNo: ++n, timestamp: at(), alControlPath: [page] });
+  const posted = "8da61efd-0002-0003-0507-0b0d1113171d";
+  const entryType = (extra = {}) => ({ ...change(journal, "EntryType", "Positiv justering", { previousValue: "Inköp", ...extra }),
+    role: "select", controlType: "select", alIdentity: id("field", { path: journal, field: "EntryType", caption: "Transaktionstyp" }) });
+  const recorded = exporter.build({ locale: "sv-SE", events: [
+    // The way to the start page: the search and the journal template, not missing steps.
+    { ...click(id("row", { path: [{ page: null }], field: "", rowIndex: 0 }), "Artikeljournaler Uppgifter "), role: "gridcell" },
+    { ...opens("Item Journal Template List"), pageCaption: "Artikeljournalmallslista" },
+    { ...click(id("row", { path: [{ page: "Item Journal Template List" }, { repeater: "Control1" }], field: "Name",
+      rowIndex: 0, value: "ARTIKEL" }), "Välj posten \"ARTIKEL\""), role: "button" },
+    closes("Item Journal Template List"),
+    entryType({ optionIndex: 2 }),
+    change(journal, "Item No.", "30043", { inputSource: "input", previousValue: "" }),
+    change(journal, "Quantity", "150", { previousValue: "0" }),
+    // A link in the line opens Item Tracking Lines.
+    { ...click(id("row", { path: journal, field: "ItemTracking08FDW", caption: "Artikelspårning", rowIndex: 0,
+      value: "Ej slutfört" }), "Artikelspårning Öppna information om Artikelspårning Ej slutfört"), role: "button" },
+    opens("Item Tracking Lines"),
+    { ...click(id("action", { path: [{ page: "Item Tracking Lines" }], action: "CreateLicensePlatesFDW" }), "Skapa lastbärare"),
+      role: "menuitem" },
+    opens("Create License Plates FDW"),
+    { ...click(id("dialog", { page: "Create License Plates FDW", operation: "", caption: "Skapa lastbärare" }),
+      "Välj ett värde för Lastbärarekod"), role: "button", alControlPath: ["Shipping Container Code", "Create License Plates FDW"] },
+    opens("ItemPackagingList05FDW"),
+    { ...click(id("row", { path: [{ page: "ItemPackagingList05FDW" }, { repeater: "Group" }], field: "Packaging Code",
+      caption: "Förpackningskod", rowIndex: 1, value: "SRS PALL" }), "Välj posten \"SRS PALL\""), role: "button" },
+    { ...click(id("control", { path: [{ page: "ItemPackagingList05FDW" }], caption: "OK" }), "OK"), role: "button" },
+    closes("ItemPackagingList05FDW"),
+    click(id("dialog", { page: "Create License Plates FDW", operation: "OK", caption: "Skapa lastbärare",
+      pageType: 10, pageMode: 1 }), "OK"),
+    closes("Create License Plates FDW"),
+    click(id("dialog", { page: "Item Tracking Lines", operation: "Cancel", caption: "Artikelspårningsrader" }), "Stäng"),
+    closes("Item Tracking Lines"),
+    // Bokför is a split button: pressing it posts, but the client reports the menu.
+    { ...click(id("menu", { path: [{ page: "Item Journal" }], action: "Category_Category5", caption: "Bokföring" }), "Bokför"),
+      role: "button" },
+    { ...opens("Dialog"), accessibleName: "Vill du bokföra journalraderna?" },
+    click(id("dialog", { page: null, automationId: posted, caption: "Bekräfta", operation: "Yes" }), "Ja"),
+    { ...opens("Dialog"), accessibleName: "Journalraderna är bokförda." },
+    click(id("dialog", { page: null, automationId: posted, caption: "", operation: "OK" }), "OK"),
+    closes("Dialog")
+  ] });
+  const shape = step => [step.type, step.invokeType || "", step.target.map(entry => Object.values(entry)[0]).join(" › ")];
+  assert.deepStrictEqual(recorded.steps.map(shape), [
+    ["navigate", "", "Item Journal"],
+    ["invoke", "", "Item Journal Template List › Control1"],
+    ["input", "", "Item Journal › Control1 › EntryType"],
+    ["input", "", "Item Journal › Control1 › Item No."],
+    ["input", "", "Item Journal › Control1 › Quantity"],
+    ["invoke", "", "Item Journal › Control1 › ItemTracking08FDW"],
+    ["invoke", "", "Item Tracking Lines › CreateLicensePlatesFDW"],
+    ["invoke", "Lookup", "Create License Plates FDW › Shipping Container Code"],
+    ["set-current-row", "", "ItemPackagingList05FDW › Group"],
+    ["invoke", "", "ItemPackagingList05FDW › Group"],
+    ["invoke", "Ok", "Create License Plates FDW"],
+    ["invoke", "Cancel", "Item Tracking Lines"]
+  ], "the steps as Business Central's own recording writes them");
+  assert.strictEqual(recorded.steps[2].value, 2, "an option is entered by its number");
+  assert.strictEqual(recorded.steps[2].description, "Mata in <value>Positiv justering</value> i <caption>Transaktionstyp</caption>");
+  assert.strictEqual(recorded.steps[5].description, "Anropa <caption>Artikelspårning</caption>");
+  assert.deepStrictEqual(recorded.steps[1].parameters, { AlwaysCommit: false },
+    "Item Journal asks for its template first when there are several; replay is asked the same, so the row chosen is a step");
+  assert.deepStrictEqual(recorded.steps[9].parameters, { AlwaysCommit: false });
+  assert.deepStrictEqual(recorded.skipped.map(item => [item.label, item.reason]),
+    [["Bokför", "unsupported"], ["Ja", "withoutCause"], ["OK", "withoutCause"]],
+    "the split button is named; the question and the message it opens follow it out; the way to the start is not missing");
+  const yaml = recorded.content;
+  assert.ok(yaml.includes("      - field: EntryType\n    value: 2\n"), yaml);
+  assert.ok(yaml.includes("      - field: Shipping Container Code\n    invokeType: Lookup\n"), yaml);
+  assert.ok(yaml.includes("    targetRecord:\n      relative: 1\n"), yaml);
+
+  // OK on a StandardDialog page (type 10) is Ok; on a page opened as a lookup (mode 3) LookupOk,
+  // as Business Central replayed them; without the type and mode (an older recording), LookupOk.
+  const okOf = extra => exporter.build({ events: [change(journal, "Quantity", "1"),
+    click(id("dialog", { page: "ChangeApplPurchDirUnitCostFDW", operation: "OK", caption: "Ändra", ...extra }), "OK")
+  ] }).steps.at(-1).invokeType;
+  assert.deepStrictEqual([okOf({ pageType: 10, pageMode: 1 }), okOf({ pageType: 0, pageMode: 3 }), okOf({})],
+    ["Ok", "LookupOk", "LookupOk"]);
+
+  // The second template is chosen by its row.
+  const second = exporter.build({ events: [
+    opens("Item Journal Template List"),
+    { ...click(id("row", { path: [{ page: "Item Journal Template List" }, { repeater: "Control1" }], field: "Name",
+      rowIndex: 1, value: "EXP" }), "EXP"), role: "button" },
+    closes("Item Journal Template List"),
+    change(journal, "Item No.", "30043")
+  ] });
+  assert.deepStrictEqual(second.steps.map(step => step.type),
+    ["navigate", "set-current-row", "invoke", "input"]);
+  assert.deepStrictEqual(second.steps[1].targetRecord, { relative: 1 });
+  assert.deepStrictEqual(second.skipped, []);
+
+  // A recording made before the choice's number was kept cannot name the option: it is left
+  // out and named rather than written as text, which replay does not accept.
+  const older = exporter.build({ events: [change(journal, "Item No.", "30043"), entryType()] });
+  assert.deepStrictEqual(older.steps.slice(1).map(step => step.target.at(-1).field), ["Item No."]);
+  assert.deepStrictEqual(older.skipped.map(item => [item.label, item.reason]), [["Transaktionstyp", "option"]]);
+
+  // A page opened by a click that is not in the file is never shown in replay: what happens in
+  // it, and in what it opens, is left out until it closes.
+  const unseen = exporter.build({ events: [
+    change(journal, "Quantity", "150"),
+    { ...click(id("menu", { path: [{ page: "Item Journal" }], action: "Category_Category6" }), "Funktioner"), role: "button" },
+    opens("Item Tracking Lines"),
+    click(id("action", { path: [{ page: "Item Tracking Lines" }], action: "CreateLicensePlatesFDW" }), "Skapa lastbärare"),
+    opens("Create License Plates FDW"),
+    click(id("dialog", { page: "Create License Plates FDW", operation: "OK", caption: "Skapa lastbärare" }), "OK"),
+    closes("Create License Plates FDW"),
+    click(id("dialog", { page: "Item Tracking Lines", operation: "Cancel", caption: "Artikelspårningsrader" }), "Stäng"),
+    closes("Item Tracking Lines"),
+    change(journal, "Quantity", "200")
+  ] });
+  assert.deepStrictEqual(unseen.steps.slice(1).map(step => step.value), ["150", "200"]);
+  assert.deepStrictEqual(unseen.skipped.map(item => [item.label, item.reason]), [["Funktioner", "unsupported"],
+    ["Skapa lastbärare", "withoutCause"], ["OK", "withoutCause"], ["Stäng", "withoutCause"]]);
+}
+
+// After a step in the file: the question is answered, and a message is checked by its text, as
+// Business Central's own recording of Post writes it.
+{
+  const journal = [{ page: "Item Journal" }, { repeater: "Control1" }];
+  const posted = "8da61efd-0002-0003-0507-0b0d1113171d";
+  const post = exporter.build({ locale: "sv-SE", events: [
+    change(journal, "Quantity", "150"),
+    click(id("action", { path: [{ page: "Item Journal" }], action: "Post", caption: "Bokför" }), "Bokför"),
+    { type: "dialog-open", eventNo: ++n, timestamp: at(), alControlPath: ["Dialog"], accessibleName: "Vill du bokföra journalraderna?" },
+    click(id("dialog", { page: null, automationId: posted, caption: "Bekräfta", operation: "Yes" }), "Ja"),
+    { type: "dialog-open", eventNo: ++n, timestamp: at(), alControlPath: ["Dialog"], accessibleName: "Journalraderna är bokförda." },
+    click(id("dialog", { page: null, automationId: posted, caption: "", operation: "OK" }), "OK")
+  ] });
+  assert.deepStrictEqual(post.skipped, []);
+  assert.ok(post.content.endsWith(`  - type: message
+    automationId: "${posted}"
+    text: "Journalraderna är bokförda."
+    description: "Meddelande: <value>Journalraderna är bokförda.</value>"
+`), post.content);
+}
+
+// A page opened by a step in the file is used as before, and a message is answered with Ok, as
+// Page Scripting writes it.
+{
+  const kept = exporter.build({ locale: "sv-SE", events: [
+    change(lines, "Quantity", "5"),
+    click(id("action", { path: [...order, { part: "PurchLines" }, { page: "Purchase Order Subform" }],
+      action: "AppliedPurchasePriceAndDiscountFDW", caption: "Tillämpat inköpspris och rabatt" }), "Tillämpat inköpspris och rabatt"),
+    { type: "dialog-open", eventNo: ++n, timestamp: at(), alControlPath: ["AppldPurchPriceAndDiscountFDW"] },
+    click(id("dialog", { page: "AppldPurchPriceAndDiscountFDW", operation: "Cancel", caption: "Tillämpat" }), "Stäng"),
+    { type: "dialog-close", eventNo: ++n, timestamp: at(), alControlPath: ["AppldPurchPriceAndDiscountFDW"] },
+    click(id("menu", { path: order, action: "Category_Category5" }), "Släpp"),
+    click(id("action", { path: order, action: "Release", caption: "Släpp" }), "Släpp"),
+    { type: "dialog-open", eventNo: ++n, timestamp: at(), alControlPath: ["Dialog"] },
+    click(id("dialog", { page: null, automationId: "00000000-0000-0000-0800-0000836bd2d2", caption: "Fel",
+      operation: "OK" }), "OK")
+  ] });
+  assert.deepStrictEqual(kept.steps.slice(1).map(step => step.invokeType || step.target.at(-1).action || step.type),
+    ["input", "AppliedPurchasePriceAndDiscountFDW", "Cancel", "Release", "Ok"]);
+  assert.strictEqual(kept.steps.at(-1).description, "Anropa <operation>OK</operation> på <caption>Fel</caption>");
+  assert.deepStrictEqual(kept.skipped, [], "a menu opened before an action is not a missing step");
+  assert.ok(kept.content.includes("    invokeType: Ok\n"));
+}
+
 // A value the recording masks is entered as typed, from typedValue.
 {
   const typed = exporter.build({ events: [
@@ -324,7 +493,15 @@ const deleteInLines = new Control({ designName: null, name: deleteGuid, controlI
   _parent: repeater, _rawCaption: box("Ta bort rad") });
 const deleteInBar = new Control({ designName: null, name: deleteGuid, controlIdentifier: deleteGuid,
   _parent: subform, _rawCaption: box("Ta bort rad") });
-const registry = new Map([["b3z", release], ["b35", releaseRef], ["c1", deleteInLines], ["c2", deleteInBar]]);
+// A promoted group shown as a split button (Bokför › Category_Category5); its first action is
+// an action reference to Post.
+const postingGroup = new Control({ designName: "Category_Category5", name: "Category_Category5", _parent: page,
+  _rawCaption: box("Bokföring"), _children: [
+    new Control({ designName: "Post_Promoted", name: "1149833852", _parent: page, _visible: box(false),
+      actionReference: { targetName: "Post" }, _rawCaption: box("Post_Promoted") }),
+    new Control({ designName: "PreviewPosting_Promoted", name: "1522847550", _parent: page,
+      actionReference: { targetName: "PreviewPosting" } })] });
+const registry = new Map([["b3z", release], ["b35", releaseRef], ["c1", deleteInLines], ["c2", deleteInBar], ["bon", postingGroup]]);
 page._context = { controlRegistry: { controlLookupById: registry } };
 quantity._context = page._context;
 const pageElement = new Element("div", {}, body);
@@ -340,10 +517,20 @@ const lookupLink = new Element("a", { text: "30043" }, lookupCell);
 const button = new Element("button", { "aria-label": "Släpp" }, pageElement);
 const label = new Element("span", { text: "Släpp" }, button);
 label["__reactFiber$x"] = { pendingProps: {}, return: { pendingProps: { "data-control-id": "b35" } } };
+const postingHolder = new Element("div", { "data-control-id": "bon" }, pageElement);
+const postingSplit = new Element("div", { role: "menuitem", "aria-haspopup": "true", "data-issplitbutton": "true",
+  "aria-label": "Bokför" }, postingHolder);
+const postingButton = new Element("button", { text: "Bokför" }, postingSplit);
+const postingArrow = new Element("button", { text: "" }, postingSplit);
+// The same group drawn with the button beside the marked container.
+const besideHolder = new Element("div", { "data-control-id": "bon", role: "menuitem", "aria-haspopup": "true" }, pageElement);
+const besideButton = new Element("button", { text: "Bokför" }, besideHolder);
+new Element("span", { "data-issplitbutton": "true" }, besideHolder);
 const dialog = new Element("div", { role: "dialog", "aria-label": "Vill du ta bort?" }, body);
 const dialogRoot = new Element("div", {}, dialog);
 dialogRoot._adapter = { $buildController: { _childAdapters: { items: [{ containerController: {
-  attachedForm: new Form({ designName: "", controlIdentifier: "00000000-0000-0000-0400-0000836bd2d2", _rawCaption: box("Bekräfta") }) } }] } } };
+  attachedForm: new Form({ designName: "", controlIdentifier: "00000000-0000-0000-0400-0000836bd2d2", _rawCaption: box("Bekräfta"),
+    pageType: 10, _pageMode: box(1) }) } }] } } };
 const yes = new Element("button", { text: "Ja" }, dialog);
 const lineMenu = new Element("div", { role: "menu" }, body);
 const deleteItem = new Element("button", { role: "menuitem", text: "Ta bort rad" }, lineMenu);
@@ -385,6 +572,28 @@ const confirm = identityAfter("pointerdown", yes);
 assert.deepStrictEqual({ kind: confirm.kind, page: confirm.page, automationId: confirm.automationId,
   caption: confirm.caption, operation: confirm.operation },
 { kind: "dialog", page: null, automationId: "00000000-0000-0000-0400-0000836bd2d2", caption: "Bekräfta", operation: "Yes" });
+assert.deepStrictEqual([confirm.pageType, confirm.pageMode], [10, 1], "the page type and mode decide how OK closes it");
+
+// The split button itself runs its group's first action, as Page Scripting records it; its arrow
+// opens the menu.
+const posting = identityAfter("pointerdown", postingButton);
+assert.deepStrictEqual([posting.kind, posting.action, posting.splitButton], ["action", "Post", true], "the first action also when none says it is shown");
+assert.deepStrictEqual(posting.path, [{ page: "Purchase Order" }]);
+// Business Central focuses the container when the button is pressed: that focus, and a key on
+// it, run the button too, so they do not turn the press into the menu.
+const focusedSplit = identityAfter("focusin", postingSplit);
+assert.deepStrictEqual([focusedSplit.kind, focusedSplit.action], ["action", "Post"], "focus on the split container");
+// A press on the text inside the button also hands the identity to the button, which is what the
+// recording keeps.
+const postingLabel = new Element("span", { text: "Bokför" }, postingButton);
+postingButton.dispatched.length = 0;
+const fromLabel = identityAfter("pointerdown", postingLabel);
+const onButton = postingButton.dispatched.find(item => item.type === "bcps-al-identity");
+assert.deepStrictEqual([fromLabel.action, onButton && JSON.parse(onButton.detail).action], ["Post", "Post"]);
+const beside = identityAfter("pointerdown", besideButton);
+assert.deepStrictEqual([beside.kind, beside.action], ["action", "Post"], "a button beside the marked container");
+const postingMenu = identityAfter("pointerdown", postingArrow);
+assert.deepStrictEqual([postingMenu.kind, postingMenu.action], ["menu", "Category_Category5"]);
 
 // A line's own ⋯ menu names no control: the action is found by its caption, and its fixed id
 // tells the file it is Delete.
@@ -442,7 +651,8 @@ require("../src/engine/language-registry");
 require("../src/ui/i18n");
 const i18n = globalThis.T9UiI18n;
 const keys = ["pageScript.exportAction", "pageScript.exportCreating", "pageScript.exportDone",
-  "pageScript.exportPartial", "pageScript.exportEmpty", "pageScript.exportNotRecorded", "pageScript.exportFailed"];
+  "pageScript.exportPartial", "pageScript.exportEmpty", "pageScript.exportNotRecorded", "pageScript.exportFailed",
+  "pageScript.dependentSkipped", "pageScript.dependentSkippedOne"];
 for (const locale of require("../src/engine/language-registry").supported().map(item => item.locale)) {
   for (const key of keys) {
     const text = i18n.translate(key, locale);

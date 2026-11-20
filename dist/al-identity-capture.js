@@ -187,6 +187,18 @@
     return names.size === 1 ? choice[0] : null;
   }
 
+  // The first shown action of a group of actions, in the order the page declares them.
+  function firstAction(group) {
+    let list = unbox(own(group, "_children"));
+    const inner = own(list, "values_") || own(list, "items") || own(list, "_items");
+    if (inner) list = inner;
+    if (!Array.isArray(list)) return null;
+    const actions = list.filter(child => child && typeof child === "object");
+    // The first shown one; when none says it is shown (promoted references can leave it to the
+    // action they point to), the first one.
+    return actions.find(child => unbox(own(child, "_visible")) === true) || actions[0] || null;
+  }
+
   function actionIdentity(element, near) {
     const hints = reactHints(element);
     const registry = registryOf(element.ownerDocument, near);
@@ -210,6 +222,22 @@
       text(own(hints.telemetry, "Control type name")) === "GroupControl";
     const identity = { kind: "action", path: container(chain), caption: captionOf(control),
       trace: trace(chain), ...(matchedBy ? { matchedBy } : {}) };
+    // A split button (data-issplitbutton, such as Bokför in a journal) is a promoted group: its
+    // arrow opens the menu, but the button itself runs the group's first action (Post_Promoted ›
+    // Post), which Page Scripting records as that action (read in Business Central 29,
+    // 2026-11-20). The button's own part carries its caption; the arrow carries only an icon.
+    // The clicked part may sit beside the marked container rather than inside it, so the control
+    // that holds the click is searched too.
+    const split = element.closest?.('[data-issplitbutton="true"]') ||
+      element.closest?.("[data-control-id]")?.querySelector?.('[data-issplitbutton="true"]');
+    // Focus or a key on the container itself runs the button too; only the arrow opens the menu.
+    const pressedPart = split && element === split ? split : element.closest?.('button,[role="button"]');
+    const ownText = String((pressedPart === split ? split.getAttribute?.("aria-label") : "") || pressedPart?.textContent || "").replace(/[\p{Co}\p{Cf}\s]+/gu, "");
+    if (split && !reference && ownText) {
+      const first = firstAction(control);
+      const firstName = first ? text(own(own(first, "actionReference"), "targetName")) || alName(first) : "";
+      if (firstName) return { ...identity, kind: "action", action: firstName, splitButton: true };
+    }
     if (opensMenu && !reference) return { ...identity, kind: "menu", action: name };
     if (name) {
       identity.action = name;
@@ -246,8 +274,14 @@
     const label = (button?.getAttribute?.("aria-label") || button?.textContent || "").trim();
     const operation = BUTTONS.find(([, pattern]) => pattern.test(label))?.[0] || "";
     const heading = dialog.querySelector?.('[role="heading"],h1,h2')?.textContent?.trim() || "";
+    // How the page was opened decides how Page Scripting closes it with OK: the page's type
+    // (10 is StandardDialog, answered with Ok) and its mode (3 when opened as a lookup, answered
+    // with LookupOk), as read in Business Central 29 on 2026-11-20.
+    const pageType = own(form, "pageType");
+    const pageMode = unbox(own(form, "_pageMode"));
     return { kind: "dialog", page: alName(form) || null, automationId: text(own(form, "controlIdentifier")),
-      caption: captionOf(form) || heading.slice(0, 120), operation, button: label.slice(0, 60) };
+      caption: captionOf(form) || heading.slice(0, 120), operation, button: label.slice(0, 60),
+      ...(Number.isInteger(pageType) ? { pageType } : {}), ...(Number.isInteger(pageMode) ? { pageMode } : {}) };
   }
 
   function rowIndexOf(element) {
@@ -293,7 +327,7 @@
     return field ? { ...identity, kind: "control", field } : { ...identity, kind: "control" };
   }
 
-  function announce(element) {
+  function announce(element, clicked = false) {
     if (!element || element.nodeType !== 1) return;
     let identity = null;
     try { identity = identify(element); } catch { identity = null; }
@@ -302,12 +336,81 @@
       lastLines = JSON.stringify(identity.path.filter(entry => !("repeater" in entry)));
     }
     try {
-      element.dispatchEvent(new CustomEvent(EVENT, { detail: JSON.stringify({ v: VERSION, ...identity }) }));
+      const detail = JSON.stringify({ v: VERSION, ...identity });
+      // A press lands on the text or icon inside a button; the button gets the identity too, so
+      // that a focus event on the container around it (a split button focuses its container)
+      // does not take the place of what was pressed.
+      const pressed = clicked ? element.closest?.('button,[role="button"]') : null;
+      if (pressed && pressed !== element) pressed.dispatchEvent(new CustomEvent(EVENT, { detail }));
+      element.dispatchEvent(new CustomEvent(EVENT, { detail }));
     } catch {}
   }
 
+  // Visa mig (recorder/guide-overlay.js) asks for the button of an action by its AL name. The
+  // action's control is looked up in the client's registry; its button is the element named by
+  // the control's id, or a shown button or menu item with the control's caption in the language
+  // Business Central is shown in. The button found is marked with an attribute, which the guide
+  // reads; nothing else is changed.
+  const GUIDE_FIND = "bcps-guide-find";
+  const GUIDE_MARK = "data-bcps-guide";
+  // Shown, and not beneath something else, as the list's buttons beneath the card opened from it.
+  const shown = element => {
+    try {
+      const box = element.getBoundingClientRect();
+      if (!(box.width > 0 && box.height > 0 && (element.checkVisibility?.() ?? true))) return false;
+      const x = box.left + box.width / 2;
+      const y = box.top + box.height / 2;
+      if (typeof document.elementFromPoint !== "function" ||
+        !(x >= 0 && y >= 0 && x < window.innerWidth && y < window.innerHeight)) return true;
+      const hit = document.elementFromPoint(x, y);
+      return !hit || element.contains(hit) || hit.contains(element);
+    } catch { return false; }
+  };
+  const label = element => (element.getAttribute?.("aria-label") || element.textContent || "")
+    .replace(/&/gu, "").replace(/\s+/gu, " ").trim().toLocaleLowerCase();
+  const CLICKABLE = 'button,a,[role="button"],[role="menuitem"],[role="menuitemcheckbox"],[role="tab"]';
+  function guideCandidates(request) {
+    const found = [];
+    for (const registry of registriesOf(document)) {
+      const entries = registry instanceof Map ? [...registry.entries()]
+        : Object.getOwnPropertyNames(registry).map(key => [key, own(registry, key)]);
+      for (const [id, control] of entries) {
+        if (!control || typeof control !== "object") continue;
+        const name = text(own(own(control, "actionReference"), "targetName")) || alName(control);
+        const matches = (request.action && name === request.action) ||
+          (request.operation === "New" && name === "Control_New");
+        if (matches) found.push({ id: String(id), caption: captionOf(control) });
+      }
+    }
+    return found;
+  }
+  function findAction(request) {
+    for (const candidate of guideCandidates(request)) {
+      let element = null;
+      try { element = document.querySelector(`[data-control-id="${CSS.escape(candidate.id)}"]`); } catch {}
+      if (element && shown(element)) return element;
+    }
+    for (const candidate of guideCandidates(request)) {
+      const wanted = candidate.caption.toLocaleLowerCase();
+      if (!wanted) continue;
+      const element = [...document.querySelectorAll(CLICKABLE)].find(item => label(item) === wanted && shown(item));
+      if (element) return element;
+    }
+    return null;
+  }
+  try { document.addEventListener(GUIDE_FIND, event => {
+    let request = null;
+    try { request = JSON.parse(String(event.detail || "")); } catch { return; }
+    if (!request || typeof request.token !== "string") return;
+    try {
+      document.querySelectorAll(`[${GUIDE_MARK}]`).forEach(item => item.removeAttribute(GUIDE_MARK));
+      const element = request.action || request.operation ? findAction(request) : null;
+      element?.setAttribute(GUIDE_MARK, request.token.slice(0, 80));
+    } catch {}
+  }, true); } catch {}
+
   window.addEventListener("pointerdown", event => {
-    if (event.button === 0) announce(event.composedPath?.()[0] || event.target);
+    if (event.button === 0) announce(event.composedPath?.()[0] || event.target, true);
   }, true);
   window.addEventListener("focusin", event => announce(event.target), true);
   window.addEventListener("keydown", event => {

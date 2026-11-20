@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="sv"><head><meta charset="utf-8"><title>BC</title>
+<style>
+body{margin:0;font:14px "Segoe UI",sans-serif;color:#212121}
+.top{height:44px;background:#00475e;color:#fff;display:flex;align-items:center;padding:0 16px;font-weight:600}
+.page{padding:16px 22px}h2{margin:0 0 10px;font-weight:600}
+.actions{display:flex;gap:4px;border-bottom:1px solid #e1e1e1;padding-bottom:8px;margin-bottom:14px}
+.actions button{border:0;background:none;padding:6px 10px;cursor:pointer}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,320px));gap:8px 40px}
+.field{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center}
+input{border:0;border-bottom:1px solid #8a8886;padding:4px 2px;min-width:60px}
+table{border-collapse:collapse;margin-top:8px}td,th{padding:4px 8px;text-align:left}
+.tall{height:500px}
+</style></head>
+<body>
+<div class="top">Dynamics 365 Business Central <button type="button" id="searchBtn" aria-label="Sök" style="margin-left:auto">&#128269;</button></div>
+<div class="page" controlname="Purchase Order">
+  <h2>Inköpsorder · 106003</h2>
+  <div class="actions"><button aria-label="Släpp" type="button">Släpp</button><button type="button">Skriv ut…</button></div>
+  <h3>Allmänt</h3>
+  <div class="fields">
+    <div class="field"><label for="v">Leverantörsnr</label><div controlname="Buy-from Vendor No."><input id="v"></div></div>
+    <div class="field"><label for="vn">Leverantörsnamn</label><div controlname="Buy-from Vendor Name"><input id="vn"></div></div>
+    <div class="field"><label for="d">Orderdatum</label><div controlname="Order Date"><input id="d" value="2026-11-19"></div></div>
+  </div>
+  <h3>Rader</h3>
+  <div controlname="PurchLines"><table><tr><th>Nr</th><th>Antal</th></tr>
+    <tr><td controlname="No."><input aria-label="Nr"></td><td controlname="Quantity"><input aria-label="Antal"></td></tr>
+    <tr><td controlname="No."><input aria-label="Nr"></td><td controlname="Quantity"><input aria-label="Antal"></td></tr></table></div>
+  <div class="tall"></div>
+<div role="dialog" id="tellme" hidden style="position:fixed;top:60px;left:40px;right:40px;background:#fff;color:#000;border:1px solid #888;padding:12px"><input type="text" aria-label="Berätta vad du vill göra." style="width:90%"><div id="results"></div></div>
+</div>
+<script>
+// The extension's port, as chrome.tabs.connect gives it to a frame.
+window.chrome = { runtime: { onConnect: { addListener(fn) { window.__onConnect = fn; } } } };
+window.bcConnect = panelSide => {
+  const frameSide = { name: "t9-guide", listeners: [], gone: [],
+    onMessage: { addListener(fn) { frameSide.listeners.push(fn); } },
+    onDisconnect: { addListener(fn) { frameSide.gone.push(fn); } },
+    postMessage(message) { setTimeout(() => panelSide.deliver(JSON.parse(JSON.stringify(message))), 0); },
+    disconnect() {} };
+  window.__onConnect(frameSide);
+  return { deliver: message => frameSide.listeners.forEach(fn => fn(message)),
+    close: () => frameSide.gone.forEach(fn => fn()) };
+};
+</script>
+<script>document.getElementById("searchBtn").onclick=()=>{document.getElementById("tellme").hidden=false;document.querySelector("#tellme input").focus();};document.querySelector("#tellme input").addEventListener("input",e=>{document.getElementById("results").innerHTML=e.target.value?"<div role=gridcell id=r1 style=padding:4px;cursor:pointer>Inköpsorder Listor</div><div role=gridcell style=padding:4px>Inköpsreturorder Listor</div>":"";});document.addEventListener("click",e=>{if(e.target.id==="r1")document.getElementById("tellme").hidden=true;});</script>
+<script>document.getElementById("v").addEventListener("change",e=>{setTimeout(()=>{document.getElementById("vn").value=e.target.value?"3N Produkter AB":"";},300);});</script>
+<script src="/src/recorder/guide-overlay.js"></script>
+</body></html>

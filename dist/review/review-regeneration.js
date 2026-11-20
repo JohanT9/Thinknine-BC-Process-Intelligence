@@ -76,7 +76,7 @@
     if (tasks.some(task => task?.manualStepId || task?.provenance === "manual")) {
       reasons.push("manual-steps");
     }
-    if (array(review?.structureOverrides).length) reasons.push("structure-overrides");
+    if (!carriedHides(review, stepMap)) reasons.push("structure-overrides");
     if (array(review?.manualSteps).length && !reasons.includes("manual-steps")) {
       reasons.push("manual-steps");
     }
@@ -90,6 +90,24 @@
     if (["sections", "subtasks", "assignments", "overrides"].some(key =>
       array(hierarchy[key]).length > 0)) reasons.push("hierarchy");
     return reasons;
+  }
+
+  // A hidden step that the new interpretation keeps as one step stays hidden: the hide moves to
+  // that step. Any other structure change (merge, split, move, or a hidden step that the new
+  // interpretation joins or removes) cannot be moved safely, and the result is null.
+  function carriedHides(review, stepMap) {
+    const values = [];
+    for (const override of array(review?.structureOverrides)) {
+      const targets = [...new Set([...array(override?.sourceStepIds), override?.targetStepId]
+        .filter(Boolean).map(String))];
+      const mapped = targets.map(id => oneToOneTarget(stepMap, id));
+      if (override?.type !== "hide" || !targets.length || !mapped.every(Boolean)) return null;
+      const value = { ...clone(override), sourceStepIds: array(override.sourceStepIds)
+        .map(id => oneToOneTarget(stepMap, String(id))) };
+      if (override.targetStepId) value.targetStepId = oneToOneTarget(stepMap, String(override.targetStepId));
+      values.push(value);
+    }
+    return values;
   }
 
   // A generated outline nobody changed is recreated by regeneration; anything else is user work.
@@ -223,7 +241,8 @@
       mappings: stepMap.mappings,
       freshReview: Object.freeze({ ...freshReview,
         tasks: Object.freeze(reconciled.tasks),
-        stepNotes: Object.freeze(reconciled.stepNotes) })
+        stepNotes: Object.freeze(reconciled.stepNotes),
+        structureOverrides: Object.freeze(carriedHides(currentReview, stepMap) || []) })
     });
   }
 

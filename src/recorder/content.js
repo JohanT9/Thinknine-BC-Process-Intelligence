@@ -210,8 +210,11 @@
         : recentField && Date.now() - recentField.at < 3000 ? recentField.element : null;
       return field?.isConnected ? interactionForElement(field, true) : "";
     }
+    // An action in the action bar of a page shown as a dialog (a menu item, as Manuellt pris...
+    // in Tillämpat inköpspris och rabatt) is a step of its own.
     const dialog = target.closest('[role="dialog"],[aria-modal="true"]');
-    if (dialog && !target.matches(EDITABLE_SELECTOR) && categoryOf(target) === "action") {
+    const pageAction = Boolean(target.closest('[role="menuitem"],[role="menuitemcheckbox"]'));
+    if (dialog && !pageAction && !target.matches(EDITABLE_SELECTOR) && categoryOf(target) === "action") {
       return dialogInteractions.get(dialog) || "";
     }
     return "";
@@ -1477,6 +1480,10 @@
       previousValue: previousValue === undefined
         ? focusSessions.previous(element) : previousValue,
       inputSource: source,
+      // The position of the choice in a drop-down list (an option field such as Transaktionstyp):
+      // Page Scripting enters an option by its number, not by the text shown.
+      ...(element instanceof HTMLSelectElement && element.selectedIndex >= 0
+        ? { optionIndex: element.selectedIndex } : {}),
       interactionId: interactionForElement(element, true),
       ...targetDescriptor,
       uiState: { ...targetDescriptor.uiState, resultVisible: true }
@@ -1694,9 +1701,16 @@
     }
   }, true);
 
+  // A search result row shows the page's name and its kind (Artikeljournaler, Uppgifter) in
+  // elements of their own; the name alone is the page the user chose, in any language.
+  const SEARCH_RESULT_NAME = '[class*="ms-itemName--"]';
   function selectionCaption(target) {
     const selectedElement = target.getAttribute?.("role") === "row"
       ? target.querySelector?.('[role="gridcell"]') || target : target;
+    const row = selectedElement?.closest?.('[role="row"]') || selectedElement;
+    const name = row?.querySelector?.(SEARCH_RESULT_NAME);
+    const nameText = clean(name?.innerText || name?.textContent || "");
+    if (nameText) return nameText;
     return clean(selectedElement?.innerText || selectedElement?.textContent || "");
   }
 

@@ -1286,6 +1286,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
           <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" data-icon="↷" title="Gör om" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
         </div>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
+        <button id="reviewShowMe" data-review-command="guide" data-review-toolbar-item class="secondary" data-i18n="guide.action" disabled>Visa mig</button>
         <button id="reviewShareLink" data-review-command="share" data-review-toolbar-item class="secondary" aria-haspopup="dialog" data-i18n="share.action" disabled>Dela länk</button>
         <span class="review-language-switch">
           <label for="reviewLanguageSwitch" data-i18n="languageSwitch.label">Dokumentspråk</label>
@@ -1672,6 +1673,7 @@ html:has(#documentsView:not([hidden])){scroll-padding-top:calc(var(--home-appbar
 <script src="engine/tenant-license-config.js"></script>
 <script src="bug-report/outlook-draft.js"></script>
 <script src="document/onedrive-share.js"></script>
+<script src="document/guide-steps.js"></script>
 <script src="document/test-suite.js"></script>
 <script src="document/test-script.js"></script>
 <script src="document/test-history.js"></script>

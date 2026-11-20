@@ -81,6 +81,43 @@ decimals, and how stable these internal structures are across BC releases (twice
   closing that page with its ✕, a new line and Release (14 of 14 steps), and Delete line from
   a line's ⋯ menu with Yes.
 
+- Item journal (2026-11-20): compared with Business Central's own recording of the same steps.
+  An option (a `select`, such as Entry Type) is entered by its number, unquoted (`value: 2`
+  for Positiv justering); the shown text fails in replay. `content.js` keeps the choice's place
+  in the list as `optionIndex`, which equalled the number there; an older recording without it
+  leaves the choice out (`option`). A link in a line (Artikelspårning) is `invoke` on its
+  field with no `invokeType`. The lookup button of a field in a page shown as a dialog
+  (Lastbärarekod) is `invoke` on the field with `invokeType: Lookup`, then the row
+  (`set-current-row`) and `invoke` on the list's repeater with `AlwaysCommit: false`, which
+  closes the list; the field is the first entry of the click's `alControlPath`. A message
+  without a title is `type: message` with `automationId` and `text` (read from the
+  dialog-open before it); OK on an error with a title is `invokeType: Ok`. The question after
+  Post has the id `8da61efd-0002-0003-0507-0b0d1113171d` in Business Central's own file too.
+- A list shown on the way to the start page (the journal templates Item Journal asks for when
+  there are several) is shown in replay after `navigate` too, and replay waits there; the row
+  chosen in it is written right after `navigate` as `set-current-row` (when not the first row)
+  and `invoke` on its repeater with `AlwaysCommit: false`.
+- Steps that cannot be replayed are left out, not written to fail. A page or question that
+  opens (`dialog-open`) right after a click that is not in the file, such as a split button
+  the client reports as a `menu` (Bokför; Business Central records `action: Post`), was
+  opened by that click: the click is reported (`unsupported`) and every step on that page,
+  and on what it opens, is left out as `withoutCause` until the page closes. The background
+  names only the missing steps and counts the dependent ones (`dependentCount`). Clicks on the
+  way to the start page are not reported as missing.
+- OK on a page shown over another depends on how the page was opened. The capture keeps the
+  form's `pageType` and `_pageMode` (read in BC 29, 2026-11-20): a StandardDialog (`pageType` 10,
+  `mappingHint` "StandardDialog", Create License Plates FDW) is closed with `Ok`, where `LookupOk`
+  fails; a page opened as a lookup (`_pageMode` 3, ChangeApplPurchDirUnitCostFDW, a Card) with
+  `LookupOk`. A recording without them gets `LookupOk`, as before.
+- A split button (`data-issplitbutton="true"`, Bokför) is a promoted group (`Category_Category5`).
+  Its own part (the one with text) runs the group's first shown action, `Post_Promoted` ›
+  `actionReference.targetName` `Post`, which the capture records as `action: Post`, as Page
+  Scripting does; its arrow (an icon only) opens the menu and stays `menu`. Business Central
+  focuses the container (`role="menuitem"`, `aria-haspopup="true"`) when the button is pressed,
+  so focus or a key on the container also counts as the button. A press on the text or icon
+  inside a button hands its identity to the button too, so that this focus event does not
+  replace what was pressed (Art journal 4 lost Bokför that way, 2026-11-20).
+
 ## Typed values and privacy
 
 A Page Scripting test has to enter exactly what the user typed, but a process recording masks

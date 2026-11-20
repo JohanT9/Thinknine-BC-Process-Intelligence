@@ -268,3 +268,34 @@ Sedan 4.7.268 följer stegens text och Business Centrals namn dokumentspråket, 
 
 - Uppspelningen skapar riktiga poster. Ska funktionen varna och föreslå en sandbox eller testmiljö?
 - Ska dokumentet kunna ha bilder för flera språk samtidigt och välja bilder efter dokumentspråket?
+
+## Visa mig även för BC Process Studio
+
+*Sparad 2026-11-20. Idé, inte beslutad.*
+
+### Vad användaren ska kunna
+
+Utöver att guida genom en dokumenterad process i Business Central ska **Visa mig** kunna visa hur man gör olika saker i BC Process Studio, till exempel starta en inspelning, slå ihop eller dela steg, byta bild på ett steg, skapa ett Word-dokument eller dela ett dokument. Guiden visar ett steg i taget och ringar in knappen eller fältet i tilläggets eget gränssnitt.
+
+### Varför
+
+Användarguiderna på webbplatsen beskriver funktionerna, men det är lättare att lära sig där man gör det. Varje guide på webbplatsen kan få en knapp **Visa mig i appen** som startar samma flöde, och ett ? vid en funktion i tillägget kan starta guiden för just den funktionen.
+
+### Vad som finns att bygga på
+
+- Visa mig för dokument (se [SHOW_ME_GUIDE.md](SHOW_ME_GUIDE.md)): sidopanel med ett steg i taget, inringning av målet och kontroll av när steget är gjort.
+- Kom igång-sidan på webbplatsen (`kom-igang.html`), som redan beskriver det första flödet steg för steg.
+- Det gemensamma designsystemet (se [UI_DESIGN_SYSTEM.md](UI_DESIGN_SYSTEM.md)), som ger kontrollerna i dashboard, Review Studio och Knowledge Base gemensamma namn att peka på.
+
+### Möjlig utformning
+
+1. Inbyggda guider för appens funktioner, beskrivna som data (steg, mål i tilläggets gränssnitt, text och när steget räknas som gjort), på samma språk som gränssnittet.
+2. En lista med guider, till exempel under hjälp i dashboarden, och ett ? vid funktionerna som öppnar rätt guide.
+3. Samma panel och inringning som Visa mig för dokument, men med målen i tilläggets egna sidor i stället för i Business Central.
+4. Guider som börjar i tillägget och fortsätter i Business Central, till exempel en första inspelning, använder båda delarna.
+
+### Öppna frågor
+
+- Ska guiderna för appen och webbplatsens användarguider skrivas från samma källa, så att de inte glider isär?
+- Hur hålls målen stabila när gränssnittet ändras? Behövs fasta id:n på kontrollerna och ett test som larmar när en guide pekar på något som inte finns?
+- Ska en guide kunna köras på exempeldata, så att man kan öva utan att ändra något riktigt?

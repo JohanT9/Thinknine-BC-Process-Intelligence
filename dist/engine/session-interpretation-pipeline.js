@@ -257,11 +257,18 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis, captionTra
     // The AL identity of the field, action and page, so a document in another language can name
     // them as Business Central does in that language (document/bc-caption-translation.js).
     const captionKeys = captionTranslation?.keysFromEvents(sourceEvents) || {};
-    // A page found by searching names no control: it is the page that opens next.
-    if (captionTranslation && !captionKeys.page && action.stepText?.kind === "searchOpenList") {
+    // A page found by searching names no control: it is the page that opens next. A result of
+    // another kind than a list can open a dialog first (a journal's template list), so its page
+    // is the next one that has the result's own name.
+    const searchKind = action.stepText?.kind;
+    if (captionTranslation && !captionKeys.page && ["searchOpenList", "searchOpen"].includes(searchKind)) {
       const last = Math.max(0, ...sourceEvents.map(event => Number(event.eventNo) || 0));
+      const slot = action.stepText?.result;
+      const resultName = String(slot?.text ?? slot ?? "").trim().toLocaleLowerCase();
       const opened = [...eventsById.values()].find(event => Number(event.eventNo) > last &&
-        captionTranslation.keysFromIdentity(event.alIdentity || event.raw?.alIdentity).page);
+        captionTranslation.keysFromIdentity(event.alIdentity || event.raw?.alIdentity).page &&
+        (searchKind === "searchOpenList" || (resultName &&
+          String(event.pageCaption || event.raw?.pageCaption || "").trim().toLocaleLowerCase() === resultName)));
       const page = opened && captionTranslation.keysFromIdentity(opened.alIdentity || opened.raw?.alIdentity).page;
       if (page) captionKeys.page = page;
     }

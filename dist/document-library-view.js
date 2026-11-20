@@ -156,6 +156,7 @@
             ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
               localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
             ${recording || bugReport || !view.pageScriptLabel ? "" : `<button type="button" data-library-action="export-page-script">${escape(view.pageScriptLabel)}</button>`}
+            ${recording || bugReport || !view.showMeLabel ? "" : `<button type="button" data-library-action="show-me">${escape(view.showMeLabel)}</button>`}
             ${recording || bugReport || !view.shareLabel ? "" : `<button type="button" data-library-action="share-link">${escape(view.shareLabel)}</button>`}
             ${view.moveToFolderLabel ? `<button type="button" data-library-action="move-folder">${escape(view.moveToFolderLabel)}</button>` : ""}
             <button type="button" data-library-action="archive">${escape(record.archived

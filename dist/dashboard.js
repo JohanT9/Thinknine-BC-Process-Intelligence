@@ -3550,10 +3550,12 @@ function reviewReadError(response) {
     : response?.error || uiT("Granskningen kunde inte läsas.");
 }
 
-async function createTestRun(record, options = {}) {
+// The document as it reads now, with the user's edits, as Export Word makes it: for a test
+// run and for Visa mig.
+async function presentationForRecord(record, noSteps) {
   const session = documentLibrarySessions.get(record.projectId);
   if (!session || session.status === "recording" || session.recordingPurpose === "bug-report") {
-    throw new Error(uiT("test.noSteps"));
+    throw new Error(uiT(noSteps));
   }
   const model = await prepareSessionModel(session);
   const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
@@ -3566,6 +3568,23 @@ async function createTestRun(record, options = {}) {
     : globalThis.T9Review.createReview(session, model.businessTasks);
   const prepared = globalThis.T9WordExportPipeline.createPresentation({
     session: model.response.session, review, profileId: record.profile.profileId });
+  return { session, review, prepared };
+}
+
+// Visa mig: the document's steps, with the field or button of each, for the guide panel.
+async function createGuide(record) {
+  const { session, prepared } = await presentationForRecord(record, "guide.noSteps");
+  try {
+    return globalThis.T9GuideSteps.create(prepared.presentationDocument, {
+      sourceDocument: prepared.sourceSemanticDocument,
+      projectId: record.projectId, sessionId: session.id, title: record.title });
+  } catch {
+    throw new Error(uiT("guide.noSteps"));
+  }
+}
+
+async function createTestRun(record, options = {}) {
+  const { session, review, prepared } = await presentationForRecord(record, "test.noSteps");
   let run;
   try {
     run = globalThis.T9TestScript.create(prepared.presentationDocument, {
@@ -3938,6 +3957,7 @@ function renderDocumentLibrary() {
     bugStatus: libraryCardBugStatus,
     shareMarker: libraryCardShare,
     shareLabel: uiT("share.action"),
+    showMeLabel: uiT("guide.action"),
     moveToFolderLabel: documentFoldersEditable ? uiT("folder.moveTo") : "",
     pageScriptLabel: uiT("pageScript.exportAction"),
     // An empty folder says how to fill it, rather than suggesting that a filter hides it, and
@@ -8767,6 +8787,40 @@ function renderDocumentShareButton() {
       : "share.actionShared");
 }
 
+// Visa mig: the guide panel opens beside Business Central in that tab's window. The browser
+// opens a panel only straight from a click, so the Business Central tab is looked up
+// beforehand and kept current; the panel makes the guide itself (panel job show-me).
+const showMeGuide = (() => {
+  let tab = null;
+  async function refresh() {
+    try { tab = (await send({ type: "T9_FIND_TEST_TAB", sessionId: "" })).tab || null; }
+    catch { tab = null; }
+  }
+  function open(projectId) {
+    if (!chrome.sidePanel?.open) { show(uiT("guide.panelUnavailable"), true); return; }
+    if (!tab) { show(uiT("guide.noBusinessCentral"), true); void refresh(); return; }
+    const target = tab;
+    chrome.sidePanel.setOptions({ enabled: true,
+      path: `guide-panel.html?projectId=${encodeURIComponent(projectId)}` }).catch(() => {});
+    chrome.sidePanel.open({ windowId: target.windowId }).then(async () => {
+      await chrome.tabs.update(target.id, { active: true }).catch(() => {});
+      await chrome.windows.update(target.windowId, { focused: true }).catch(() => {});
+      show("");
+    }, () => {
+      show(uiT("guide.noBusinessCentral"), true);
+      void refresh();
+    });
+  }
+  // Not in a panel job's hidden frame (PANEL_JOB is defined further down).
+  if (!new URLSearchParams(globalThis.location.search).has("panelJob")) {
+    void refresh();
+    globalThis.addEventListener("focus", () => { void refresh(); });
+    chrome.tabs?.onUpdated?.addListener((id, change) => { if (change.url || change.status === "complete") void refresh(); });
+    chrome.tabs?.onRemoved?.addListener(() => { void refresh(); });
+  }
+  return { open };
+})();
+
 function renderReviewAttention(tasks) {
   renderDocumentExportCheck();
   const remaining = tasks.filter(task => !task.approved).length;
@@ -12194,6 +12248,10 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
     exportReviewFromToolbar(button);
   } else if (command === "share") {
     documentShare.openActive(button);
+  } else if (command === "guide" && activeReviewSession) {
+    // The guide reads the stored document, so the latest edits are saved first.
+    void reviewPersistence.saveExplicitly({ render: false }).catch(() => {});
+    showMeGuide.open(activeReviewSession.id);
   }
 });
 
@@ -12732,9 +12790,12 @@ async function exportPageScript(record) {
   const skipped = response.skipped || [];
   const names = skipped.slice(0, 5).map(item => item.label || "?").join("; ") +
     (skipped.length > 5 ? "; …" : "");
+  const dependent = response.dependentCount || 0;
   const outcome = skipped.length
-    ? uiTf("pageScript.exportPartial", { fileName: response.fileName, count: response.stepCount,
-      skipped: skipped.length, steps: names })
+    ? [uiTf("pageScript.exportPartial", { fileName: response.fileName, count: response.stepCount,
+      skipped: skipped.length, steps: names }),
+    dependent === 1 ? uiT("pageScript.dependentSkippedOne")
+      : dependent > 1 ? uiTf("pageScript.dependentSkipped", { count: dependent }) : ""].filter(Boolean).join(" ")
     : uiTf("pageScript.exportDone", { fileName: response.fileName, count: response.stepCount });
   // A test that starts on a card replays on whichever record is open; say so with the outcome.
   show(response.startsOnRecord
@@ -12765,6 +12826,9 @@ async function runLibraryMenuAction(action, projectId, card) {
       await exportPageScript(record);
     } else if (action === "share-link") {
       documentShare.openRecord(record, card?.querySelector(".library-card-menu summary"));
+      return;
+    } else if (action === "show-me") {
+      showMeGuide.open(projectId);
       return;
     } else if (action === "move-folder") {
       openLibraryMoveDialog([projectId], card.querySelector(".library-card-menu summary"));
@@ -13095,7 +13159,7 @@ document.addEventListener("keydown", event => {
 const PANEL_JOB = (() => {
   const params = new URLSearchParams(globalThis.location.search);
   const kind = params.get("panelJob");
-  if (!["export-word", "run-test", "share-link"].includes(kind) || globalThis.parent === globalThis) return null;
+  if (!["export-word", "run-test", "share-link", "show-me"].includes(kind) || globalThis.parent === globalThis) return null;
   return { kind, projectId: params.get("projectId") || "", jobId: params.get("jobId") || "" };
 })();
 
@@ -13121,6 +13185,8 @@ async function runPanelJob(job, sessionsLoaded) {
       reply({ ok: true, link: result.share.link, wasShared: result.wasShared,
         linkChanged: Boolean(result.share.linkChanged),
         file: `OneDrive › ${result.share.folder} › ${result.share.fileName}` });
+    } else if (job.kind === "show-me") {
+      reply({ ok: true, guide: await createGuide(record) });
     } else {
       const run = await createTestRun(record, { open: false });
       reply({ ok: true, testRunId: run.testRunId });

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="/dist/">
+  <script src="/docs/prototypes/guide-harness/stub.js"></script>
+  <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Show me</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    html{overflow-x:hidden}body{font:15px system-ui;margin:0;color:var(--c-fg-172b4d);background:var(--c-bg-ffffff);overflow-x:hidden}
+    main{box-sizing:border-box;min-height:100vh;display:flex;flex-direction:column;min-width:0}
+    .guide-head{padding:12px 14px 10px;border-bottom:1px solid var(--c-bd-ccd5df);display:grid;gap:4px;min-width:0}
+    .guide-head-row{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+    .guide-kicker{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--c-fg-005f65)}
+    .guide-end{margin:0;min-height:28px;padding:2px 8px;font-size:.8125rem}
+    h1{margin:0;font-size:1rem;line-height:1.3;overflow-wrap:anywhere}
+    .guide-progress{display:flex;align-items:center;gap:10px;font-size:.8125rem;color:var(--c-fg-526273)}
+    .guide-bar{flex:1;height:6px;border-radius:3px;background:var(--c-bg-e2e8ee);overflow:hidden}
+    .guide-bar span{display:block;height:100%;width:0;background:var(--c-bg-008c95);transition:width .3s}
+    @media (prefers-reduced-motion:reduce){.guide-bar span{transition:none}.guide-dot{animation:none!important}}
+    .guide-body{flex:1;padding:14px;display:grid;gap:12px;align-content:start;min-width:0}
+    .guide-section{margin:0;font-size:.75rem;font-weight:700;color:var(--c-fg-526273);text-transform:uppercase;letter-spacing:.04em;overflow-wrap:anywhere}
+    .guide-step{margin:0;font-size:1.1875rem;line-height:1.4;font-weight:600;overflow-wrap:anywhere}
+    .guide-step:focus{outline:none}.guide-step:focus-visible{outline:var(--focusWidth) solid var(--colorFocusIndicator);outline-offset:2px}
+    .guide-done-note{margin:0;font-size:.875rem;color:var(--c-fg-18713a);font-weight:600;min-height:1.2em}
+    .guide-hint{display:flex;gap:8px;align-items:flex-start;margin:0;padding:10px 12px;border-radius:8px;background:var(--c-bg-f5f7fa);font-size:.875rem;line-height:1.45;overflow-wrap:anywhere}
+    .guide-hint[data-kind=warn]{background:var(--c-bg-fff7ed);color:var(--c-fg-9a3412)}
+    .guide-hint[data-kind=error]{background:var(--c-bg-fff4f2);color:var(--c-fg-8a1c14)}
+    .guide-dot{flex:none;width:9px;height:9px;margin-top:6px;border-radius:50%;background:var(--c-bg-ca5010);animation:guide-pulse 1.6s infinite}
+    .guide-hint:not([data-kind=found]) .guide-dot{display:none}
+    @keyframes guide-pulse{50%{opacity:.35}}
+    .guide-more{border:1px solid var(--c-bd-ccd5df);border-radius:8px;min-width:0}
+    .guide-more summary{padding:8px 10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--c-fg-005f65)}
+    .guide-more img{display:block;width:calc(100% - 20px);margin:0 10px 10px;border:1px solid var(--c-bd-ccd5df);border-radius:4px}
+    .guide-more p{margin:0 10px 10px;font-size:.875rem;color:var(--c-fg-526273)}
+    .guide-list{margin:0 10px 10px;padding-left:1.6em;display:grid;gap:2px;font-size:.875rem}
+    .guide-list button{all:unset;cursor:pointer;display:block;min-height:0;padding:3px 4px;border:0!important;border-radius:4px!important;background:none;color:inherit;text-align:left;overflow-wrap:anywhere}
+    .guide-list button:hover{background:var(--c-bg-eef2f6)}
+    .guide-list button:focus-visible{outline:var(--focusWidth) solid var(--colorFocusIndicator)}
+    .guide-list li[data-state=done] button{color:var(--c-fg-526273)}
+    .guide-list li[data-state=now] button{font-weight:700}
+    .guide-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--c-bd-ccd5df)}
+    .guide-foot button{margin:0;min-height:36px}
+    .guide-finished{text-align:center;justify-items:center;padding-top:30px}
+    .guide-check{width:54px;height:54px;border-radius:50%;background:var(--c-bg-e9f7ed);color:var(--c-fg-18713a);display:grid;place-items:center;font-size:28px}
+    .guide-finished h2{margin:0;font-size:1.1875rem}.guide-finished h2:focus{outline:none}
+    .guide-finished p{margin:0;color:var(--c-fg-526273);font-size:.9375rem}
+    #guideMessage{margin:0;font-size:.875rem;overflow-wrap:anywhere}#guideMessage:empty{display:none}
+  </style>
+</head>
+<body>
+  <main aria-labelledby="guideTitle">
+    <header class="guide-head">
+      <div class="guide-head-row">
+        <p class="guide-kicker" data-i18n="guide.kicker">Show me</p>
+        <button id="guideEnd" type="button" class="secondary guide-end" data-i18n="guide.end">End guide</button>
+      </div>
+      <h1 id="guideTitle" data-i18n-ignore></h1>
+      <div class="guide-progress" id="guideProgress" hidden><div class="guide-bar" aria-hidden="true"><span id="guideBar"></span></div><span id="guideCount" data-i18n-ignore></span></div>
+    </header>
+    <section id="guideStepView" class="guide-body" aria-labelledby="guideStep" hidden>
+      <p id="guideDoneNote" class="guide-done-note" role="status" aria-live="polite" data-i18n-ignore></p>
+      <p id="guideSection" class="guide-section" data-i18n-ignore></p>
+      <p id="guideStep" class="guide-step" tabindex="-1" data-i18n-ignore></p>
+      <p id="guideHint" class="guide-hint" role="status" aria-live="polite"><span class="guide-dot" aria-hidden="true"></span><span id="guideHintText" data-i18n-ignore></span></p>
+      <details id="guideShot" class="guide-more">
+        <summary data-i18n="guide.screenshot">Show the screenshot from the document</summary>
+        <div id="guideShotContent" data-i18n-ignore></div>
+      </details>
+      <details class="guide-more">
+        <summary data-i18n="guide.allSteps">All steps</summary>
+        <ol id="guideList" class="guide-list" data-i18n-ignore></ol>
+      </details>
+    </section>
+    <section id="guideFinished" class="guide-body guide-finished" aria-labelledby="guideFinishedTitle" aria-live="polite" hidden>
+      <div class="guide-check" aria-hidden="true">✓</div>
+      <h2 id="guideFinishedTitle" tabindex="-1" data-i18n-ignore></h2>
+      <p data-i18n="guide.finishedText">Go through it again whenever you like, or do the same steps as a test.</p>
+    </section>
+    <section id="guideLoading" class="guide-body" aria-live="polite">
+      <p id="guideMessage" role="status" data-i18n-ignore></p>
+      <div><button id="guideRetry" type="button" data-i18n="guide.retry" hidden>Try again</button></div>
+    </section>
+    <footer id="guideStepFoot" class="guide-foot" hidden>
+      <button id="guideBack" type="button" class="secondary" data-i18n="guide.previous">Previous</button>
+      <button id="guideNext" type="button" class="primary" data-i18n="guide.manual">I've done it</button>
+    </footer>
+    <footer id="guideFinishedFoot" class="guide-foot" hidden>
+      <button id="guideAgain" type="button" class="secondary" data-i18n="guide.again">Go through it again</button>
+      <button id="guideTest" type="button" class="primary" data-i18n="guide.test">Start as a test</button>
+    </footer>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="guide-panel.js"></script>
+</body>
+</html>

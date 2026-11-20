@@ -19,7 +19,8 @@ assert.deepStrictEqual(middle, {
   "move-up": true,
   "move-down": true,
   export: true,
-  share: true
+  share: true,
+  guide: true
 });
 
 const firstPair = toolbar.derive({
